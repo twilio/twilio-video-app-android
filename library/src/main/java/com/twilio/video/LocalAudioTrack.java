@@ -153,6 +153,7 @@ public class LocalAudioTrack extends AudioTrack {
     }
 
     /** Releases native memory owned by audio track. */
+    @Override
     public synchronized void release() {
         if (!isReleased()) {
             nativeRelease(nativeLocalAudioTrackHandle);
@@ -167,7 +168,7 @@ public class LocalAudioTrack extends AudioTrack {
             @NonNull String name,
             boolean enabled,
             Context context) {
-        super(enabled, name);
+        super(nativeLocalAudioTrackHandle, enabled, name);
         this.nativeTrackHash = nativeTrackHash;
         this.nativeLocalAudioTrackHandle = nativeLocalAudioTrackHandle;
         this.mediaFactory = MediaFactory.instance(this, context);

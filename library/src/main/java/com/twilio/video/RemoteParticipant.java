@@ -166,6 +166,10 @@ public class RemoteParticipant implements Participant {
                             remoteParticipant,
                             remoteAudioTrackPublication,
                             "onAudioTrackUnsubscribed");
+
+                    // Release audio track on notifier thread
+                    remoteAudioTrack.release();
+
                     handler.post(
                             () -> {
                                 ThreadChecker.checkIsValidThread(handler);
@@ -620,6 +624,17 @@ public class RemoteParticipant implements Participant {
 
     synchronized void release() {
         if (!isReleased()) {
+            // Release all audio tracks
+            for (RemoteAudioTrackPublication remoteAudioTrackPublication :
+                    remoteAudioTrackPublications) {
+                RemoteAudioTrack remoteAudioTrack =
+                        remoteAudioTrackPublication.getRemoteAudioTrack();
+
+                if (remoteAudioTrack != null) {
+                    remoteAudioTrack.release();
+                }
+            }
+
             for (RemoteVideoTrackPublication remoteVideoTrackPublication :
                     remoteVideoTrackPublications) {
                 RemoteVideoTrack remoteVideoTrack =
@@ -629,6 +644,8 @@ public class RemoteParticipant implements Participant {
                     remoteVideoTrack.release();
                 }
             }
+
+            // Release native participant
             nativeRelease(nativeParticipantContext);
             nativeParticipantContext = 0;
         }

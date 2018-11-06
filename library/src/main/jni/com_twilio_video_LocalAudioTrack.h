@@ -19,19 +19,16 @@
 
 #include <jni.h>
 #include "twilio/media/track.h"
+#include "com_twilio_video_AudioTrack.h"
 
 namespace twilio_video_jni {
 
-class LocalAudioTrackContext {
+class LocalAudioTrackContext : public AudioTrackContext {
 public:
     LocalAudioTrackContext(std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track)
-            : local_audio_track_(local_audio_track) {
+            : AudioTrackContext(local_audio_track), local_audio_track_(local_audio_track) { }
 
-    }
-
-    virtual ~LocalAudioTrackContext() {
-        local_audio_track_.reset();
-    }
+    virtual ~LocalAudioTrackContext() = default;
 
     std::shared_ptr<twilio::media::LocalAudioTrack> getLocalAudioTrack() {
         return local_audio_track_;

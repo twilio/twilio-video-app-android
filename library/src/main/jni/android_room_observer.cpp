@@ -21,6 +21,7 @@
 #include "logging.h"
 #include "jni_utils.h"
 #include "com_twilio_video_TwilioException.h"
+#include "com_twilio_video_RemoteAudioTrack.h"
 #include "webrtc/modules/utility/include/helpers_android.h"
 
 namespace twilio_video_jni {
@@ -119,7 +120,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc::GetMethodID(env,
                                     j_remote_audio_track_class_.obj(),
                                     "<init>",
-                                    "(Lorg/webrtc/AudioTrack;Ljava/lang/String;Ljava/lang/String;Z)V")),
+                                    kRemoteAudioTrackConstructorSignature)),
         j_audio_track_publication_ctor_id_(
                 webrtc::GetMethodID(env,
                                     j_remote_audio_track_publication_class_.obj(),

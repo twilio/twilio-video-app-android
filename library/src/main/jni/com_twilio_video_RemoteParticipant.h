@@ -91,12 +91,6 @@ jobject createRemoteParticipantDataTracks(JNIEnv *env,
                                           jmethodID j_remote_data_track_ctor_id,
                                           jmethodID j_remote_data_track_publication_ctor_id);
 
-jobject createJavaRemoteAudioTrack(JNIEnv *env,
-                                   std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track,
-                                   jobject j_webrtc_audio_track,
-                                   jclass j_remote_audio_track_class,
-                                   jmethodID j_remote_audio_track_ctor_id);
-
 jobject createJavaRemoteVideoTrack(JNIEnv *env,
                                    std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track,
                                    jobject j_webrtc_video_track,

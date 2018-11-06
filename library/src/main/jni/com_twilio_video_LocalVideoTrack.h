@@ -25,13 +25,9 @@ namespace twilio_video_jni {
 class LocalVideoTrackContext {
 public:
     LocalVideoTrackContext(std::shared_ptr<twilio::media::LocalVideoTrack> local_video_track)
-            : local_video_track_(local_video_track) {
+            : local_video_track_(local_video_track) { }
 
-    }
-
-    virtual ~LocalVideoTrackContext() {
-        local_video_track_.reset();
-    }
+    virtual ~LocalVideoTrackContext() = default;
 
     std::shared_ptr<twilio::media::LocalVideoTrack> getLocalVideoTrack() {
         return local_video_track_;

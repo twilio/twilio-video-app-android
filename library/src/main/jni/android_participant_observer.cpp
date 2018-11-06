@@ -22,6 +22,7 @@
 #include "webrtc/modules/utility/include/helpers_android.h"
 #include "webrtc/sdk/android/src/jni/classreferenceholder.h"
 #include "com_twilio_video_TwilioException.h"
+#include "com_twilio_video_RemoteAudioTrack.h"
 #include "jni_utils.h"
 
 namespace twilio_video_jni {
@@ -40,23 +41,6 @@ jobject createJavaWebRtcVideoTrack(JNIEnv *env,
     CHECK_EXCEPTION(env) << "Failed to create org.webrtc.VideoTrack";
 
     return j_webrtc_video_track;
-}
-
-jobject createJavaWebRtcAudioTrack(JNIEnv *env,
-                                   std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track) {
-    webrtc::ScopedJavaLocalRef<jclass> j_webrtc_audio_track_class =
-            webrtc::GetClass(env, "org/webrtc/AudioTrack");
-    jmethodID j_webrtc_audio_track_ctor_id = webrtc::GetMethodID(env,
-                                                                 j_webrtc_audio_track_class.obj(),
-                                                                 "<init>",
-                                                                 "(J)V");
-    jobject j_webrtc_audio_track = env->NewObject(j_webrtc_audio_track_class.obj(),
-                                                  j_webrtc_audio_track_ctor_id,
-                                                  webrtc::NativeToJavaPointer(
-                                                          remote_audio_track->getWebRtcTrack()));
-    CHECK_EXCEPTION(env) << "Failed to create org.webrtc.AudioTrack";
-
-    return j_webrtc_audio_track;
 }
 
 AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
@@ -184,7 +168,7 @@ AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
                 webrtc::GetMethodID(env,
                                     j_remote_audio_track_class_.obj(),
                                     "<init>",
-                                    "(Lorg/webrtc/AudioTrack;Ljava/lang/String;Ljava/lang/String;Z)V")),
+                                    kRemoteAudioTrackConstructorSignature)),
         j_audio_track_publication_ctor_id_(
                 webrtc::GetMethodID(env,
                                     j_remote_audio_track_publication_class_.obj(),
@@ -536,10 +520,8 @@ void AndroidParticipantObserver::onAudioTrackSubscribed(twilio::video::RemotePar
         }
 
         jobject j_remote_audio_track_publication = remote_audio_track_publication_map_[remote_audio_track_publication];
-        jobject j_webrtc_audio_track = createJavaWebRtcAudioTrack(jni(), remote_audio_track);
         jobject j_remote_audio_track = createJavaRemoteAudioTrack(jni(),
                                                                   remote_audio_track,
-                                                                  j_webrtc_audio_track,
                                                                   j_remote_audio_track_class_.obj(),
                                                                   j_audio_track_ctor_id_);
         remote_audio_track_map_.insert(std::make_pair(remote_audio_track_publication->getRemoteTrack(),

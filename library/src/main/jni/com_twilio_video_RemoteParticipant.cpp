@@ -246,25 +246,6 @@ jobject createRemoteParticipantDataTracks(JNIEnv *env,
     return j_remote_data_tracks;
 }
 
-jobject createJavaRemoteAudioTrack(JNIEnv *env,
-                                   std::shared_ptr<twilio::media::RemoteAudioTrack> remote_audio_track,
-                                   jobject j_webrtc_audio_track,
-                                   jclass j_remote_audio_track_class,
-                                   jmethodID j_remote_audio_track_ctor_id) {
-    jstring j_sid = JavaUTF16StringFromStdString(env, remote_audio_track->getSid());
-    jstring j_name = JavaUTF16StringFromStdString(env, remote_audio_track->getName());
-    jboolean j_is_enabled = (jboolean) remote_audio_track->isEnabled();
-    jobject j_remote_audio_track = env->NewObject(j_remote_audio_track_class,
-                                                  j_remote_audio_track_ctor_id,
-                                                  j_webrtc_audio_track,
-                                                  j_sid,
-                                                  j_name,
-                                                  j_is_enabled);
-    CHECK_EXCEPTION(env) << "Failed to create RemoteAudioTrack";
-
-    return j_remote_audio_track;
-}
-
 jobject createJavaRemoteVideoTrack(JNIEnv *env,
                                    std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track,
                                    jobject j_webrtc_video_track,

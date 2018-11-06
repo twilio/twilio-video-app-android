@@ -115,14 +115,11 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         // Wait to allow audio to flow and stats to contain valid values
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(THREAD_SLEEP);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                        () -> {
+                            try {
+                                Thread.sleep(THREAD_SLEEP);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
                         });
 
@@ -142,14 +139,11 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         // Wait to allow audio to flow and stats to contain valid values
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(THREAD_SLEEP);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                        () -> {
+                            try {
+                                Thread.sleep(THREAD_SLEEP);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
                         });
 
@@ -162,6 +156,84 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         remoteAudioTrackStats =
                 statsListener.getStatsReports().get(0).getRemoteAudioTrackStats().get(0);
         assertTrue(remoteAudioTrackStats.audioLevel > 0);
+    }
+
+    @Test
+    public void shouldAllowEnablePlaybackAfterRelease() throws InterruptedException {
+        final CallbackHelper.FakeStatsListener statsListener =
+                new CallbackHelper.FakeStatsListener();
+        publishAudioTrack();
+
+        // Get bobs remote audio track
+        RemoteAudioTrackPublication bobRemoteAudioTrackPublication =
+                bobRemoteParticipant.getRemoteAudioTracks().get(0);
+
+        // Validate that playback is enabled by default
+        assertTrue(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
+
+        // Validate that we can disable playback
+        bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(false);
+        assertFalse(bobRemoteAudioTrackPublication.getRemoteAudioTrack().isPlaybackEnabled());
+
+        // Wait to allow audio to flow and stats to contain valid values
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        () -> {
+                            try {
+                                Thread.sleep(THREAD_SLEEP);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+        // Request stats report
+        statsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(statsListener);
+        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+
+        // Validate that bobs audio level is zero after playback is disabled
+        RemoteAudioTrackStats remoteAudioTrackStats =
+                statsListener.getStatsReports().get(0).getRemoteAudioTrackStats().get(0);
+        assertEquals(0, remoteAudioTrackStats.audioLevel);
+
+        // Now we enable playback
+        bobRemoteAudioTrackPublication.getRemoteAudioTrack().enablePlayback(true);
+
+        // Wait to allow audio to flow and stats to contain valid values
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        () -> {
+                            try {
+                                Thread.sleep(THREAD_SLEEP);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+        // Request stats report
+        statsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(statsListener);
+        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+
+        // Validate that bobs audio level is greater than 0 after playback enabled
+        remoteAudioTrackStats =
+                statsListener.getStatsReports().get(0).getRemoteAudioTrackStats().get(0);
+        assertTrue(remoteAudioTrackStats.audioLevel > 0);
+
+        RemoteAudioTrack remoteTrack = bobRemoteAudioTrackPublication.getRemoteAudioTrack();
+        remoteTrack.release();
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        () -> {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+        remoteTrack.enablePlayback(false);
+        assertFalse(remoteTrack.isPlaybackEnabled());
     }
 
     private void publishAudioTrack() throws InterruptedException {

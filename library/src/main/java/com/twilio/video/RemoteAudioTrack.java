@@ -18,16 +18,19 @@ package com.twilio.video;
 
 /** A remote audio track represents a remote audio source. */
 public class RemoteAudioTrack extends AudioTrack {
-    final org.webrtc.AudioTrack webRtcAudioTrack;
+    private static final Logger logger = Logger.getLogger(RemoteAudioTrack.class);
+
+    private long nativeRemoteAudioTrackHandle;
     private final String sid;
     private boolean playbackEnabled;
+    private boolean isReleased = false;
 
     RemoteAudioTrack(
-            org.webrtc.AudioTrack webRtcAudioTrack, String sid, String name, boolean isEnabled) {
-        super(isEnabled, name);
+            long nativeRemoteAudioTrackHandle, String sid, String name, boolean isEnabled) {
+        super(nativeRemoteAudioTrackHandle, isEnabled, name);
+        this.nativeRemoteAudioTrackHandle = nativeRemoteAudioTrackHandle;
         this.sid = sid;
         this.playbackEnabled = true;
-        this.webRtcAudioTrack = webRtcAudioTrack;
     }
 
     /**
@@ -45,9 +48,12 @@ public class RemoteAudioTrack extends AudioTrack {
      */
     public synchronized void enablePlayback(boolean enable) {
         this.playbackEnabled = enable;
-
-        if (webRtcAudioTrack != null) {
-            webRtcAudioTrack.setEnabled(playbackEnabled);
+        if (!isReleased) {
+            nativeEnablePlayback(nativeRemoteAudioTrackHandle, enable);
+        } else {
+            logger.w(
+                    "Cannot enable playback of remote audio track that is no longer "
+                            + "subscribed to");
         }
     }
 
@@ -62,4 +68,16 @@ public class RemoteAudioTrack extends AudioTrack {
     public synchronized boolean isPlaybackEnabled() {
         return playbackEnabled;
     }
+
+    @Override
+    synchronized void release() {
+        if (!isReleased) {
+            nativeRelease(nativeRemoteAudioTrackHandle);
+            isReleased = true;
+        }
+    }
+
+    private native void nativeEnablePlayback(long nativeAudioTrackHandle, boolean enable);
+
+    private native void nativeRelease(long nativeAudioTrackHandle);
 }

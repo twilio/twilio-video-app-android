@@ -19,10 +19,12 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 public abstract class AudioTrack implements Track {
+    private long nativeAudioTrackHandle;
     private final String name;
     private boolean isEnabled;
 
-    AudioTrack(boolean isEnabled, @NonNull String name) {
+    AudioTrack(long nativeAudioTrackHandle, boolean isEnabled, @NonNull String name) {
+        this.nativeAudioTrackHandle = nativeAudioTrackHandle;
         this.isEnabled = isEnabled;
         this.name = name;
     }
@@ -49,4 +51,7 @@ public abstract class AudioTrack implements Track {
     void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
     }
+
+    // Require subclasses implement release logic
+    abstract void release();
 }
