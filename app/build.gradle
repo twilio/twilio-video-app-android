@@ -84,21 +84,21 @@ android {
         internal {
             dimension "environment"
             applicationId "com.twilio.video.app.internal"
-            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"P2P"'
-            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"group"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
         }
 
         twilio {
             dimension "environment"
-            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"SFU"'
-            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"group"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
         }
 
         community {
             dimension "environment"
             applicationId "com.twilio.video.app.community"
-            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"P2P"'
-            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"prod"'
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"peer-to-peer"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
             buildConfigField("java.util.Map<String, String>",
                     "twilioCredentials",
                     "${getTwilioVideoAppConfig()}")

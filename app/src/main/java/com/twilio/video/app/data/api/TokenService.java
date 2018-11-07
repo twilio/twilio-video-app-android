@@ -16,9 +16,9 @@
 
 package com.twilio.video.app.data.api;
 
-import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.data.api.model.RoomProperties;
 import io.reactivex.Single;
 
 public interface TokenService {
-    Single<String> getToken(String identity, Topology topology);
+    Single<String> getToken(String identity, RoomProperties roomProperties);
 }

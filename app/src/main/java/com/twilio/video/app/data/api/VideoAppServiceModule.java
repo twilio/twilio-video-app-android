@@ -16,6 +16,7 @@
 
 package com.twilio.video.app.data.api;
 
+import android.content.SharedPreferences;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.twilio.video.app.ApplicationScope;
 import dagger.Module;
@@ -29,6 +30,11 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Module
 public class VideoAppServiceModule {
+    private static final String VIDEO_APP_SERVICE_DEV_URL = "https://app.dev.video.bytwilio.com";
+    private static final String VIDEO_APP_SERVICE_STAGE_URL =
+            "https://app.stage.video.bytwilio.com";
+    private static final String VIDEO_APP_SERVICE_PROD_URL = "https://app.video.bytwilio.com";
+
     @Provides
     @ApplicationScope
     @Named("VideoAppService")
@@ -38,13 +44,67 @@ public class VideoAppServiceModule {
 
     @Provides
     @ApplicationScope
-    @Named("VideoAppService")
-    Retrofit.Builder providesRetrofitBuilder(@Named("VideoAppService") OkHttpClient okHttpClient) {
+    @Named("VideoAppServiceDev")
+    VideoAppService providesVideoAppServiceDev(
+            @Named("VideoAppService") OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
+                .baseUrl(VIDEO_APP_SERVICE_DEV_URL)
                 .addCallAdapterFactory(
                         RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create());
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(VideoAppService.class);
+    }
+
+    @Provides
+    @ApplicationScope
+    @Named("VideoAppServiceStage")
+    VideoAppService providesVideoAppServiceStage(
+            @Named("VideoAppService") OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(VIDEO_APP_SERVICE_STAGE_URL)
+                .addCallAdapterFactory(
+                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(VideoAppService.class);
+    }
+
+    @Provides
+    @ApplicationScope
+    @Named("VideoAppServiceProd")
+    VideoAppService providesVideoAppServiceProd(
+            @Named("VideoAppService") OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(VIDEO_APP_SERVICE_PROD_URL)
+                .addCallAdapterFactory(
+                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(VideoAppService.class);
+    }
+
+    @Provides
+    @ApplicationScope
+    VideoAppServiceDelegate providesVideoAppServiceDelegate(
+            SharedPreferences sharedPreferences,
+            @Named("VideoAppServiceDev") VideoAppService videoAppServiceDev,
+            @Named("VideoAppServiceStage") VideoAppService videoAppServiceStage,
+            @Named("VideoAppServiceProd") VideoAppService videoAppServiceProd) {
+
+        return new VideoAppServiceDelegate(
+                sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd);
+    }
+
+    @Provides
+    @ApplicationScope
+    TokenService providesTokenService(final VideoAppServiceDelegate videoAppServiceDelegate) {
+        return videoAppServiceDelegate;
     }
 }

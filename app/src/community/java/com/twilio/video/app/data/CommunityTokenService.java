@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.data.api.TokenService;
-import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.token.VideoAccessToken;
 import io.reactivex.Single;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class CommunityTokenService implements TokenService {
      * REST API to create a Room with topology and create token with Room SID.
      */
     @Override
-    public Single<String> getToken(final String identity, Topology topology) {
+    public Single<String> getToken(final String identity, final RoomProperties roomProperties) {
         Preconditions.checkNotNull(
                 BuildConfig.twilioCredentials, TWILIO_VIDEO_APP_JSON_NOT_PROVIDED);
         final Map<String, String> credentials = resolveCredentials();

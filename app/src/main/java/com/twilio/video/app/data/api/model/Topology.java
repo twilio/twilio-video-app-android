@@ -17,9 +17,9 @@
 package com.twilio.video.app.data.api.model;
 
 public enum Topology {
-    P2P("P2P"),
-    SFU("SFU"),
-    SFU_RECORDING("SFU Recording");
+    GROUP("group"),
+    GROUP_SMALL("group-small"),
+    P2P("peer-to-peer");
 
     private final String topology;
 
@@ -34,10 +34,10 @@ public enum Topology {
     public static Topology fromString(String topology) {
         if (topology.equals(P2P.topology)) {
             return P2P;
-        } else if (topology.equals(SFU.topology)) {
-            return SFU;
-        } else if (topology.equals(SFU_RECORDING.topology)) {
-            return SFU_RECORDING;
+        } else if (topology.equals(GROUP.topology)) {
+            return GROUP;
+        } else if (topology.equals(GROUP_SMALL.topology)) {
+            return GROUP_SMALL;
         } else {
             throw new RuntimeException("Unsupported topology string -> " + topology);
         }

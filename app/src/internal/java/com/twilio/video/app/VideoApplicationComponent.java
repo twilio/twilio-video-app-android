@@ -17,8 +17,8 @@
 package com.twilio.video.app;
 
 import com.twilio.video.app.auth.AuthModule;
-import com.twilio.video.app.data.InternalDataModule;
-import com.twilio.video.app.data.api.InternalVideoAppServiceModule;
+import com.twilio.video.app.data.DataModule;
+import com.twilio.video.app.data.api.VideoAppServiceModule;
 import com.twilio.video.app.ui.login.LoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
@@ -30,8 +30,8 @@ import dagger.Component;
     modules = {
         ApplicationModule.class,
         TreeModule.class,
-        InternalDataModule.class,
-        InternalVideoAppServiceModule.class,
+        DataModule.class,
+        VideoAppServiceModule.class,
         AuthModule.class,
         SplashActivityModule.class,
         LoginActivityModule.class,

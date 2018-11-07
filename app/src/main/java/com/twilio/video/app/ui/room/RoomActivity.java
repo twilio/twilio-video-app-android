@@ -93,6 +93,7 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
+import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.BuildConfigUtils;
@@ -241,6 +242,7 @@ public class RoomActivity extends BaseActivity {
     private Map<String, String> localVideoTrackNames = new HashMap<>();
 
     @Inject TokenService tokenService;
+
     @Inject SharedPreferences sharedPreferences;
 
     /** Coordinates participant thumbs and primary participant rendering. */
@@ -446,16 +448,19 @@ public class RoomActivity extends BaseActivity {
         connect.setEnabled(false);
         // obtain room name
         final String roomName = roomEditText.getText().toString();
-
         // obtain latest environment preferences
-        Topology topology =
-                Topology.fromString(
-                        sharedPreferences.getString(
-                                Preferences.TOPOLOGY, Preferences.TOPOLOGY_DEFAULT));
-
+        RoomProperties roomProperties =
+                new RoomProperties.Builder()
+                        .setName(roomName)
+                        .setTopology(
+                                Topology.fromString(
+                                        sharedPreferences.getString(
+                                                Preferences.TOPOLOGY,
+                                                Preferences.TOPOLOGY_DEFAULT)))
+                        .createRoomProperties();
         Single<Room> connection =
                 updateEnv()
-                        .andThen(tokenService.getToken(displayName, topology))
+                        .andThen(tokenService.getToken(displayName, roomProperties))
                         .flatMap(token -> connect(token, roomName));
 
         connection
