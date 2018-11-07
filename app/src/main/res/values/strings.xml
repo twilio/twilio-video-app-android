@@ -106,15 +106,15 @@
     </string-array>
 
     <string-array name="environment_array_values">
-        <item>prod</item>
+        <item>production</item>
         <item>stage</item>
         <item>dev</item>
     </string-array>
 
     <string-array name="topology_array">
-        <item>P2P</item>
-        <item>SFU</item>
-        <item>SFU Recording</item>
+        <item>peer-to-peer</item>
+        <item>group</item>
+        <item>group-small</item>
     </string-array>
 
     <string-array name="ice_trans_policy_array">
