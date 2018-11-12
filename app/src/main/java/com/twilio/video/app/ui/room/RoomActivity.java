@@ -449,6 +449,7 @@ public class RoomActivity extends BaseActivity {
         // obtain room name
         final String roomName = roomEditText.getText().toString();
         // obtain latest environment preferences
+
         RoomProperties roomProperties =
                 new RoomProperties.Builder()
                         .setName(roomName)
@@ -457,6 +458,10 @@ public class RoomActivity extends BaseActivity {
                                         sharedPreferences.getString(
                                                 Preferences.TOPOLOGY,
                                                 Preferences.TOPOLOGY_DEFAULT)))
+                        .setRecordOnParticipantsConnect(
+                                sharedPreferences.getBoolean(
+                                        Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
+                                        Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
                         .createRoomProperties();
         Single<Room> connection =
                 updateEnv()

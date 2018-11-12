@@ -10,6 +10,11 @@
             android:key="pref_enable_insights"
             android:title="@string/enable_insights"
             android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="pref_record_participants_on_connect"
+            android:title="Record Participants on Connect"
+            android:defaultValue="false"
+            />
         <ListPreference
             android:defaultValue="prod"
             android:entries="@array/environment_array"

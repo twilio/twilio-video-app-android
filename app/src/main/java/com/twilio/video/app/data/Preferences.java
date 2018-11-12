@@ -49,4 +49,7 @@ public class Preferences {
     public static final int MAX_AUDIO_BITRATE_DEFAULT = 0;
     public static final String MAX_VIDEO_BITRATE = "pref_max_video_bitrate";
     public static final int MAX_VIDEO_BITRATE_DEFAULT = 0;
+    public static final String RECORD_PARTICIPANTS_ON_CONNECT =
+            "pref_record_participants_on_connect";
+    public static final boolean RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT = false;
 }

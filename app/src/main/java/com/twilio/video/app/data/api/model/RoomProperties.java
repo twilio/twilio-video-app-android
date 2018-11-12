@@ -25,7 +25,7 @@ public class RoomProperties {
     RoomProperties(
             @NonNull final String name,
             @NonNull final Topology topology,
-            final boolean recordParticipantsOnConnect) {
+            boolean recordParticipantsOnConnect) {
         this.name = name;
         this.topology = topology;
         this.recordParticipantsOnConnect = recordParticipantsOnConnect;
@@ -35,12 +35,12 @@ public class RoomProperties {
         return topology;
     }
 
-    public boolean isRecordParticipantsOnConnect() {
-        return recordParticipantsOnConnect;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public boolean isRecordParticipantsOnConnect() {
+        return recordParticipantsOnConnect;
     }
 
     public static class Builder {
@@ -58,8 +58,8 @@ public class RoomProperties {
             return this;
         }
 
-        public Builder setRecordParticipantsOnConnect(boolean recordParticipantsOnConnect) {
-            this.recordParticipantsOnConnect = recordParticipantsOnConnect;
+        public Builder setRecordOnParticipantsConnect(boolean recordOnParticipantsConnect) {
+            this.recordParticipantsOnConnect = recordOnParticipantsConnect;
             return this;
         }
 
