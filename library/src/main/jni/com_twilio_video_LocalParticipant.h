@@ -73,35 +73,35 @@ jobject createJavaLocalDataTrackPublication(JNIEnv *env,
                                             jclass j_published_data_track_class,
                                             jmethodID j_published_data_track_ctor_id);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *,
                                                                                       jobject,
                                                                                       jlong,
                                                                                       jobject,
                                                                                       jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideoTrack(JNIEnv *,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideoTrack(JNIEnv *,
                                                                                       jobject,
                                                                                       jlong,
                                                                                       jobject,
                                                                                       jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataTrack(JNIEnv *,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataTrack(JNIEnv *,
                                                                                      jobject,
                                                                                      jlong,
                                                                                      jobject,
                                                                                      jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAudioTrack(JNIEnv *,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAudioTrack(JNIEnv *,
                                                                                         jobject,
                                                                                         jlong,
                                                                                         jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVideoTrack(JNIEnv *,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVideoTrack(JNIEnv *,
                                                                                         jobject,
                                                                                         jlong,
                                                                                         jlong);
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishDataTrack(JNIEnv *,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishDataTrack(JNIEnv *,
                                                                                        jobject,
                                                                                        jlong,
                                                                                        jlong);

@@ -406,7 +406,7 @@ jobject createJavaLocalParticipant(JNIEnv *env,
     return j_local_participant;
 }
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *jni,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudioTrack(JNIEnv *jni,
                                                                                       jobject j_local_participant,
                                                                                       jlong j_local_participant_handle,
                                                                                       jobject j_local_audio_track,
@@ -421,7 +421,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishAudio
     return local_participant_context->local_participant->publishTrack(audio_track);
 }
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideoTrack(JNIEnv *jni,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideoTrack(JNIEnv *jni,
                                                                                       jobject j_local_participant,
                                                                                       jlong j_local_participant_handle,
                                                                                       jobject j_local_video_track,
@@ -436,7 +436,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishVideo
     return local_participant_context->local_participant->publishTrack(video_track);
 }
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataTrack(JNIEnv *jni,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataTrack(JNIEnv *jni,
                                                                                      jobject j_local_participant,
                                                                                      jlong j_local_participant_handle,
                                                                                      jobject j_local_data_track,
@@ -451,7 +451,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativePublishDataT
     return local_participant_context->local_participant->publishTrack(data_track);
 }
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAudioTrack(JNIEnv *jni,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAudioTrack(JNIEnv *jni,
                                                                                         jobject j_local_participant,
                                                                                         jlong j_local_participant_handle,
                                                                                         jlong j_audio_track_handle) {
@@ -473,7 +473,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishAud
     return result;
 }
 
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVideoTrack(JNIEnv *jni,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVideoTrack(JNIEnv *jni,
                                                                                         jobject j_local_participant,
                                                                                         jlong j_local_participant_handle,
                                                                                         jlong j_video_track_handle) {
@@ -493,8 +493,7 @@ JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishVid
 
     return result;
 }
-
-JNIEXPORT bool JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishDataTrack(JNIEnv *jni,
+JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublishDataTrack(JNIEnv *jni,
                                                                                        jobject j_local_participant,
                                                                                        jlong j_local_participant_handle,
                                                                                        jlong j_data_track_handle) {
