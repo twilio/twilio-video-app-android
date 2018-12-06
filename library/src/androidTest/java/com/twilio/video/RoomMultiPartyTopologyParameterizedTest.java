@@ -28,6 +28,7 @@ import android.support.test.filters.LargeTest;
 import android.util.Pair;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
@@ -62,6 +63,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
     private List<Pair<Room, CallbackHelper.FakeRoomListener>> rooms;
     private String roomName;
     private final Topology topology;
+    private VideoRoom videoRoom;
 
     public RoomMultiPartyTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -72,7 +74,8 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
         super.setup();
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        videoRoom = RoomUtils.createRoom(roomName, topology);
+        assertNotNull(videoRoom);
         rooms = new ArrayList<>();
         tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
@@ -92,6 +95,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
          * resources.
          */
         RoomUtils.completeRoom(rooms.get(0).first);
+        RoomUtils.completeRoom(videoRoom);
         rooms.clear();
         assertTrue(MediaFactory.isReleased());
     }

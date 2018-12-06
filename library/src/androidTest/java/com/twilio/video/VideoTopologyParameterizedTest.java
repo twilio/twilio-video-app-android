@@ -28,6 +28,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -74,6 +75,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
     private LocalVideoTrack localVideoTrack;
     private LocalDataTrack localDataTrack;
     private final Topology topology;
+    private VideoRoom videoRoom;
 
     public VideoTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -85,7 +87,8 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        videoRoom = RoomUtils.createRoom(roomName, topology);
+        assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
     }
 
@@ -103,6 +106,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         if (room != null && !StringUtils.isNullOrEmpty(room.getSid())) {
             RoomUtils.completeRoom(room);
         }
+        RoomUtils.completeRoom(videoRoom);
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }

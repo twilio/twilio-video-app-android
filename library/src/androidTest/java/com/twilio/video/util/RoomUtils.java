@@ -86,6 +86,14 @@ public class RoomUtils {
     }
 
     public static @Nullable VideoRoom completeRoom(Room room) {
+        return completeRoom(room.getSid());
+    }
+
+    public static @Nullable VideoRoom completeRoom(VideoRoom videoRoom) {
+        return completeRoom(videoRoom.getSid());
+    }
+
+    public static @Nullable VideoRoom completeRoom(String roomSid) {
         Preconditions.checkNotNull(
                 BuildConfig.twilioCredentials, CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
         Map<String, String> credentials =
@@ -98,7 +106,7 @@ public class RoomUtils {
                     VideoApiUtils.completeRoom(
                             credentials.get(CredentialsUtils.API_KEY),
                             credentials.get(CredentialsUtils.API_KEY_SECRET),
-                            room.getSid(),
+                            roomSid,
                             BuildConfig.ENVIRONMENT);
         } catch (RetrofitError e) {
             Response errorResponse = e.getResponse();

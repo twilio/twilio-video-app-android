@@ -30,6 +30,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -57,6 +58,7 @@ public class RemoteParticipantTest extends BaseVideoTest {
             new ActivityTestRule<>(MediaTestActivity.class);
 
     private MediaTestActivity mediaTestActivity;
+    private VideoRoom videoRoom;
 
     @Before
     public void setup() throws InterruptedException {
@@ -77,7 +79,8 @@ public class RemoteParticipantTest extends BaseVideoTest {
             throws InterruptedException {
         final String roomName = random(Constants.ROOM_NAME_LENGTH);
         Topology topology = Topology.P2P;
-        Assert.assertNotNull(RoomUtils.createRoom(roomName, topology));
+        videoRoom = RoomUtils.createRoom(roomName, topology);
+        Assert.assertNotNull(videoRoom);
         String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         final CountDownLatch aliceConnected = new CountDownLatch(1);
         final CountDownLatch aliceSeesBobConnected = new CountDownLatch(1);
@@ -330,6 +333,7 @@ public class RemoteParticipantTest extends BaseVideoTest {
          * resources.
          */
         RoomUtils.completeRoom(aliceRoom.get());
+        RoomUtils.completeRoom(videoRoom);
         bobAudioTrack.release();
         aliceThread.quit();
         bobThread.quit();

@@ -27,6 +27,7 @@ import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -59,6 +60,7 @@ public class VideoTest extends BaseVideoTest {
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack localVideoTrack;
     private CallbackHelper.FakeRoomListener roomListener;
+    private VideoRoom videoRoom;
 
     @Before
     public void setup() throws InterruptedException {
@@ -66,12 +68,14 @@ public class VideoTest extends BaseVideoTest {
         mediaTestActivity = activityRule.getActivity();
         roomListener = new CallbackHelper.FakeRoomListener();
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, Topology.P2P));
+        videoRoom = RoomUtils.createRoom(roomName, Topology.P2P);
+        assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, Topology.P2P);
     }
 
     @After
     public void teardown() {
+        RoomUtils.completeRoom(videoRoom);
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }

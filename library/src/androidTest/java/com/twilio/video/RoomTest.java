@@ -26,6 +26,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
@@ -46,6 +47,7 @@ public class RoomTest extends BaseVideoTest {
     private final CallbackHelper.FakeRoomListener roomListener =
             new CallbackHelper.FakeRoomListener();
     private Room room;
+    private VideoRoom videoRoom;
 
     @Before
     public void setup() throws InterruptedException {
@@ -54,7 +56,8 @@ public class RoomTest extends BaseVideoTest {
         identity = Constants.PARTICIPANT_ALICE;
         roomName = random(Constants.ROOM_NAME_LENGTH);
         Topology topology = Topology.GROUP;
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        videoRoom = RoomUtils.createRoom(roomName, topology);
+        assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(identity, topology);
     }
 
@@ -74,6 +77,7 @@ public class RoomTest extends BaseVideoTest {
         if (room != null) {
             RoomUtils.completeRoom(room);
         }
+        RoomUtils.completeRoom(videoRoom);
         assertTrue(MediaFactory.isReleased());
     }
 

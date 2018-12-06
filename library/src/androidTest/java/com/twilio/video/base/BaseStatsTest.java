@@ -34,10 +34,12 @@ import com.twilio.video.TestUtils;
 import com.twilio.video.Video;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
+import com.twilio.video.util.StringUtils;
 import com.twilio.video.util.Topology;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +71,7 @@ public abstract class BaseStatsTest extends BaseVideoTest {
     protected CallbackHelper.FakeParticipantListener aliceMediaListener;
     protected CallbackHelper.FakeParticipantListener bobMediaListener;
     protected Topology topology;
+    private VideoRoom videoRoom;
 
     protected void baseSetup(Topology topology) throws InterruptedException {
         baseSetup(topology, null);
@@ -79,7 +82,8 @@ public abstract class BaseStatsTest extends BaseVideoTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology, false, videoCodecs));
+        videoRoom = RoomUtils.createRoom(roomName, topology, false, videoCodecs);
+        assertNotNull(videoRoom);
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
         aliceListener = new CallbackHelper.FakeRoomListener();
@@ -97,9 +101,14 @@ public abstract class BaseStatsTest extends BaseVideoTest {
          * After all participants have disconnected complete the room to clean up backend
          * resources.
          */
-        Room room = aliceRoom != null ? aliceRoom : bobRoom;
-        if (room != null) {
-            RoomUtils.completeRoom(room);
+        if (aliceRoom != null && !StringUtils.isNullOrEmpty(aliceRoom.getSid())) {
+            RoomUtils.completeRoom(aliceRoom);
+        }
+        if (bobRoom != null && !StringUtils.isNullOrEmpty(bobRoom.getSid())) {
+            RoomUtils.completeRoom(bobRoom);
+        }
+        if (videoRoom != null) {
+            RoomUtils.completeRoom(videoRoom);
         }
 
         if (aliceLocalAudioTrack != null) {

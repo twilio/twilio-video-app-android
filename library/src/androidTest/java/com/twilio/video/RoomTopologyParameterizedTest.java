@@ -83,6 +83,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     private LocalVideoTrack localVideoTrack;
     private final Topology topology;
     private final boolean enableRecording;
+    private VideoRoom videoRoom;
 
     public RoomTopologyParameterizedTest(Topology topology, boolean enableRecording) {
         this.topology = topology;
@@ -95,7 +96,8 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         mediaTestActivity = activityRule.getActivity();
         identity = Constants.PARTICIPANT_ALICE;
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology, enableRecording));
+        videoRoom = RoomUtils.createRoom(roomName, topology, enableRecording);
+        assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(identity, topology);
     }
 
@@ -113,6 +115,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         if (room != null) {
             RoomUtils.completeRoom(room);
         }
+        RoomUtils.completeRoom(videoRoom);
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }

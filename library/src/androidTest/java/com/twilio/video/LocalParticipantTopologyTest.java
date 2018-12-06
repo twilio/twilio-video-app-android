@@ -28,6 +28,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -79,6 +80,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
     private LocalDataTrack localDataTrack;
     private LocalDataTrack localDataTrackTwo;
     private Topology topology;
+    private VideoRoom videoRoom;
 
     public LocalParticipantTopologyTest(Topology topology) {
         this.topology = topology;
@@ -90,7 +92,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         mediaTestActivity = activityRule.getActivity();
         identity = Constants.PARTICIPANT_ALICE;
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        videoRoom = RoomUtils.createRoom(roomName, topology);
+        assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(identity, topology);
     }
 
@@ -108,6 +111,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         if (room != null) {
             RoomUtils.completeRoom(room);
         }
+        RoomUtils.completeRoom(videoRoom);
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }

@@ -29,6 +29,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -65,6 +66,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     private final CallbackHelper.FakeRoomListener otherRoomListener =
             new CallbackHelper.FakeRoomListener();
     private final Topology topology;
+    private VideoRoom videoRoom;
 
     public RemoteParticipantTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -74,7 +76,8 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     public void setup() throws InterruptedException {
         super.baseSetup(topology);
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(roomName, topology));
+        videoRoom = RoomUtils.createRoom(roomName, topology);
+        assertNotNull(videoRoom);
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
@@ -89,10 +92,13 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
          * After all participants have disconnected complete the room to clean up backend
          * resources.
          */
-        Room roomToComplete = room != null ? room : otherRoom;
-        if (roomToComplete != null) {
-            RoomUtils.completeRoom(roomToComplete);
+        if (room != null) {
+            RoomUtils.completeRoom(room);
         }
+        if (otherRoom != null) {
+            RoomUtils.completeRoom(otherRoom);
+        }
+        RoomUtils.completeRoom(videoRoom);
         assertTrue(MediaFactory.isReleased());
     }
 

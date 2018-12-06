@@ -36,10 +36,12 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.Room;
 import com.twilio.video.Video;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
+import com.twilio.video.util.StringUtils;
 import com.twilio.video.util.Topology;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +87,7 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     protected CallbackHelper.FakeParticipantListener bobParticipantListener;
     protected CallbackHelper.FakeRoomListener charlieRoomListener =
             new CallbackHelper.FakeRoomListener();
+    private VideoRoom videoRoom;
 
     protected Room connect(
             ConnectOptions connectOptions, CallbackHelper.FakeRoomListener roomListener)
@@ -121,7 +124,8 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         mediaTestActivity = activityRule.getActivity();
         // Setup room
         testRoomName = random(Constants.ROOM_NAME_LENGTH);
-        assertNotNull(RoomUtils.createRoom(testRoomName, topology));
+        videoRoom = RoomUtils.createRoom(testRoomName, topology);
+        assertNotNull(videoRoom);
         // Setup IceOptions
         IceOptions iceOptions =
                 new IceOptions.Builder()
@@ -175,19 +179,24 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     @After
     public void teardown() throws InterruptedException {
         disconnect(bobRoom, bobRoomListener);
-        bobRoom = null;
         disconnect(aliceRoom, aliceRoomListener);
-        aliceRoom = null;
-        aliceRoomListener = null;
         disconnect(charlieRoom, charlieRoomListener);
 
         /*
          * After all participants have disconnected complete the room to clean up backend
          * resources.
          */
-        Room room = aliceRoom != null ? aliceRoom : bobRoom;
-        if (room != null) {
-            RoomUtils.completeRoom(room);
+        if (aliceRoom != null && !StringUtils.isNullOrEmpty(aliceRoom.getSid())) {
+            RoomUtils.completeRoom(aliceRoom);
+        }
+        if (bobRoom != null && !StringUtils.isNullOrEmpty(bobRoom.getSid())) {
+            RoomUtils.completeRoom(bobRoom);
+        }
+        if (charlieRoom != null && !StringUtils.isNullOrEmpty(charlieRoom.getSid())) {
+            RoomUtils.completeRoom(charlieRoom);
+        }
+        if (videoRoom != null) {
+            RoomUtils.completeRoom(videoRoom);
         }
 
         bobRemoteParticipant = null;
