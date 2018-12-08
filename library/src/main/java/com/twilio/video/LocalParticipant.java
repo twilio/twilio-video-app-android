@@ -480,7 +480,9 @@ public class LocalParticipant implements Participant {
     public interface Listener {
         /**
          * This method notifies the listener that a {@link LocalAudioTrack} has been shared to a
-         * {@link Room}.
+         * {@link Room}. Note: If a {@link LocalAudioTrack} was provided in {@link ConnectOptions}
+         * this callback will not be triggered because the track is published prior to {@link
+         * Room.Listener#onConnected} being raised.
          *
          * @param localParticipant The local participant that published the audio track.
          * @param localAudioTrackPublication The published local audio track.
@@ -505,7 +507,9 @@ public class LocalParticipant implements Participant {
 
         /**
          * This method notifies the listener that a {@link LocalVideoTrack} has been shared to a
-         * {@link Room}.
+         * {@link Room}. Note: If a {@link LocalVideoTrack} was provided in {@link ConnectOptions}
+         * this callback will not be triggered because the track is published prior to {@link
+         * Room.Listener#onConnected} being raised.
          *
          * @param localParticipant The local participant that published the video track.
          * @param localVideoTrackPublication The published local video track.
