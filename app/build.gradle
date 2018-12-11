@@ -121,8 +121,8 @@ dependencies {
     implementation project(':twilioapi')
     implementation project(':env')
     implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"
-    implementation "com.android.support:design:${versions.supportLibrary}"
-    implementation "com.android.support:preference-v14:${versions.supportLibrary}"
+    implementation "com.android.support:design:${versions.designLibrary}"
+    implementation "com.android.support:preference-v14:${versions.preferenceLibrary}"
     implementation "com.jakewharton.timber:timber:${versions.timber}"
     implementation "com.appyvet:materialrangebar:${versions.materialrangebar}"
     implementation "com.jakewharton:butterknife:${versions.butterknife}"
@@ -132,7 +132,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:${versions.firebase}"
     implementation "com.google.firebase:firebase-auth:${versions.firebaseAuth}"
     implementation "com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}"
-    implementation "com.google.android.gms:play-services-auth:${versions.playServices}"
+    implementation "com.google.android.gms:play-services-auth:${versions.playServicesAuth}"
 
     implementation "com.google.dagger:dagger:${versions.dagger}"
     implementation "com.google.dagger:dagger-android:${versions.dagger}"

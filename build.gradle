@@ -10,7 +10,6 @@ buildscript {
             // Plugins
             'androidGradlePlugin': '3.1.4',
             'googleServices': '3.2.1',
-            'firebasePlugin': '1.1.0-alpha1',
             'gradleHockeyPlugin': '3.6',
             'fabricPlugin': '1.25.4',
 
@@ -24,6 +23,8 @@ buildscript {
             'guava': '19.0',
             'retrofit': '1.9.0',
             'supportLibrary': '27.1.1',
+            'designLibrary': '27.1.1',
+            'preferenceLibrary': '27.1.1',
             'espresso': '3.0.0',
             'testSupportLibrary': '1.0.0',
             'uiAutomator': '2.1.2',
@@ -41,6 +42,7 @@ buildscript {
             'firebaseAuth': '16.0.2',
             'crashlytics': '2.9.5',
             'playServices': '15.0.1',
+            'playServicesAuth': '15.0.1',
             'dagger': '2.10',
             'rxJava2': '2.0.6',
             'rxJava2Adapter': '1.0.0',
@@ -76,9 +78,6 @@ buildscript {
         classpath "com.android.tools.build:gradle:${versions.androidGradlePlugin}"
         classpath "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
         classpath "com.google.gms:google-services:${versions.googleServices}"
-        classpath ("com.google.firebase:firebase-plugins:${versions.firebasePlugin}") {
-            exclude group: 'com.google.guava', module: 'guava-jdk5'
-        }
         classpath "de.felixschulze.gradle:gradle-hockeyapp-plugin:${versions.gradleHockeyPlugin}"
         classpath "io.fabric.tools:gradle:${versions.fabricPlugin}"
     }
