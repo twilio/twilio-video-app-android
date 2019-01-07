@@ -69,6 +69,10 @@ aliases:
       echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
       echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
       echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+  - &install-cmake
+    name: Install Cmake
+    command:
+      sdkmanager "cmake;3.6.4111459"
   - &gcloud-auth
     name: Google Cloud Auth
     command: >
@@ -187,6 +191,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
 
       # Build app
       - run:
@@ -216,6 +221,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
 
       # Build library and tests
       - run:
@@ -244,6 +250,7 @@ jobs:
       - run: *create-android-ndk-directory
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
+      - run: *install-cmake
 
       # Check library size
       - run:
@@ -335,6 +342,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
 
       # Publish library snapshot
       - run:
@@ -358,6 +366,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
 
       # Publish app snapshot
       - run:
@@ -383,6 +392,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
       - run: *configure-git-user
 
       # Publish library rc
@@ -412,6 +422,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
 
       # Publish app RC
       - run:
@@ -438,6 +449,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-secrets
+      - run: *install-cmake
       - run: *configure-git-user
 
       # Publish library
