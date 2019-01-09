@@ -34,6 +34,7 @@ import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.Room;
+import com.twilio.video.TestUtils;
 import com.twilio.video.Video;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.twilioapi.model.VideoRoom;
@@ -94,7 +95,9 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
             throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        boolean connected = roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS);
+        boolean connected =
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         // Call disconnect before failing to ensure native memory released
         if (!connected) {
