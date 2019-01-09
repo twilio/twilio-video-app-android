@@ -95,6 +95,35 @@ public class Room {
                 }
 
                 @Override
+                public void onReconnecting(
+                        @NonNull Room room, @NonNull TwilioException twilioException) {
+                    handler.post(
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onReconnecting()");
+
+                                // Update room state
+                                Room.this.roomState = State.RECONNECTING;
+
+                                // Notify developer
+                                Room.this.listener.onReconnecting(room, twilioException);
+                            });
+                }
+
+                @Override
+                public void onReconnected(@NonNull Room room) {
+                    handler.post(
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onReconnected()");
+
+                                // Notify developer
+                                Room.this.roomState = State.CONNECTED;
+                                Room.this.listener.onReconnected(room);
+                            });
+                }
+
+                @Override
                 public void onDisconnected(final Room room, final TwilioException twilioException) {
                     // Release native room
                     releaseRoom();
@@ -382,6 +411,26 @@ public class Room {
         void onConnectFailure(Room room, TwilioException twilioException);
 
         /**
+         * Called when the {@link LocalParticipant} has experienced a network disruption and the
+         * client begins trying to reestablish a connection to a room.
+         *
+         * @param room the room the {@link LocalParticipant} is attempting to reconnect to.
+         * @param twilioException An error explaining why the {@link LocalParticipant} is
+         *     reconnecting to a room. Errors are limited to {@link
+         *     TwilioException#SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION} and {@link
+         *     TwilioException#MEDIA_CONNECTION_ERROR_EXCEPTION}.
+         */
+        void onReconnecting(@NonNull Room room, @NonNull TwilioException twilioException);
+
+        /**
+         * Called after the {@link LocalParticipant} reconnects to a room after a network
+         * disruption.
+         *
+         * @param room the room that was reconnected.
+         */
+        void onReconnected(@NonNull Room room);
+
+        /**
          * Called when a room has been disconnected from.
          *
          * @param room the room that was disconnected from.
@@ -432,6 +481,7 @@ public class Room {
     public enum State {
         CONNECTING,
         CONNECTED,
+        RECONNECTING,
         DISCONNECTED
     }
 

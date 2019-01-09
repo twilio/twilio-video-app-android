@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.Manifest;
+import android.support.annotation.NonNull;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
@@ -138,6 +139,17 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                                 TwilioException.CONFIGURATION_ACQUIRE_FAILED_EXCEPTION,
                                 twilioException.getCode());
                         connectFailure.countDown();
+                    }
+
+                    @Override
+                    public void onReconnecting(
+                            @NonNull Room room, @NonNull TwilioException twilioException) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onReconnected(@NonNull Room room) {
+                        fail();
                     }
 
                     @Override

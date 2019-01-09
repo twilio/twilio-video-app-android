@@ -61,6 +61,14 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                                     j_room_observer_class_.obj(),
                                     "onConnected",
                                     "(Lcom/twilio/video/Room;)V")),
+        j_on_reconnecting_(webrtc::GetMethodID(env,
+                                               j_room_observer_class_.obj(),
+                                               "onReconnecting",
+                                               "(Lcom/twilio/video/Room;Lcom/twilio/video/TwilioException;)V")),
+        j_on_reconnected_(webrtc::GetMethodID(env,
+                                              j_room_observer_class_.obj(),
+                                              "onReconnected",
+                                              "(Lcom/twilio/video/Room;)V")),
         j_on_disconnected_(
                 webrtc::GetMethodID(env,
                                     j_room_observer_class_.obj(),
@@ -250,6 +258,54 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
                               j_on_connected_,
                               j_room_.obj());
         CHECK_EXCEPTION(jni()) << "error calling onConnected";
+    }
+}
+void AndroidRoomObserver::onReconnecting(const twilio::video::Room *room,
+                                         const twilio::video::TwilioError twilio_error) {
+    webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+
+    {
+        rtc::CritScope cs(&deletion_lock_);
+
+        if (!isObserverValid(func_name)) {
+            return;
+        }
+
+        jobject j_twilio_exception = (createJavaTwilioException(jni(),
+                                                                j_twilio_exception_class_.obj(),
+                                                                j_twilio_exception_ctor_id_,
+                                                                twilio_error));
+
+        jni()->CallVoidMethod(j_room_observer_.obj(),
+                              j_on_reconnecting_,
+                              j_room_.obj(),
+                              j_twilio_exception);
+        CHECK_EXCEPTION(jni()) << "error calling onReconnecting";
+    }
+}
+
+void AndroidRoomObserver::onReconnected(const twilio::video::Room *room) {
+    webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+
+    {
+        rtc::CritScope cs(&deletion_lock_);
+
+        if (!isObserverValid(func_name)) {
+            return;
+        }
+
+        jni()->CallVoidMethod(j_room_observer_.obj(),
+                              j_on_reconnected_,
+                              j_room_.obj());
+        CHECK_EXCEPTION(jni()) << "error calling onReconnected";
     }
 }
 

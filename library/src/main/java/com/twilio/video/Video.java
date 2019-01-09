@@ -169,6 +169,17 @@ public abstract class Video {
             }
 
             @Override
+            public void onReconnecting(
+                    @NonNull Room room, @NonNull TwilioException twilioException) {
+                roomListener.onReconnecting(room, twilioException);
+            }
+
+            @Override
+            public void onReconnected(@NonNull Room room) {
+                roomListener.onReconnected(room);
+            }
+
+            @Override
             public void onDisconnected(Room room, TwilioException twilioException) {
                 roomListener.onDisconnected(room, twilioException);
                 release(room);

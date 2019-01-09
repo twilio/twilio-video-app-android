@@ -19,6 +19,7 @@ package com.twilio.video.helper;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackPublication;
@@ -64,6 +65,8 @@ public class CallbackHelper {
 
         public CountDownLatch onConnectedLatch;
         public CountDownLatch onConnectFailureLatch;
+        public CountDownLatch onReconnectingLatch;
+        public CountDownLatch onReconnectedLatch;
         public CountDownLatch onDisconnectedLatch;
         public CountDownLatch onParticipantConnectedLatch;
         public CountDownLatch onParticipantDisconnectedLatch;
@@ -85,6 +88,19 @@ public class CallbackHelper {
             this.room = room;
             this.twilioException = twilioException;
             triggerLatch(onConnectFailureLatch);
+        }
+
+        @Override
+        public void onReconnecting(@NonNull Room room, @NonNull TwilioException twilioException) {
+            this.room = room;
+            this.twilioException = twilioException;
+            triggerLatch(onReconnectingLatch);
+        }
+
+        @Override
+        public void onReconnected(@NonNull Room room) {
+            this.room = room;
+            triggerLatch(onReconnectedLatch);
         }
 
         @Override
@@ -140,6 +156,12 @@ public class CallbackHelper {
 
         @Override
         public void onConnectFailure(Room room, TwilioException twilioException) {}
+
+        @Override
+        public void onReconnecting(@NonNull Room room, @NonNull TwilioException twilioException) {}
+
+        @Override
+        public void onReconnected(@NonNull Room room) {}
 
         @Override
         public void onDisconnected(Room room, TwilioException twilioException) {}

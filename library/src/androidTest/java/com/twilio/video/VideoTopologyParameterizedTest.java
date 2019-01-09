@@ -106,7 +106,9 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         if (room != null && !StringUtils.isNullOrEmpty(room.getSid())) {
             RoomUtils.completeRoom(room);
         }
-        RoomUtils.completeRoom(videoRoom);
+        if (videoRoom != null) {
+            RoomUtils.completeRoom(videoRoom);
+        }
         if (localAudioTrack != null) {
             localAudioTrack.release();
         }

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -237,6 +238,13 @@ public class RemoteParticipantTest extends BaseVideoTest {
 
                     @Override
                     public void onConnectFailure(Room room, TwilioException twilioException) {}
+
+                    @Override
+                    public void onReconnecting(
+                            @NonNull Room room, @NonNull TwilioException twilioException) {}
+
+                    @Override
+                    public void onReconnected(@NonNull Room room) {}
 
                     @Override
                     public void onDisconnected(Room room, TwilioException twilioException) {

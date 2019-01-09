@@ -40,6 +40,9 @@ protected:
                                 std::unique_ptr<twilio::video::TwilioError> twilio_error);
     virtual void onConnectFailure(const twilio::video::Room *room,
                                   const twilio::video::TwilioError twilio_error);
+    virtual void onReconnecting(const twilio::video::Room *room,
+                                const twilio::video::TwilioError twilio_error);
+    virtual void onReconnected(const twilio::video::Room *room);
     virtual void onParticipantConnected(twilio::video::Room *room,
                                         std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
     virtual void onParticipantDisconnected(twilio::video::Room *room,
@@ -83,6 +86,8 @@ private:
     const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_publication_class_;
     jmethodID j_set_connected_;
     jmethodID j_on_connected_;
+    jmethodID j_on_reconnecting_;
+    jmethodID j_on_reconnected_;
     jmethodID j_on_disconnected_;
     jmethodID j_on_connect_failure_;
     jmethodID j_on_participant_connected_;

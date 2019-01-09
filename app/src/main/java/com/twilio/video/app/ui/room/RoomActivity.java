@@ -33,6 +33,7 @@ import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
@@ -1362,6 +1363,17 @@ public class RoomActivity extends BaseActivity {
                 updateUi(room);
 
                 setAudioFocus(false);
+            }
+
+            @Override
+            public void onReconnecting(
+                    @NonNull Room room, @NonNull TwilioException twilioException) {
+                Timber.i("onReconnecting: " + room.getName());
+            }
+
+            @Override
+            public void onReconnected(@NonNull Room room) {
+                Timber.i("onReconnected: " + room.getName());
             }
 
             @Override
