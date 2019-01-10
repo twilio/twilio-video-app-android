@@ -353,6 +353,46 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     }
 
     @Test
+    public void shouldReceiveOnReconnectedIfNetworkChangeDuringReconnecting()
+            throws InterruptedException {
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onReconnectingLatch = new CountDownLatch(1);
+        roomListener.onReconnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        // Connect to room
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertEquals(Room.State.CONNECTED, room.getState());
+
+        // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
+        // Expected flow: Connected -> Reconnecting -> Connected
+        room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
+        assertTrue(
+                roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertEquals(Room.State.RECONNECTING, room.getState());
+        assertEquals(
+                TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
+                roomListener.getTwilioException().getCode());
+        // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
+        room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
+        // Reinitialize Reconnected latch
+        roomListener.onReconnectedLatch = new CountDownLatch(1);
+        // Assert that network disruption during RECONNECTING can still transition to RECONNECTED
+        assertEquals(Room.State.RECONNECTING, room.getState());
+        assertTrue(
+                roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertEquals(Room.State.CONNECTED, room.getState());
+    }
+
+    @Test
     public void shouldFailToConnectWithInvalidToken() throws InterruptedException {
         String invalidToken = "invalid token";
         ConnectOptions connectOptions = new ConnectOptions.Builder(invalidToken).build();
