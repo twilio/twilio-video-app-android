@@ -90,7 +90,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         String expectedMessage = "Hello DataTrack!";
         dataTrackListener.onStringMessageLatch = new CountDownLatch(1);
         bobLocalDataTrack.send(expectedMessage);
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Integer.valueOf(1), dataTrackListener.messages.get(0).first);
         assertEquals(expectedMessage, dataTrackListener.messages.get(0).second);
     }
@@ -104,7 +106,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedMessage);
         bobLocalDataTrack.send(secondExpectedMessage);
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.messagesSet.contains(firstExpectedMessage));
         assertTrue(dataTrackListener.messagesSet.contains(secondExpectedMessage));
     }
@@ -118,7 +122,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(firstExpectedBufferMessage));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(secondExpectedBufferMessage));
     }
@@ -133,7 +139,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedMessage);
         bobLocalDataTrack.send(secondExpectedMessage);
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.messagesSet.contains(firstExpectedMessage));
         assertTrue(dataTrackListener.messagesSet.contains(secondExpectedMessage));
     }
@@ -148,7 +156,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(firstExpectedBufferMessage));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(secondExpectedBufferMessage));
     }
@@ -163,7 +173,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onStringMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedMessage);
         bobLocalDataTrack.send(secondExpectedMessage);
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.messagesSet.contains(firstExpectedMessage));
         assertTrue(dataTrackListener.messagesSet.contains(secondExpectedMessage));
     }
@@ -178,7 +190,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(2);
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(firstExpectedBufferMessage));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(secondExpectedBufferMessage));
     }
@@ -189,7 +203,9 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         ByteBuffer expectedMessageBuffer = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(1);
         bobLocalDataTrack.send(expectedMessageBuffer);
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Integer.valueOf(1), dataTrackListener.bufferMessages.get(0).first);
         assertArrayEquals(
                 expectedMessageBuffer.array(),
@@ -209,8 +225,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         bobLocalDataTrack.send(firstExpectedBufferMessage);
         bobLocalDataTrack.send(secondExpectedMessage);
         bobLocalDataTrack.send(secondExpectedBufferMessage);
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Integer.valueOf(1), dataTrackListener.messages.get(0).first);
         assertEquals(firstExpectedMessage, dataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), dataTrackListener.bufferMessages.get(0).first);
@@ -247,8 +267,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         bobSecondLocalDataTrack.send(secondExpectedBufferMessage);
 
         // Validate the messages
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(dataTrackListener.messagesSet.contains(firstExpectedMessage));
         assertTrue(dataTrackListener.messagesSet.contains(secondExpectedMessage));
         assertTrue(dataTrackListener.bufferMessagesSet.contains(firstExpectedBufferMessage));
@@ -288,8 +312,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
 
         // Alice and Bob wait to see charlie connected
-        assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceRoomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobRoomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RemoteParticipant charlieAliceRemoteParticipant =
                 getRemoteParticipant(Constants.PARTICIPANT_CHARLIE, aliceRoom);
         charlieAliceRemoteParticipant.setListener(participantListener);
@@ -301,8 +329,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         LocalParticipant charlieLocalParticipant = charlieRoom.getLocalParticipant();
         charlieLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         charlieLocalParticipant.publishTrack(charlieLocalDataTrack);
-        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onDataTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Alice and bob observer charlie remote data track
         charlieAliceRemoteParticipant
@@ -335,10 +367,18 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         charlieLocalDataTrack.send(secondExpectedBufferMessage);
 
         // Validate all messages were received
-        assertTrue(aliceDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceDataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceDataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobDataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobDataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate all messages received are correct
         assertEquals(Integer.valueOf(1), aliceDataTrackListener.messages.get(0).first);
@@ -396,8 +436,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         charlieRoom = connect(charlieConnectOptions, charlieRoomListener);
 
         // Alice and Bob wait to see charlie connected
-        assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceRoomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobRoomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RemoteParticipant charlieAliceRemoteParticipant =
                 getRemoteParticipant(Constants.PARTICIPANT_CHARLIE, aliceRoom);
         charlieAliceRemoteParticipant.setListener(participantListener);
@@ -409,8 +453,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         LocalParticipant charlieLocalParticipant = charlieRoom.getLocalParticipant();
         charlieLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         charlieLocalParticipant.publishTrack(charlieLocalDataTrack);
-        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onDataTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Alice and bob observer charlie remote data track
         charlieAliceRemoteParticipant
@@ -443,10 +491,18 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         charlieLocalDataTrack.send(secondExpectedBufferMessage);
 
         // Validate all messages were received
-        assertTrue(aliceDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceDataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceDataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobDataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobDataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate all messages received are correct
         assertEquals(Integer.valueOf(1), aliceDataTrackListener.messages.get(0).first);
@@ -486,8 +542,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         charlieLocalDataTrack.send(secondExpectedBufferMessage);
 
         // Validate all messages were received by Bob
-        assertTrue(bobDataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(bobDataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                bobDataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobDataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate all messages Bob received are correct
         assertEquals(Integer.valueOf(5), bobDataTrackListener.messages.get(2).first);
@@ -513,8 +573,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         dataTrackListener.onBufferMessageLatch = new CountDownLatch(1);
         bobLocalDataTrack.send(expectedMessage);
         bobLocalDataTrack.send(expectedBufferMessage);
-        assertTrue(dataTrackListener.onStringMessageLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(dataTrackListener.onBufferMessageLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onStringMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                dataTrackListener.onBufferMessageLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Integer.valueOf(1), dataTrackListener.messages.get(0).first);
         assertEquals(expectedMessage, dataTrackListener.messages.get(0).second);
         assertEquals(Integer.valueOf(2), dataTrackListener.bufferMessages.get(0).first);
@@ -537,9 +601,12 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         bobRemoteParticipant.setListener(aliceParticipantListener);
         bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalDataTrack));
-        assertTrue(aliceParticipantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+                aliceParticipantListener.onDataTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         final RemoteDataTrack remoteDataTrack =
                 bobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack();
         // Wait to ensure the data channels reach opened state
@@ -581,7 +648,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                             bobLocalDataTrack.send(ByteBuffer.wrap(new byte[] {0xf, 0xe}));
                         });
 
-        assertTrue(messagesReceived.await(10, TimeUnit.SECONDS));
+        assertTrue(messagesReceived.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(expectedThreadId.get(), onBufferMessageThreadId.get());
         assertEquals(expectedThreadId.get(), onStringMessageThreadId.get());
     }
@@ -607,12 +674,16 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         bobLocalParticipant.setListener(bobLocalParticipantListener);
         assertTrue(bobLocalParticipant.publishTrack(localDataTrack));
         assertTrue(
-                bobLocalParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+                bobLocalParticipantListener.onPublishedDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalDataTrackPublication localDataTrackPublication =
                 getLocalDataTrackPublication(localDataTrack, bobLocalParticipant);
-        assertTrue(aliceParticipantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+                aliceParticipantListener.onDataTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         getRemoteDataTrack(localDataTrackPublication.getTrackSid(), bobRemoteParticipant)
                 .setListener(dataTrackListener);
 

@@ -118,7 +118,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .iceOptions(iceOptions)
                         .build();
         room = Video.connect(context, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Room.State.CONNECTED, room.getState());
 
         connectOptions =
@@ -128,7 +130,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .build();
         otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         otherRoom = Video.connect(context, connectOptions, otherRoomListener);
-        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, room.getRemoteParticipants().size());
     }
 
@@ -149,7 +153,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .iceOptions(iceOptions)
                         .build();
         room = Video.connect(context, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Room.State.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 =
@@ -161,7 +167,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         otherRoom = Video.connect(context, connectOptions2, otherRoomListener);
 
-        assertTrue(otherRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                otherRoomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         List<RemoteParticipant> client2RemoteParticipants =
                 new ArrayList<>(otherRoom.getRemoteParticipants());
@@ -169,7 +177,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
 
         assertEquals(1, client2RemoteParticipants.size());
         assertTrue(client1RemoteParticipant.isConnected());
-        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         List<RemoteParticipant> client1RemoteParticipants =
                 new ArrayList<>(room.getRemoteParticipants());
@@ -179,13 +189,19 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertTrue(client2RemoteParticipant.isConnected());
 
         otherRoom.disconnect();
-        assertTrue(otherRoomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                otherRoomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onParticipantDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertFalse(client2RemoteParticipant.isConnected());
         assertTrue(room.getRemoteParticipants().isEmpty());
 
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertFalse(client1RemoteParticipant.isConnected());
     }
 
@@ -208,7 +224,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         .iceOptions(iceOptions)
                         .build();
         room = Video.connect(context, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(Room.State.CONNECTED, room.getState());
 
         ConnectOptions connectOptions2 =
@@ -220,7 +238,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         otherRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         otherRoom = Video.connect(context, connectOptions2, otherRoomListener);
 
-        assertTrue(otherRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                otherRoomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         List<RemoteParticipant> client2RemoteParticipants =
                 new ArrayList<>(otherRoom.getRemoteParticipants());
@@ -228,7 +248,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
 
         assertEquals(1, client2RemoteParticipants.size());
         assertTrue(client1RemoteParticipant.isConnected());
-        assertTrue(roomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(expectedIdentity, client1RemoteParticipant.getIdentity());
 
         List<RemoteParticipant> client1RemoteParticipants =
@@ -239,13 +261,19 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         assertTrue(client2RemoteParticipant.isConnected());
 
         otherRoom.disconnect();
-        assertTrue(otherRoomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(roomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                otherRoomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onParticipantDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertFalse(client2RemoteParticipant.isConnected());
         assertTrue(room.getRemoteParticipants().isEmpty());
 
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertFalse(client1RemoteParticipant.isConnected());
     }
 
@@ -259,26 +287,37 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
-        assertTrue(participantListener.onAudioTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onAudioTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Audio track disabled
         participantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
         bobLocalAudioTrack.enable(false);
-        assertTrue(participantListener.onAudioTrackDisabledLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onAudioTrackDisabledLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Audio track enabled
         participantListener.onAudioTrackEnabledLatch = new CountDownLatch(1);
         bobLocalAudioTrack.enable(true);
-        assertTrue(participantListener.onAudioTrackEnabledLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onAudioTrackEnabledLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Audio track removed and unsubscribed
         participantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalAudioTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onAudioTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
+                participantListener.onUnsubscribedFromAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onAudioTrackUnpublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track added and subscribed
         participantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
@@ -286,42 +325,60 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         bobLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onVideoTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track disabled
         participantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
         bobLocalVideoTrack.enable(false);
-        assertTrue(participantListener.onVideoTrackDisabledLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onVideoTrackDisabledLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track enabled
         participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
         bobLocalVideoTrack.enable(true);
-        assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onVideoTrackEnabledLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track removed and unsubscribed
         participantListener.onVideoTrackUnpublishedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalVideoTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onVideoTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
+                participantListener.onUnsubscribedFromVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onVideoTrackUnpublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Data track published and subscribed
         participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
         participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
         bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalDataTrack));
-        assertTrue(participantListener.onDataTrackPublishedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onDataTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Data track unsubscribed and unpublished
         participantListener.onDataTrackUnpublishedLatch = new CountDownLatch(1);
         participantListener.onUnsubscribedFromDataTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalDataTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromDataTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onDataTrackUnpublishedLatch.await(20, TimeUnit.SECONDS));
+                participantListener.onUnsubscribedFromDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onDataTrackUnpublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate the order of events
         List<String> expectedParticipantEvents =
@@ -356,12 +413,16 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         this.bobRemoteParticipant.setListener(participantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
-        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Cache bobRemoteParticipant two tracks
         List<RemoteAudioTrackPublication> remoteAudioTrackPublications =
@@ -376,7 +437,9 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         // RemoteParticipant two disconnects
         aliceRoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
         bobRoom.disconnect();
-        assertTrue(aliceRoomListener.onParticipantDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceRoomListener.onParticipantDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RemoteParticipant remoteParticipant = aliceRoomListener.getRemoteParticipant();
 
         // Validate enabled matches last known state

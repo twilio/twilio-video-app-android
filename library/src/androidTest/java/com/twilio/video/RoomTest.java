@@ -68,7 +68,8 @@ public class RoomTest extends BaseVideoTest {
             room.disconnect();
             assertTrue(
                     "Did not receive disconnect callback",
-                    roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+                    roomListener.onDisconnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
         /*
          * After all participants have disconnected complete the room to clean up backend
@@ -96,7 +97,9 @@ public class RoomTest extends BaseVideoTest {
         room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -117,6 +120,8 @@ public class RoomTest extends BaseVideoTest {
                 statsReports -> {
                     // Do nothing
                 });
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 }

@@ -118,7 +118,8 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         room.disconnect();
         assertTrue(
                 "Failed to disconnect from room",
-                roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     public void baseSetup(Topology topology) throws InterruptedException {
@@ -169,7 +170,9 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         aliceRemoteParticipant.setListener(bobParticipantListener);
 
         // Alice wait for bob to connect
-        assertTrue(aliceRoomListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceRoomListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         bobLocalParticipant = bobRoom.getLocalParticipant();
         List<RemoteParticipant> remoteParticipantList =
                 new ArrayList<>(aliceRoom.getRemoteParticipants());

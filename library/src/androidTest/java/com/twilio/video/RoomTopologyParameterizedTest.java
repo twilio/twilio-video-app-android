@@ -110,7 +110,9 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         if (room != null && room.getState() != Room.State.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
-            assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(
+                    roomListener.onDisconnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
         /*
          * After all participants have disconnected complete the room to clean up backend

@@ -102,7 +102,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         if (room != null && room.getState() != Room.State.DISCONNECTED) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
-            assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(
+                    roomListener.onDisconnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
         /*
          * After all participants have disconnected complete the room to clean up backend
@@ -152,7 +154,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -172,9 +176,15 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(0, localParticipant.getLocalDataTracks().size());
 
         // Validate we received callbacks
-        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Now unpublish tracks
         assertTrue(localParticipant.unpublishTrack(localAudioTrack));
@@ -204,7 +214,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -227,9 +239,15 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(0, localParticipant.getLocalDataTracks().size());
 
         // Validate we received callbacks
-        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate collections
         assertEquals(1, localParticipant.getAudioTracks().size());
@@ -265,9 +283,15 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(0, localParticipant.getLocalDataTracks().size());
 
         // Validate we received callbacks
-        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate collections
         assertEquals(1, localParticipant.getAudioTracks().size());
@@ -307,7 +331,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         .roomName(roomName);
 
         room = Video.connect(mediaTestActivity, connectOptionsBuilder.build(), roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -319,7 +345,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(1, localParticipant.getLocalVideoTracks().size());
         if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
-                    localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+                    localParticipantListener.onPublishedDataTrackLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
         assertEquals(1, localParticipant.getDataTracks().size());
         assertEquals(1, localParticipant.getLocalDataTracks().size());
@@ -339,7 +366,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
 
@@ -360,14 +389,18 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
 
         room.disconnect();
         assertEquals(identity, localParticipant.getIdentity());
         assertNotNull(localParticipant.getSid());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -383,12 +416,16 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
 
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(identity, localParticipant.getIdentity());
         assertNotNull(localParticipant.getSid());
     }
@@ -406,7 +443,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         int audioTrackSize = localParticipant.getLocalAudioTracks().size();
@@ -415,7 +454,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertFalse(localParticipant.publishTrack(localAudioTrack));
         assertEquals(audioTrackSize, localParticipant.getAudioTracks().size());
         assertEquals(audioTrackSize, localParticipant.getLocalAudioTracks().size());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -431,7 +472,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         int videoTrackSize = localParticipant.getLocalVideoTracks().size();
@@ -440,7 +483,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertFalse(localParticipant.publishTrack(localVideoTrack));
         assertEquals(videoTrackSize, localParticipant.getVideoTracks().size());
         assertEquals(videoTrackSize, localParticipant.getLocalVideoTracks().size());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -456,7 +501,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         int dataTrackSize = localParticipant.getLocalDataTracks().size();
@@ -465,7 +512,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertFalse(localParticipant.publishTrack(localDataTrack));
         assertEquals(dataTrackSize, localParticipant.getDataTracks().size());
         assertEquals(dataTrackSize, localParticipant.getLocalDataTracks().size());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -484,19 +533,25 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
         localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         localParticipant.publishTrack(localAudioTrack);
-        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         int audioTrackSize = localParticipant.getLocalAudioTracks().size();
         room.disconnect();
         assertFalse(localParticipant.unpublishTrack(localAudioTrack));
         assertEquals(audioTrackSize, localParticipant.getAudioTracks().size());
         assertEquals(audioTrackSize, localParticipant.getLocalAudioTracks().size());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -515,20 +570,26 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         localParticipant.publishTrack(localVideoTrack);
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         int videoTrackSize = localParticipant.getLocalVideoTracks().size();
         room.disconnect();
         assertFalse(localParticipant.unpublishTrack(localVideoTrack));
         assertEquals(videoTrackSize, localParticipant.getVideoTracks().size());
         assertEquals(videoTrackSize, localParticipant.getLocalVideoTracks().size());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -547,19 +608,25 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
         localDataTrack = LocalDataTrack.create(mediaTestActivity);
         localParticipant.publishTrack(localDataTrack);
-        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         int dataTrackSize = localParticipant.getLocalDataTracks().size();
         room.disconnect();
         assertFalse(localParticipant.unpublishTrack(localDataTrack));
         assertEquals(dataTrackSize, localParticipant.getDataTracks().size());
         assertEquals(dataTrackSize, localParticipant.getLocalDataTracks().size());
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     /*
@@ -584,14 +651,18 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
         localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         localParticipant.publishTrack(localVideoTrack);
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         room.disconnect();
         EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
         localParticipant.setEncodingParameters(encodingParameters);
@@ -624,7 +695,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -657,7 +730,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -693,7 +768,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         .roomName(roomName)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -760,7 +837,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         .dataTracks(Arrays.asList(localDataTrack, localDataTrackTwo))
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -770,7 +849,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
          */
         if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
             assertTrue(
-                    localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+                    localParticipantListener.onPublishedDataTrackLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
 
         /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398
@@ -823,7 +903,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -836,13 +918,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         // Validate callbacks
         assertTrue(
                 localParticipantListener.onAudioTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
                 localParticipantListener.onVideoTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
                 localParticipantListener.onDataTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate the exception
         assertEquals(
@@ -894,7 +976,9 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         LocalParticipant localParticipant = room.getLocalParticipant();
         assertNotNull(localParticipant);
         localParticipant.setListener(localParticipantListener);
@@ -905,9 +989,15 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localParticipant.publishTrack(localDataTrack);
 
         // Wait for published callbacks
-        assertTrue(localParticipantListener.onPublishedAudioTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(localParticipantListener.onPublishedDataTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedDataTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Publish tracks with duplicated names
         localParticipant.publishTrack(localAudioTrackTwo);
@@ -917,13 +1007,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         // Validate callbacks
         assertTrue(
                 localParticipantListener.onAudioTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
                 localParticipantListener.onVideoTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
                 localParticipantListener.onDataTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate the exception
         assertEquals(

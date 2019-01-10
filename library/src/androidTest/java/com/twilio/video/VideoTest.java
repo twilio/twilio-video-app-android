@@ -143,7 +143,9 @@ public class VideoTest extends BaseVideoTest {
             ConnectOptions connectOptions = new ConnectOptions.Builder(token).build();
             room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             room.disconnect();
-            assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(
+                    roomListener.onDisconnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
         /*
          * After all participants have disconnected complete the room to clean up backend

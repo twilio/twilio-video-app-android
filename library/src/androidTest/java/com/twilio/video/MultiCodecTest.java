@@ -84,7 +84,9 @@ public class MultiCodecTest extends BaseCodecTest {
                         .roomName(roomName)
                         .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Set bob participant listener
@@ -105,19 +107,21 @@ public class MultiCodecTest extends BaseCodecTest {
         aliceLocalParticipant.publishTrack(aliceLocalVideoTrack);
 
         // Validate the track published successfully
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate bob received published track event
         assertTrue(
                 bobRemoteParticipantListener.onVideoTrackPublishedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         TrackPublication aliceVideoTrackPublication =
                 aliceRemoteParticipant.getVideoTracks().get(0);
 
         // Validate that bob received track subscription error
         assertTrue(
                 bobRemoteParticipantListener.onVideoTrackSubscriptionFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(
                 TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
                 bobRemoteParticipantListener
@@ -153,7 +157,9 @@ public class MultiCodecTest extends BaseCodecTest {
         ConnectOptions bobConnectOptions =
                 new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Alice publish video track
@@ -167,7 +173,7 @@ public class MultiCodecTest extends BaseCodecTest {
         // Validate the track publication failed
         assertTrue(
                 localParticipantListener.onVideoTrackPublicationFailedLatch.await(
-                        20, TimeUnit.SECONDS));
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(
                 TwilioException.MEDIA_NO_SUPPORTED_CODEC_EXCEPTION,
                 localParticipantListener.publicationFailures.get(aliceLocalVideoTrack).getCode());
@@ -203,7 +209,9 @@ public class MultiCodecTest extends BaseCodecTest {
         ConnectOptions bobConnectOptions =
                 new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398
@@ -250,7 +258,9 @@ public class MultiCodecTest extends BaseCodecTest {
         ConnectOptions bobConnectOptions =
                 new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         /* FIXME: Callbacks are not received when connecting with tracks GSDK-1398

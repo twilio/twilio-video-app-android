@@ -103,7 +103,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
             localVideoTrack.release();
             completed.countDown();
         }
-        assertTrue(completed.await(20, TimeUnit.SECONDS));
+        assertTrue(completed.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -406,7 +406,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         // Wait for parameters to be set
-        assertTrue(cameraParametersSet.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraParametersSet.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Assume that flash is supported
         assumeNotNull(actualCameraParameters.get().getFlashMode());
@@ -564,7 +564,9 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                 cameraParametersUpdated, expectedFlashMode, actualCameraParameters);
 
         // Wait for parameters to be set
-        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+        assertTrue(
+                cameraParametersUpdated.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Assume that flash is supported
         assumeNotNull(actualCameraParameters.get().getFlashMode());
@@ -645,7 +647,9 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         assertFalse(parameterUpdateScheduled);
 
         // Wait for original parameters to be set
-        assertTrue(cameraParametersUpdated.await(10, TimeUnit.SECONDS));
+        assertTrue(
+                cameraParametersUpdated.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Assume that flash is supported
         assumeNotNull(actualCameraParameters.get().getFlashMode());

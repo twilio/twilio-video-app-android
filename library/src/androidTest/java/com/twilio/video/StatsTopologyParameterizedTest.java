@@ -90,7 +90,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                         roomName,
                         Collections.singletonList(bobLocalAudioTrack),
                         Collections.singletonList(bobLocalVideoTrack));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         expectStatsReportTracksSize(1, 0, 1, 1);
@@ -110,7 +112,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
         // Connect Bob without media
         bobRoom = createRoom(bobToken, bobListener, roomName);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Add audio track to Bob and check stats
@@ -125,7 +129,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
-        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         expectStatsReportTracksSize(1, 0, 1, 0);
 
@@ -133,13 +139,16 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         bobLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         expectStatsReportTracksSize(1, 0, 1, 1);
 
         // Remove Bob's video track and check the stats
         bobLocalParticipant.unpublishTrack(bobLocalVideoTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromVideoTrackLatch.await(20, TimeUnit.SECONDS));
+                participantListener.onUnsubscribedFromVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         expectStatsReportTracksSize(1, 0, 1, 0);
     }
 
@@ -151,7 +160,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
         // Connect Bob without tracks
         bobRoom = createRoom(bobToken, bobListener, roomName);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Get alice local bobRemoteParticipant
@@ -190,7 +201,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                         bobListener,
                         roomName,
                         Collections.singletonList(bobLocalAudioTrack));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Call getStats multiple times
@@ -202,7 +215,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         }
 
         // Validate all callbacks received
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceStatsListener.onStatsLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate size
         expectStatsReportTracksSize(1, 0, 1, 0);
@@ -234,7 +249,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                         roomName,
                         Collections.singletonList(bobLocalAudioTrack),
                         Collections.singletonList(bobLocalVideoTrack));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         StatsReport statsReport = expectStatsReportTracksSize(1, 1, 1, 1);
 
@@ -275,7 +292,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                         roomName,
                         Collections.singletonList(bobLocalAudioTrack),
                         Collections.singletonList(bobLocalVideoTrack));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         StatsReport statsReport = expectStatsReportTracksSize(1, 1, 1, 1);
 
@@ -340,7 +359,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                         bobListener,
                         roomName,
                         Collections.singletonList(bobLocalAudioTrack));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // let's give peer connection some time to get media flowing
@@ -357,9 +378,13 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         // disconnect from room
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);
         aliceRoom.disconnect();
-        assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceStatsListener.onStatsLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
         assertEquals(0, statsReportList.size());
     }
@@ -390,7 +415,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                         roomName,
                         Collections.singletonList(bobLocalAudioTrack),
                         Collections.singletonList(bobLocalVideoTrack));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         CallbackHelper.FakeStatsListener aliceStatsListener =
                 new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
@@ -398,13 +425,16 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         aliceRoom.disconnect();
 
         // wait for disconnect
-        assertTrue(aliceListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // call get stats after room has been disconnected
         aliceStatsListener = new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(aliceStatsListener);
-        assertFalse(aliceStatsListener.onStatsLatch.await(5, TimeUnit.SECONDS));
+        assertFalse(
+                aliceStatsListener.onStatsLatch.await(TestUtils.SMALL_WAIT, TimeUnit.MILLISECONDS));
     }
 
     private StatsReport expectStatsReportTracksSize(
@@ -425,7 +455,9 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                     new CallbackHelper.FakeStatsListener();
             aliceStatsListener.onStatsLatch = new CountDownLatch(1);
             aliceRoom.getStats(aliceStatsListener);
-            assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(
+                    aliceStatsListener.onStatsLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
             List<StatsReport> statsReportList = aliceStatsListener.getStatsReports();
             assertEquals(1, statsReportList.size());

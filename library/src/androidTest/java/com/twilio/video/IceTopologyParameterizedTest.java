@@ -179,7 +179,7 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         fail();
                     }
                 });
-        assertTrue(connectFailure.await(10, TimeUnit.SECONDS));
+        assertTrue(connectFailure.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Ignore
@@ -204,9 +204,13 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         .build();
 
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RoomUtils.completeRoom(room);
     }
 
@@ -229,11 +233,14 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         .build();
 
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        boolean isConnected = roomListener.onConnectedLatch.await(10, TimeUnit.SECONDS);
+        boolean isConnected =
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         if (isConnected) {
             room.disconnect();
-            roomListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
+            roomListener.onDisconnectedLatch.await(
+                    TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
         } else {
             if (roomListener.getTwilioException() != null) {
                 assertTrue(
@@ -263,10 +270,14 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         .build();
 
         Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        boolean isConnected = roomListener.onConnectedLatch.await(60, TimeUnit.SECONDS);
+        boolean isConnected =
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
         assertTrue(isConnected);
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RoomUtils.completeRoom(room);
     }
 
@@ -297,10 +308,14 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
 
         Room aliceRoom = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         aliceRoom.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RoomUtils.completeRoom(aliceRoom);
     }
 
@@ -328,7 +343,9 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         .build();
 
         Room aliceRoom = Video.connect(mediaTestActivity, connectOptions, aliceListener);
-        assertTrue(aliceListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         bobLocalVideoTrack =
@@ -348,18 +365,30 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
         participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         Room bobRoom = Video.connect(mediaTestActivity, connectOptions, bobListener);
-        assertTrue(bobListener.onConnectedLatch.await(10, TimeUnit.SECONDS));
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(
+                bobListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         aliceRoom.getRemoteParticipants().get(0).setListener(participantListener);
-        assertTrue(participantListener.onSubscribedToAudioTrackLatch.await(10, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);
         bobListener.onDisconnectedLatch = new CountDownLatch(1);
         aliceRoom.disconnect();
         bobRoom.disconnect();
-        assertTrue(aliceListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
-        assertTrue(bobListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         RoomUtils.completeRoom(aliceRoom);
     }
 }

@@ -88,7 +88,8 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
         for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
             roomPair.second.onDisconnectedLatch = new CountDownLatch(1);
             roomPair.first.disconnect();
-            roomPair.second.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
+            roomPair.second.onDisconnectedLatch.await(
+                    TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
         }
         /*
          * After all participants have disconnected complete the room to clean up backend
@@ -113,12 +114,16 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
             }
 
             Room room = createRoom(token, roomListener, roomName);
-            assertTrue(roomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(
+                    roomListener.onConnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
             assertEquals(numberOfParticipants, room.getRemoteParticipants().size());
 
             // check if all participants got notification
             for (Pair<Room, CallbackHelper.FakeRoomListener> roomPair : rooms) {
-                assertTrue(roomPair.second.onParticipantConnectedLatch.await(10, TimeUnit.SECONDS));
+                assertTrue(
+                        roomPair.second.onParticipantConnectedLatch.await(
+                                TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
                 assertEquals(numberOfParticipants, roomPair.first.getRemoteParticipants().size());
             }
 
@@ -155,7 +160,9 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         Room room = Video.connect(context, connectOptions, listener);
-        assertTrue(listener.onConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                listener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         return room;
     }
 }

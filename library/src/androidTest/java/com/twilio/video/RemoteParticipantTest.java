@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import static com.twilio.video.TestUtils.ICE_TIMEOUT;
+import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
 import static junit.framework.Assert.fail;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
@@ -301,7 +302,7 @@ public class RemoteParticipantTest extends BaseVideoTest {
                                         mediaTestActivity,
                                         aliceConnectOptions,
                                         aliceRoomListener)));
-        assertTrue(aliceConnected.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceConnected.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Connect bob
         final LocalAudioTrack bobAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
@@ -313,8 +314,9 @@ public class RemoteParticipantTest extends BaseVideoTest {
                         bobRoom.set(
                                 Video.connect(
                                         mediaTestActivity, bobConnectOptions, bobRoomListener)));
-        assertTrue(bobRoomListener.onConnectedLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(aliceSeesBobConnected.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                bobRoomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(aliceSeesBobConnected.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Publish audio track
         bobHandler.post(
@@ -328,14 +330,17 @@ public class RemoteParticipantTest extends BaseVideoTest {
                 });
 
         // Validate that alice received bob track event and the events happened as expected
-        assertTrue(aliceReceivedBobAudioTrackAdded.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceReceivedBobAudioTrackAdded.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertArrayEquals(expectedTestEvents, testEvents.toArray());
 
         // Teardown test scenario
         aliceRoom.get().disconnect();
         bobRoom.get().disconnect();
-        assertTrue(aliceDisconnected.await(20, TimeUnit.SECONDS));
-        assertTrue(bobRoomListener.onDisconnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(aliceDisconnected.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                bobRoomListener.onDisconnectedLatch.await(
+                        STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         /*
          * After all participants have disconnected complete the room to clean up backend
          * resources.

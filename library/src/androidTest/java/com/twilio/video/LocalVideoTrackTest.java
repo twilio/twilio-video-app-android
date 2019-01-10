@@ -337,7 +337,7 @@ public class LocalVideoTrackTest extends BaseVideoTest {
             localVideoTrack.addRenderer(frameCountRenderer);
             localVideoTrackList.add(localVideoTrack);
         }
-        assertTrue(cameraFrameLatch.await(10, TimeUnit.SECONDS));
+        assertTrue(cameraFrameLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         for (VideoTrack videoTrack : localVideoTrackList) {
             videoTrack.release();

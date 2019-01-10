@@ -98,7 +98,9 @@ public class CodecPreferencesTest extends BaseCodecTest {
                         .iceOptions(iceOptions)
                         .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Validate the codec published
@@ -136,7 +138,9 @@ public class CodecPreferencesTest extends BaseCodecTest {
         ConnectOptions bobConnectOptions =
                 new ConnectOptions.Builder(bobToken).roomName(roomName).build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Validate published codec
@@ -178,7 +182,9 @@ public class CodecPreferencesTest extends BaseCodecTest {
                         .iceOptions(iceOptions)
                         .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Validate published codec

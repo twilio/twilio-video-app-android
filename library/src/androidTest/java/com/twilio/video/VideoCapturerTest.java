@@ -105,7 +105,7 @@ public class VideoCapturerTest extends BaseVideoTest {
                             frameRendered.countDown();
                         },
                         rotationApplied);
-        assertTrue(frameRendered.await(10, TimeUnit.SECONDS));
+        assertTrue(frameRendered.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         this.i420Frame = frameReference.get();
 
         // Validate frame

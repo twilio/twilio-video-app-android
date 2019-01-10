@@ -175,7 +175,9 @@ public abstract class BaseStatsTest extends BaseVideoTest {
             throws InterruptedException {
         listener.onConnectedLatch = new CountDownLatch(1);
         Room room = Video.connect(mediaTestActivity, connectOptions, listener);
-        boolean connected = listener.onConnectedLatch.await(20, TimeUnit.SECONDS);
+        boolean connected =
+                listener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         // Call disconnect before failing to ensure native memory released
         if (!connected) {
@@ -192,7 +194,8 @@ public abstract class BaseStatsTest extends BaseVideoTest {
             CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
-            roomListener.onDisconnectedLatch.await(10, TimeUnit.SECONDS);
+            roomListener.onDisconnectedLatch.await(
+                    TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
         }
     }
 }

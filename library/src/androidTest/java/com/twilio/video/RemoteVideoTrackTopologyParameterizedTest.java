@@ -122,7 +122,9 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                 LocalVideoTrack.create(mediaTestActivity, false, new FakeVideoCapturer());
 
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertFalse(
                 aliceRoom
                         .getRemoteParticipants()
@@ -131,7 +133,9 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                         .get(0)
                         .isTrackEnabled());
         bobLocalVideoTrack.enable(true);
-        assertTrue(participantListener.onVideoTrackEnabledLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onVideoTrackEnabledLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
                 aliceRoom
                         .getRemoteParticipants()
@@ -148,8 +152,11 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                 LocalVideoTrack.create(
                         mediaTestActivity, true, new FakeVideoCapturer(), bobVideoTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
-        assertTrue(aliceParticipantListener.onVideoTrackPublishedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+                aliceParticipantListener.onVideoTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 }

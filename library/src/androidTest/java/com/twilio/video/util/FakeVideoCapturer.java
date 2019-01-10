@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import com.twilio.video.TestUtils;
 import com.twilio.video.VideoCapturer;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
@@ -201,7 +202,7 @@ public class FakeVideoCapturer implements VideoCapturer {
                         capturerStopped.countDown();
                     });
             try {
-                capturerStopped.await(10, TimeUnit.SECONDS);
+                capturerStopped.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 fail("Failed to stop fake capturer");

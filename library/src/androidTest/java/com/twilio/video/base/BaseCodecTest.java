@@ -26,6 +26,7 @@ import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.RemoteAudioTrackStats;
 import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.StatsReport;
+import com.twilio.video.TestUtils;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.util.StringUtils;
@@ -72,8 +73,12 @@ public abstract class BaseCodecTest extends BaseStatsTest {
             bobStatsListener.onStatsLatch = new CountDownLatch(1);
             aliceRoom.getStats(aliceStatsListener);
             bobRoom.getStats(bobStatsListener);
-            assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
-            assertTrue(bobStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+            assertTrue(
+                    aliceStatsListener.onStatsLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+            assertTrue(
+                    bobStatsListener.onStatsLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
             // Extract local and remote audio and video codecs
             if (expectedAudioCodec != null) {

@@ -61,7 +61,9 @@ public class StatsTest extends BaseStatsTest {
                 new CallbackHelper.FakeStatsListener();
         aliceStatsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(aliceStatsListener);
-        assertTrue(aliceStatsListener.onStatsLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceStatsListener.onStatsLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(1 >= aliceStatsListener.getStatsReports().size());
     }
 
@@ -95,6 +97,6 @@ public class StatsTest extends BaseStatsTest {
                             aliceRoom.getStats(statsListener);
                         });
 
-        assertTrue(statsCallback.await(20, TimeUnit.SECONDS));
+        assertTrue(statsCallback.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 }

@@ -194,7 +194,9 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
                         .iceOptions(iceOptions)
                         .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Validate the codec published
@@ -239,7 +241,9 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
                         .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         RemoteParticipant aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
-        assertTrue(aliceListener.onParticipantConnectedLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                aliceListener.onParticipantConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Alice publish video track
@@ -253,8 +257,12 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
         aliceRemoteParticipant.setListener(participantListener);
         aliceLocalParticipant.setListener(localParticipantListener);
         aliceLocalParticipant.publishTrack(aliceLocalVideoTrack);
-        assertTrue(localParticipantListener.onPublishedVideoTrackLatch.await(20, TimeUnit.SECONDS));
-        assertTrue(participantListener.onSubscribedToVideoTrackLatch.await(20, TimeUnit.SECONDS));
+        assertTrue(
+                localParticipantListener.onPublishedVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                participantListener.onSubscribedToVideoTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate the codec published
         assertVideoCodecPublished(expectedCodec);

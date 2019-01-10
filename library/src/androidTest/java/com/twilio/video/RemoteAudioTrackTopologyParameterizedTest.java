@@ -126,7 +126,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(statsListener);
-        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+        statsListener.onStatsLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         // Validate that bobs audio level is zero after playback is disabled
         RemoteAudioTrackStats remoteAudioTrackStats =
@@ -150,7 +150,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(statsListener);
-        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+        statsListener.onStatsLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         // Validate that bobs audio level is greater than 0 after playback enabled
         remoteAudioTrackStats =
@@ -189,7 +189,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(statsListener);
-        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+        statsListener.onStatsLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         // Validate that bobs audio level is zero after playback is disabled
         RemoteAudioTrackStats remoteAudioTrackStats =
@@ -213,7 +213,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         // Request stats report
         statsListener.onStatsLatch = new CountDownLatch(1);
         aliceRoom.getStats(statsListener);
-        statsListener.onStatsLatch.await(20, TimeUnit.SECONDS);
+        statsListener.onStatsLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
 
         // Validate that bobs audio level is greater than 0 after playback enabled
         remoteAudioTrackStats =
@@ -242,8 +242,11 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         bobRemoteParticipant.setListener(aliceParticipantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
-        assertTrue(aliceParticipantListener.onAudioTrackPublishedLatch.await(20, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onSubscribedToAudioTrackLatch.await(20, TimeUnit.SECONDS));
+                aliceParticipantListener.onAudioTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 }
