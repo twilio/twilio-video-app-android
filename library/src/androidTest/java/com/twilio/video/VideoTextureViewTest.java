@@ -19,6 +19,7 @@ package com.twilio.video;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -145,6 +146,7 @@ public class VideoTextureViewTest extends BaseVideoTest {
                             recyclerView.setLayoutManager(
                                     new LinearLayoutManager(videoViewTestActivity));
                             recyclerView.setAdapter(videoViewRecyclerViewAdapter);
+                            videoViewRecyclerViewAdapter.notifyDataSetChanged();
                         });
 
         // Scroll through each item and validate a frame was received
@@ -160,6 +162,14 @@ public class VideoTextureViewTest extends BaseVideoTest {
             assertTrue(
                     videoViewHolder.frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
         }
+        // Clean up
+        for (LocalVideoTrack track : videoTracks) {
+            track.enable(false);
+            track.release();
+        }
+        videoTracks.clear();
+        localVideoTrack.release();
+        localVideoTrack = null;
     }
 
     @Test
@@ -179,6 +189,7 @@ public class VideoTextureViewTest extends BaseVideoTest {
         // Create a list of the same local video track
         localVideoTrack =
                 LocalVideoTrack.create(videoViewTestActivity, true, new FakeVideoCapturer());
+        assertNotNull(localVideoTrack);
         List<LocalVideoTrack> videoTracks = new ArrayList<>(numItems);
         for (int i = 0; i < numItems; i++) {
             videoTracks.add(i, localVideoTrack);
@@ -193,6 +204,7 @@ public class VideoTextureViewTest extends BaseVideoTest {
                 .runOnMainSync(
                         () -> {
                             relativeLayout.addView(listView);
+                            videoViewListViewAdapter.notifyDataSetChanged();
                             listView.setAdapter(videoViewListViewAdapter);
                         });
 
@@ -207,10 +219,19 @@ public class VideoTextureViewTest extends BaseVideoTest {
                             });
             VideoTextureViewListViewAdapter.ViewHolder viewHolder =
                     videoViewListViewAdapter.viewHolderPositionMap.get(position);
+            assertNotNull(viewHolder);
             if (viewHolder.frameCountProxyRendererListener != null) {
                 assertTrue(viewHolder.frameCountProxyRendererListener.waitForFrame(FRAME_DELAY_MS));
             }
         }
+        // Clean up
+        for (LocalVideoTrack track : videoTracks) {
+            track.enable(false);
+            track.release();
+        }
+        videoTracks.clear();
+        localVideoTrack.release();
+        localVideoTrack = null;
     }
 
     private Object[] parametersForCanSetVideoScaleType() {
