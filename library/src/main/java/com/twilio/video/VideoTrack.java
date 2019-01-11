@@ -32,7 +32,10 @@ public abstract class VideoTrack implements Track {
     private boolean isEnabled;
     private boolean isReleased = false;
 
-    VideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled, @NonNull String name) {
+    VideoTrack(
+            @NonNull org.webrtc.VideoTrack webRtcVideoTrack,
+            boolean enabled,
+            @NonNull String name) {
         this.isEnabled = enabled;
         this.name = name;
         this.webRtcVideoTrack = webRtcVideoTrack;
@@ -113,6 +116,7 @@ public abstract class VideoTrack implements Track {
      * Returns the video track name. A pseudo random string is returned if no track name was
      * specified.
      */
+    @NonNull
     @Override
     public String getName() {
         return name;

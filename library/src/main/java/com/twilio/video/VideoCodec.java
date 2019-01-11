@@ -16,21 +16,25 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** Abstract base class for video codecs. */
 public abstract class VideoCodec {
     private final String name;
 
-    protected VideoCodec(String name) {
+    protected VideoCodec(@NonNull String name) {
         this.name = name;
     }
 
     /** Returns the string representation of the video codec. */
+    @NonNull
     public String getName() {
         return name;
     }
 
     /** Returns the name of the video codec. */
     @Override
+    @NonNull
     public String toString() {
         return name;
     }

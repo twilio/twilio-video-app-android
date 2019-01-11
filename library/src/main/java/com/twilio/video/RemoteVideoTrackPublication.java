@@ -42,6 +42,7 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
      * Returns the remote video track's server identifier. This value uniquely identifies the remote
      * video track within the scope of a {@link Room}.
      */
+    @NonNull
     @Override
     public String getTrackSid() {
         return sid;
@@ -51,8 +52,9 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
      * Returns the base video track object of the published remote video track. {@code null} is
      * returned if the track is not subscribed to.
      */
+    @Nullable
     @Override
-    public synchronized @Nullable VideoTrack getVideoTrack() {
+    public synchronized VideoTrack getVideoTrack() {
         return remoteVideoTrack;
     }
 
@@ -60,6 +62,7 @@ public class RemoteVideoTrackPublication implements VideoTrackPublication {
      * Returns the name of the published video track. An empty string is returned if no track name
      * was specified.
      */
+    @NonNull
     @Override
     public String getTrackName() {
         return name;

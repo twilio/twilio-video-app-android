@@ -16,52 +16,62 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public class VideoDimensions {
     public static final int CIF_VIDEO_WIDTH = 352;
     public static final int CIF_VIDEO_HEIGHT = 288;
     /** CIF (352 x 288) resolution in 1.22:1 aspect ratio */
+    @NonNull
     public static final VideoDimensions CIF_VIDEO_DIMENSIONS =
             new VideoDimensions(CIF_VIDEO_WIDTH, CIF_VIDEO_HEIGHT);
 
     public static final int VGA_VIDEO_WIDTH = 640;
     public static final int VGA_VIDEO_HEIGHT = 480;
     /** VGA (640 x 480) resolution in 4:3 aspect ratio */
+    @NonNull
     public static final VideoDimensions VGA_VIDEO_DIMENSIONS =
             new VideoDimensions(VGA_VIDEO_WIDTH, VGA_VIDEO_HEIGHT);
 
     public static final int WVGA_VIDEO_WIDTH = 800;
     public static final int WVGA_VIDEO_HEIGHT = 480;
     /** WVGA (800 x 480) resolution */
+    @NonNull
     public static final VideoDimensions WVGA_VIDEO_DIMENSIONS =
             new VideoDimensions(WVGA_VIDEO_WIDTH, WVGA_VIDEO_HEIGHT);
 
     public static final int HD_540P_VIDEO_WIDTH = 960;
     public static final int HD_540P_VIDEO_HEIGHT = 540;
     /** HD 540P (960 x 540) resolution */
+    @NonNull
     public static final VideoDimensions HD_540P_VIDEO_DIMENSIONS =
             new VideoDimensions(HD_540P_VIDEO_WIDTH, HD_540P_VIDEO_HEIGHT);
 
     public static final int HD_720P_VIDEO_WIDTH = 1280;
     public static final int HD_720P_VIDEO_HEIGHT = 720;
     /** HD 720P (1280 x 720) resolution */
+    @NonNull
     public static final VideoDimensions HD_720P_VIDEO_DIMENSIONS =
             new VideoDimensions(HD_720P_VIDEO_WIDTH, HD_720P_VIDEO_HEIGHT);
 
     public static final int HD_960P_VIDEO_WIDTH = 1280;
     public static final int HD_960P_VIDEO_HEIGHT = 960;
     /** HD 960P (1280 x 960) resolution */
+    @NonNull
     public static final VideoDimensions HD_960P_VIDEO_DIMENSIONS =
             new VideoDimensions(HD_960P_VIDEO_WIDTH, HD_960P_VIDEO_HEIGHT);
 
     public static final int HD_S1080P_VIDEO_WIDTH = 1440;
     public static final int HD_S1080P_VIDEO_HEIGHT = 1080;
     /** HD Standard 1080P (1440 x 1080) resolution */
+    @NonNull
     public static final VideoDimensions HD_S1080P_VIDEO_DIMENSIONS =
             new VideoDimensions(HD_S1080P_VIDEO_WIDTH, HD_S1080P_VIDEO_HEIGHT);
 
     public static final int HD_1080P_VIDEO_WIDTH = 1920;
     public static final int HD_1080P_VIDEO_HEIGHT = 1080;
     /** HD Widescreen 1080P (1920 x 1080) resolution */
+    @NonNull
     public static final VideoDimensions HD_1080P_VIDEO_DIMENSIONS =
             new VideoDimensions(HD_1080P_VIDEO_WIDTH, HD_1080P_VIDEO_HEIGHT);
 
@@ -96,6 +106,7 @@ public class VideoDimensions {
         return result;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return String.valueOf(width) + "x" + String.valueOf(height);

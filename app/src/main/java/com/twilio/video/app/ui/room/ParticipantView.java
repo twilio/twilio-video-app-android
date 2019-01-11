@@ -146,7 +146,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     @Override
-    public void renderFrame(I420Frame frame) {
+    public void renderFrame(@NonNull I420Frame frame) {
         videoView.renderFrame(frame);
     }
 

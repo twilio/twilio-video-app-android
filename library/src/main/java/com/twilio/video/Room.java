@@ -63,7 +63,7 @@ public class Room {
     private final Room.Listener roomListenerProxy =
             new Room.Listener() {
                 @Override
-                public void onConnected(final Room room) {
+                public void onConnected(@NonNull final Room room) {
                     handler.post(
                             () -> {
                                 ThreadChecker.checkIsValidThread(handler);
@@ -74,7 +74,7 @@ public class Room {
 
                 @Override
                 public void onConnectFailure(
-                        final Room room, final TwilioException twilioException) {
+                        @NonNull final Room room, @NonNull final TwilioException twilioException) {
                     // Release native room
                     releaseRoom();
 
@@ -124,7 +124,8 @@ public class Room {
                 }
 
                 @Override
-                public void onDisconnected(final Room room, final TwilioException twilioException) {
+                public void onDisconnected(
+                        @NonNull final Room room, @Nullable final TwilioException twilioException) {
                     // Release native room
                     releaseRoom();
 
@@ -152,7 +153,7 @@ public class Room {
 
                 @Override
                 public void onParticipantConnected(
-                        final Room room, final RemoteParticipant participant) {
+                        @NonNull final Room room, @NonNull final RemoteParticipant participant) {
                     handler.post(
                             () -> {
                                 ThreadChecker.checkIsValidThread(handler);
@@ -168,7 +169,8 @@ public class Room {
 
                 @Override
                 public void onParticipantDisconnected(
-                        final Room room, final RemoteParticipant remoteParticipant) {
+                        @NonNull final Room room,
+                        @NonNull final RemoteParticipant remoteParticipant) {
                     // Release participant
                     remoteParticipant.release();
 
@@ -187,7 +189,7 @@ public class Room {
                 }
 
                 @Override
-                public void onRecordingStarted(final Room room) {
+                public void onRecordingStarted(@NonNull final Room room) {
                     handler.post(
                             () -> {
                                 ThreadChecker.checkIsValidThread(handler);
@@ -197,7 +199,7 @@ public class Room {
                 }
 
                 @Override
-                public void onRecordingStopped(final Room room) {
+                public void onRecordingStopped(@NonNull final Room room) {
                     handler.post(
                             () -> {
                                 ThreadChecker.checkIsValidThread(handler);
@@ -214,7 +216,11 @@ public class Room {
                 }
             };
 
-    Room(Context context, String name, Handler handler, Listener listener) {
+    Room(
+            @NonNull Context context,
+            @NonNull String name,
+            @NonNull Handler handler,
+            @NonNull Listener listener) {
         this.context = context;
         this.name = name;
         this.sid = "";
@@ -228,16 +234,19 @@ public class Room {
      * Returns the name of the current room. This method will return the SID if the room was created
      * without a name.
      */
+    @NonNull
     public String getName() {
         return name;
     }
 
     /** Returns the SID of the current room. */
+    @NonNull
     public String getSid() {
         return sid;
     }
 
     /** Returns the current room state. */
+    @NonNull
     public synchronized Room.State getState() {
         return roomState;
     }
@@ -272,7 +281,6 @@ public class Room {
      *
      * @param statsListener listener that receives stats reports for all media tracks.
      */
-    @Nullable
     public synchronized void getStats(@NonNull StatsListener statsListener) {
         Preconditions.checkNotNull(statsListener, "StatsListener must not be null");
         if (roomState == Room.State.DISCONNECTED) {
@@ -304,7 +312,7 @@ public class Room {
      * creation is fully completed.
      */
     @SuppressLint("RestrictedApi")
-    void connect(final ConnectOptions connectOptions) {
+    void connect(@NonNull final ConnectOptions connectOptions) {
         // Check if audio or video tracks have been released
         ConnectOptions.checkAudioTracksReleased(connectOptions.getAudioTracks());
         ConnectOptions.checkVideoTracksReleased(connectOptions.getVideoTracks());
@@ -400,7 +408,7 @@ public class Room {
          *
          * @param room the connected room.
          */
-        void onConnected(Room room);
+        void onConnected(@NonNull Room room);
 
         /**
          * Called when a connection to a room failed.
@@ -408,7 +416,7 @@ public class Room {
          * @param room the room that failed to be connected to.
          * @param twilioException an exception describing why connect failed.
          */
-        void onConnectFailure(Room room, TwilioException twilioException);
+        void onConnectFailure(@NonNull Room room, @NonNull TwilioException twilioException);
 
         /**
          * Called when the {@link LocalParticipant} has experienced a network disruption and the
@@ -438,7 +446,7 @@ public class Room {
          *     disconnected from. This value will be null is there were no problems disconnecting
          *     from the room.
          */
-        void onDisconnected(Room room, TwilioException twilioException);
+        void onDisconnected(@NonNull Room room, @Nullable TwilioException twilioException);
 
         /**
          * Called when a participant has connected to a room.
@@ -446,7 +454,8 @@ public class Room {
          * @param room the room the participant connected to.
          * @param remoteParticipant the newly connected participant.
          */
-        void onParticipantConnected(Room room, RemoteParticipant remoteParticipant);
+        void onParticipantConnected(
+                @NonNull Room room, @NonNull RemoteParticipant remoteParticipant);
 
         /**
          * Called when a participant has disconnected from a room. The disconnected participant's
@@ -456,7 +465,8 @@ public class Room {
          * @param room the room the participant disconnected from.
          * @param remoteParticipant the disconnected participant.
          */
-        void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant);
+        void onParticipantDisconnected(
+                @NonNull Room room, @NonNull RemoteParticipant remoteParticipant);
 
         /**
          * This method is only called when a {@link Room} which was not previously recording starts
@@ -465,7 +475,7 @@ public class Room {
          *
          * @param room
          */
-        void onRecordingStarted(Room room);
+        void onRecordingStarted(@NonNull Room room);
 
         /**
          * This method is only called when a {@link Room} which was previously recording stops
@@ -474,7 +484,7 @@ public class Room {
          *
          * @param room
          */
-        void onRecordingStopped(Room room);
+        void onRecordingStopped(@NonNull Room room);
     }
 
     /** Represents the current state of a {@link Room}. */

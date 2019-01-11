@@ -39,6 +39,7 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
      * Returns the remote data track's server identifier. This value uniquely identifies the remote
      * data track within the scope of a {@link Room}.
      */
+    @NonNull
     @Override
     public String getTrackSid() {
         return sid;
@@ -59,6 +60,7 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
      * was specified.
      */
     @Override
+    @NonNull
     public String getTrackName() {
         return name;
     }

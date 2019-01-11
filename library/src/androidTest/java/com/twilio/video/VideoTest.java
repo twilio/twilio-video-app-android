@@ -85,6 +85,21 @@ public class VideoTest extends BaseVideoTest {
         assertTrue(MediaFactory.isReleased());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void moduleLogLevel_ShouldNotAcceptNullModule() {
+        Video.setModuleLogLevel(null, LogLevel.ALL);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void moduleLogLevel_ShouldNotAcceptNullLogLevel() {
+        Video.setModuleLogLevel(LogModule.CORE, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void logLevel_ShouldNotAcceptNullLogLevel() {
+        Video.setLogLevel(null);
+    }
+
     @Test
     public void logLevel_shouldBeRetained() {
         Video.setLogLevel(LogLevel.DEBUG);

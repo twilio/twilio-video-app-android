@@ -36,7 +36,7 @@ public class FrameCountProxyRendererListener implements VideoRenderer {
     }
 
     @Override
-    public void renderFrame(I420Frame frame) {
+    public void renderFrame(@NonNull I420Frame frame) {
         frameArrived.get().countDown();
         videoRenderer.renderFrame(frame);
     }

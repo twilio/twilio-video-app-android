@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public abstract class RemoteTrackStats extends BaseTrackStats {
     /** Total number of bytes received */
     public final long bytesReceived;
@@ -24,10 +26,10 @@ public abstract class RemoteTrackStats extends BaseTrackStats {
     public final int packetsReceived;
 
     protected RemoteTrackStats(
-            String trackSid,
+            @NonNull String trackSid,
             int packetsLost,
-            String codec,
-            String ssrc,
+            @NonNull String codec,
+            @NonNull String ssrc,
             double timestamp,
             long bytesReceived,
             int packetsReceived) {

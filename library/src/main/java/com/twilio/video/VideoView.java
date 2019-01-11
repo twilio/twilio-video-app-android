@@ -62,11 +62,11 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
     private VideoRenderer.Listener listener;
     private EglBaseProvider eglBaseProvider;
 
-    public VideoView(Context context) {
+    public VideoView(@NonNull Context context) {
         this(context, null);
     }
 
-    public VideoView(Context context, AttributeSet attrs) {
+    public VideoView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray a =
                 context.getTheme().obtainStyledAttributes(attrs, R.styleable.VideoView, 0, 0);

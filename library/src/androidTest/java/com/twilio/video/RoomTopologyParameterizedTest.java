@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.Manifest;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
@@ -402,12 +403,13 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                 connectOptions,
                 new Room.Listener() {
                     @Override
-                    public void onConnected(Room room) {
+                    public void onConnected(@NonNull Room room) {
                         fail();
                     }
 
                     @Override
-                    public void onConnectFailure(Room room, TwilioException twilioException) {
+                    public void onConnectFailure(
+                            @NonNull Room room, @NonNull TwilioException twilioException) {
                         assertEquals(
                                 TwilioException.ACCESS_TOKEN_INVALID_EXCEPTION,
                                 twilioException.getCode());
@@ -426,29 +428,30 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                     }
 
                     @Override
-                    public void onDisconnected(Room room, TwilioException twilioException) {
+                    public void onDisconnected(
+                            @NonNull Room room, @Nullable TwilioException twilioException) {
                         fail();
                     }
 
                     @Override
                     public void onParticipantConnected(
-                            Room room, RemoteParticipant remoteParticipant) {
+                            @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                         fail();
                     }
 
                     @Override
                     public void onParticipantDisconnected(
-                            Room room, RemoteParticipant remoteParticipant) {
+                            @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                         fail();
                     }
 
                     @Override
-                    public void onRecordingStarted(Room room) {
+                    public void onRecordingStarted(@NonNull Room room) {
                         fail();
                     }
 
                     @Override
-                    public void onRecordingStopped(Room room) {
+                    public void onRecordingStopped(@NonNull Room room) {
                         fail();
                     }
                 });
@@ -502,12 +505,13 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                 connectOptions,
                 new Room.Listener() {
                     @Override
-                    public void onConnected(Room room) {
+                    public void onConnected(@NonNull Room room) {
                         connectedLatch.countDown();
                     }
 
                     @Override
-                    public void onConnectFailure(Room room, TwilioException twilioException) {
+                    public void onConnectFailure(
+                            @NonNull Room room, @NonNull TwilioException twilioException) {
                         fail();
                     }
 
@@ -523,7 +527,8 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                     }
 
                     @Override
-                    public void onDisconnected(Room room, TwilioException twilioException) {
+                    public void onDisconnected(
+                            @NonNull Room room, @Nullable TwilioException twilioException) {
                         assertEquals(
                                 TwilioException.PARTICIPANT_DUPLICATE_IDENTITY_EXCEPTION,
                                 twilioException.getCode());
@@ -531,23 +536,24 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                     }
 
                     @Override
-                    public void onParticipantConnected(Room room, RemoteParticipant participant) {
+                    public void onParticipantConnected(
+                            @NonNull Room room, @NonNull RemoteParticipant participant) {
                         fail();
                     }
 
                     @Override
                     public void onParticipantDisconnected(
-                            Room room, RemoteParticipant participant) {
+                            @NonNull Room room, @NonNull RemoteParticipant participant) {
                         fail();
                     }
 
                     @Override
-                    public void onRecordingStarted(Room room) {
+                    public void onRecordingStarted(@NonNull Room room) {
                         fail();
                     }
 
                     @Override
-                    public void onRecordingStopped(Room room) {
+                    public void onRecordingStopped(@NonNull Room room) {
                         fail();
                     }
                 });

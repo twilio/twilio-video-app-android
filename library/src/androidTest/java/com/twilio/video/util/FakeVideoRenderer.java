@@ -16,12 +16,13 @@
 
 package com.twilio.video.util;
 
+import android.support.annotation.NonNull;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 
 public class FakeVideoRenderer implements VideoRenderer {
     @Override
-    public void renderFrame(I420Frame frame) {
+    public void renderFrame(@NonNull I420Frame frame) {
         frame.release();
     }
 }

@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** A VideoRenderer is used to receive frames from a {@link VideoTrack}. */
 public interface VideoRenderer {
     /** Interface that provides events related to a {@link VideoRenderer}. */
@@ -38,5 +40,5 @@ public interface VideoRenderer {
      *
      * @param frame I420 YUV frame
      */
-    void renderFrame(I420Frame frame);
+    void renderFrame(@NonNull I420Frame frame);
 }

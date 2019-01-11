@@ -16,11 +16,13 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import java.util.List;
 
 /** Generic video capturing interface. */
 public interface VideoCapturer {
     /** Returns list of all supported video formats this capturer supports. */
+    @NonNull
     List<VideoFormat> getSupportedFormats();
 
     /**
@@ -36,7 +38,7 @@ public interface VideoCapturer {
      * @param captureFormat format to start capturing in.
      * @param capturerListener consumes frames upon availability.
      */
-    void startCapture(VideoFormat captureFormat, Listener capturerListener);
+    void startCapture(@NonNull VideoFormat captureFormat, @NonNull Listener capturerListener);
 
     /** Stop capturing. This method must block until capturer has stopped. */
     void stopCapture();
@@ -54,6 +56,6 @@ public interface VideoCapturer {
         void onCapturerStarted(boolean success);
 
         /** Provides available video frame. */
-        void onFrameCaptured(VideoFrame videoFrame);
+        void onFrameCaptured(@NonNull VideoFrame videoFrame);
     }
 }

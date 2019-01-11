@@ -27,6 +27,7 @@ import static org.junit.Assume.assumeTrue;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -326,11 +327,13 @@ public class LocalVideoTrackTest extends BaseVideoTest {
                                 }
 
                                 @Override
-                                public void onCameraSwitched(String newCameraId) {}
+                                public void onCameraSwitched(@NonNull String newCameraId) {}
 
                                 @Override
                                 public void onError(
-                                        Camera2Capturer.Exception camera2CapturerException) {}
+                                        @NonNull
+                                                Camera2Capturer.Exception
+                                                        camera2CapturerException) {}
                             });
             capturers.add(camera);
             localVideoTrack = LocalVideoTrack.create(context, true, camera);
@@ -351,14 +354,11 @@ public class LocalVideoTrackTest extends BaseVideoTest {
 
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(2000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                        () -> {
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
                         });
     }

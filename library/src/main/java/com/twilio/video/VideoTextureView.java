@@ -23,6 +23,7 @@ import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.TextureView;
@@ -76,11 +77,11 @@ public class VideoTextureView extends TextureView
 
     private EglBaseProvider eglBaseProvider;
 
-    public VideoTextureView(Context context) {
+    public VideoTextureView(@NonNull Context context) {
         this(context, null);
     }
 
-    public VideoTextureView(Context context, AttributeSet attrs) {
+    public VideoTextureView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         String resourceName = getResourceName();
         eglRenderer = new EglRenderer(resourceName);
@@ -128,6 +129,7 @@ public class VideoTextureView extends TextureView
     }
 
     /** Returns the current {@link VideoScaleType}. */
+    @NonNull
     public VideoScaleType getVideoScaleType() {
         return videoScaleType;
     }
@@ -140,7 +142,7 @@ public class VideoTextureView extends TextureView
      * height to {@link android.view.ViewGroup.LayoutParams#MATCH_PARENT} results in the video being
      * scaled to fill the maximum value of the dimension.
      */
-    public void setVideoScaleType(VideoScaleType scalingType) {
+    public void setVideoScaleType(@NonNull VideoScaleType scalingType) {
         ThreadUtils.checkIsOnMainThread();
 
         // Log warning if scale type may not be respected in certain dimensions
@@ -176,7 +178,7 @@ public class VideoTextureView extends TextureView
     }
 
     @Override
-    public void renderFrame(I420Frame frame) {
+    public void renderFrame(@NonNull I420Frame frame) {
         updateFrameDimensionsAndReportEvents(frame);
         eglRenderer.renderFrame(frame.webRtcI420Frame);
     }
@@ -281,13 +283,7 @@ public class VideoTextureView extends TextureView
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
         ThreadUtils.checkIsOnMainThread();
         final CountDownLatch completionLatch = new CountDownLatch(1);
-        eglRenderer.releaseEglSurface(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        completionLatch.countDown();
-                    }
-                });
+        eglRenderer.releaseEglSurface(completionLatch::countDown);
         ThreadUtils.awaitUninterruptibly(completionLatch);
         return true;
     }
@@ -340,12 +336,9 @@ public class VideoTextureView extends TextureView
                 rotatedFrameHeight = frame.rotatedHeight();
                 frameRotation = frame.rotationDegree;
                 uiThreadHandler.post(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                updateSurfaceSize();
-                                requestLayout();
-                            }
+                        () -> {
+                            updateSurfaceSize();
+                            requestLayout();
                         });
             }
         }

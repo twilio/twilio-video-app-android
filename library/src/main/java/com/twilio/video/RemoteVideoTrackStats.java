@@ -16,22 +16,24 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public class RemoteVideoTrackStats extends RemoteTrackStats {
     /** Received frame dimensions */
-    public final VideoDimensions dimensions;
+    @NonNull public final VideoDimensions dimensions;
 
     /** Received frame rate */
     public final int frameRate;
 
     RemoteVideoTrackStats(
-            String trackSid,
+            @NonNull String trackSid,
             int packetsLost,
-            String codec,
-            String ssrc,
+            @NonNull String codec,
+            @NonNull String ssrc,
             double timestamp,
             long bytesReceived,
             int packetsReceived,
-            VideoDimensions dimensions,
+            @NonNull VideoDimensions dimensions,
             int frameRate) {
         super(trackSid, packetsLost, codec, ssrc, timestamp, bytesReceived, packetsReceived);
         this.dimensions = dimensions;

@@ -117,7 +117,7 @@ public class ScreenCapturer implements VideoCapturer {
          *
          * @param errorDescription description of the error that occurred.
          */
-        void onScreenCaptureError(String errorDescription);
+        void onScreenCaptureError(@NonNull String errorDescription);
 
         /** Indicates when the first frame has been captured from the screen. */
         void onFirstFrameAvailable();
@@ -149,6 +149,7 @@ public class ScreenCapturer implements VideoCapturer {
      *
      * @return all supported video formats.
      */
+    @NonNull
     @Override
     public synchronized List<VideoFormat> getSupportedFormats() {
         List<VideoFormat> screencastFormats = new ArrayList<>();
@@ -182,7 +183,8 @@ public class ScreenCapturer implements VideoCapturer {
      * @param capturerListener consumer of available frames.
      */
     @Override
-    public void startCapture(VideoFormat captureFormat, VideoCapturer.Listener capturerListener) {
+    public void startCapture(
+            @NonNull VideoFormat captureFormat, @NonNull VideoCapturer.Listener capturerListener) {
         this.capturerListener = capturerListener;
         this.firstFrameReported = false;
         if (screenCaptureIntentResult != Activity.RESULT_OK) {

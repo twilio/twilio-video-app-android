@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import java.util.List;
 
 /** Interface that provides event related to {@link Room#getStats(StatsListener)} */
@@ -25,5 +26,5 @@ public interface StatsListener {
      *
      * @param statsReports Reports for all media tracks.
      */
-    void onStats(List<StatsReport> statsReports);
+    void onStats(@NonNull List<StatsReport> statsReports);
 }

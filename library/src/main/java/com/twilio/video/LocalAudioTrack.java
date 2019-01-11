@@ -133,6 +133,7 @@ public class LocalAudioTrack extends AudioTrack {
      * Returns the local audio track name. A pseudo random string is returned if no track name was
      * specified.
      */
+    @NonNull
     @Override
     public String getName() {
         return super.getName();

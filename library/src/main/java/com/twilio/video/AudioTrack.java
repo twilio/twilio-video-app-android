@@ -43,6 +43,7 @@ public abstract class AudioTrack implements Track {
      * Returns the audio track name. A pseudo random string is returned if no track name was
      * specified.
      */
+    @NonNull
     @Override
     public String getName() {
         return name;

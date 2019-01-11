@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import com.twilio.video.TestUtils;
 import com.twilio.video.VideoCapturer;
 import com.twilio.video.VideoDimensions;
@@ -101,6 +102,7 @@ public class FakeVideoCapturer implements VideoCapturer {
         return started.get();
     }
 
+    @NonNull
     @Override
     public synchronized List<VideoFormat> getSupportedFormats() {
         return supportedFormats;
@@ -112,7 +114,8 @@ public class FakeVideoCapturer implements VideoCapturer {
     }
 
     @Override
-    public void startCapture(VideoFormat captureFormat, VideoCapturer.Listener capturerListener) {
+    public void startCapture(
+            @NonNull VideoFormat captureFormat, @NonNull VideoCapturer.Listener capturerListener) {
         this.captureFormat = captureFormat;
         this.capturerListener = capturerListener;
         this.started.set(true);

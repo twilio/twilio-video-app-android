@@ -38,6 +38,7 @@ public class VideoFrame {
             return this.rotation;
         }
 
+        @NonNull
         public static RotationAngle fromInt(int rotation) {
             if (rotation == 0) {
                 return ROTATION_0;
@@ -59,9 +60,9 @@ public class VideoFrame {
     /** The bytes of a frame. */
     public final byte[] imageBuffer;
     /** The size of a frame. */
-    public final VideoDimensions dimensions;
+    @NonNull public final VideoDimensions dimensions;
     /** The orientation of a frame in degrees (must be multiple of 90). */
-    public final RotationAngle orientation;
+    @NonNull public final RotationAngle orientation;
     /** The time in nanoseconds at which this frame was captured. */
     public final long timestamp;
 

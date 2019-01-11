@@ -16,12 +16,17 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** A remote video track represents a remote video source. */
 public class RemoteVideoTrack extends VideoTrack {
     private final String sid;
 
     RemoteVideoTrack(
-            org.webrtc.VideoTrack webRtcVideoTrack, String sid, String name, boolean enabled) {
+            @NonNull org.webrtc.VideoTrack webRtcVideoTrack,
+            @NonNull String sid,
+            @NonNull String name,
+            boolean enabled) {
         super(webRtcVideoTrack, enabled, name);
         this.sid = sid;
     }
@@ -30,6 +35,7 @@ public class RemoteVideoTrack extends VideoTrack {
      * Returns the remote video track's server identifier. This value uniquely identifies the remote
      * video track within the scope of a {@link Room}.
      */
+    @NonNull
     public String getSid() {
         return sid;
     }

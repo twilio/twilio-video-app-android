@@ -16,8 +16,11 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** A published video track represents a video track that has been shared with a {@link Room}. */
 public interface VideoTrackPublication extends TrackPublication {
     /** Returns the published video track. */
+    @NonNull
     VideoTrack getVideoTrack();
 }

@@ -80,18 +80,14 @@ public class VideoTextureViewTest extends BaseVideoTest {
     public void setVideoScaleType_canBeCalledBeforeViewInflated() {
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                VideoTextureView videoView =
-                                        new VideoTextureView(videoViewTestActivity);
-                                VideoScaleType expectedVideoScaleType =
-                                        VideoScaleType.ASPECT_BALANCED;
+                        () -> {
+                            VideoTextureView videoView =
+                                    new VideoTextureView(videoViewTestActivity);
+                            VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
 
-                                videoView.setVideoScaleType(expectedVideoScaleType);
+                            videoView.setVideoScaleType(expectedVideoScaleType);
 
-                                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
-                            }
+                            assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
                         });
     }
 
@@ -100,22 +96,18 @@ public class VideoTextureViewTest extends BaseVideoTest {
     public void canSetVideoScaleType(final int width, final int height) {
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                VideoTextureView videoView =
-                                        new VideoTextureView(videoViewTestActivity);
-                                RelativeLayout.LayoutParams layoutParams =
-                                        new RelativeLayout.LayoutParams(width, height);
-                                VideoScaleType expectedVideoScaleType =
-                                        VideoScaleType.ASPECT_BALANCED;
+                        () -> {
+                            VideoTextureView videoView =
+                                    new VideoTextureView(videoViewTestActivity);
+                            RelativeLayout.LayoutParams layoutParams =
+                                    new RelativeLayout.LayoutParams(width, height);
+                            VideoScaleType expectedVideoScaleType = VideoScaleType.ASPECT_BALANCED;
 
-                                videoView.setLayoutParams(layoutParams);
-                                relativeLayout.addView(videoView);
-                                videoView.setVideoScaleType(expectedVideoScaleType);
+                            videoView.setLayoutParams(layoutParams);
+                            relativeLayout.addView(videoView);
+                            videoView.setVideoScaleType(expectedVideoScaleType);
 
-                                assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
-                            }
+                            assertEquals(expectedVideoScaleType, videoView.getVideoScaleType());
                         });
     }
 
@@ -148,14 +140,11 @@ public class VideoTextureViewTest extends BaseVideoTest {
         // Add the recycler view to the layout
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                relativeLayout.addView(recyclerView);
-                                recyclerView.setLayoutManager(
-                                        new LinearLayoutManager(videoViewTestActivity));
-                                recyclerView.setAdapter(videoViewRecyclerViewAdapter);
-                            }
+                        () -> {
+                            relativeLayout.addView(recyclerView);
+                            recyclerView.setLayoutManager(
+                                    new LinearLayoutManager(videoViewTestActivity));
+                            recyclerView.setAdapter(videoViewRecyclerViewAdapter);
                         });
 
         // Scroll through each item and validate a frame was received
@@ -202,12 +191,9 @@ public class VideoTextureViewTest extends BaseVideoTest {
         // Add the list view to the layout
         InstrumentationRegistry.getInstrumentation()
                 .runOnMainSync(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                relativeLayout.addView(listView);
-                                listView.setAdapter(videoViewListViewAdapter);
-                            }
+                        () -> {
+                            relativeLayout.addView(listView);
+                            listView.setAdapter(videoViewListViewAdapter);
                         });
 
         // Scroll through each item and validate a frame was received
@@ -215,12 +201,9 @@ public class VideoTextureViewTest extends BaseVideoTest {
             final int position = i;
             InstrumentationRegistry.getInstrumentation()
                     .runOnMainSync(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    listView.smoothScrollToPosition(position);
-                                    listView.setSelection(position);
-                                }
+                            () -> {
+                                listView.smoothScrollToPosition(position);
+                                listView.setSelection(position);
                             });
             VideoTextureViewListViewAdapter.ViewHolder viewHolder =
                     videoViewListViewAdapter.viewHolderPositionMap.get(position);

@@ -17,7 +17,6 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * A local data track publication represents a {@link LocalDataTrack} that has been shared to a
@@ -39,6 +38,7 @@ public class LocalDataTrackPublication implements DataTrackPublication {
      * Returns the local data track's server identifier. This value uniquely identifies the local
      * data track within the scope of a {@link Room}.
      */
+    @NonNull
     @Override
     public String getTrackSid() {
         return sid;
@@ -48,6 +48,7 @@ public class LocalDataTrackPublication implements DataTrackPublication {
      * Returns the name of the local data track. An empty string is returned if no name was
      * specified.
      */
+    @NonNull
     @Override
     public String getTrackName() {
         return localDataTrack.getName();
@@ -66,7 +67,7 @@ public class LocalDataTrackPublication implements DataTrackPublication {
     }
 
     /** Returns the published local data track. */
-    @Nullable
+    @NonNull
     public LocalDataTrack getLocalDataTrack() {
         return localDataTrack;
     }

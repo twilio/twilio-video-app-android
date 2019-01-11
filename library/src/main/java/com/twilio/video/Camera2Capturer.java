@@ -228,6 +228,7 @@ public class Camera2Capturer implements VideoCapturer {
      *
      * @return all supported video formats.
      */
+    @NonNull
     @Override
     public synchronized List<VideoFormat> getSupportedFormats() {
         checkCapturerState();

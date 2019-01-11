@@ -18,6 +18,7 @@ package com.twilio.video;
 
 import static org.junit.Assert.assertTrue;
 
+import android.support.annotation.NonNull;
 import com.twilio.video.base.BaseCamera2CapturerTest;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -67,10 +68,10 @@ public class Camera2CapturerIdParameterizedTest extends BaseCamera2CapturerTest 
                             }
 
                             @Override
-                            public void onCameraSwitched(String cameraId) {}
+                            public void onCameraSwitched(@NonNull String cameraId) {}
 
                             @Override
-                            public void onError(Camera2Capturer.Exception exception) {}
+                            public void onError(@NonNull Camera2Capturer.Exception exception) {}
                         });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
@@ -104,10 +105,10 @@ public class Camera2CapturerIdParameterizedTest extends BaseCamera2CapturerTest 
                             public void onFirstFrameAvailable() {}
 
                             @Override
-                            public void onCameraSwitched(String cameraId) {}
+                            public void onCameraSwitched(@NonNull String cameraId) {}
 
                             @Override
-                            public void onError(Camera2Capturer.Exception exception) {}
+                            public void onError(@NonNull Camera2Capturer.Exception exception) {}
                         });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
         localVideoTrack.addRenderer(localVideo);
@@ -132,10 +133,10 @@ public class Camera2CapturerIdParameterizedTest extends BaseCamera2CapturerTest 
                             }
 
                             @Override
-                            public void onCameraSwitched(String cameraId) {}
+                            public void onCameraSwitched(@NonNull String cameraId) {}
 
                             @Override
-                            public void onError(Camera2Capturer.Exception exception) {}
+                            public void onError(@NonNull Camera2Capturer.Exception exception) {}
                         });
         for (int i = 0; i < reuseCount; i++) {
             firstFrameReceived.set(new CountDownLatch(1));

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.Manifest;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
@@ -129,12 +130,13 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                 connectOptions,
                 new Room.Listener() {
                     @Override
-                    public void onConnected(Room room) {
+                    public void onConnected(@NonNull Room room) {
                         fail();
                     }
 
                     @Override
-                    public void onConnectFailure(Room room, TwilioException twilioException) {
+                    public void onConnectFailure(
+                            @NonNull Room room, @NonNull TwilioException twilioException) {
                         assertEquals(
                                 TwilioException.CONFIGURATION_ACQUIRE_FAILED_EXCEPTION,
                                 twilioException.getCode());
@@ -153,29 +155,30 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                     }
 
                     @Override
-                    public void onDisconnected(Room room, TwilioException twilioException) {
+                    public void onDisconnected(
+                            @NonNull Room room, @Nullable TwilioException twilioException) {
                         fail();
                     }
 
                     @Override
                     public void onParticipantConnected(
-                            Room room, RemoteParticipant remoteParticipant) {
+                            @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                         fail();
                     }
 
                     @Override
                     public void onParticipantDisconnected(
-                            Room room, RemoteParticipant remoteParticipant) {
+                            @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                         fail();
                     }
 
                     @Override
-                    public void onRecordingStarted(Room room) {
+                    public void onRecordingStarted(@NonNull Room room) {
                         fail();
                     }
 
                     @Override
-                    public void onRecordingStopped(Room room) {
+                    public void onRecordingStopped(@NonNull Room room) {
                         fail();
                     }
                 });

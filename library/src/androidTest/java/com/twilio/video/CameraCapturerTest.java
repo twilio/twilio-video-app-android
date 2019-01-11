@@ -27,6 +27,7 @@ import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import android.hardware.Camera;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseCameraCapturerTest;
@@ -685,7 +686,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                     public void onShutter() {}
 
                     @Override
-                    public void onPictureTaken(byte[] pictureData) {
+                    public void onPictureTaken(@NonNull byte[] pictureData) {
                         onPictureTakenLatch.countDown();
                     }
                 };
@@ -742,7 +743,7 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
                                         }
 
                                         @Override
-                                        public void onPictureTaken(byte[] pictureData) {
+                                        public void onPictureTaken(@NonNull byte[] pictureData) {
                                             assertEquals(
                                                     callingThreadId,
                                                     Thread.currentThread().getId());

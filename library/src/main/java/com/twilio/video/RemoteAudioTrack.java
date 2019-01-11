@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** A remote audio track represents a remote audio source. */
 public class RemoteAudioTrack extends AudioTrack {
     private static final Logger logger = Logger.getLogger(RemoteAudioTrack.class);
@@ -26,7 +28,10 @@ public class RemoteAudioTrack extends AudioTrack {
     private boolean isReleased = false;
 
     RemoteAudioTrack(
-            long nativeRemoteAudioTrackHandle, String sid, String name, boolean isEnabled) {
+            long nativeRemoteAudioTrackHandle,
+            @NonNull String sid,
+            @NonNull String name,
+            boolean isEnabled) {
         super(nativeRemoteAudioTrackHandle, isEnabled, name);
         this.nativeRemoteAudioTrackHandle = nativeRemoteAudioTrackHandle;
         this.sid = sid;
@@ -37,6 +42,7 @@ public class RemoteAudioTrack extends AudioTrack {
      * Returns the remote audio track's server identifier. This value uniquely identifies the remote
      * audio track within the scope of a {@link Room}.
      */
+    @NonNull
     public String getSid() {
         return sid;
     }

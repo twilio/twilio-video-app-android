@@ -78,13 +78,13 @@ public class CallbackHelper {
         private RemoteParticipant remoteParticipant;
 
         @Override
-        public void onConnected(Room room) {
+        public void onConnected(@NonNull Room room) {
             this.room = room;
             triggerLatch(onConnectedLatch);
         }
 
         @Override
-        public void onConnectFailure(Room room, TwilioException twilioException) {
+        public void onConnectFailure(@NonNull Room room, @NonNull TwilioException twilioException) {
             this.room = room;
             this.twilioException = twilioException;
             triggerLatch(onConnectFailureLatch);
@@ -104,34 +104,36 @@ public class CallbackHelper {
         }
 
         @Override
-        public void onDisconnected(Room room, TwilioException twilioException) {
+        public void onDisconnected(@NonNull Room room, @Nullable TwilioException twilioException) {
             this.room = room;
             this.twilioException = twilioException;
             triggerLatch(onDisconnectedLatch);
         }
 
         @Override
-        public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
+        public void onParticipantConnected(
+                @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
             this.room = room;
             this.remoteParticipant = remoteParticipant;
             triggerLatch(onParticipantConnectedLatch);
         }
 
         @Override
-        public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
+        public void onParticipantDisconnected(
+                @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
             this.room = room;
             this.remoteParticipant = remoteParticipant;
             triggerLatch(onParticipantDisconnectedLatch);
         }
 
         @Override
-        public void onRecordingStarted(Room room) {
+        public void onRecordingStarted(@NonNull Room room) {
             this.room = room;
             triggerLatch(onRecordingStartedLatch);
         }
 
         @Override
-        public void onRecordingStopped(Room room) {
+        public void onRecordingStopped(@NonNull Room room) {
             this.room = room;
             triggerLatch(onRecordingStoppedLatch);
         }
@@ -152,10 +154,11 @@ public class CallbackHelper {
     public static class EmptyRoomListener implements Room.Listener {
 
         @Override
-        public void onConnected(Room room) {}
+        public void onConnected(@NonNull Room room) {}
 
         @Override
-        public void onConnectFailure(Room room, TwilioException twilioException) {}
+        public void onConnectFailure(
+                @NonNull Room room, @NonNull TwilioException twilioException) {}
 
         @Override
         public void onReconnecting(@NonNull Room room, @NonNull TwilioException twilioException) {}
@@ -164,19 +167,21 @@ public class CallbackHelper {
         public void onReconnected(@NonNull Room room) {}
 
         @Override
-        public void onDisconnected(Room room, TwilioException twilioException) {}
+        public void onDisconnected(@NonNull Room room, @Nullable TwilioException twilioException) {}
 
         @Override
-        public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {}
+        public void onParticipantConnected(
+                @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {}
 
         @Override
-        public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {}
+        public void onParticipantDisconnected(
+                @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {}
 
         @Override
-        public void onRecordingStarted(Room room) {}
+        public void onRecordingStarted(@NonNull Room room) {}
 
         @Override
-        public void onRecordingStopped(Room room) {}
+        public void onRecordingStopped(@NonNull Room room) {}
     }
 
     public static class FakeParticipantListener implements RemoteParticipant.Listener {
@@ -205,25 +210,25 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
             participantEvents.add("onAudioTrackPublished");
             triggerLatch(onAudioTrackPublishedLatch);
         }
 
         @Override
         public void onAudioTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
             participantEvents.add("onAudioTrackUnpublished");
             triggerLatch(onAudioTrackUnpublishedLatch);
         }
 
         @Override
         public void onAudioTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                RemoteAudioTrack remoteAudioTrack) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                @NonNull RemoteAudioTrack remoteAudioTrack) {
             assertTrue(remoteAudioTrackPublication.isTrackSubscribed());
             participantEvents.add("onAudioTrackSubscribed");
             triggerLatch(onSubscribedToAudioTrackLatch);
@@ -231,9 +236,9 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                TwilioException twilioException) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                @NonNull TwilioException twilioException) {
             assertFalse(remoteAudioTrackPublication.isTrackSubscribed());
             participantEvents.add("onAudioTrackSubscriptionFailed");
             subscriptionFailures.put(remoteAudioTrackPublication, twilioException);
@@ -242,9 +247,9 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                RemoteAudioTrack remoteAudioTrack) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                @NonNull RemoteAudioTrack remoteAudioTrack) {
             assertFalse(remoteAudioTrackPublication.isTrackSubscribed());
             participantEvents.add("onAudioTrackUnsubscribed");
             triggerLatch(onUnsubscribedFromAudioTrackLatch);
@@ -252,25 +257,25 @@ public class CallbackHelper {
 
         @Override
         public void onVideoTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {
             participantEvents.add("onVideoTrackPublished");
             triggerLatch(onVideoTrackPublishedLatch);
         }
 
         @Override
         public void onVideoTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {
             participantEvents.add("onVideoTrackUnpublished");
             triggerLatch(onVideoTrackUnpublishedLatch);
         }
 
         @Override
         public void onVideoTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                RemoteVideoTrack remoteVideoTrack) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                @NonNull RemoteVideoTrack remoteVideoTrack) {
             assertTrue(remoteVideoTrackPublication.isTrackSubscribed());
             participantEvents.add("onVideoTrackSubscribed");
             triggerLatch(onSubscribedToVideoTrackLatch);
@@ -278,9 +283,9 @@ public class CallbackHelper {
 
         @Override
         public void onVideoTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                TwilioException twilioException) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                @NonNull TwilioException twilioException) {
             assertFalse(remoteVideoTrackPublication.isTrackSubscribed());
             participantEvents.add("onVideoTrackSubscriptionFailed");
             subscriptionFailures.put(remoteVideoTrackPublication, twilioException);
@@ -289,9 +294,9 @@ public class CallbackHelper {
 
         @Override
         public void onVideoTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                RemoteVideoTrack remoteVideoTrack) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                @NonNull RemoteVideoTrack remoteVideoTrack) {
             assertFalse(remoteVideoTrackPublication.isTrackSubscribed());
             participantEvents.add("onVideoTrackUnsubscribed");
             triggerLatch(onUnsubscribedFromVideoTrackLatch);
@@ -299,25 +304,25 @@ public class CallbackHelper {
 
         @Override
         public void onDataTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication) {
             participantEvents.add("onDataTrackPublished");
             triggerLatch(onDataTrackPublishedLatch);
         }
 
         @Override
         public void onDataTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication) {
             participantEvents.add("onDataTrackUnpublished");
             triggerLatch(onDataTrackUnpublishedLatch);
         }
 
         @Override
         public void onDataTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                RemoteDataTrack remoteDataTrack) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                @NonNull RemoteDataTrack remoteDataTrack) {
             assertTrue(remoteDataTrackPublication.isTrackSubscribed());
             participantEvents.add("onDataTrackSubscribed");
             triggerLatch(onSubscribedToDataTrackLatch);
@@ -325,9 +330,9 @@ public class CallbackHelper {
 
         @Override
         public void onDataTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                TwilioException twilioException) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                @NonNull TwilioException twilioException) {
             assertFalse(remoteDataTrackPublication.isTrackSubscribed());
             participantEvents.add("onDataTrackSubscriptionFailed");
             subscriptionFailures.put(remoteDataTrackPublication, twilioException);
@@ -336,9 +341,9 @@ public class CallbackHelper {
 
         @Override
         public void onDataTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                RemoteDataTrack remoteDataTrack) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                @NonNull RemoteDataTrack remoteDataTrack) {
             assertFalse(remoteDataTrackPublication.isTrackSubscribed());
             participantEvents.add("onDataTrackUnsubscribed");
             triggerLatch(onUnsubscribedFromDataTrackLatch);
@@ -346,8 +351,8 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackEnabled(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
             assertTrue(remoteAudioTrackPublication.isTrackEnabled());
             participantEvents.add("onAudioTrackEnabled");
             triggerLatch(onAudioTrackEnabledLatch);
@@ -355,8 +360,8 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackDisabled(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
             assertFalse(remoteAudioTrackPublication.isTrackEnabled());
             participantEvents.add("onAudioTrackDisabled");
             triggerLatch(onAudioTrackDisabledLatch);
@@ -364,8 +369,8 @@ public class CallbackHelper {
 
         @Override
         public void onVideoTrackEnabled(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {
             assertTrue(remoteVideoTrackPublication.isTrackEnabled());
             participantEvents.add("onVideoTrackEnabled");
             triggerLatch(onVideoTrackEnabledLatch);
@@ -373,8 +378,8 @@ public class CallbackHelper {
 
         @Override
         public void onVideoTrackDisabled(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {
             assertFalse(remoteVideoTrackPublication.isTrackEnabled());
             participantEvents.add("onVideoTrackDisabled");
             triggerLatch(onVideoTrackDisabledLatch);
@@ -386,7 +391,7 @@ public class CallbackHelper {
         public CountDownLatch onStatsLatch;
 
         @Override
-        public void onStats(List<StatsReport> statsReports) {
+        public void onStats(@NonNull List<StatsReport> statsReports) {
             this.statsReports = statsReports;
             triggerLatch(onStatsLatch);
         }
@@ -409,17 +414,17 @@ public class CallbackHelper {
 
         @Override
         public void onAudioTrackPublished(
-                LocalParticipant localParticipant,
-                LocalAudioTrackPublication localAudioTrackPublication) {
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalAudioTrackPublication localAudioTrackPublication) {
             localParticipantEvents.add("onAudioTrackPublished");
             triggerLatch(onPublishedAudioTrackLatch);
         }
 
         @Override
         public void onAudioTrackPublicationFailed(
-                LocalParticipant localParticipant,
-                LocalAudioTrack localAudioTrack,
-                TwilioException twilioException) {
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalAudioTrack localAudioTrack,
+                @NonNull TwilioException twilioException) {
             localParticipantEvents.add("onAudioTrackPublicationFailed");
             publicationFailures.put(localAudioTrack, twilioException);
             triggerLatch(onAudioTrackPublicationFailedLatch);
@@ -427,17 +432,17 @@ public class CallbackHelper {
 
         @Override
         public void onVideoTrackPublished(
-                LocalParticipant localParticipant,
-                LocalVideoTrackPublication localVideoTrackPublication) {
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalVideoTrackPublication localVideoTrackPublication) {
             localParticipantEvents.add("onVideoTrackPublished");
             triggerLatch(onPublishedVideoTrackLatch);
         }
 
         @Override
         public void onVideoTrackPublicationFailed(
-                LocalParticipant localParticipant,
-                LocalVideoTrack localVideoTrack,
-                TwilioException twilioException) {
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalVideoTrack localVideoTrack,
+                @NonNull TwilioException twilioException) {
             localParticipantEvents.add("onVideoTrackPublicationFailed");
             publicationFailures.put(localVideoTrack, twilioException);
             triggerLatch(onVideoTrackPublicationFailedLatch);
@@ -445,17 +450,17 @@ public class CallbackHelper {
 
         @Override
         public void onDataTrackPublished(
-                LocalParticipant localParticipant,
-                LocalDataTrackPublication localDataTrackPublication) {
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalDataTrackPublication localDataTrackPublication) {
             localParticipantEvents.add("onDataTrackPublished");
             triggerLatch(onPublishedDataTrackLatch);
         }
 
         @Override
         public void onDataTrackPublicationFailed(
-                LocalParticipant localParticipant,
-                LocalDataTrack localDataTrack,
-                TwilioException twilioException) {
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalDataTrack localDataTrack,
+                @NonNull TwilioException twilioException) {
             localParticipantEvents.add("onDataTrackPublicationFailed");
             publicationFailures.put(localDataTrack, twilioException);
             triggerLatch(onDataTrackPublicationFailedLatch);
@@ -473,14 +478,15 @@ public class CallbackHelper {
         public final AtomicInteger messageCount = new AtomicInteger(1);
 
         @Override
-        public void onMessage(RemoteDataTrack remoteDataTrack, ByteBuffer messageBuffer) {
+        public void onMessage(
+                @NonNull RemoteDataTrack remoteDataTrack, @NonNull ByteBuffer messageBuffer) {
             bufferMessages.add(new Pair<>(messageCount.getAndIncrement(), messageBuffer));
             bufferMessagesSet.add(messageBuffer);
             triggerLatch(onBufferMessageLatch);
         }
 
         @Override
-        public void onMessage(RemoteDataTrack remoteDataTrack, String message) {
+        public void onMessage(@NonNull RemoteDataTrack remoteDataTrack, @NonNull String message) {
             messages.add(new Pair<>(messageCount.getAndIncrement(), message));
             messagesSet.add(message);
             triggerLatch(onStringMessageLatch);

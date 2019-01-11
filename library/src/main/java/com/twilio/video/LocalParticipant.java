@@ -53,8 +53,8 @@ public class LocalParticipant implements Participant {
             new Listener() {
                 @Override
                 public void onAudioTrackPublished(
-                        final LocalParticipant localParticipant,
-                        final LocalAudioTrackPublication localAudioTrackPublication) {
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final LocalAudioTrackPublication localAudioTrackPublication) {
                     checkPublishedCallback(
                             localParticipant, localAudioTrackPublication, "onAudioTrackPublished");
                     handler.post(
@@ -73,9 +73,9 @@ public class LocalParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackPublicationFailed(
-                        final LocalParticipant localParticipant,
-                        final LocalAudioTrack localAudioTrack,
-                        final TwilioException twilioException) {
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final LocalAudioTrack localAudioTrack,
+                        @NonNull final TwilioException twilioException) {
                     checkPublicationFailedCallback(
                             localParticipant,
                             localAudioTrack,
@@ -96,8 +96,8 @@ public class LocalParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackPublished(
-                        final LocalParticipant localParticipant,
-                        final LocalVideoTrackPublication localVideoTrackPublication) {
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final LocalVideoTrackPublication localVideoTrackPublication) {
                     checkPublishedCallback(
                             localParticipant, localVideoTrackPublication, "onVideoTrackPublished");
                     handler.post(
@@ -116,9 +116,9 @@ public class LocalParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackPublicationFailed(
-                        final LocalParticipant localParticipant,
-                        final LocalVideoTrack localVideoTrack,
-                        final TwilioException twilioException) {
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final LocalVideoTrack localVideoTrack,
+                        @NonNull final TwilioException twilioException) {
                     checkPublicationFailedCallback(
                             localParticipant,
                             localVideoTrack,
@@ -139,8 +139,8 @@ public class LocalParticipant implements Participant {
 
                 @Override
                 public void onDataTrackPublished(
-                        final LocalParticipant localParticipant,
-                        final LocalDataTrackPublication localDataTrackPublication) {
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final LocalDataTrackPublication localDataTrackPublication) {
                     checkPublishedCallback(
                             localParticipant, localDataTrackPublication, "onDataTrackPublished");
                     handler.post(
@@ -159,9 +159,9 @@ public class LocalParticipant implements Participant {
 
                 @Override
                 public void onDataTrackPublicationFailed(
-                        final LocalParticipant localParticipant,
-                        final LocalDataTrack localDataTrack,
-                        final TwilioException twilioException) {
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final LocalDataTrack localDataTrack,
+                        @NonNull final TwilioException twilioException) {
                     checkPublicationFailedCallback(
                             localParticipant,
                             localDataTrack,
@@ -210,30 +210,35 @@ public class LocalParticipant implements Participant {
             };
 
     /** Returns the SID of the local participant. */
+    @NonNull
     @Override
     public String getSid() {
         return sid;
     }
 
     /** Returns the identity of the local participant. */
+    @NonNull
     @Override
     public String getIdentity() {
         return identity;
     }
 
     /** Returns read-only list of audio track publications. */
+    @NonNull
     @Override
     public synchronized List<AudioTrackPublication> getAudioTracks() {
         return Collections.unmodifiableList(audioTrackPublications);
     }
 
     /** Returns read-only list of video track publications. */
+    @NonNull
     @Override
     public synchronized List<VideoTrackPublication> getVideoTracks() {
         return Collections.unmodifiableList(videoTrackPublications);
     }
 
     /** Returns read-only list of data track publications. */
+    @NonNull
     @Override
     public synchronized List<DataTrackPublication> getDataTracks() {
         return Collections.unmodifiableList(dataTrackPublications);
@@ -488,8 +493,8 @@ public class LocalParticipant implements Participant {
          * @param localAudioTrackPublication The published local audio track.
          */
         void onAudioTrackPublished(
-                LocalParticipant localParticipant,
-                LocalAudioTrackPublication localAudioTrackPublication);
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalAudioTrackPublication localAudioTrackPublication);
 
         /**
          * This method notifies the listener that the {@link LocalParticipant} failed to publish a
@@ -501,9 +506,9 @@ public class LocalParticipant implements Participant {
          *     publish the local audio track.
          */
         void onAudioTrackPublicationFailed(
-                LocalParticipant localParticipant,
-                LocalAudioTrack localAudioTrack,
-                TwilioException twilioException);
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalAudioTrack localAudioTrack,
+                @NonNull TwilioException twilioException);
 
         /**
          * This method notifies the listener that a {@link LocalVideoTrack} has been shared to a
@@ -515,8 +520,8 @@ public class LocalParticipant implements Participant {
          * @param localVideoTrackPublication The published local video track.
          */
         void onVideoTrackPublished(
-                LocalParticipant localParticipant,
-                LocalVideoTrackPublication localVideoTrackPublication);
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalVideoTrackPublication localVideoTrackPublication);
 
         /**
          * This method notifies the listener that the {@link LocalParticipant} failed to publish a
@@ -528,9 +533,9 @@ public class LocalParticipant implements Participant {
          *     publish the local video track.
          */
         void onVideoTrackPublicationFailed(
-                LocalParticipant localParticipant,
-                LocalVideoTrack localVideoTrack,
-                TwilioException twilioException);
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalVideoTrack localVideoTrack,
+                @NonNull TwilioException twilioException);
 
         /**
          * This method notifies the listener that a {@link LocalDataTrack} has been shared to a
@@ -540,8 +545,8 @@ public class LocalParticipant implements Participant {
          * @param localDataTrackPublication The published local data track.
          */
         void onDataTrackPublished(
-                LocalParticipant localParticipant,
-                LocalDataTrackPublication localDataTrackPublication);
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalDataTrackPublication localDataTrackPublication);
 
         /**
          * This method notifies the listener that the {@link LocalParticipant} failed to publish a
@@ -553,9 +558,9 @@ public class LocalParticipant implements Participant {
          *     publish the local data track.
          */
         void onDataTrackPublicationFailed(
-                LocalParticipant localParticipant,
-                LocalDataTrack localDataTrack,
-                TwilioException twilioException);
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalDataTrack localDataTrack,
+                @NonNull TwilioException twilioException);
     }
 
     private native boolean nativePublishAudioTrack(

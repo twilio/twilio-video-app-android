@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.nio.ByteBuffer;
 
@@ -52,7 +53,8 @@ public class RemoteDataTrack extends DataTrack {
 
                 @Override
                 public void onMessage(
-                        final RemoteDataTrack remoteDataTrack, final ByteBuffer messageBuffer) {
+                        @NonNull final RemoteDataTrack remoteDataTrack,
+                        @NonNull final ByteBuffer messageBuffer) {
                     checkCallback(messageBuffer, "onMessage(ByteBuffer)");
 
                     synchronized (RemoteDataTrack.this) {
@@ -72,7 +74,9 @@ public class RemoteDataTrack extends DataTrack {
                 }
 
                 @Override
-                public void onMessage(final RemoteDataTrack remoteDataTrack, final String message) {
+                public void onMessage(
+                        @NonNull final RemoteDataTrack remoteDataTrack,
+                        @NonNull final String message) {
                     checkCallback(message, "onMessage(String)");
 
                     synchronized (RemoteDataTrack.this) {
@@ -100,6 +104,7 @@ public class RemoteDataTrack extends DataTrack {
      * Returns the remote data track's server identifier. This value uniquely identifies the remote
      * data track within the scope of a {@link Room}.
      */
+    @NonNull
     public String getSid() {
         return sid;
     }
@@ -121,8 +126,8 @@ public class RemoteDataTrack extends DataTrack {
             boolean reliable,
             int maxPacketLifeTime,
             int maxRetransmits,
-            String sid,
-            String name,
+            @NonNull String sid,
+            @NonNull String name,
             long nativeRemoteDataTrackContext) {
         super(enabled, ordered, reliable, maxPacketLifeTime, maxRetransmits, name);
         this.sid = sid;
@@ -148,7 +153,7 @@ public class RemoteDataTrack extends DataTrack {
          * @param remoteDataTrack Remote data track.
          * @param messageBuffer The binary message received.
          */
-        void onMessage(RemoteDataTrack remoteDataTrack, ByteBuffer messageBuffer);
+        void onMessage(@NonNull RemoteDataTrack remoteDataTrack, @NonNull ByteBuffer messageBuffer);
 
         /**
          * This method notifies the listener that a string message was received.
@@ -156,7 +161,7 @@ public class RemoteDataTrack extends DataTrack {
          * @param remoteDataTrack Remote data track.
          * @param message The string message received.
          */
-        void onMessage(RemoteDataTrack remoteDataTrack, String message);
+        void onMessage(@NonNull RemoteDataTrack remoteDataTrack, @NonNull String message);
     }
 
     private native void nativeRelease(long nativeRemoteDataTrackContext);

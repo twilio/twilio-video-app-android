@@ -42,6 +42,7 @@ public class RemoteAudioTrackPublication implements AudioTrackPublication {
      * Returns the remote audio track's server identifier. This value uniquely identifies the remote
      * audio track within the scope of a {@link Room}.
      */
+    @NonNull
     @Override
     public String getTrackSid() {
         return sid;
@@ -60,6 +61,7 @@ public class RemoteAudioTrackPublication implements AudioTrackPublication {
      * Returns the name of the published audio track. An empty string is returned if no track name
      * was specified.
      */
+    @NonNull
     @Override
     public String getTrackName() {
         return name;

@@ -26,6 +26,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseCamera2CapturerTest;
@@ -75,14 +76,14 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
                             public void onFirstFrameAvailable() {}
 
                             @Override
-                            public void onCameraSwitched(String newCameraId) {
+                            public void onCameraSwitched(@NonNull String newCameraId) {
                                 assertEquals(expectedCameraId, newCameraId);
                                 assertEquals(expectedCameraId, camera2Capturer.getCameraId());
                                 cameraSwitched.countDown();
                             }
 
                             @Override
-                            public void onError(Camera2Capturer.Exception exception) {}
+                            public void onError(@NonNull Camera2Capturer.Exception exception) {}
                         });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
@@ -120,14 +121,14 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
                             public void onFirstFrameAvailable() {}
 
                             @Override
-                            public void onCameraSwitched(String newCameraId) {
+                            public void onCameraSwitched(@NonNull String newCameraId) {
                                 assertEquals(expectedCameraId, newCameraId);
                                 assertEquals(expectedCameraId, camera2Capturer.getCameraId());
                                 cameraSwitched.countDown();
                             }
 
                             @Override
-                            public void onError(Camera2Capturer.Exception exception) {}
+                            public void onError(@NonNull Camera2Capturer.Exception exception) {}
                         });
 
         // Switch our camera
@@ -163,10 +164,10 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
                             public void onFirstFrameAvailable() {}
 
                             @Override
-                            public void onCameraSwitched(String newCameraId) {}
+                            public void onCameraSwitched(@NonNull String newCameraId) {}
 
                             @Override
-                            public void onError(Camera2Capturer.Exception exception) {
+                            public void onError(@NonNull Camera2Capturer.Exception exception) {
                                 assertEquals(
                                         Camera2Capturer.Exception.CAMERA_SWITCH_FAILED,
                                         exception.getCode());
@@ -214,7 +215,8 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
                                                 }
 
                                                 @Override
-                                                public void onCameraSwitched(String cameraId1) {
+                                                public void onCameraSwitched(
+                                                        @NonNull String cameraId1) {
                                                     assertEquals(
                                                             callingThreadId,
                                                             Thread.currentThread().getId());
@@ -223,7 +225,9 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
 
                                                 @Override
                                                 public void onError(
-                                                        Camera2Capturer.Exception exception) {
+                                                        @NonNull
+                                                                Camera2Capturer.Exception
+                                                                        exception) {
                                                     assertEquals(
                                                             callingThreadId,
                                                             Thread.currentThread().getId());

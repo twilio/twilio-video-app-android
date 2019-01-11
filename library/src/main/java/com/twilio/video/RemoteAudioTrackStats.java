@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public class RemoteAudioTrackStats extends RemoteTrackStats {
     /** Audio output level */
     public final int audioLevel;
@@ -24,10 +26,10 @@ public class RemoteAudioTrackStats extends RemoteTrackStats {
     public final int jitter;
 
     RemoteAudioTrackStats(
-            String trackSid,
+            @NonNull String trackSid,
             int packetsLost,
-            String codec,
-            String ssrc,
+            @NonNull String codec,
+            @NonNull String ssrc,
             double timestamp,
             long bytesReceived,
             int packetsReceived,

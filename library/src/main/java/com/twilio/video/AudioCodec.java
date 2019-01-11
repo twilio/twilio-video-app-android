@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 /** Abstract base class for audio codecs. */
 public abstract class AudioCodec {
-    private final String name;
+    @NonNull private final String name;
 
     protected AudioCodec(@NonNull String name) {
         this.name = name;

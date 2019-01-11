@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** Specifies what type of video scaling that will be performed by a {@link VideoRenderer}. */
 public enum VideoScaleType {
     /**
@@ -32,6 +34,7 @@ public enum VideoScaleType {
      */
     ASPECT_BALANCED;
 
+    @NonNull
     static VideoScaleType fromInt(int scaleTypeInt) {
         if (scaleTypeInt == VideoScaleType.ASPECT_FIT.ordinal()) {
             return VideoScaleType.ASPECT_FIT;

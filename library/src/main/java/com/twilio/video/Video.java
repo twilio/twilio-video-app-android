@@ -158,12 +158,13 @@ public abstract class Video {
         return new Room.Listener() {
 
             @Override
-            public void onConnected(Room room) {
+            public void onConnected(@NonNull Room room) {
                 roomListener.onConnected(room);
             }
 
             @Override
-            public void onConnectFailure(Room room, TwilioException twilioException) {
+            public void onConnectFailure(
+                    @NonNull Room room, @NonNull TwilioException twilioException) {
                 roomListener.onConnectFailure(room, twilioException);
                 release(room);
             }
@@ -186,22 +187,24 @@ public abstract class Video {
             }
 
             @Override
-            public void onParticipantConnected(Room room, RemoteParticipant remoteParticipant) {
+            public void onParticipantConnected(
+                    @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                 roomListener.onParticipantConnected(room, remoteParticipant);
             }
 
             @Override
-            public void onParticipantDisconnected(Room room, RemoteParticipant remoteParticipant) {
+            public void onParticipantDisconnected(
+                    @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                 roomListener.onParticipantDisconnected(room, remoteParticipant);
             }
 
             @Override
-            public void onRecordingStarted(Room room) {
+            public void onRecordingStarted(@NonNull Room room) {
                 roomListener.onRecordingStarted(room);
             }
 
             @Override
-            public void onRecordingStopped(Room room) {
+            public void onRecordingStopped(@NonNull Room room) {
                 roomListener.onRecordingStopped(room);
             }
         };
@@ -232,7 +235,8 @@ public abstract class Video {
      *
      * @param level The logging level
      */
-    public static void setLogLevel(LogLevel level) {
+    public static void setLogLevel(@NonNull LogLevel level) {
+        Preconditions.checkNotNull(level, "LogLevel should not be null");
         setSDKLogLevel(level);
         trySetCoreLogLevel(level.ordinal());
         // Save the log level
@@ -245,7 +249,10 @@ public abstract class Video {
      * @param module The module for this log level
      * @param level The logging level
      */
-    public static void setModuleLogLevel(LogModule module, LogLevel level) {
+    public static void setModuleLogLevel(@NonNull LogModule module, @NonNull LogLevel level) {
+        Preconditions.checkNotNull(module, "LogModule should not be null");
+        Preconditions.checkNotNull(level, "LogLevel should not be null");
+
         if (module == LogModule.PLATFORM) {
             setSDKLogLevel(level);
         }

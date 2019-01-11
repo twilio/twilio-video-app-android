@@ -155,7 +155,7 @@ public class VideoCapturerTest extends BaseVideoTest {
                             }
 
                             @Override
-                            public void onFrameCaptured(VideoFrame videoFrame) {
+                            public void onFrameCaptured(@NonNull VideoFrame videoFrame) {
                                 rotationAngle.set(videoFrame.orientation);
                                 rotationSet.countDown();
                                 videoCapturerListener.onFrameCaptured(videoFrame);

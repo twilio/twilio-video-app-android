@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Defines audio and video encoding parameters. Maximum bitrate is specified as Transport
  * Independent Application Specific Maximum (TIAS) bitrate <a
@@ -65,6 +67,7 @@ public class EncodingParameters {
         return result;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "EncodingParameters{"

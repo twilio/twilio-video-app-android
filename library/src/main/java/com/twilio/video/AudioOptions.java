@@ -38,6 +38,7 @@ public class AudioOptions {
         typingDetection = builder.typingDetection;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "AudioOptions{"

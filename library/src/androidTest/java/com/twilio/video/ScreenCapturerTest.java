@@ -26,6 +26,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -85,7 +86,7 @@ public class ScreenCapturerTest extends BaseVideoTest {
         ScreenCapturer.Listener screenCapturerListener =
                 new ScreenCapturer.Listener() {
                     @Override
-                    public void onScreenCaptureError(String errorDescription) {}
+                    public void onScreenCaptureError(@NonNull String errorDescription) {}
 
                     @Override
                     public void onFirstFrameAvailable() {}
@@ -112,7 +113,7 @@ public class ScreenCapturerTest extends BaseVideoTest {
         ScreenCapturer.Listener screenCapturerListener =
                 new ScreenCapturer.Listener() {
                     @Override
-                    public void onScreenCaptureError(String errorDescription) {}
+                    public void onScreenCaptureError(@NonNull String errorDescription) {}
 
                     @Override
                     public void onFirstFrameAvailable() {
@@ -138,7 +139,7 @@ public class ScreenCapturerTest extends BaseVideoTest {
         ScreenCapturer.Listener screenCapturerListener =
                 new ScreenCapturer.Listener() {
                     @Override
-                    public void onScreenCaptureError(String errorDescription) {
+                    public void onScreenCaptureError(@NonNull String errorDescription) {
                         screenCaptureError.countDown();
                     }
 
@@ -175,7 +176,8 @@ public class ScreenCapturerTest extends BaseVideoTest {
                             ScreenCapturer.Listener screenCapturerListener =
                                     new ScreenCapturer.Listener() {
                                         @Override
-                                        public void onScreenCaptureError(String errorDescription) {
+                                        public void onScreenCaptureError(
+                                                @NonNull String errorDescription) {
                                             assertEquals(
                                                     callingThreadId,
                                                     Thread.currentThread().getId());
@@ -256,7 +258,7 @@ public class ScreenCapturerTest extends BaseVideoTest {
         ScreenCapturer.Listener screenCapturerListener =
                 new ScreenCapturer.Listener() {
                     @Override
-                    public void onScreenCaptureError(String errorDescription) {}
+                    public void onScreenCaptureError(@NonNull String errorDescription) {}
 
                     @Override
                     public void onFirstFrameAvailable() {

@@ -4,6 +4,7 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Improvements
 
 - Added new state `Reconnecting` to `Room.State` and new callbacks `onReconnecting`, `onReconnected` to `Room.Listener`. When the `LocalParticipant` experiences a network interruption in signaling or media, the room will transition to `Reconnecting` and `Room.Listener` will notify the developer of this new state via `onReconnecting`. If the connection is successfully restored, `Room.Listener` will notify the developer via `onReconnected`. However, if the connection could not be reestablished `Room.Listener` will notify the developer via `onDisconnected`.
+- Added and updated public API nullability annotations.
 
 Known issues
 

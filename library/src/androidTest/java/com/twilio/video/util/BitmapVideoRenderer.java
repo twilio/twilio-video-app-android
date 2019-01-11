@@ -25,6 +25,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import java.io.ByteArrayOutputStream;
@@ -39,7 +40,7 @@ public class BitmapVideoRenderer implements VideoRenderer {
     private BitmapListener bitmapListener;
 
     @Override
-    public void renderFrame(final I420Frame i420Frame) {
+    public void renderFrame(@NonNull final I420Frame i420Frame) {
         // Capture bitmap and notify listener
         if (bitmapRequested.compareAndSet(true, false)) {
             final Bitmap bitmap =

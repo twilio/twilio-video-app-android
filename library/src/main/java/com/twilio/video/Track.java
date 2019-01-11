@@ -16,11 +16,14 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /** A representation of a media track. */
 public interface Track {
     /** Checks if the track is enabled. */
     boolean isEnabled();
 
     /** Return track name. */
+    @NonNull
     String getName();
 }

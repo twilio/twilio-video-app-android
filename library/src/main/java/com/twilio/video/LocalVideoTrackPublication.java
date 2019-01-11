@@ -38,6 +38,7 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
      * Returns the local video track's server identifier. This value uniquely identifies the local
      * video track within the scope of a {@link Room}.
      */
+    @NonNull
     @Override
     public String getTrackSid() {
         return sid;
@@ -47,6 +48,7 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
      * Returns the name of the local video track. An empty string is returned if no name was
      * specified.
      */
+    @NonNull
     @Override
     public String getTrackName() {
         return localVideoTrack.getName();
@@ -59,6 +61,7 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
     }
 
     /** Returns the base video track object of the published local video track. */
+    @NonNull
     @Override
     public VideoTrack getVideoTrack() {
         return localVideoTrack;

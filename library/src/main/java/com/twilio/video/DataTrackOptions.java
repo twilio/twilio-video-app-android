@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /** Represents options when creating {@link LocalDataTrack}s. */
 public class DataTrackOptions {
@@ -83,7 +84,7 @@ public class DataTrackOptions {
 
         /** Data track name. */
         @NonNull
-        public Builder name(@NonNull String name) {
+        public Builder name(@Nullable String name) {
             this.name = name;
             return this;
         }

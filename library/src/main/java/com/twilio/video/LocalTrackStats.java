@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public abstract class LocalTrackStats extends BaseTrackStats {
     /** Total number of bytes sent for this SSRC */
     public final long bytesSent;
@@ -30,10 +32,10 @@ public abstract class LocalTrackStats extends BaseTrackStats {
     public final long roundTripTime;
 
     protected LocalTrackStats(
-            String trackSid,
+            @NonNull String trackSid,
             int packetsLost,
-            String codec,
-            String ssrc,
+            @NonNull String codec,
+            @NonNull String ssrc,
             double timestamp,
             long bytesSent,
             int packetsSent,

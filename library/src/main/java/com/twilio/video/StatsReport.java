@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +30,12 @@ public class StatsReport {
     private List<IceCandidatePairStats> iceCandidatePairStats = new ArrayList<>();
     private List<IceCandidateStats> iceCandidateStats = new ArrayList<>();
 
-    StatsReport(String peerConnectionId) {
+    StatsReport(@NonNull String peerConnectionId) {
         this.peerConnectionId = peerConnectionId;
     }
 
     /** Returns the id of peer connection related to this report. */
+    @NonNull
     public String getPeerConnectionId() {
         return peerConnectionId;
     }
@@ -43,6 +45,7 @@ public class StatsReport {
      *
      * @return a list of local audio tracks stats
      */
+    @NonNull
     public List<LocalAudioTrackStats> getLocalAudioTrackStats() {
         return localAudioTrackStats;
     }
@@ -52,6 +55,7 @@ public class StatsReport {
      *
      * @return a list of local video tracks stats
      */
+    @NonNull
     public List<LocalVideoTrackStats> getLocalVideoTrackStats() {
         return localVideoTrackStats;
     }
@@ -61,6 +65,7 @@ public class StatsReport {
      *
      * @return a list of remote audio tracks stats
      */
+    @NonNull
     public List<RemoteAudioTrackStats> getRemoteAudioTrackStats() {
         return remoteAudioTrackStats;
     }
@@ -70,6 +75,7 @@ public class StatsReport {
      *
      * @return a list of remote video tracks stats
      */
+    @NonNull
     public List<RemoteVideoTrackStats> getRemoteVideoTrackStats() {
         return remoteVideoTrackStats;
     }
@@ -79,6 +85,7 @@ public class StatsReport {
      *
      * @return a list of ice candidate pair stats
      */
+    @NonNull
     public List<IceCandidatePairStats> getIceCandidatePairStats() {
         return iceCandidatePairStats;
     }
@@ -88,6 +95,7 @@ public class StatsReport {
      *
      * @return a list of all ice candidate stats
      */
+    @NonNull
     public List<IceCandidateStats> getIceCandidateStats() {
         return iceCandidateStats;
     }

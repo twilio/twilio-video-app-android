@@ -1,5 +1,7 @@
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 /**
  * Statistics of ICE candidate pair as defined in <a
  * href="https://www.w3.org/TR/webrtc-stats/#candidatepair-dict*">Identifiers for WebRTC's
@@ -7,22 +9,22 @@ package com.twilio.video;
  */
 public class IceCandidatePairStats {
     /** Unique identifier of the underlying candidate pair. */
-    public final String transportId;
+    @NonNull public final String transportId;
 
     /** Unique identifier of the underlying local candidate associated with this candidate pair. */
-    public final String localCandidateId;
+    @NonNull public final String localCandidateId;
 
     /** Unique identifier of the underlying remote candidate associated with this candidate pair. */
-    public final String remoteCandidateId;
+    @NonNull public final String remoteCandidateId;
 
     /** State of this candidate pair, see {@link IceCandidatePairState}. */
     public final IceCandidatePairState state;
 
     /** IP address of local candidate. */
-    public final String localCandidateIp;
+    @NonNull public final String localCandidateIp;
 
     /** IP address of remote candidate. */
-    public final String remoteCandidateIp;
+    @NonNull public final String remoteCandidateIp;
 
     /** Candidate priorities as per <a href="https://tools.ietf.org/html/rfc5245">RFC 5245</a>. */
     public final long priority;
@@ -99,12 +101,12 @@ public class IceCandidatePairStats {
     public final String relayProtocol;
 
     IceCandidatePairStats(
-            final String transportId,
-            final String localCandidateId,
-            final String remoteCandidateId,
+            @NonNull final String transportId,
+            @NonNull final String localCandidateId,
+            @NonNull final String remoteCandidateId,
             final IceCandidatePairState state,
-            final String localCandidateIp,
-            final String remoteCandidateIp,
+            @NonNull final String localCandidateIp,
+            @NonNull final String remoteCandidateIp,
             final long priority,
             final boolean nominated,
             final boolean writeable,

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseParticipantTest;
@@ -627,8 +628,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                                     new RemoteDataTrack.Listener() {
                                         @Override
                                         public void onMessage(
-                                                RemoteDataTrack remoteDataTrack1,
-                                                ByteBuffer messageBuffer) {
+                                                @NonNull RemoteDataTrack remoteDataTrack1,
+                                                @NonNull ByteBuffer messageBuffer) {
                                             onBufferMessageThreadId.set(
                                                     Thread.currentThread().getId());
                                             messagesReceived.countDown();
@@ -636,7 +637,8 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
 
                                         @Override
                                         public void onMessage(
-                                                RemoteDataTrack remoteDataTrack1, String message) {
+                                                @NonNull RemoteDataTrack remoteDataTrack1,
+                                                @NonNull String message) {
                                             onStringMessageThreadId.set(
                                                     Thread.currentThread().getId());
                                             messagesReceived.countDown();

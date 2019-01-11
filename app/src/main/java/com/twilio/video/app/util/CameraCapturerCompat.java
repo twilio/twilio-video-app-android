@@ -17,6 +17,7 @@
 package com.twilio.video.app.util;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
@@ -40,12 +41,12 @@ public class CameraCapturerCompat {
                 }
 
                 @Override
-                public void onCameraSwitched(String newCameraId) {
+                public void onCameraSwitched(@NonNull String newCameraId) {
                     Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
                 }
 
                 @Override
-                public void onError(Camera2Capturer.Exception camera2CapturerException) {
+                public void onError(@NonNull Camera2Capturer.Exception camera2CapturerException) {
                     Timber.e(camera2CapturerException.getMessage());
                 }
             };

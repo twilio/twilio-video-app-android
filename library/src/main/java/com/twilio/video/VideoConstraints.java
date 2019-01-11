@@ -47,7 +47,7 @@ public class VideoConstraints {
 
     private final AspectRatio aspectRatio;
 
-    private VideoConstraints(Builder builder) {
+    private VideoConstraints(@NonNull Builder builder) {
         this.minVideoDimensions = builder.minVideoDimensions;
         this.maxVideoDimensions = builder.maxVideoDimensions;
         this.minFps = builder.minFps;
@@ -56,11 +56,13 @@ public class VideoConstraints {
     }
 
     /** The minimum video size allowed. */
+    @NonNull
     public VideoDimensions getMinVideoDimensions() {
         return minVideoDimensions;
     }
 
     /** The maximum video size allowed. */
+    @NonNull
     public VideoDimensions getMaxVideoDimensions() {
         return maxVideoDimensions;
     }
@@ -76,6 +78,7 @@ public class VideoConstraints {
     }
 
     /** The aspect ratio. */
+    @NonNull
     public AspectRatio getAspectRatio() {
         return aspectRatio;
     }
@@ -113,31 +116,37 @@ public class VideoConstraints {
 
         public Builder() {}
 
+        @NonNull
         public Builder minVideoDimensions(@NonNull VideoDimensions minVideoDimensions) {
             this.minVideoDimensions = minVideoDimensions;
             return this;
         }
 
+        @NonNull
         public Builder maxVideoDimensions(@NonNull VideoDimensions maxVideoDimensions) {
             this.maxVideoDimensions = maxVideoDimensions;
             return this;
         }
 
+        @NonNull
         public Builder minFps(int minFps) {
             this.minFps = minFps;
             return this;
         }
 
+        @NonNull
         public Builder maxFps(int maxFps) {
             this.maxFps = maxFps;
             return this;
         }
 
-        public Builder aspectRatio(AspectRatio aspectRatio) {
+        @NonNull
+        public Builder aspectRatio(@NonNull AspectRatio aspectRatio) {
             this.aspectRatio = aspectRatio;
             return this;
         }
 
+        @NonNull
         public VideoConstraints build() {
             if (minVideoDimensions == null) {
                 throw new NullPointerException("MinVideoDimensions must not be null");

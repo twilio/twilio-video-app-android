@@ -17,6 +17,7 @@
 package com.twilio.video;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,8 +63,8 @@ public class RemoteParticipant implements Participant {
             new Listener() {
                 @Override
                 public void onAudioTrackPublished(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication) {
                     checkCallback(
                             remoteParticipant,
                             remoteAudioTrackPublication,
@@ -85,8 +86,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackUnpublished(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication) {
                     checkCallback(
                             remoteParticipant,
                             remoteAudioTrackPublication,
@@ -108,9 +109,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackSubscribed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication,
-                        final RemoteAudioTrack remoteAudioTrack) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication,
+                        @NonNull final RemoteAudioTrack remoteAudioTrack) {
                     checkCallback(
                             remoteParticipant,
                             remoteAudioTrackPublication,
@@ -134,9 +135,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackSubscriptionFailed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication,
-                        final TwilioException twilioException) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication,
+                        @NonNull final TwilioException twilioException) {
                     checkCallback(
                             remoteParticipant,
                             remoteAudioTrackPublication,
@@ -159,9 +160,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackUnsubscribed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication,
-                        final RemoteAudioTrack remoteAudioTrack) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication,
+                        @NonNull final RemoteAudioTrack remoteAudioTrack) {
                     checkCallback(
                             remoteParticipant,
                             remoteAudioTrackPublication,
@@ -189,8 +190,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackPublished(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication) {
                     checkCallback(
                             remoteParticipant,
                             remoteVideoTrackPublication,
@@ -212,8 +213,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackUnpublished(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication) {
                     checkCallback(
                             remoteParticipant,
                             remoteVideoTrackPublication,
@@ -235,9 +236,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackSubscribed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication,
-                        final RemoteVideoTrack remoteVideoTrack) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication,
+                        @NonNull final RemoteVideoTrack remoteVideoTrack) {
                     checkCallback(
                             remoteParticipant,
                             remoteVideoTrackPublication,
@@ -261,9 +262,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackSubscriptionFailed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication,
-                        final TwilioException twilioException) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication,
+                        @NonNull final TwilioException twilioException) {
                     checkCallback(
                             remoteParticipant,
                             remoteVideoTrackPublication,
@@ -286,9 +287,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackUnsubscribed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication,
-                        final RemoteVideoTrack remoteVideoTrack) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication,
+                        @NonNull final RemoteVideoTrack remoteVideoTrack) {
                     checkCallback(
                             remoteParticipant,
                             remoteVideoTrackPublication,
@@ -316,8 +317,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onDataTrackPublished(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteDataTrackPublication remoteDataTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteDataTrackPublication remoteDataTrackPublication) {
                     checkCallback(
                             remoteParticipant, remoteDataTrackPublication, "onDataTrackPublished");
                     handler.post(
@@ -337,8 +338,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onDataTrackUnpublished(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteDataTrackPublication remoteDataTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteDataTrackPublication remoteDataTrackPublication) {
                     checkCallback(
                             remoteParticipant,
                             remoteDataTrackPublication,
@@ -360,9 +361,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onDataTrackSubscribed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteDataTrackPublication remoteDataTrackPublication,
-                        final RemoteDataTrack remoteDataTrack) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteDataTrackPublication remoteDataTrackPublication,
+                        @NonNull final RemoteDataTrack remoteDataTrack) {
                     checkCallback(
                             remoteParticipant, remoteDataTrackPublication, "onDataTrackSubscribed");
                     handler.post(
@@ -384,9 +385,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onDataTrackSubscriptionFailed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteDataTrackPublication remoteDataTrackPublication,
-                        final TwilioException twilioException) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteDataTrackPublication remoteDataTrackPublication,
+                        @NonNull final TwilioException twilioException) {
                     checkCallback(
                             remoteParticipant,
                             remoteDataTrackPublication,
@@ -409,9 +410,9 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onDataTrackUnsubscribed(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteDataTrackPublication remoteDataTrackPublication,
-                        final RemoteDataTrack remoteDataTrack) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteDataTrackPublication remoteDataTrackPublication,
+                        @NonNull final RemoteDataTrack remoteDataTrack) {
                     checkCallback(
                             remoteParticipant,
                             remoteDataTrackPublication,
@@ -439,8 +440,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackEnabled(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication) {
                     checkCallback(
                             remoteParticipant, remoteAudioTrackPublication, "onAudioTrackEnabled");
                     handler.post(
@@ -459,8 +460,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onAudioTrackDisabled(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteAudioTrackPublication remoteAudioTrackPublication) {
                     checkCallback(
                             remoteParticipant, remoteAudioTrackPublication, "onAudioTrackDisabled");
                     handler.post(
@@ -479,8 +480,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackEnabled(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication) {
                     checkCallback(
                             remoteParticipant, remoteVideoTrackPublication, "onVideoTrackEnabled");
                     handler.post(
@@ -499,8 +500,8 @@ public class RemoteParticipant implements Participant {
 
                 @Override
                 public void onVideoTrackDisabled(
-                        final RemoteParticipant remoteParticipant,
-                        final RemoteVideoTrackPublication remoteVideoTrackPublication) {
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final RemoteVideoTrackPublication remoteVideoTrackPublication) {
                     checkCallback(
                             remoteParticipant, remoteVideoTrackPublication, "onVideoTrackDisabled");
                     handler.post(
@@ -534,6 +535,13 @@ public class RemoteParticipant implements Participant {
 
     private long nativeParticipantContext;
 
+    /** Returns the SID of a remote participant. */
+    @NonNull
+    @Override
+    public String getSid() {
+        return sid;
+    }
+
     RemoteParticipant(
             String identity,
             String sid,
@@ -557,31 +565,29 @@ public class RemoteParticipant implements Participant {
         this.nativeParticipantContext = nativeParticipantContext;
     }
 
-    /** Returns the SID of a remote participant. */
-    @Override
-    public String getSid() {
-        return sid;
-    }
-
     /** Returns the identity of the remote participant. */
+    @NonNull
     @Override
     public String getIdentity() {
         return identity;
     }
 
     /** Returns read-only list of audio track publications. */
+    @NonNull
     @Override
     public List<AudioTrackPublication> getAudioTracks() {
         return Collections.unmodifiableList(audioTrackPublications);
     }
 
     /** Returns read-only list of video track publications. */
+    @NonNull
     @Override
     public List<VideoTrackPublication> getVideoTracks() {
         return Collections.unmodifiableList(videoTrackPublications);
     }
 
     /** Returns read-only list of data track publications. */
+    @NonNull
     @Override
     public List<DataTrackPublication> getDataTracks() {
         return Collections.unmodifiableList(dataTrackPublications);
@@ -682,8 +688,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteAudioTrackPublication The audio track publication.
          */
         void onAudioTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} has unpublished a
@@ -693,8 +699,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteAudioTrackPublication The audio track publication.
          */
         void onAudioTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication);
 
         /**
          * This method notifies the listener the {@link RemoteAudioTrack} of the {@link
@@ -706,9 +712,9 @@ public class RemoteParticipant implements Participant {
          * @param remoteAudioTrack The audio track subscribed to.
          */
         void onAudioTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                RemoteAudioTrack remoteAudioTrack);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                @NonNull RemoteAudioTrack remoteAudioTrack);
 
         /**
          * This method notifies the listener that media negotiation for a {@link RemoteAudioTrack}
@@ -720,9 +726,9 @@ public class RemoteParticipant implements Participant {
          * @param twilioException Exception that describes failure.
          */
         void onAudioTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                TwilioException twilioException);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                @NonNull TwilioException twilioException);
 
         /**
          * This method notifies the listener that the {@link RemoteAudioTrack} of the {@link
@@ -734,9 +740,9 @@ public class RemoteParticipant implements Participant {
          * @param remoteAudioTrack The audio track unsubscribed from.
          */
         void onAudioTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication,
-                RemoteAudioTrack remoteAudioTrack);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                @NonNull RemoteAudioTrack remoteAudioTrack);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} has published a {@link
@@ -747,8 +753,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteVideoTrackPublication The video track publication.
          */
         void onVideoTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} has removed a {@link
@@ -758,8 +764,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteVideoTrackPublication The video track publication.
          */
         void onVideoTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication);
 
         /**
          * This method notifies the listener the {@link RemoteVideoTrack} of the {@link
@@ -771,9 +777,9 @@ public class RemoteParticipant implements Participant {
          * @param remoteVideoTrack The video track subscribed to.
          */
         void onVideoTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                RemoteVideoTrack remoteVideoTrack);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                @NonNull RemoteVideoTrack remoteVideoTrack);
 
         /**
          * This method notifies the listener that media negotiation for a {@link RemoteVideoTrack}
@@ -785,9 +791,9 @@ public class RemoteParticipant implements Participant {
          * @param twilioException Exception that describes failure.
          */
         void onVideoTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                TwilioException twilioException);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                @NonNull TwilioException twilioException);
 
         /**
          * This method notifies the listener that the {@link RemoteVideoTrack} of the {@link
@@ -800,9 +806,9 @@ public class RemoteParticipant implements Participant {
          * @param remoteVideoTrack The video track removed from this room.
          */
         void onVideoTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication,
-                RemoteVideoTrack remoteVideoTrack);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                @NonNull RemoteVideoTrack remoteVideoTrack);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} has published a {@link
@@ -812,8 +818,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteDataTrackPublication The data track publication.
          */
         void onDataTrackPublished(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} has removed a {@link
@@ -823,8 +829,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteDataTrackPublication The data track publication.
          */
         void onDataTrackUnpublished(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication);
 
         /**
          * This method notifies the listener the {@link RemoteDataTrack} of the {@link
@@ -835,9 +841,9 @@ public class RemoteParticipant implements Participant {
          * @param remoteDataTrack The data track subscribed to.
          */
         void onDataTrackSubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                RemoteDataTrack remoteDataTrack);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                @NonNull RemoteDataTrack remoteDataTrack);
 
         /**
          * This method notifies the listener that media negotiation for a {@link RemoteDataTrack}
@@ -849,9 +855,9 @@ public class RemoteParticipant implements Participant {
          * @param twilioException Exception that describes failure.
          */
         void onDataTrackSubscriptionFailed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                TwilioException twilioException);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                @NonNull TwilioException twilioException);
 
         /**
          * This method notifies the listener that the {@link RemoteDataTrack} of the {@link
@@ -863,9 +869,9 @@ public class RemoteParticipant implements Participant {
          * @param remoteDataTrack The data track removed from this room.
          */
         void onDataTrackUnsubscribed(
-                RemoteParticipant remoteParticipant,
-                RemoteDataTrackPublication remoteDataTrackPublication,
-                RemoteDataTrack remoteDataTrack);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                @NonNull RemoteDataTrack remoteDataTrack);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} audio track has been
@@ -875,8 +881,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteAudioTrackPublication The audio track publication.
          */
         void onAudioTrackEnabled(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} audio track has been
@@ -886,8 +892,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteAudioTrackPublication The audio track publication.
          */
         void onAudioTrackDisabled(
-                RemoteParticipant remoteParticipant,
-                RemoteAudioTrackPublication remoteAudioTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} video track has been
@@ -897,8 +903,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteVideoTrackPublication The video track publication.
          */
         void onVideoTrackEnabled(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication);
 
         /**
          * This method notifies the listener that a {@link RemoteParticipant} video track has been
@@ -908,8 +914,8 @@ public class RemoteParticipant implements Participant {
          * @param remoteVideoTrackPublication The video track publication.
          */
         void onVideoTrackDisabled(
-                RemoteParticipant remoteParticipant,
-                RemoteVideoTrackPublication remoteVideoTrackPublication);
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication);
     }
 
     private native boolean nativeIsConnected(long nativeHandle);

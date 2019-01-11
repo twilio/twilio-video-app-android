@@ -25,6 +25,7 @@ import static org.junit.Assume.assumeTrue;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseCameraCapturerTest;
 import com.twilio.video.test.R;
@@ -140,7 +141,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                             public void onShutter() {}
 
                             @Override
-                            public void onPictureTaken(byte[] pictureData) {
+                            public void onPictureTaken(@NonNull byte[] pictureData) {
                                 pictureTaken.countDown();
                             }
                         }));
@@ -242,7 +243,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                     }
 
                     @Override
-                    public void onPictureTaken(byte[] pictureData) {
+                    public void onPictureTaken(@NonNull byte[] pictureData) {
                         // Validate our picture data
                         assertNotNull(pictureData);
 
@@ -287,7 +288,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                     }
 
                     @Override
-                    public void onPictureTaken(byte[] pictureData) {
+                    public void onPictureTaken(@NonNull byte[] pictureData) {
                         // Validate our picture data
                         assertNotNull(pictureData);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

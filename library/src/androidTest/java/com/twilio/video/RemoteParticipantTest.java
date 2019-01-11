@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -123,8 +124,8 @@ public class RemoteParticipantTest extends BaseVideoTest {
                 new RemoteParticipant.Listener() {
                     @Override
                     public void onAudioTrackPublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
                         Log.d(TAG, "Alice received bob's audio track");
                         testEvents.add("aliceReceivesBobAudioTrackAdded");
                         aliceReceivedBobAudioTrackAdded.countDown();
@@ -132,113 +133,114 @@ public class RemoteParticipantTest extends BaseVideoTest {
 
                     @Override
                     public void onAudioTrackUnpublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
                     public void onAudioTrackSubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                            RemoteAudioTrack remoteAudioTrack) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                            @NonNull RemoteAudioTrack remoteAudioTrack) {}
 
                     @Override
                     public void onAudioTrackSubscriptionFailed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                            TwilioException twilioException) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                            @NonNull TwilioException twilioException) {}
 
                     @Override
                     public void onAudioTrackUnsubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication,
-                            RemoteAudioTrack remoteAudioTrack) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
+                            @NonNull RemoteAudioTrack remoteAudioTrack) {}
 
                     @Override
                     public void onVideoTrackPublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
                     public void onVideoTrackUnpublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
                     public void onVideoTrackSubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication,
-                            RemoteVideoTrack remoteVideoTrack) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                            @NonNull RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
                     public void onVideoTrackSubscriptionFailed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication,
-                            TwilioException twilioException) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
+                            @NonNull TwilioException twilioException) {}
 
                     @Override
                     public void onVideoTrackUnsubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
-                            RemoteVideoTrack remoteVideoTrack) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublicatieon,
+                            @NonNull RemoteVideoTrack remoteVideoTrack) {}
 
                     @Override
                     public void onDataTrackPublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteDataTrackPublication remoteDataTrackPublication) {}
 
                     @Override
                     public void onDataTrackUnpublished(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteDataTrackPublication remoteDataTrackPublication) {}
 
                     @Override
                     public void onDataTrackSubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication,
-                            RemoteDataTrack remoteDataTrack) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                            @NonNull RemoteDataTrack remoteDataTrack) {}
 
                     @Override
                     public void onDataTrackSubscriptionFailed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication,
-                            TwilioException twilioException) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                            @NonNull TwilioException twilioException) {}
 
                     @Override
                     public void onDataTrackUnsubscribed(
-                            RemoteParticipant remoteParticipant,
-                            RemoteDataTrackPublication remoteDataTrackPublication,
-                            RemoteDataTrack remoteDataTrack) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
+                            @NonNull RemoteDataTrack remoteDataTrack) {}
 
                     @Override
                     public void onAudioTrackEnabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
                     public void onAudioTrackDisabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteAudioTrackPublication remoteAudioTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {}
 
                     @Override
                     public void onVideoTrackEnabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {}
 
                     @Override
                     public void onVideoTrackDisabled(
-                            RemoteParticipant remoteParticipant,
-                            RemoteVideoTrackPublication remoteVideoTrackPublication) {}
+                            @NonNull RemoteParticipant remoteParticipant,
+                            @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {}
                 };
         final Room.Listener aliceRoomListener =
                 new Room.Listener() {
                     @Override
-                    public void onConnected(Room room) {
+                    public void onConnected(@NonNull Room room) {
                         testEvents.add("aliceConnected");
                         aliceConnected.countDown();
                     }
 
                     @Override
-                    public void onConnectFailure(Room room, TwilioException twilioException) {}
+                    public void onConnectFailure(
+                            @NonNull Room room, @NonNull TwilioException twilioException) {}
 
                     @Override
                     public void onReconnecting(
@@ -248,13 +250,14 @@ public class RemoteParticipantTest extends BaseVideoTest {
                     public void onReconnected(@NonNull Room room) {}
 
                     @Override
-                    public void onDisconnected(Room room, TwilioException twilioException) {
+                    public void onDisconnected(
+                            @NonNull Room room, @Nullable TwilioException twilioException) {
                         aliceDisconnected.countDown();
                     }
 
                     @Override
                     public void onParticipantConnected(
-                            Room room, RemoteParticipant remoteParticipant) {
+                            @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                         Log.d(TAG, "Alice sees bob connected");
                         testEvents.add("aliceSeesBobConnected");
                         aliceSeesBobConnected.countDown();
@@ -275,13 +278,13 @@ public class RemoteParticipantTest extends BaseVideoTest {
 
                     @Override
                     public void onParticipantDisconnected(
-                            Room room, RemoteParticipant remoteParticipant) {}
+                            @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {}
 
                     @Override
-                    public void onRecordingStarted(Room room) {}
+                    public void onRecordingStarted(@NonNull Room room) {}
 
                     @Override
-                    public void onRecordingStopped(Room room) {}
+                    public void onRecordingStopped(@NonNull Room room) {}
                 };
 
         /*

@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public class LocalAudioTrackStats extends LocalTrackStats {
     /** Audio input level */
     public final int audioLevel;
@@ -24,10 +26,10 @@ public class LocalAudioTrackStats extends LocalTrackStats {
     public final int jitter;
 
     LocalAudioTrackStats(
-            String trackSid,
+            @NonNull String trackSid,
             int packetsLost,
-            String codec,
-            String ssrc,
+            @NonNull String codec,
+            @NonNull String ssrc,
             double timestamp,
             long bytesSent,
             int packetsSent,

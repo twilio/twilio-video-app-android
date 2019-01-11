@@ -16,15 +16,17 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+
 public class LocalVideoTrackStats extends LocalTrackStats {
     /** Captured frame dimensions */
-    public final VideoDimensions captureDimensions;
+    @NonNull public final VideoDimensions captureDimensions;
 
     /** Captured frame rate */
     public final int capturedFrameRate;
 
     /** Sent frame dimensions */
-    public final VideoDimensions dimensions;
+    @NonNull public final VideoDimensions dimensions;
 
     /** Sent frame rate */
     public final int frameRate;
@@ -38,8 +40,8 @@ public class LocalVideoTrackStats extends LocalTrackStats {
             long bytesSent,
             int packetsSent,
             long roundTripTime,
-            VideoDimensions captureDimensions,
-            VideoDimensions dimensions,
+            @NonNull VideoDimensions captureDimensions,
+            @NonNull VideoDimensions dimensions,
             int capturedFrameRate,
             int frameRate) {
         super(trackSid, packetsLost, codec, ssrc, timestamp, bytesSent, packetsSent, roundTripTime);

@@ -17,7 +17,6 @@
 package com.twilio.video;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * A local audio track publication represents a {@link LocalAudioTrack} that has been shared to a
@@ -39,6 +38,7 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
      * Returns the local audio track's server identifier. This value uniquely identifies the local
      * audio track within the scope of a {@link Room}.
      */
+    @NonNull
     @Override
     public String getTrackSid() {
         return sid;
@@ -48,6 +48,7 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
      * Returns the name of the local audio track. An empty string is returned if not name was
      * specified.
      */
+    @NonNull
     @Override
     public String getTrackName() {
         return localAudioTrack.getName();
@@ -60,13 +61,14 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
     }
 
     /** Returns the base audio track object of the published local audio track. */
+    @NonNull
     @Override
     public AudioTrack getAudioTrack() {
         return localAudioTrack;
     }
 
     /** Returns the published local audio track. */
-    @Nullable
+    @NonNull
     public LocalAudioTrack getLocalAudioTrack() {
         return localAudioTrack;
     }
