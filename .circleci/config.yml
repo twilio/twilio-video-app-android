@@ -96,7 +96,7 @@ aliases:
   - &build-defaults
     working_directory: *workspace
     docker:
-      - image: circleci/android:api-27-node8-alpha
+      - image: circleci/android:api-28-node@sha256:a8d15723766a8f32f1a4ead42c5441bb0ded2e832329291cb4bbd9f1d1557721
     environment:
       - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
