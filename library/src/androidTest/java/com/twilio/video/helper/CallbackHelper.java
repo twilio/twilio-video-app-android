@@ -41,6 +41,7 @@ import com.twilio.video.StatsReport;
 import com.twilio.video.Track;
 import com.twilio.video.TrackPublication;
 import com.twilio.video.TwilioException;
+import com.twilio.video.util.Sequence;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,8 +62,16 @@ public class CallbackHelper {
         }
     }
 
+    private static void addSequenceEvent(
+            @Nullable Sequence sequence, @NonNull String sequenceEvent) {
+        if (sequence != null) {
+            sequence.addEvent(sequenceEvent);
+        }
+    }
+
     public static class FakeRoomListener implements Room.Listener {
 
+        public Sequence sequence;
         public CountDownLatch onConnectedLatch;
         public CountDownLatch onConnectFailureLatch;
         public CountDownLatch onReconnectingLatch;
@@ -81,6 +90,7 @@ public class CallbackHelper {
         public void onConnected(@NonNull Room room) {
             this.room = room;
             triggerLatch(onConnectedLatch);
+            addSequenceEvent(sequence, "onConnected");
         }
 
         @Override
@@ -88,6 +98,7 @@ public class CallbackHelper {
             this.room = room;
             this.twilioException = twilioException;
             triggerLatch(onConnectFailureLatch);
+            addSequenceEvent(sequence, "onConnectFailure");
         }
 
         @Override
@@ -95,12 +106,14 @@ public class CallbackHelper {
             this.room = room;
             this.twilioException = twilioException;
             triggerLatch(onReconnectingLatch);
+            addSequenceEvent(sequence, "onReconnecting");
         }
 
         @Override
         public void onReconnected(@NonNull Room room) {
             this.room = room;
             triggerLatch(onReconnectedLatch);
+            addSequenceEvent(sequence, "onReconnected");
         }
 
         @Override
@@ -108,6 +121,7 @@ public class CallbackHelper {
             this.room = room;
             this.twilioException = twilioException;
             triggerLatch(onDisconnectedLatch);
+            addSequenceEvent(sequence, "onDisconnected");
         }
 
         @Override
@@ -116,6 +130,7 @@ public class CallbackHelper {
             this.room = room;
             this.remoteParticipant = remoteParticipant;
             triggerLatch(onParticipantConnectedLatch);
+            addSequenceEvent(sequence, "onParticipantConnected");
         }
 
         @Override
@@ -124,18 +139,21 @@ public class CallbackHelper {
             this.room = room;
             this.remoteParticipant = remoteParticipant;
             triggerLatch(onParticipantDisconnectedLatch);
+            addSequenceEvent(sequence, "onParticipantDisconnected");
         }
 
         @Override
         public void onRecordingStarted(@NonNull Room room) {
             this.room = room;
             triggerLatch(onRecordingStartedLatch);
+            addSequenceEvent(sequence, "onRecordingStarted");
         }
 
         @Override
         public void onRecordingStopped(@NonNull Room room) {
             this.room = room;
             triggerLatch(onRecordingStoppedLatch);
+            addSequenceEvent(sequence, "onRecordingStopped");
         }
 
         public Room getRoom() {

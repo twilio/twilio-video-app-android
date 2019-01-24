@@ -9,8 +9,10 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.util.FakeVideoCapturer;
+import com.twilio.video.util.Sequence;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -52,18 +54,26 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
 
     @Test
     public void canPublishTracksWhileReconnecting() throws InterruptedException {
-        CountDownLatch videoTrackPublished = new CountDownLatch(1),
-                audioTrackPublished = new CountDownLatch(1),
-                dataTrackPublished = new CountDownLatch(1);
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
 
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         aliceLocalVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
         aliceLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
 
-        aliceRoomListener.onConnectedLatch = new CountDownLatch(1);
+        /*
+         * Define the expected sequence. Tracks can be published in any order so long as they occur
+         * after reconnecting -> reconnected
+         */
+        final List<String> expectedSequence =
+                Arrays.asList(
+                        "onReconnecting",
+                        "onReconnected",
+                        "onTrackPublished",
+                        "onTrackPublished",
+                        "onTrackPublished");
+        final Sequence reconnectingEventSequence = new Sequence(expectedSequence);
+        aliceRoomListener.sequence = reconnectingEventSequence;
         aliceRoomListener.onReconnectingLatch = new CountDownLatch(1);
-        aliceRoomListener.onReconnectedLatch = new CountDownLatch(1);
 
         aliceRoom
                 .getLocalParticipant()
@@ -73,7 +83,7 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
                             public void onAudioTrackPublished(
                                     LocalParticipant localParticipant,
                                     LocalAudioTrackPublication localAudioTrackPublication) {
-                                audioTrackPublished.countDown();
+                                reconnectingEventSequence.addEvent("onTrackPublished");
                             }
 
                             @Override
@@ -88,7 +98,7 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
                             public void onVideoTrackPublished(
                                     LocalParticipant localParticipant,
                                     LocalVideoTrackPublication localVideoTrackPublication) {
-                                videoTrackPublished.countDown();
+                                reconnectingEventSequence.addEvent("onTrackPublished");
                             }
 
                             @Override
@@ -103,7 +113,7 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
                             public void onDataTrackPublished(
                                     LocalParticipant localParticipant,
                                     LocalDataTrackPublication localDataTrackPublication) {
-                                dataTrackPublished.countDown();
+                                reconnectingEventSequence.addEvent("onTrackPublished");
                             }
 
                             @Override
@@ -126,14 +136,10 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
 
         // Simulate network connectivity restored
         aliceRoom.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
-        assertTrue(
-                aliceRoomListener.onReconnectedLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
-        // Validate that track published callbacks were received
-        assertTrue(videoTrackPublished.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertTrue(audioTrackPublished.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertTrue(dataTrackPublished.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        // Validate the sequence occurred as expected
+        reconnectingEventSequence.assertSequenceOccurred(
+                expectedSequence.size() * TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
     }
 
     @Test
@@ -141,8 +147,8 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
             throws InterruptedException {
         aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         aliceRoomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
-
         aliceRoomListener.onConnectedLatch = new CountDownLatch(1);
+        bobRoomListener.onConnectedLatch = new CountDownLatch(1);
         aliceRoomListener.onReconnectingLatch = new CountDownLatch(1);
         aliceRoomListener.onReconnectedLatch = new CountDownLatch(1);
 
@@ -152,13 +158,14 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
         assertTrue(
                 aliceRoomListener.onReconnectingLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        // Disconnect bob while reconnecting
         bobRoom.disconnect();
+
         // Simulate network connectivity restored
         aliceRoom.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
 
-        assertTrue(
-                aliceRoomListener.onReconnectingLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        // Wait for events
         assertTrue(
                 aliceRoomListener.onParticipantDisconnectedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
@@ -185,6 +192,7 @@ public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         aliceRoom.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
+
         aliceRoomListener.onReconnectedLatch = new CountDownLatch(1);
         aliceRoomListener.onReconnectedLatch.await(
                 TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS);
