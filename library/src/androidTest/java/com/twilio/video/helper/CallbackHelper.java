@@ -16,6 +16,7 @@
 
 package com.twilio.video.helper;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -89,6 +90,7 @@ public class CallbackHelper {
         @Override
         public void onConnected(@NonNull Room room) {
             this.room = room;
+            assertEquals(Room.State.CONNECTED, room.getState());
             triggerLatch(onConnectedLatch);
             addSequenceEvent(sequence, "onConnected");
         }
@@ -97,6 +99,7 @@ public class CallbackHelper {
         public void onConnectFailure(@NonNull Room room, @NonNull TwilioException twilioException) {
             this.room = room;
             this.twilioException = twilioException;
+            assertEquals(Room.State.DISCONNECTED, room.getState());
             triggerLatch(onConnectFailureLatch);
             addSequenceEvent(sequence, "onConnectFailure");
         }
@@ -105,6 +108,7 @@ public class CallbackHelper {
         public void onReconnecting(@NonNull Room room, @NonNull TwilioException twilioException) {
             this.room = room;
             this.twilioException = twilioException;
+            assertEquals(Room.State.RECONNECTING, room.getState());
             triggerLatch(onReconnectingLatch);
             addSequenceEvent(sequence, "onReconnecting");
         }
@@ -112,6 +116,7 @@ public class CallbackHelper {
         @Override
         public void onReconnected(@NonNull Room room) {
             this.room = room;
+            assertEquals(Room.State.CONNECTED, room.getState());
             triggerLatch(onReconnectedLatch);
             addSequenceEvent(sequence, "onReconnected");
         }
@@ -120,6 +125,7 @@ public class CallbackHelper {
         public void onDisconnected(@NonNull Room room, @Nullable TwilioException twilioException) {
             this.room = room;
             this.twilioException = twilioException;
+            assertEquals(Room.State.DISCONNECTED, room.getState());
             triggerLatch(onDisconnectedLatch);
             addSequenceEvent(sequence, "onDisconnected");
         }

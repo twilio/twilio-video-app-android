@@ -39,8 +39,10 @@ import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
+import com.twilio.video.util.ConnectivityUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
+import com.twilio.video.util.DeviceUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
@@ -50,6 +52,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -101,6 +104,9 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         mediaTestActivity = activityRule.getActivity();
         identity = Constants.PARTICIPANT_ALICE;
         roomName = random(Constants.ROOM_NAME_LENGTH);
+
+        ConnectivityUtils.enableWifi(mediaTestActivity, true);
+
         videoRoom = RoomUtils.createRoom(roomName, topology, enableRecording);
         assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(identity, topology);
@@ -191,19 +197,16 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
             assertTrue(
                     roomListener.onConnectedLatch.await(
                             STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-            assertEquals(Room.State.CONNECTED, room.getState());
             room.disconnect();
             assertTrue(
                     roomListener.onDisconnectedLatch.await(
                             STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-            assertEquals(Room.State.DISCONNECTED, room.getState());
-
             Thread.sleep(1000);
         }
     }
 
     @Test
-    public void shouldTriggerOnReconnectingOnNetworkChange() throws InterruptedException {
+    public void simulated_shouldTriggerOnReconnectingOnNetworkChange() throws InterruptedException {
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .iceServersTimeout(ICE_TIMEOUT)
@@ -219,24 +222,61 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Connect to room
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
 
         // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
         // Expected flow: Connected -> Reconnecting -> Connected
         room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
         assertTrue(
                 roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.RECONNECTING, room.getState());
-        assertEquals(
-                TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
-                roomListener.getTwilioException().getCode());
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+
         assertTrue(
                 roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
     }
 
     @Test
-    public void shouldReconnectAfterMultipleNetworkChanges() throws InterruptedException {
+    public void wifi_shouldTriggerOnReconnectingOnNetworkChange() throws InterruptedException {
+        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onReconnectingLatch = new CountDownLatch(1);
+        roomListener.onReconnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        // Connect to room
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        // Toggle WiFi which should trigger {@link Video.NetworkChangeEvent.CONNECTION_CHANGED}
+        // event
+        // Expected flow: Connected -> Reconnecting -> Connected
+        ConnectivityUtils.enableWifi(mediaTestActivity, false);
+        assertTrue(
+                roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+        ConnectivityUtils.enableWifi(mediaTestActivity, true);
+        assertTrue(
+                roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void simulated_shouldReconnectAfterMultipleNetworkChanges() throws InterruptedException {
         final int NETWORK_CHANGES = 4;
         roomListener.onConnectedLatch = new CountDownLatch(1);
         IceOptions iceOptions =
@@ -249,8 +289,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         // Connect to room
         assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
-
         for (int i = 0; i < NETWORK_CHANGES; i++) {
             roomListener.onReconnectingLatch = new CountDownLatch(1);
             roomListener.onReconnectedLatch = new CountDownLatch(1);
@@ -261,20 +299,61 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
             assertTrue(
                     roomListener.onReconnectingLatch.await(
                             STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-            assertEquals(Room.State.RECONNECTING, room.getState());
-            assertEquals(
-                    TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
-                    roomListener.getTwilioException().getCode());
+            assertTrue(
+                    "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                    (roomListener.getTwilioException().getCode()
+                                    == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                            | roomListener.getTwilioException().getCode()
+                                    == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
             assertTrue(
                     roomListener.onReconnectedLatch.await(
                             STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-            assertEquals(Room.State.CONNECTED, room.getState());
             Thread.sleep(SMALL_WAIT);
         }
     }
 
     @Test
-    public void shouldDisconnectDuringNetworkTimeoutAfterSuccessfulReconnect()
+    public void wifi_shouldReconnectAfterMultipleNetworkChanges() throws InterruptedException {
+        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        final int NETWORK_CHANGES = 4;
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        // Connect to room
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        for (int i = 0; i < NETWORK_CHANGES; i++) {
+            roomListener.onReconnectingLatch = new CountDownLatch(1);
+            roomListener.onReconnectedLatch = new CountDownLatch(1);
+
+            // Toggle WiFi which should trigger {@link Video.NetworkChangeEvent.CONNECTION_CHANGED}
+            // event
+            // Expected flow: Connected -> Reconnecting -> Connected
+            ConnectivityUtils.enableWifi(mediaTestActivity, false);
+            assertTrue(
+                    roomListener.onReconnectingLatch.await(
+                            STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+            assertTrue(
+                    "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                    (roomListener.getTwilioException().getCode()
+                                    == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                            | roomListener.getTwilioException().getCode()
+                                    == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+            ConnectivityUtils.enableWifi(mediaTestActivity, true);
+            assertTrue(
+                    roomListener.onReconnectedLatch.await(
+                            STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+            Thread.sleep(SMALL_WAIT);
+        }
+    }
+
+    @Test
+    public void simulated_shouldDisconnectDuringNetworkTimeoutAfterSuccessfulReconnect()
             throws InterruptedException {
         IceOptions iceOptions =
                 new IceOptions.Builder()
@@ -291,20 +370,20 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Connect to room
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
-
         // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
         // Expected flow: Connected -> Reconnecting -> Connected
         room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
         assertTrue(
                 roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.RECONNECTING, room.getState());
-        assertEquals(
-                TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
-                roomListener.getTwilioException().getCode());
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+
         assertTrue(
                 roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
 
         // Fire {@link Video.NetworkChangeEvent.CONNECTION_LOST} event
         // Expected flow: Connected -> Reconnecting -> Disconnected
@@ -312,16 +391,69 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_LOST);
         assertTrue(
                 roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.RECONNECTING, room.getState());
-        assertEquals(
-                TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
-                roomListener.getTwilioException().getCode());
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
         assertTrue(roomListener.onDisconnectedLatch.await(SIP_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.DISCONNECTED, room.getState());
     }
 
     @Test
-    public void shouldTryToReconnectAndTransitionToDisconnectedIfNetworkUnavailable()
+    public void wifi_shouldDisconnectDuringNetworkTimeoutAfterSuccessfulReconnect()
+            throws InterruptedException {
+        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onReconnectingLatch = new CountDownLatch(1);
+        roomListener.onReconnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        // Connect to room
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        // Toggle WiFi which should trigger {@link Video.NetworkChangeEvent.CONNECTION_CHANGED}
+        // event
+        // Expected flow: Connected -> Reconnecting -> Connected
+        ConnectivityUtils.enableWifi(mediaTestActivity, false);
+        assertTrue(
+                roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+        ConnectivityUtils.enableWifi(mediaTestActivity, true);
+        assertTrue(
+                roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        // Toggle WiFi which should trigger {@link Video.NetworkChangeEvent.CONNECTION_CHANGED}
+        // event
+        // Expected flow: Connected -> Reconnecting -> Disconnected
+        roomListener.onReconnectingLatch = new CountDownLatch(1);
+        ConnectivityUtils.enableWifi(mediaTestActivity, false);
+        assertTrue(
+                roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+        assertTrue(roomListener.onDisconnectedLatch.await(SIP_TIMEOUT, TimeUnit.SECONDS));
+        ConnectivityUtils.enableWifi(mediaTestActivity, true);
+    }
+
+    @Test
+    public void simulated_shouldTryToReconnectAndTransitionToDisconnectedIfNetworkUnavailable()
             throws InterruptedException {
         IceOptions iceOptions =
                 new IceOptions.Builder()
@@ -338,23 +470,57 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Connect to room
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
-
         // Fire {@link Video.NetworkChangeEvent.CONNECTION_LOST} event
         // Expected flow: Connected -> Reconnecting -> Disconnected
         room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_LOST);
         assertTrue(
                 roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.RECONNECTING, room.getState());
-        assertEquals(
-                TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
-                roomListener.getTwilioException().getCode());
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
         assertTrue(roomListener.onDisconnectedLatch.await(SIP_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.DISCONNECTED, room.getState());
     }
 
     @Test
-    public void shouldReceiveOnReconnectedIfNetworkChangeDuringReconnecting()
+    public void wifi_shouldTryToReconnectAndTransitionToDisconnectedIfNetworkUnavailable()
+            throws InterruptedException {
+        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onReconnectingLatch = new CountDownLatch(1);
+        roomListener.onReconnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+
+        // Connect to room
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        // Toggle WiFi which should trigger {@link Video.NetworkChangeEvent.CONNECTION_CHANGED}
+        // event
+        // Expected flow: Connected -> Reconnecting -> Disconnected
+        ConnectivityUtils.enableWifi(mediaTestActivity, false);
+        assertTrue(
+                roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
+        assertTrue(roomListener.onDisconnectedLatch.await(SIP_TIMEOUT, TimeUnit.SECONDS));
+        ConnectivityUtils.enableWifi(mediaTestActivity, true);
+    }
+
+    @Test
+    public void simulated_shouldReceiveOnReconnectedIfNetworkChangeDuringReconnecting()
             throws InterruptedException {
         IceOptions iceOptions =
                 new IceOptions.Builder()
@@ -371,26 +537,25 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Connect to room
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
 
         // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
         // Expected flow: Connected -> Reconnecting -> Connected
         room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
         assertTrue(
                 roomListener.onReconnectingLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.RECONNECTING, room.getState());
-        assertEquals(
-                TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION,
-                roomListener.getTwilioException().getCode());
+        assertTrue(
+                "Error must be SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION or MEDIA_CONNECTION_ERROR_EXCEPTION",
+                (roomListener.getTwilioException().getCode()
+                                == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
+                        | roomListener.getTwilioException().getCode()
+                                == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
         // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
         room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
         // Reinitialize Reconnected latch
         roomListener.onReconnectedLatch = new CountDownLatch(1);
         // Assert that network disruption during RECONNECTING can still transition to RECONNECTED
-        assertEquals(Room.State.RECONNECTING, room.getState());
         assertTrue(
                 roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertEquals(Room.State.CONNECTED, room.getState());
     }
 
     @Test
@@ -600,5 +765,14 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         assertEquals(
                 roomListener.getTwilioException().getCode(),
                 TwilioException.ROOM_ROOM_COMPLETED_EXCEPTION);
+    }
+
+    private boolean isDeviceValidForWiFiTest() {
+        return !DeviceUtils.isSamsungGalaxyS3()
+                && !DeviceUtils.isSamsungGalaxyS7Active()
+                && !DeviceUtils.isSamsungGalaxyS7()
+                && !DeviceUtils.isPixel2()
+                && !DeviceUtils.isG3()
+                && !DeviceUtils.isOnePlusOne();
     }
 }
