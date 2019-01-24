@@ -49,15 +49,15 @@ public class DeviceUtils {
     }
 
     public static boolean isG3() {
-        return Build.MODEL.equals(LG_G3);
+        return Build.DEVICE.equals(LG_G3);
     }
 
     public static boolean isOnePlusOne() {
-        return Build.MODEL.equals(ONE_PLUS_ONE);
+        return Build.DEVICE.equals(ONE_PLUS_ONE);
     }
 
     public static boolean isPixel2() {
-        return Build.MODEL.equals(PIXEL_2);
+        return Build.DEVICE.equals(PIXEL_2);
     }
 
     public static boolean isNexus9() {

@@ -772,6 +772,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                 && !DeviceUtils.isSamsungGalaxyS7Active()
                 && !DeviceUtils.isSamsungGalaxyS7()
                 && !DeviceUtils.isPixel2()
+                && !DeviceUtils.isNexus7()
                 && !DeviceUtils.isG3()
                 && !DeviceUtils.isOnePlusOne();
     }
