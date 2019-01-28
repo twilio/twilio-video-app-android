@@ -424,33 +424,8 @@ public class Room {
          *
          * <p>The SDK groups network disruptions into two categories: signaling and media. The
          * occurrence of either of these network disruptions will result in the onReconnecting
-         * callback. During a media reconnection certain signaling related method could continue to
-         * be invoked as documented below:
-         *
-         * <p>The following {@link Room.Listener} events could be invoked:
-         *
-         * <ul>
-         *   <li>{@link Room.Listener#onDisconnected(Room, TwilioException)}
-         *   <li>{@link Room.Listener#onParticipantConnected(Room, RemoteParticipant)}
-         *   <li>{@link Room.Listener#onParticipantDisconnected(Room, RemoteParticipant)}
-         *   <li>{@link Room.Listener#onRecordingStarted(Room)}
-         *   <li>{@link Room.Listener#onRecordingStopped(Room)}
-         * </ul>
-         *
-         * <p>All {@link LocalParticipant.Listener} methods could be invoked
-         *
-         * <p>All {@link RemoteParticipant.Listener} methods except the following could be invoked:
-         *
-         * <p>
-         *
-         * <ul>
-         *   <li>{@link RemoteParticipant.Listener#onDataTrackSubscribed(RemoteParticipant,
-         *       RemoteDataTrackPublication, RemoteDataTrack)}
-         *   <li>{@link RemoteParticipant.Listener#onAudioTrackSubscribed(RemoteParticipant,
-         *       RemoteAudioTrackPublication, RemoteAudioTrack)}
-         *   <li>{@link RemoteParticipant.Listener#onVideoTrackSubscribed(RemoteParticipant,
-         *       RemoteVideoTrackPublication, RemoteVideoTrack)}
-         * </ul>
+         * callback. During a media reconnection signaling related methods may continue to be
+         * invoked.
          *
          * @param room the room the {@link LocalParticipant} is attempting to reconnect to.
          * @param twilioException An error explaining why the {@link LocalParticipant} is
