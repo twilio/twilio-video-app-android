@@ -40,7 +40,7 @@ library-physical-device-tests:
         - {model: flo, version: 21}
         - {model: A0001, version: 22}
         - {model: herolte, version: 23}
-        - {model: herolte, version: 24}
+        - {model: lucye, version: 24}
         - {model: sailfish, version: 25}
         - {model: walleye, version: 26}
         - {model: walleye, version: 27}
@@ -72,7 +72,7 @@ library-camera-tests:
         - {model: g3, version: 19}
         - {model: hero2lte, version: 23}
         - {model: herolte, version: 23}
-        - {model: herolte, version: 24}
+        - {model: lucye, version: 24}
         - {model: hlte, version: 19}
         - {model: j7xelte, version: 23}
         - {model: lt02wifi, version: 19}
