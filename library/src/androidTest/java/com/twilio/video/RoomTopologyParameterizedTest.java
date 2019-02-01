@@ -30,11 +30,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
+import android.util.Log;
+import com.github.anrwatchdog.ANRError;
+import com.github.anrwatchdog.ANRWatchDog;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.twilioapi.model.VideoRoom;
@@ -765,6 +773,65 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         assertEquals(
                 roomListener.getTwilioException().getCode(),
                 TwilioException.ROOM_ROOM_COMPLETED_EXCEPTION);
+    }
+
+    @Test
+    public void shouldDisconnectFromRoomAfterNetworkChange() throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        // Register ANR listener
+        new ANRWatchDog()
+                .setANRListener(
+                        new ANRWatchDog.ANRListener() {
+                            @Override
+                            public void onAppNotResponding(ANRError error) {
+                                fail();
+                            }
+                        });
+
+        // Register connectivity broadcast receiver
+        BroadcastReceiver connectivityChangeReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        if (intent.getAction()
+                                .equalsIgnoreCase(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                            if (isInitialStickyBroadcast()) {
+                                Log.d(
+                                        getClass().getSimpleName(),
+                                        "Ignoring network event, sticky broadcast");
+                                return;
+                            }
+                            room.disconnect();
+                        }
+                    }
+                };
+        mediaTestActivity
+                .getApplicationContext()
+                .registerReceiver(
+                        connectivityChangeReceiver,
+                        new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        // Connect to room
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        // Toggle WiFi
+        ConnectivityUtils.enableWifi(mediaTestActivity, false);
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        // Unregister broadcast receiver
+        mediaTestActivity.getApplicationContext().unregisterReceiver(connectivityChangeReceiver);
+        ConnectivityUtils.enableWifi(mediaTestActivity, true);
     }
 
     private boolean isDeviceValidForWiFiTest() {

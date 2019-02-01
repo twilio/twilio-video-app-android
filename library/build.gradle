@@ -141,6 +141,7 @@ dependencies {
     androidTestImplementation "com.google.code.gson:gson:${versions.gson}"
     androidTestImplementation "org.apache.commons:commons-lang3:${versions.apacheCommons}"
     androidTestImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
+    androidTestImplementation 'com.github.anrwatchdog:anrwatchdog:1.3.0'
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
     implementation "com.getkeepsafe.relinker:relinker:${versions.relinker}"
