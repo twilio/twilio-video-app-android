@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
  * @see <a href="https://en.wikipedia.org/wiki/Internet_Speech_Audio_Codec">iSAC</a>
  */
 public class IsacCodec extends AudioCodec {
-    @NonNull public static final String NAME = "ISAC";
+    @NonNull public static final String NAME = "isac";
 
     public IsacCodec() {
         super(NAME);

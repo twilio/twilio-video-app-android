@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
  * @see <a href="https://en.wikipedia.org/wiki/Opus_(audio_format)">Opus</a>
  */
 public class OpusCodec extends AudioCodec {
-    @NonNull public static final String NAME = "OPUS";
+    @NonNull public static final String NAME = "opus";
 
     public OpusCodec() {
         super(NAME);

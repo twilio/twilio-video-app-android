@@ -40,9 +40,9 @@ std::shared_ptr<twilio::media::AudioCodec> getAudioCodec(JNIEnv *env, jobject j_
     std::string audio_codec_name = JavaToUTF8StdString(env, j_audio_codec_name);
     std::shared_ptr<twilio::media::AudioCodec> audio_codec;
 
-    if (audio_codec_name == "ISAC") {
+    if (audio_codec_name == "isac") {
         audio_codec.reset(new twilio::media::IsacCodec());
-    } else if (audio_codec_name == "OPUS") {
+    } else if (audio_codec_name == "opus") {
         audio_codec.reset(new twilio::media::OpusCodec());
     } else if (audio_codec_name == "PCMA") {
         audio_codec.reset(new twilio::media::PcmaCodec());
