@@ -33,14 +33,21 @@ public interface VideoCapturer {
     boolean isScreencast();
 
     /**
-     * Start capturing frames.
+     * Starts capturing frames at the specified format. Frames should be provided to the given
+     * listener upon availability.
      *
-     * @param captureFormat format to start capturing in.
-     * @param capturerListener consumes frames upon availability.
+     * <p><b>Note</b>: This method is not meant to be invoked directly.
+     *
+     * @param captureFormat the format in which to capture frames.
+     * @param capturerListener consumer of available frames.
      */
     void startCapture(@NonNull VideoFormat captureFormat, @NonNull Listener capturerListener);
 
-    /** Stop capturing. This method must block until capturer has stopped. */
+    /**
+     * Stops all frames being captured.
+     *
+     * <p><b>Note</b>: This method is not meant to be invoked directly.
+     */
     void stopCapture();
 
     /**
