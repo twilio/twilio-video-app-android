@@ -50,7 +50,6 @@ import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.ConnectivityUtils;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
-import com.twilio.video.util.DeviceUtils;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
@@ -249,7 +248,10 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
     @Test
     public void wifi_shouldTriggerOnReconnectingOnNetworkChange() throws InterruptedException {
-        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        // FTL doesn't reliably reconnect after toggling WiFi. See Google issue:
+        // https://issuetracker.google.com/issues/124123221
+        Assume.assumeFalse(TestUtils.isFTL(mediaTestActivity));
+
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .iceServersTimeout(ICE_TIMEOUT)
@@ -322,7 +324,9 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
     @Test
     public void wifi_shouldReconnectAfterMultipleNetworkChanges() throws InterruptedException {
-        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        // FTL doesn't reliably reconnect after toggling WiFi. See Google issue:
+        // https://issuetracker.google.com/issues/124123221
+        Assume.assumeFalse(TestUtils.isFTL(mediaTestActivity));
         final int NETWORK_CHANGES = 4;
         roomListener.onConnectedLatch = new CountDownLatch(1);
         IceOptions iceOptions =
@@ -411,7 +415,9 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     @Test
     public void wifi_shouldDisconnectDuringNetworkTimeoutAfterSuccessfulReconnect()
             throws InterruptedException {
-        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        // FTL doesn't reliably reconnect after toggling WiFi. See Google issue:
+        // https://issuetracker.google.com/issues/124123221
+        Assume.assumeFalse(TestUtils.isFTL(mediaTestActivity));
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .iceServersTimeout(ICE_TIMEOUT)
@@ -495,7 +501,9 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     @Test
     public void wifi_shouldTryToReconnectAndTransitionToDisconnectedIfNetworkUnavailable()
             throws InterruptedException {
-        Assume.assumeTrue(isDeviceValidForWiFiTest());
+        // FTL doesn't reliably reconnect after toggling WiFi. See Google issue:
+        // https://issuetracker.google.com/issues/124123221
+        Assume.assumeFalse(TestUtils.isFTL(mediaTestActivity));
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .iceServersTimeout(ICE_TIMEOUT)
@@ -776,7 +784,11 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     }
 
     @Test
-    public void shouldDisconnectFromRoomAfterNetworkChange() throws InterruptedException {
+    public void wifi_shouldDisconnectFromRoomAfterNetworkChange() throws InterruptedException {
+        // FTL doesn't reliably reconnect after toggling WiFi. See Google issue:
+        // https://issuetracker.google.com/issues/124123221
+        Assume.assumeFalse(TestUtils.isFTL(mediaTestActivity));
+
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         // Register ANR listener
@@ -832,15 +844,5 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Unregister broadcast receiver
         mediaTestActivity.getApplicationContext().unregisterReceiver(connectivityChangeReceiver);
         ConnectivityUtils.enableWifi(mediaTestActivity, true);
-    }
-
-    private boolean isDeviceValidForWiFiTest() {
-        return !DeviceUtils.isSamsungGalaxyS3()
-                && !DeviceUtils.isSamsungGalaxyS7Active()
-                && !DeviceUtils.isSamsungGalaxyS7()
-                && !DeviceUtils.isPixel2()
-                && !DeviceUtils.isNexus7()
-                && !DeviceUtils.isG3()
-                && !DeviceUtils.isOnePlusOne();
     }
 }
