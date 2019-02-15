@@ -18,6 +18,7 @@ codecs:
     - PCMA
     - G722
     - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants.
 
 ###3.2.2
 
