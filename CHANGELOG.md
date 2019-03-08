@@ -1,9 +1,9 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
-####4.2.0
+#### 4.0.1
 
-Enhancements
+Updates
 
-- Added Dominant Speaker APIs to `Room` and `RoomObserver`. These APIs report the `RemoteParticipant` publishing the loudest `RemoteAudioTrack` your `LocalParticipant` is subscribed to, if any. Whenever the Dominant Speaker changes, `RoomObserver::onDominantSpeakerChanged` is invoked.
+- Updated C++ library to include changes for upcoming feature.
 
 Known issues
 
@@ -17,8 +17,6 @@ codecs:
     - G722
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants.
-
-####4.1.0
 
 ###4.0.0
 
