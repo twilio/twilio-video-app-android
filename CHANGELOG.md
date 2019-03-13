@@ -1,9 +1,12 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 #### 4.0.1
 
-Updates
+Bug Fixes
 
-- Updated C++ library to include changes for upcoming feature.
+- `Room.getStats()` will raise a callback to the provided `StatsObserver` if called while `Room.getState() == Room.State.RECONNECTING`.
+- Fixed a crash related to stats gathering which could occur when insights reporting is enabled.
+- Fixed a crash related to media state summarization which could occur when disconnecting from a Room.
+- Fixed a crash related to stats gathering which could occur in the media monitor component.
 
 Known issues
 
