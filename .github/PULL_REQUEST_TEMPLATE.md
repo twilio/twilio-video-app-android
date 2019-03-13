@@ -1,9 +1,3 @@
-## Submission Checklist
-
- - [ ] The `CHANGELOG.md` reflects any **feature**, **bug fixes**, or **known issues** made in the source code
- - [ ] The source has been evaluated for API changes and semantic versioning changes are reflected in `gradle.properties`
- - [ ] A visual inspection of the `Files changed` tab was made prior to submitting the pull request ensuring the style guide was followed
-
 ## Description
 
 [Description of the Pull Request]
@@ -23,3 +17,9 @@
 ## Additional Notes
 
 [Any additional comments, notes, or information relevant to reviewers.]
+
+## Submission Checklist
+
+ - [ ] The `CHANGELOG.md` reflects any **feature**, **bug fixes**, or **known issues** made in the source code
+ - [ ] The source has been evaluated for API changes and semantic versioning changes are reflected in `gradle.properties`
+ - [ ] A visual inspection of the `Files changed` tab was made prior to submitting the pull request ensuring the style guide was followed
