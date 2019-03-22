@@ -19,8 +19,7 @@ codecs:
     - PCMA
     - G722
     - VP9
-- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants.
-
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
 ###4.0.0
 
 Improvements
