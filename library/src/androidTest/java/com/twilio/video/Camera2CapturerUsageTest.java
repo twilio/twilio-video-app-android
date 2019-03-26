@@ -152,19 +152,24 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
         // TODO: Fix crash on S6 GSDK-1561
         assumeFalse(DeviceUtils.isSamsungGalaxyS6());
         assumeTrue(cameraIds.length > 1);
-        final String cameraId = cameraIds[0];
-        final String otherCameraId = cameraIds[1];
+        final String originalCameraId = cameraIds[0];
+        final String expectedCameraId = cameraIds[1];
+        final CountDownLatch cameraSwitched = new CountDownLatch(1);
         final CountDownLatch cameraSwitchError = new CountDownLatch(1);
         camera2Capturer =
                 new Camera2Capturer(
                         cameraCapturerActivity,
-                        cameraId,
+                        originalCameraId,
                         new Camera2Capturer.Listener() {
                             @Override
                             public void onFirstFrameAvailable() {}
 
                             @Override
-                            public void onCameraSwitched(@NonNull String newCameraId) {}
+                            public void onCameraSwitched(@NonNull String newCameraId) {
+                                assertEquals(expectedCameraId, newCameraId);
+                                assertEquals(expectedCameraId, camera2Capturer.getCameraId());
+                                cameraSwitched.countDown();
+                            }
 
                             @Override
                             public void onError(@NonNull Camera2Capturer.Exception exception) {
@@ -177,10 +182,11 @@ public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, camera2Capturer);
 
         // Switch our cameras quickly
-        camera2Capturer.switchCamera(otherCameraId);
-        camera2Capturer.switchCamera(otherCameraId);
+        camera2Capturer.switchCamera(expectedCameraId);
+        camera2Capturer.switchCamera(expectedCameraId);
 
-        // Wait for callback
+        // Wait for callbacks
+        assertTrue(cameraSwitched.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
         assertTrue(cameraSwitchError.await(CAMERA2_CAPTURER_DELAY_MS, TimeUnit.MILLISECONDS));
     }
 

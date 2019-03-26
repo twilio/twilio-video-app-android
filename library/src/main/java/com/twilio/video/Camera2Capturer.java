@@ -51,6 +51,8 @@ import org.webrtc.SurfaceTextureHelper;
  */
 @TargetApi(21)
 public class Camera2Capturer implements VideoCapturer {
+    private static final String CAMERA_SWITCH_PENDING_ERROR_MESSAGE =
+            "Camera switch already in progress.";
     private static final Logger logger = Logger.getLogger(Camera2Capturer.class);
 
     private final Object stateLock = new Object();
@@ -144,7 +146,9 @@ public class Camera2Capturer implements VideoCapturer {
                 @Override
                 public void onCameraSwitchError(final String errorMessage) {
                     logger.e("Failed to switch to camera with ID: " + pendingCameraId);
-                    pendingCameraId = null;
+                    synchronized (Camera2Capturer.this) {
+                        pendingCameraId = null;
+                    }
                     handler.post(
                             () ->
                                     listener.onError(
@@ -318,8 +322,17 @@ public class Camera2Capturer implements VideoCapturer {
                 newCameraId);
         synchronized (stateLock) {
             if (state != Camera2Capturer.State.IDLE) {
-                pendingCameraId = newCameraId;
-                webrtcCamera2Capturer.switchCamera(newCameraId, cameraSwitchHandler);
+                if (pendingCameraId == null) {
+                    pendingCameraId = newCameraId;
+                    webrtcCamera2Capturer.switchCamera(newCameraId, cameraSwitchHandler);
+                } else {
+                    handler.post(
+                            () ->
+                                    listener.onError(
+                                            new Exception(
+                                                    Exception.CAMERA_SWITCH_FAILED,
+                                                    CAMERA_SWITCH_PENDING_ERROR_MESSAGE)));
+                }
             } else {
                 cameraId = newCameraId;
                 listener.onCameraSwitched(cameraId);
