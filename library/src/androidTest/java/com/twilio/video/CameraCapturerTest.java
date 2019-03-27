@@ -65,7 +65,12 @@ public class CameraCapturerTest extends BaseCameraCapturerTest {
         sourcesSupported = frontCameraSupported ? (sourcesSupported + 1) : (sourcesSupported);
         sourcesSupported = backCameraSupported ? (sourcesSupported + 1) : (sourcesSupported);
 
-        assertEquals(Camera.getNumberOfCameras(), sourcesSupported);
+        /*
+         * Cap the expected number of cameras at two. This test only checks for the presence of
+         * a front and back camera.
+         */
+        final int expectedNumberOfCameras = Math.min(2, Camera.getNumberOfCameras());
+        assertEquals(expectedNumberOfCameras, sourcesSupported);
     }
 
     @Test
