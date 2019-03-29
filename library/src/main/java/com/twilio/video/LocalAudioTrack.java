@@ -175,6 +175,30 @@ public class LocalAudioTrack extends AudioTrack {
         this.mediaFactory = MediaFactory.instance(this, context);
     }
 
+    /**
+     * Adds a sink to the Track. Sinks consume raw audio samples for further processing or storage.
+     */
+    @Override
+    public synchronized void addSink(@NonNull AudioSink audioSink) {
+        Preconditions.checkState(
+                !isReleased(), "Cannot add AudioSink to audio track that has " + "been released");
+        super.addSink(audioSink);
+    }
+
+    /**
+     * Removes a sink from the Track.
+     *
+     * @param audioSink An object that implements the `AudioSink` interface.
+     */
+    @Override
+    public synchronized void removeSink(@NonNull AudioSink audioSink) {
+        Preconditions.checkState(
+                !isReleased(),
+                "Cannot remove AudioSink from audio track that has " + "been released");
+        super.removeSink(audioSink);
+    }
+
+    @Override
     boolean isReleased() {
         return nativeLocalAudioTrackHandle == 0;
     }

@@ -235,18 +235,4 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
         remoteTrack.enablePlayback(false);
         assertFalse(remoteTrack.isPlaybackEnabled());
     }
-
-    private void publishAudioTrack() throws InterruptedException {
-        aliceParticipantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
-        aliceParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(aliceParticipantListener);
-        bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
-        assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
-        assertTrue(
-                aliceParticipantListener.onAudioTrackPublishedLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertTrue(
-                aliceParticipantListener.onSubscribedToAudioTrackLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-    }
 }

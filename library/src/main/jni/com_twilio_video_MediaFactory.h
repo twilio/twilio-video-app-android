@@ -32,14 +32,29 @@ public:
     }
 
     virtual ~MediaFactoryContext() {
+        /*
+         * Ensure the audio source is safely destroyed first, before the webrtc signaling and
+         * worker threads are shutdown.
+         */
+        audio_source_ = nullptr;
         media_factory_.reset();
     }
 
     std::shared_ptr<twilio::media::MediaFactory> getMediaFactory() {
         return media_factory_;
     }
+
+    rtc::scoped_refptr<webrtc::AudioSourceInterface> getAudioSource(cricket::AudioOptions audio_options) {
+        // Lazily instantiate audio source with audio sink enabled
+        if (!audio_source_) {
+            audio_source_ = media_factory_->createAudioSource(audio_options, true);
+        }
+
+        return audio_source_;
+    }
 private:
     twilio::media::MediaOptions media_options_;
+    rtc::scoped_refptr<webrtc::AudioSourceInterface> audio_source_;
     std::shared_ptr<twilio::media::MediaFactory> media_factory_;
 };
 

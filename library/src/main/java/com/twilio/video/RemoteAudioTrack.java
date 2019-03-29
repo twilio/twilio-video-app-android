@@ -25,7 +25,6 @@ public class RemoteAudioTrack extends AudioTrack {
     private long nativeRemoteAudioTrackHandle;
     private final String sid;
     private boolean playbackEnabled;
-    private boolean isReleased = false;
 
     RemoteAudioTrack(
             long nativeRemoteAudioTrackHandle,
@@ -54,7 +53,7 @@ public class RemoteAudioTrack extends AudioTrack {
      */
     public synchronized void enablePlayback(boolean enable) {
         this.playbackEnabled = enable;
-        if (!isReleased) {
+        if (!isReleased()) {
             nativeEnablePlayback(nativeRemoteAudioTrackHandle, enable);
         } else {
             logger.w(
@@ -77,10 +76,15 @@ public class RemoteAudioTrack extends AudioTrack {
 
     @Override
     synchronized void release() {
-        if (!isReleased) {
+        if (!isReleased()) {
             nativeRelease(nativeRemoteAudioTrackHandle);
-            isReleased = true;
+            nativeRemoteAudioTrackHandle = 0;
         }
+    }
+
+    @Override
+    boolean isReleased() {
+        return nativeRemoteAudioTrackHandle == 0;
     }
 
     private native void nativeEnablePlayback(long nativeAudioTrackHandle, boolean enable);

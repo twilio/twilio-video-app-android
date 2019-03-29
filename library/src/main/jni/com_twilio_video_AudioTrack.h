@@ -19,10 +19,7 @@
 
 #include <jni.h>
 #include "twilio/media/track.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "audio_sink_adapter.h"
 
 namespace twilio_video_jni {
 
@@ -31,21 +28,33 @@ public:
     AudioTrackContext(std::shared_ptr<twilio::media::AudioTrack> audio_track)
     : audio_track_(audio_track) { }
 
-    virtual ~AudioTrackContext() = default;
+    virtual ~AudioTrackContext();
 
-    std::shared_ptr<twilio::media::AudioTrack> getAudioTrack() {
-        return audio_track_;
-    }
+    void addSink(JNIEnv *env, jobject j_audio_sink);
+    void removeSink(jobject j_audio_sink);
 private:
     std::shared_ptr<twilio::media::AudioTrack> audio_track_;
+    std::map<jobject, std::unique_ptr<AudioSinkAdapter>> audio_sink_map_;
 };
 
-// TODO: Implement nativeAdd/RemoveSink
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-}
-
+JNIEXPORT void JNICALL
+Java_com_twilio_video_AudioTrack_nativeAddSink(JNIEnv *env,
+                                               jobject instance,
+                                               jlong native_audio_track_handle,
+                                               jobject j_audio_sink);
+JNIEXPORT void JNICALL
+Java_com_twilio_video_AudioTrack_nativeRemoveSink(JNIEnv *env,
+                                                  jobject instance,
+                                                  jlong native_audio_track_handle,
+                                                  jobject j_audio_sink);
 #ifdef __cplusplus
 }
 #endif
+
+}
 
 #endif // VIDEO_ANDROID_COM_TWILIO_VIDEO_AUDIOTRACK_H_

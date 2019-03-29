@@ -231,6 +231,32 @@ public class LocalAudioTrackTest extends BaseVideoTest {
         return audioOptionsList;
     }
 
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNPEWhenAddingNullAudioSink() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localAudioTrack.addSink(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNPEWhenRemovingNullAudioSink() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localAudioTrack.removeSink(null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowISEWhenAddingAudioSink() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localAudioTrack.release();
+        localAudioTrack.addSink(null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowISEWhenRemovingAudioSinkFromReleasedLocalAudioTrack() {
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localAudioTrack.release();
+        localAudioTrack.removeSink(null);
+    }
+
     /*
      * Builds a matrix of AudioOptions permutations.
      */

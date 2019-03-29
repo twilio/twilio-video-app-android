@@ -228,4 +228,33 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
             charlieLocalDataTrack.release();
         }
     }
+
+    protected void publishAudioTrack() throws InterruptedException {
+        aliceParticipantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
+        aliceParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
+        if (bobLocalAudioTrack == null) {
+            bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
+        }
+        assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
+        assertTrue(
+                aliceParticipantListener.onAudioTrackPublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onSubscribedToAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+    }
+
+    protected void unpublishAudioTrack() throws InterruptedException {
+        aliceParticipantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
+        aliceParticipantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceParticipantListener);
+        assertTrue(bobLocalParticipant.unpublishTrack(bobLocalAudioTrack));
+        assertTrue(
+                aliceParticipantListener.onUnsubscribedFromAudioTrackLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(
+                aliceParticipantListener.onAudioTrackUnpublishedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+    }
 }

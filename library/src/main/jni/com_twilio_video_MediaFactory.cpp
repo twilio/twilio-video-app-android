@@ -61,6 +61,14 @@ std::shared_ptr<twilio::media::MediaFactory> getMediaFactory(jlong media_factory
     return media_factory_context->getMediaFactory();
 }
 
+rtc::scoped_refptr<webrtc::AudioSourceInterface> getAudioSource(jlong media_factory_handle,
+        cricket::AudioOptions audio_options) {
+    MediaFactoryContext *media_factory_context =
+            reinterpret_cast<MediaFactoryContext *>(media_factory_handle);
+
+    return media_factory_context->getAudioSource(audio_options);
+}
+
 twilio::media::MediaOptions getMediaOptions(jobject j_media_options) {
     JNIEnv* jni = webrtc::jni::AttachCurrentThreadIfNeeded();
     twilio::media::MediaOptions media_options = twilio::media::MediaOptions();
@@ -350,7 +358,7 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
                        ("") :
                        (JavaToUTF8StdString(jni, j_name));
     rtc::scoped_refptr<webrtc::AudioSourceInterface> audio_source =
-            media_factory->createAudioSource(audio_options);
+            getAudioSource(media_factory_handle, audio_options);
     twilio::media::AudioTrackOptions audio_track_options =
             twilio::media::AudioTrackOptions(enabled, name);
     std::shared_ptr<twilio::media::LocalAudioTrack> local_audio_track =
