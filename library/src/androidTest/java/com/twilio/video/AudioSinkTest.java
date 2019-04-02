@@ -457,7 +457,9 @@ public class AudioSinkTest extends BaseParticipantTest {
                 player.stop();
             }
         }
-        assertTrue(didGetSound);
+        if (!TestUtils.isFTL(mediaTestActivity)) {
+            assertTrue(didGetSound);
+        }
         player.release();
     }
 
