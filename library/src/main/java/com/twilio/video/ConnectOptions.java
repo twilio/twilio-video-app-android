@@ -53,7 +53,6 @@ public class ConnectOptions {
     private final List<VideoCodec> preferredVideoCodecs;
     private final EncodingParameters encodingParameters;
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     private final MediaFactory mediaFactory;
 
     static void checkAudioCodecs(@Nullable List<AudioCodec> audioCodecs) {
