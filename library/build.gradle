@@ -350,7 +350,7 @@ def getEnvironment() {
     // Possible values for ENVIRONMENT are 'prod', 'stage', and 'dev'.
 
     // Attempt to get it from the environment variable
-    def environment = System.getenv("ENVIRONMENT");
+    def environment = System.getenv("ENVIRONMENT")
 
     if (environment == null) {
         println "Could not locate ENVIRONMENT environment variable. Trying local.properties"
@@ -367,7 +367,7 @@ def getEnvironment() {
     }
 
     println "Environment: " + environment
-    return environment;
+    return environment
 }
 
 def getTestCoverageEnabled() {
@@ -444,24 +444,24 @@ def getTestLogLevel() {
 def getTwilioVideoConfig() {
     if (project.file('twilio-video.json').exists()) {
         def slurper = new groovy.json.JsonSlurper()
-        def twilioVideoConfig = slurper.parse(project.file('twilio-video.json'));
+        def twilioVideoConfig = slurper.parse(project.file('twilio-video.json'))
 
         // Validate that mandatory credentials are set
-        assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
-        assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
-        assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
+        assertCredentialDefined(twilioVideoConfig.credentials, "account_sid")
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key")
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret")
 
         // Generate credential HashMap
-        def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
-        def hashMapSuffix = "}}";
-        def hashMap = hashMapPrefix;
+        def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n"
+        def hashMapSuffix = "}}"
+        def hashMap = hashMapPrefix
 
         twilioVideoConfig.credentials.each { credentialsEntry ->
-            def hashMapEntry = "    put(\"${credentialsEntry.key}\", \"${credentialsEntry.value}\");\n";
+            def hashMapEntry = "    put(\"${credentialsEntry.key}\", \"${credentialsEntry.value}\");\n"
             hashMap += hashMapEntry
         }
 
-        return hashMap + hashMapSuffix;
+        return hashMap + hashMapSuffix
     } else {
         logger.log(LogLevel.WARN, "Could not find twilio-video.json in " +
                 project.projectDir.toString() + ". Library instrumentation tests cannot be run" +
@@ -469,9 +469,9 @@ def getTwilioVideoConfig() {
     }
 }
 
-def assertCredentialDefined(credentials, credentialKey) {
+static def assertCredentialDefined(credentials, credentialKey) {
     assert credentials.containsKey(credentialKey) :
-            "twilio-video.json must contain key " + credentialKey;
-    assert credentials.get(credentialKey) != null : credentialKey + " must not be null";
-    assert !credentials.get(credentialKey).equals("") : credentialKey + " must not be empty";
+            "twilio-video.json must contain key " + credentialKey
+    assert credentials.get(credentialKey) != null : credentialKey + " must not be null"
+    assert !credentials.get(credentialKey).equals("") : credentialKey + " must not be empty"
 }
