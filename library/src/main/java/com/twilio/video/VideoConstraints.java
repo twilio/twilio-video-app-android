@@ -164,9 +164,6 @@ public class VideoConstraints {
             if (maxFps < 0) {
                 throw new IllegalStateException("MaxFps is less than 0");
             }
-            if (minFps > maxFps) {
-                throw new IllegalStateException("MinFps is greater than maxFps");
-            }
             if (minVideoDimensions.width > maxVideoDimensions.width) {
                 throw new IllegalStateException(
                         "Min video dimensions width "
