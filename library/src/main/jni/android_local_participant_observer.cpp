@@ -290,6 +290,10 @@ void AndroidLocalParticipantObserver::onDataTrackPublicationFailed(twilio::video
     }
 }
 
+void AndroidLocalParticipantObserver::onNetworkQualityLevelChanged(twilio::video::LocalParticipant *participant, twilio::video::NetworkQualityLevel level){
+
+}
+
 bool AndroidLocalParticipantObserver::isObserverValid(const std::string &callback_name) {
     if (observer_deleted_) {
         VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,

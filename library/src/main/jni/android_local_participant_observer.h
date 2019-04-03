@@ -61,6 +61,7 @@ protected:
                                               std::shared_ptr<twilio::media::LocalDataTrack> data_track,
                                               const twilio::video::TwilioError twilio_error);
 
+    virtual void onNetworkQualityLevelChanged(twilio::video::LocalParticipant *participant, twilio::video::NetworkQualityLevel level);
 private:
     JNIEnv *jni() {
         return webrtc::jni::AttachCurrentThreadIfNeeded();
