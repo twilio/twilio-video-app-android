@@ -266,8 +266,13 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
     int rotated_height = crop_height;
 
     if (capturer_->apply_rotation() && (rotation == 90 || rotation == 270)) {
-        std::swap(adapted_width, adapted_height);
-        std::swap(rotated_width, rotated_height);
+        int tmp = adapted_height;
+        adapted_height = adapted_width;
+        adapted_width = tmp;
+
+        tmp = rotated_height;
+        rotated_height = rotated_width;
+        rotated_width = tmp;
     }
 
     rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer =
@@ -403,7 +408,9 @@ void VideoCapturerDelegate::OnTextureFrame(int width,
     if (capturer_->apply_rotation()) {
         if (rotation == webrtc::kVideoRotation_90 ||
             rotation == webrtc::kVideoRotation_270) {
-            std::swap(adapted_width, adapted_height);
+            int tmp = adapted_height;
+            adapted_height = adapted_width;
+            adapted_width = tmp;
         }
         matrix.Rotate(static_cast<webrtc::VideoRotation>(rotation));
     }
