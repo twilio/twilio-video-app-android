@@ -116,7 +116,7 @@ private:
     std::vector<VideoDecoderParams> params_;
 };
 
-// Fake class for mocking out webrtc::VideoEnoder
+// Fake class for mocking out webrtc::VideoEncoder
 class FakeWebRtcVideoEncoder : public webrtc::VideoEncoder {
 public:
     FakeWebRtcVideoEncoder()
