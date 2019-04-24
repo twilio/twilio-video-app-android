@@ -16,9 +16,13 @@ public class TestUtils {
      * @param context
      * @return true if this code is running inside of Firebase Test Lab
      */
-    public static boolean isFTL(Context context) {
+    static boolean isFTL(Context context) {
         String testLabSetting =
                 Settings.System.getString(context.getContentResolver(), "firebase.test.lab");
         return "true".equals(testLabSetting);
+    }
+
+    static void blockingWait(long milliseconds) throws InterruptedException {
+        Thread.sleep(milliseconds);
     }
 }

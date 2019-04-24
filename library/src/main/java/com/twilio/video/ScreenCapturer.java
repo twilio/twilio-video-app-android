@@ -25,7 +25,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.DisplayMetrics;
+import android.view.Surface;
 import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,7 @@ public class ScreenCapturer implements VideoCapturer {
     private static final int SCREENCAPTURE_FRAME_RATE = 30;
 
     private boolean firstFrameReported;
+    private VideoFrame.RotationAngle orientation;
 
     private final Context context;
     private final Intent screenCaptureIntentData;
@@ -60,6 +63,8 @@ public class ScreenCapturer implements VideoCapturer {
     private VideoCapturer.Listener capturerListener;
     private ScreenCapturerAndroid webRtcScreenCapturer;
     private SurfaceTextureHelper surfaceTextureHelper;
+
+    private VideoDimensions videoDimensions;
 
     private final MediaProjection.Callback mediaProjectionCallback =
             new MediaProjection.Callback() {
@@ -100,13 +105,20 @@ public class ScreenCapturer implements VideoCapturer {
                         firstFrameReported = true;
                     }
                     org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
-                    VideoDimensions dimensions =
-                            new VideoDimensions(buffer.getWidth(), buffer.getHeight());
-                    VideoFrame.RotationAngle orientation =
-                            VideoFrame.RotationAngle.fromInt(videoFrame.getRotation());
+                    videoDimensions = new VideoDimensions(buffer.getWidth(), buffer.getHeight());
+                    VideoFrame.RotationAngle currentOrientation =
+                            VideoFrame.RotationAngle.fromInt(getDeviceOrientation());
 
                     capturerListener.onFrameCaptured(
-                            new VideoFrame(videoFrame, dimensions, orientation));
+                            new VideoFrame(videoFrame, videoDimensions, orientation));
+
+                    if (updateCaptureDimensions(orientation, currentOrientation)) {
+                        // Swap width and height capture dimensions due to orientation update
+                        logger.d("Swapping width and height of frame due to orientation");
+                        orientation = currentOrientation;
+                        webRtcScreenCapturer.changeCaptureFormat(
+                                buffer.getHeight(), buffer.getWidth(), SCREENCAPTURE_FRAME_RATE);
+                    }
                 }
             };
 
@@ -139,6 +151,7 @@ public class ScreenCapturer implements VideoCapturer {
         this.screenCaptureIntentResult = screenCaptureIntentResult;
         this.screenCapturerListener = screenCapturerListener;
         this.listenerHandler = Util.createCallbackHandler();
+        this.orientation = VideoFrame.RotationAngle.fromInt(getDeviceOrientation());
     }
 
     /**
@@ -223,7 +236,46 @@ public class ScreenCapturer implements VideoCapturer {
         logger.d("stopCapture done");
     }
 
+    private int getDeviceOrientation() {
+        int orientation = 0;
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        switch (wm.getDefaultDisplay().getRotation()) {
+            case Surface.ROTATION_90:
+                orientation = 90;
+                break;
+            case Surface.ROTATION_180:
+                orientation = 180;
+                break;
+            case Surface.ROTATION_270:
+                orientation = 270;
+                break;
+            case Surface.ROTATION_0:
+            default:
+                orientation = 0;
+                break;
+        }
+        return orientation;
+    }
+
+    private boolean updateCaptureDimensions(
+            VideoFrame.RotationAngle currentOrientation, VideoFrame.RotationAngle orientation) {
+        if (currentOrientation == orientation
+                || Math.abs(currentOrientation.getValue() - orientation.getValue()) == 180) {
+            logger.d("No orientation change detected");
+            return false;
+        } else {
+            logger.d("Orientation change detected");
+            return true;
+        }
+    }
+
     void setSurfaceTextureHelper(SurfaceTextureHelper surfaceTextureHelper) {
         this.surfaceTextureHelper = surfaceTextureHelper;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    VideoDimensions getVideoDimensions() {
+        return videoDimensions;
     }
 }

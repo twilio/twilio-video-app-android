@@ -22,13 +22,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
@@ -61,6 +64,10 @@ public class ScreenCapturerTest extends BaseVideoTest {
     public ActivityTestRule<ScreenCapturerTestActivity> activityRule =
             new ActivityTestRule<>(ScreenCapturerTestActivity.class);
 
+    @Rule
+    public GrantPermissionRule recordAudioPermissionRule =
+            GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO);
+
     private ScreenCapturerTestActivity screenCapturerActivity;
     private LocalVideoTrack screenVideoTrack;
     private ScreenCapturer screenCapturer;
@@ -74,9 +81,10 @@ public class ScreenCapturerTest extends BaseVideoTest {
     }
 
     @After
-    public void teardown() {
+    public void teardown() throws InterruptedException {
         if (screenVideoTrack != null) {
             screenVideoTrack.release();
+            screenVideoTrack = null;
         }
         assertTrue(MediaFactory.isReleased());
     }
@@ -287,6 +295,57 @@ public class ScreenCapturerTest extends BaseVideoTest {
             // Remove video track and wait
             screenVideoTrack.release();
         }
+    }
+
+    @Test
+    public void shouldUpdateCaptureResolutionOnRotation()
+            throws InterruptedException, RemoteException {
+        UiDevice uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        uiDevice.setOrientationNatural();
+
+        final AtomicReference<CountDownLatch> firstFrameReceived = new AtomicReference<>();
+        firstFrameReceived.set(new CountDownLatch(1));
+        ScreenCapturer.Listener screenCapturerListener =
+                new ScreenCapturer.Listener() {
+                    @Override
+                    public void onScreenCaptureError(@NonNull String errorDescription) {
+                        fail();
+                    }
+
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.get().countDown();
+                    }
+                };
+        screenCapturer =
+                new ScreenCapturer(
+                        screenCapturerActivity,
+                        screenCapturerActivity.getScreenCaptureResultCode(),
+                        screenCapturerActivity.getScreenCaptureIntent(),
+                        screenCapturerListener);
+        firstFrameReceived.set(new CountDownLatch(1));
+
+        screenVideoTrack =
+                LocalVideoTrack.create(
+                        screenCapturerActivity, true, screenCapturer, "ScreenCapturer");
+
+        assertTrue(
+                firstFrameReceived
+                        .get()
+                        .await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        VideoDimensions videoDimensions = screenCapturer.getVideoDimensions();
+
+        if (videoDimensions == null || videoDimensions.width == 0 || videoDimensions.height == 0) {
+            fail();
+        }
+        assertTrue(videoDimensions.height > videoDimensions.width);
+
+        uiDevice.setOrientationLeft();
+        TestUtils.blockingWait(TestUtils.SMALL_WAIT);
+        videoDimensions = screenCapturer.getVideoDimensions();
+
+        assertTrue(videoDimensions.height < videoDimensions.width);
     }
 
     private void allowScreenCapture() {
