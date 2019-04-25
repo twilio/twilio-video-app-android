@@ -5,6 +5,7 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 Bug Fixes
 
 - Fixed stuck aspect ratio when switching orientations with `ScreenCapturer`.
+- Fixed a bug where media reconnection might fail when the loopback interface is mistakenly chosen as a preferred network interface.
 
 Known issues
 
