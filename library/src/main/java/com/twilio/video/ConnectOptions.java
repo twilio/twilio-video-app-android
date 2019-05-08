@@ -49,6 +49,7 @@ public class ConnectOptions {
     private final List<LocalDataTrack> dataTracks;
     private final IceOptions iceOptions;
     private final boolean enableInsights;
+    private final boolean enableAutomaticSubscription;
     private final List<AudioCodec> preferredAudioCodecs;
     private final List<VideoCodec> preferredVideoCodecs;
     private final EncodingParameters encodingParameters;
@@ -103,6 +104,7 @@ public class ConnectOptions {
         this.dataTracks = builder.dataTracks;
         this.iceOptions = builder.iceOptions;
         this.enableInsights = builder.enableInsights;
+        this.enableAutomaticSubscription = builder.enableAutomaticSubscription;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
         this.encodingParameters = builder.encodingParameters;
@@ -208,6 +210,7 @@ public class ConnectOptions {
                 getLocalDataTracksArray(),
                 iceOptions,
                 enableInsights,
+                enableAutomaticSubscription,
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
                 getVideoCodecsArray(),
@@ -222,10 +225,12 @@ public class ConnectOptions {
             LocalDataTrack[] dataTracks,
             IceOptions iceOptions,
             boolean enableInsights,
+            boolean enableAutomaticSubscription,
             long platformInfoNativeHandle,
             AudioCodec[] preferredAudioCodecs,
             VideoCodec[] preferredVideoCodecs,
             EncodingParameters encodingParameters);
+
     /**
      * Build new {@link ConnectOptions}.
      *
@@ -239,6 +244,7 @@ public class ConnectOptions {
         private List<LocalVideoTrack> videoTracks;
         private List<LocalDataTrack> dataTracks;
         private boolean enableInsights = true;
+        private boolean enableAutomaticSubscription = true;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
         private EncodingParameters encodingParameters;
@@ -292,6 +298,19 @@ public class ConnectOptions {
         @NonNull
         public Builder enableInsights(boolean enable) {
             this.enableInsights = enable;
+            return this;
+        }
+
+        /**
+         * Toggles automatic track subscription. If set to false, the LocalParticipant will receive
+         * notifications of track publish events, but will not automatically subscribe to them. If
+         * set to true, the LocalParticipant will automatically subscribe to tracks as they are
+         * published. If unset, the default is true. Note: This feature is only available for Group
+         * Rooms. Toggling the flag in a P2P room does not modify subscription behavior.
+         */
+        @NonNull
+        public Builder enableAutomaticSubscription(boolean enableAutomaticSubscription) {
+            this.enableAutomaticSubscription = enableAutomaticSubscription;
             return this;
         }
 

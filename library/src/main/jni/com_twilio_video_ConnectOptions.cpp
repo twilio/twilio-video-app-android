@@ -97,6 +97,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobjectArray j_data_tracks,
                                                   jobject j_ice_options,
                                                   jboolean j_enable_insights,
+                                                  jboolean j_enable_automatic_subscription,
                                                   jlong j_platform_info_handle,
                                                   jobjectArray j_preferred_audio_codecs,
                                                   jobjectArray j_preferred_video_codecs,
@@ -228,6 +229,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
     }
 
     builder->enableInsights(j_enable_insights);
+    builder->enableAutomaticSubscription(j_enable_automatic_subscription);
 
     return webrtc::NativeToJavaPointer(builder);
 }

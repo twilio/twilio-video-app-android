@@ -1,4 +1,9 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
+### 4.2.0
+ Improvements
+
+ - Added field `enableAutomaticSubscription` to `ConnectOptions`. `enableAutomaticSubscription` toggles automatic track subscription. If set to `false`, the `LocalParticipant` will receive notifications of track publish events, but will not automatically subscribe to them. If
+set to `true`, the `LocalParticipant` will automatically subscribe to tracks as they are published. If unset, the default is `true`. Note: This feature is only available for Group Rooms. Toggling the flag in a P2P room does not modify subscription behavior.
 
 #### 4.1.2
 
