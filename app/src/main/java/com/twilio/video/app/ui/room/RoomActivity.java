@@ -695,6 +695,10 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
+    private boolean getEnableAutomaticTrackSubscription(String key, boolean defaultValue) {
+        return sharedPreferences.getBoolean(key, defaultValue);
+    }
+
     private void requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!permissionsGranted()) {
@@ -1032,6 +1036,10 @@ public class RoomActivity extends BaseActivity {
                                     Preferences.ENABLE_INSIGHTS,
                                     Preferences.ENABLE_INSIGHTS_DEFAULT);
 
+                    boolean enableAutomaticTrackSubscription =
+                            getEnableAutomaticTrackSubscription(
+                                    Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION, true);
+
                     VideoCodec preferedVideoCodec =
                             getVideoCodecPreference(
                                     Preferences.VIDEO_CODEC, Preferences.VIDEO_CODEC_DEFAULT);
@@ -1043,6 +1051,7 @@ public class RoomActivity extends BaseActivity {
                     ConnectOptions.Builder connectOptionsBuilder =
                             new ConnectOptions.Builder(token)
                                     .roomName(roomName)
+                                    .enableAutomaticSubscription(enableAutomaticTrackSubscription)
                                     .enableInsights(enableInsights);
 
                     int maxVideoBitrate =

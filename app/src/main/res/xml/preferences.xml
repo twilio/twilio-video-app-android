@@ -12,8 +12,13 @@
             android:defaultValue="true"/>
         <CheckBoxPreference
             android:key="pref_record_participants_on_connect"
-            android:title="Record Participants on Connect"
+            android:title="@string/record_participants_on_connect"
             android:defaultValue="false"
+            />
+        <CheckBoxPreference
+            android:key="pref_enable_automatic_subscription"
+            android:title="@string/enable_automatic_track_subscription"
+            android:defaultValue="true"
             />
         <ListPreference
             android:defaultValue="prod"
