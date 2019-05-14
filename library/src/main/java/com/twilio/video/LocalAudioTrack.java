@@ -47,7 +47,7 @@ public class LocalAudioTrack extends AudioTrack {
      * Creates an audio track. Note that the RECORD_AUDIO permission must be granted in order for
      * this operation to succeed. If RECORD_AUDIO is not granted null is returned.
      *
-     * @param context applicatoin context.
+     * @param context application context.
      * @param enabled initial state of audio track.
      * @param audioOptions audio options to be applied to the track.
      * @return local audio track if successfully added or null if audio track could not be created.
