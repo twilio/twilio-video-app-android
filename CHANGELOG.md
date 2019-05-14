@@ -1,4 +1,27 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
+### 5.0.0
+
+Improvements
+
+- The Client uses a new WebSocket based signaling transport, and communicates with globally available signaling Servers.
+- Participants are considered to be reconnecting within 15 seconds, and are disconnected from a Room after 45 seconds of lost connectivity.
+
+Bug Fixes
+
+- Participants can send messages that are larger than 16 KB.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
 ### 4.2.0
  Improvements
 
