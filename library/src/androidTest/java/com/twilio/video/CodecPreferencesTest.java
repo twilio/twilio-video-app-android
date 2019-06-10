@@ -136,7 +136,10 @@ public class CodecPreferencesTest extends BaseCodecTest {
 
         // Connect bob with no tracks
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .iceOptions(iceOptions)
+                        .roomName(roomName)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(
                 aliceListener.onParticipantConnectedLatch.await(
