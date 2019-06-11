@@ -90,7 +90,7 @@ aliases:
   - &filter-snapshot
     branches:
       only:
-        - "master"
+        - "5.0.0"
 
   # Containers
   - &build-defaults
