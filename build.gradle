@@ -175,7 +175,7 @@ task incrementRc {
             standardOutput stdOut
         }
         println("DEFAULT BRANCH = " + stdOut.toString())
-        def gitBranch = stdOut
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
@@ -263,7 +263,7 @@ task incrementVersionAfterRelease {
         }
         println("DEFAULT BRANCH = " + stdOut.toString())
 
-        def gitBranch = stdOut.toString()
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
@@ -386,7 +386,7 @@ task incrementVersionAfterPreRelease {
             standardOutput stdOut
         }
         println("DEFAULT BRANCH = " + stdOut.toString())
-        def gitBranch = stdOut
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
