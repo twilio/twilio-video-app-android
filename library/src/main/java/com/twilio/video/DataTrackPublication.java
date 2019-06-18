@@ -20,7 +20,18 @@ import android.support.annotation.Nullable;
 
 /** A published data track represents a data track that has been shared with a {@link Room}. */
 public interface DataTrackPublication extends TrackPublication {
-    /** Returns the published data track. */
+    /**
+     * {@link LocalDataTrackPublication} and {@link RemoteDataTrackPublication} extend {@link
+     * DataTrackPublication} and each interface implements getDataTrack with different nullability
+     * behavior. {@link LocalDataTrackPublication#getDataTrack} is annotated as @NonNull and {@link
+     * RemoteDataTrackPublication#getDataTrack} is annotated as @Nullable.
+     *
+     * <p>This method is marked as @Nullable because at least one of the subclasses returns null.
+     *
+     * @see LocalDataTrackPublication
+     * @see RemoteDataTrackPublication
+     * @return the published data track.
+     */
     @Nullable
     DataTrack getDataTrack();
 }

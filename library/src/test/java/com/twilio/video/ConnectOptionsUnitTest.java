@@ -125,4 +125,34 @@ public class ConnectOptionsUnitTest {
         codecs.add(null);
         new ConnectOptions.Builder("token").preferAudioCodecs(codecs).build();
     }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullAudioTracks() {
+        new ConnectOptions.Builder("token").audioTracks(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullVideoTracks() {
+        new ConnectOptions.Builder("token").videoTracks(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullDataTracks() {
+        new ConnectOptions.Builder("token").dataTracks(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullRoomName() {
+        new ConnectOptions.Builder("token").roomName(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullIceOptions() {
+        new ConnectOptions.Builder("token").iceOptions(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullEncodingParameters() {
+        new ConnectOptions.Builder("token").encodingParameters(null).build();
+    }
 }

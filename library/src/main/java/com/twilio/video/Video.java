@@ -23,6 +23,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.getkeepsafe.relinker.ReLinker;
 import java.util.EnumMap;
@@ -181,7 +182,8 @@ public abstract class Video {
             }
 
             @Override
-            public void onDisconnected(Room room, TwilioException twilioException) {
+            public void onDisconnected(
+                    @NonNull Room room, @Nullable TwilioException twilioException) {
                 roomListener.onDisconnected(room, twilioException);
                 release(room);
             }

@@ -57,7 +57,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -661,7 +660,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
 
         if ((topology == Topology.GROUP && enableRecording)
                 || (topology == Topology.GROUP_SMALL && enableRecording)) {
-            Assert.assertTrue(room.isRecording());
+            assertTrue(room.isRecording());
         } else {
             assertFalse(room.isRecording());
         }
@@ -671,7 +670,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Wait for disconnect and validate recording state
         assertTrue(
                 roomListener.onDisconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        Assert.assertFalse(room.isRecording());
+        assertFalse(room.isRecording());
     }
 
     @Test

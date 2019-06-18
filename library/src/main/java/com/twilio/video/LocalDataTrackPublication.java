@@ -60,7 +60,12 @@ public class LocalDataTrackPublication implements DataTrackPublication {
         return localDataTrack.isEnabled();
     }
 
-    /** Returns the base data track object of the published local data track. */
+    /**
+     * Unlike {@link DataTrackPublication} or {@link RemoteDataTrackPublication} this {@link
+     * DataTrack} is guaranteed to be non null.
+     *
+     * @return Returns the base data track object of the published local data track.
+     */
     @Override
     public DataTrack getDataTrack() {
         return localDataTrack;

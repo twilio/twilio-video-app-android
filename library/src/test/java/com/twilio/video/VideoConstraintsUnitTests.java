@@ -17,7 +17,7 @@
 package com.twilio.video;
 
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
