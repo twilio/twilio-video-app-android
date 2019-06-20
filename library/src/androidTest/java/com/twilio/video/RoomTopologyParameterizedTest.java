@@ -60,7 +60,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -285,8 +284,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                 roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
-    @Ignore // CSDK-2957: Client may fail to reconnect if a network change event occurs while the
-    // Room is reconnecting
     @Test
     public void simulated_shouldReconnectAfterMultipleNetworkChanges() throws InterruptedException {
         final int NETWORK_CHANGES = 4;
@@ -537,8 +534,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         ConnectivityUtils.enableWifi(mediaTestActivity, true);
     }
 
-    @Ignore // CSDK-2957: Client may fail to reconnect if a network change event occurs while the
-    // Room is reconnecting
     @Test
     public void simulated_shouldReceiveOnReconnectedIfNetworkChangeDuringReconnecting()
             throws InterruptedException {

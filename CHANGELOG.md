@@ -22,7 +22,6 @@ codecs:
     - G722
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
-- Client may fail to reconnect if a network change event occurs while the Room is reconnecting.
 
 ### 4.2.0
  Improvements
