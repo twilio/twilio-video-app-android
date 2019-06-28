@@ -33,17 +33,19 @@ public class RoomUtils {
     private static final String TAG = "RoomUtils";
 
     public static VideoRoom createRoom(String name, Topology topology) {
-        return createRoom(name, topology, false, null);
+        return createRoom(name, topology, false, null, null, null);
     }
 
     public static VideoRoom createRoom(String name, Topology topology, boolean enableRecording) {
-        return createRoom(name, topology, enableRecording, null);
+        return createRoom(name, topology, enableRecording, null, null, null);
     }
 
     public static VideoRoom createRoom(
             String name,
             Topology topology,
             boolean enableRecording,
+            @Nullable String region,
+            @Nullable String mediaRegion,
             @Nullable List<VideoCodec> videoCodecs) {
         Preconditions.checkNotNull(
                 BuildConfig.twilioCredentials, CredentialsUtils.TWILIO_VIDEO_JSON_NOT_PROVIDED);
@@ -63,6 +65,9 @@ public class RoomUtils {
         } else if (topology == Topology.GROUP_SMALL) {
             type = VideoApiUtils.GROUP_SMALL;
         }
+        if (region == null) {
+            region = "gll";
+        }
         return VideoApiUtils.createRoom(
                 credentials.get(CredentialsUtils.ACCOUNT_SID),
                 credentials.get(CredentialsUtils.API_KEY),
@@ -70,6 +75,8 @@ public class RoomUtils {
                 name,
                 type,
                 BuildConfig.ENVIRONMENT,
+                region,
+                mediaRegion,
                 enableTurn,
                 enableRecording,
                 videoCodecStrings);

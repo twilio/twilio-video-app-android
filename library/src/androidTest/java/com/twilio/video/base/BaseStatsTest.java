@@ -82,7 +82,7 @@ public abstract class BaseStatsTest extends BaseVideoTest {
         super.setup();
         mediaTestActivity = activityRule.getActivity();
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        videoRoom = RoomUtils.createRoom(roomName, topology, false, videoCodecs);
+        videoRoom = RoomUtils.createRoom(roomName, topology, false, null, null, videoCodecs);
         assertNotNull(videoRoom);
         aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
         bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);

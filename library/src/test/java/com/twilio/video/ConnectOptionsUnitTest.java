@@ -126,6 +126,19 @@ public class ConnectOptionsUnitTest {
         new ConnectOptions.Builder("token").preferAudioCodecs(codecs).build();
     }
 
+    @Test
+    public void shouldSetRegion() {
+        String region = "de1";
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").region(region).build();
+        assertEquals(connectOptions.getRegion(), region);
+    }
+
+    @Test
+    public void shouldHaveDefaultRegion() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").build();
+        assertEquals(connectOptions.getRegion(), "gll");
+    }
+
     @Test(expected = NullPointerException.class)
     public void shouldNotAllowNullAudioTracks() {
         new ConnectOptions.Builder("token").audioTracks(null).build();

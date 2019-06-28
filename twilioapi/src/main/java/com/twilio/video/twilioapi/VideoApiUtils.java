@@ -58,6 +58,8 @@ public class VideoApiUtils {
                 @Field("EnableTurn") boolean enableTurn,
                 @Field("RecordParticipantsOnConnect") boolean enableRecording,
                 @Field("VideoCodecs") List<String> videoCodecs,
+                @Field("region") String region,
+                @Field("media_region") String mediaRegion,
                 Callback<VideoRoom> videoRoomCallback);
 
         @POST("/v1/Rooms")
@@ -68,7 +70,9 @@ public class VideoApiUtils {
                 @Field("Type") String type,
                 @Field("EnableTurn") boolean enableTurn,
                 @Field("RecordParticipantsOnConnect") boolean enableRecording,
-                @Field("VideoCodecs") List<String> videoCodecs);
+                @Field("VideoCodecs") List<String> videoCodecs,
+                @Field("region") String region,
+                @Field("media_region") String mediaRegion);
 
         @GET("/v1/Rooms/{unique_name}")
         VideoRoom getRoom(
@@ -106,6 +110,8 @@ public class VideoApiUtils {
             String name,
             String type,
             String environment,
+            String region,
+            String mediaRegion,
             boolean enableTurn,
             boolean enableRecording,
             List<String> videoCodecs,
@@ -125,11 +131,25 @@ public class VideoApiUtils {
             currentEnvironment = environment;
             videoApiService = createVideoApiService();
         }
+        if (region == null) {
+            region = "gll";
+        }
+        if (mediaRegion == null) {
+            mediaRegion = "gll";
+        }
         String authString = signingKeySid + ":" + signingKeySecret;
         String authorization =
                 "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
         videoApiService.createRoom(
-                authorization, name, type, enableTurn, enableRecording, videoCodecs, callback);
+                authorization,
+                name,
+                type,
+                enableTurn,
+                enableRecording,
+                videoCodecs,
+                region,
+                mediaRegion,
+                callback);
     }
 
     // Provide a synchronous version of createRoom for tests
@@ -140,6 +160,8 @@ public class VideoApiUtils {
             String name,
             String type,
             String environment,
+            String region,
+            String mediaRegion,
             boolean enableTurn,
             boolean enableRecording,
             List<String> videoCodecs) {
@@ -158,6 +180,12 @@ public class VideoApiUtils {
             videoApiService = createVideoApiService();
         }
 
+        if (region == null) {
+            region = "gll";
+        }
+        if (mediaRegion == null) {
+            mediaRegion = "gll";
+        }
         String authString = signingKeySid + ":" + signingKeySecret;
         String authorization =
                 "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
@@ -177,7 +205,9 @@ public class VideoApiUtils {
                                 type,
                                 enableTurn,
                                 enableRecording,
-                                videoCodecs);
+                                videoCodecs,
+                                region,
+                                mediaRegion);
             } catch (RetrofitError createRoomError) {
                 Log.e(
                         "VideoApiUtils",

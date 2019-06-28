@@ -44,6 +44,7 @@ public class ConnectOptions {
 
     private final String accessToken;
     private final String roomName;
+    private final String region;
     private final List<LocalAudioTrack> audioTracks;
     private final List<LocalVideoTrack> videoTracks;
     private final List<LocalDataTrack> dataTracks;
@@ -107,6 +108,7 @@ public class ConnectOptions {
         this.enableAutomaticSubscription = builder.enableAutomaticSubscription;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
+        this.region = builder.region;
         this.encodingParameters = builder.encodingParameters;
         this.mediaFactory = builder.mediaFactory;
     }
@@ -129,6 +131,10 @@ public class ConnectOptions {
 
     List<LocalDataTrack> getDataTracks() {
         return dataTracks;
+    }
+
+    String getRegion() {
+        return region;
     }
 
     IceOptions getIceOptions() {
@@ -214,6 +220,7 @@ public class ConnectOptions {
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
                 getVideoCodecsArray(),
+                region,
                 encodingParameters);
     }
 
@@ -229,6 +236,7 @@ public class ConnectOptions {
             long platformInfoNativeHandle,
             AudioCodec[] preferredAudioCodecs,
             VideoCodec[] preferredVideoCodecs,
+            String region,
             EncodingParameters encodingParameters);
 
     /**
@@ -247,6 +255,7 @@ public class ConnectOptions {
         private boolean enableAutomaticSubscription = true;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
+        private String region = "gll";
         private EncodingParameters encodingParameters;
         private MediaFactory mediaFactory;
 
@@ -381,6 +390,24 @@ public class ConnectOptions {
         public Builder preferVideoCodecs(@NonNull List<VideoCodec> preferredVideoCodecs) {
             Preconditions.checkNotNull(preferredVideoCodecs);
             this.preferredVideoCodecs = new ArrayList<>(preferredVideoCodecs);
+            return this;
+        }
+
+        /**
+         * The region of the signaling Server the Client will use. By default, the Client will
+         * connect to the nearest signaling Server determined by <a
+         * href="https://www.twilio.com/docs/video/ip-address-whitelisting#signaling-communication">latency
+         * based routing</a>. Setting a value other than "gll" bypasses routing and guarantees that
+         * signaling traffic will be terminated in the region that you prefer. If you are connecting
+         * to a Group Room created with the "gll" Media Region (either <a
+         * href="https://www.twilio.com/console/video/configure">Ad-Hoc</a> or via the <a
+         * href="https://www.twilio.com/docs/video/api/rooms-resource#room-instance-resource">REST
+         * API</a>), then the Room's Media Region will be selected based upon your Client's region.
+         * The default value is `gll`.
+         */
+        @NonNull
+        public Builder region(@NonNull String region) {
+            this.region = region;
             return this;
         }
 

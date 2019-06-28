@@ -5,6 +5,7 @@ Improvements
 
 - The Client uses a new WebSocket based signaling transport, and communicates with globally available signaling Servers.
 - Participants are considered to be reconnecting within 15 seconds, and are disconnected from a Room after 45 seconds of lost connectivity.
+- Added a `ConnectOptions.region` property. By default, the Client will connect to the nearest signaling Server determined by latency based routing. Setting a value other than `gll` bypasses routing and guarantees that signaling traffic will be terminated in the region that you prefer. If you are connecting to a Group Room created with the "gll" Media Region (either Ad-Hoc or via the REST API), then the Room's Media Region will be selected based upon your Client's region.
 - Added and updated public API nullability annotations.
 
 Bug Fixes

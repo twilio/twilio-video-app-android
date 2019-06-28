@@ -101,6 +101,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jlong j_platform_info_handle,
                                                   jobjectArray j_preferred_audio_codecs,
                                                   jobjectArray j_preferred_video_codecs,
+                                                  jstring j_region,
                                                   jobject j_encoding_parameters) {
 
     std::string access_token = JavaToUTF8StdString(env, j_access_token);
@@ -209,6 +210,11 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
             }
             builder->setPreferredVideoCodecs(preferred_video_codecs);
         }
+    }
+
+    if(!IsNull(env, j_region)){
+        std::string region = JavaToUTF8StdString(env, j_region);
+        builder->setRegion(region);
     }
 
     if (!IsNull(env, j_ice_options)) {

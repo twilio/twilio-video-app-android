@@ -1,5 +1,8 @@
 package com.twilio.video;
 
+import static com.twilio.video.helper.TrackContainer.AUDIO;
+import static com.twilio.video.helper.TrackContainer.DATA;
+import static com.twilio.video.helper.TrackContainer.VIDEO;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -13,6 +16,7 @@ import android.support.test.rule.GrantPermissionRule;
 import android.util.Pair;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.helper.TrackContainer;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -22,9 +26,7 @@ import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -36,10 +38,6 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class TrackSubscriptionTest extends BaseVideoTest {
-    public static final String VIDEO = "video";
-    public static final String AUDIO = "audio";
-    public static final String DATA = "data";
-
     private static final int PARTICIPANT_NUM = 3;
     private static final String[] PARTICIPANTS = {
         Constants.PARTICIPANT_ALICE, Constants.PARTICIPANT_BOB, Constants.PARTICIPANT_CHARLIE
@@ -52,21 +50,6 @@ public class TrackSubscriptionTest extends BaseVideoTest {
 
     private Room aliceRoom, bobRoom, charlieRoom;
     private VideoRoom videoRoom;
-
-    /**
-     * Container for parameterizing by tracks, map key is the type of track and the value is a pair,
-     * first being a boolean denoting whether the track is enabled for the test, second being the
-     * track itself. Track can't be initialized until the test is fully setup.
-     */
-    static class TrackContainer {
-        private Map<String, Pair<Boolean, Track>> trackMap = new HashMap<>();
-
-        TrackContainer(boolean hasVideo, boolean hasAudio, boolean hasData) {
-            trackMap.put(AUDIO, new Pair<>(hasAudio, null));
-            trackMap.put(VIDEO, new Pair<>(hasVideo, null));
-            trackMap.put(DATA, new Pair<>(hasData, null));
-        }
-    }
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
@@ -347,7 +330,7 @@ public class TrackSubscriptionTest extends BaseVideoTest {
     public void shouldSubscribeToTracksInP2PIfAutomaticSubscriptionDisabled()
             throws InterruptedException {
         initTokensWithTopology(Topology.P2P);
-        videoRoom = RoomUtils.createRoom(roomName, Topology.P2P, false, null);
+        videoRoom = RoomUtils.createRoom(roomName, Topology.P2P, false, null, null, null);
 
         SubscriptionCountHolder subscriptionCountHolder = new SubscriptionCountHolder();
 
