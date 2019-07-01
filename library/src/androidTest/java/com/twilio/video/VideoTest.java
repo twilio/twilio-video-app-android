@@ -152,10 +152,16 @@ public class VideoTest extends BaseVideoTest {
     @Test
     public void canConnectAndDisconnectRepeatedly() throws InterruptedException {
         int numIterations = 25;
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).iceOptions(iceOptions).build();
         Room room = null;
         for (int i = 0; i < numIterations; i++) {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
-            ConnectOptions connectOptions = new ConnectOptions.Builder(token).build();
             room = Video.connect(mediaTestActivity, connectOptions, roomListener);
             room.disconnect();
             assertTrue(

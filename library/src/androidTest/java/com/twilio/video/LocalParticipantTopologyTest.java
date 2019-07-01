@@ -758,6 +758,11 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         random(TRACK_NAME_LENGTH_MAX + 1));
         DataTrackOptions dataTrackOptions =
                 new DataTrackOptions.Builder().name(random(TRACK_NAME_LENGTH_MAX + 1)).build();
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         localDataTrack = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         ConnectOptions connectOptions =
@@ -765,6 +770,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                         .audioTracks(Collections.singletonList(localAudioTrack))
                         .videoTracks(Collections.singletonList(localVideoTrack))
                         .dataTracks(Collections.singletonList(localDataTrack))
+                        .iceOptions(iceOptions)
                         .roomName(roomName)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
@@ -829,12 +835,18 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localDataTrackTwo = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         // Connect to Room
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .audioTracks(Arrays.asList(localAudioTrack, localAudioTrackTwo))
                         .videoTracks(Arrays.asList(localVideoTrack, localVideoTrackTwo))
                         .dataTracks(Arrays.asList(localDataTrack, localDataTrackTwo))
+                        .iceOptions(iceOptions)
                         .build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(
@@ -889,6 +901,11 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         // Create tracks with names too long
         DataTrackOptions dataTrackOptions =
                 new DataTrackOptions.Builder().name(random(TRACK_NAME_LENGTH_MAX + 1)).build();
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         localAudioTrack =
                 LocalAudioTrack.create(mediaTestActivity, true, random(TRACK_NAME_LENGTH_MAX + 1));
         localVideoTrack =
@@ -901,7 +918,7 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
 
         // Connect to room
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(
                 roomListener.onConnectedLatch.await(
@@ -973,8 +990,13 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         localDataTrackTwo = LocalDataTrack.create(mediaTestActivity, dataTrackOptions);
 
         // Connect to Room
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).build();
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
         assertTrue(
                 roomListener.onConnectedLatch.await(

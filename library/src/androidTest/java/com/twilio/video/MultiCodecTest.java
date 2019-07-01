@@ -67,9 +67,15 @@ public class MultiCodecTest extends BaseCodecTest {
         // Connect alice with H264 preferred
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
+                        .iceOptions(iceOptions)
                         .preferVideoCodecs(Collections.<VideoCodec>singletonList(h264Codec))
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
@@ -82,6 +88,7 @@ public class MultiCodecTest extends BaseCodecTest {
                 new ConnectOptions.Builder(bobToken)
                         .mediaFactory(mediaFactory)
                         .roomName(roomName)
+                        .iceOptions(iceOptions)
                         .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(
@@ -145,17 +152,26 @@ public class MultiCodecTest extends BaseCodecTest {
         // Connect alice with VP8 preferred
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
                         .roomName(roomName)
                         .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
 
         // Connect bob with no tracks
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .iceOptions(iceOptions)
+                        .roomName(roomName)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(
                 aliceListener.onParticipantConnectedLatch.await(
@@ -188,6 +204,11 @@ public class MultiCodecTest extends BaseCodecTest {
         assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
         assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         // Connect alice with VP8 preferred
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
@@ -196,6 +217,7 @@ public class MultiCodecTest extends BaseCodecTest {
                         .roomName(roomName)
                         .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
                         .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
@@ -207,7 +229,10 @@ public class MultiCodecTest extends BaseCodecTest {
         // Connect bob with no tracks
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .iceOptions(iceOptions)
+                        .roomName(roomName)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(
                 aliceListener.onParticipantConnectedLatch.await(
@@ -237,6 +262,11 @@ public class MultiCodecTest extends BaseCodecTest {
         assumeFalse(MediaCodecVideoEncoder.isH264HwSupported());
         assumeFalse(MediaCodecVideoDecoder.isH264HwSupported());
 
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
         // Connect alice with VP8 preferred
         aliceLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
@@ -245,6 +275,7 @@ public class MultiCodecTest extends BaseCodecTest {
                         .roomName(roomName)
                         .preferVideoCodecs(Collections.<VideoCodec>singletonList(vp8Codec))
                         .videoTracks(Collections.singletonList(aliceLocalVideoTrack))
+                        .iceOptions(iceOptions)
                         .build();
         aliceRoom = createRoom(aliceListener, aliceConnectOptions);
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
@@ -256,7 +287,10 @@ public class MultiCodecTest extends BaseCodecTest {
         // Connect bob with no tracks
         aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
         ConnectOptions bobConnectOptions =
-                new ConnectOptions.Builder(bobToken).roomName(roomName).build();
+                new ConnectOptions.Builder(bobToken)
+                        .iceOptions(iceOptions)
+                        .roomName(roomName)
+                        .build();
         bobRoom = createRoom(bobListener, bobConnectOptions);
         assertTrue(
                 aliceListener.onParticipantConnectedLatch.await(
