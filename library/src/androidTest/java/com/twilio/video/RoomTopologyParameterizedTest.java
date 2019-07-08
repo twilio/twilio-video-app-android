@@ -74,7 +74,7 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                 new Object[][] {
                     {Topology.P2P, false},
                     {Topology.GROUP, false},
-                    {Topology.GROUP, true}
+                    {Topology.GROUP, true},
                 });
     }
 

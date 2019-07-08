@@ -20,12 +20,14 @@ import static junit.framework.Assert.assertNotNull;
 
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.MediaTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(AndroidJUnit4.class)
 public class EglBaseProviderTest extends BaseVideoTest {
     private static final int NUM_EGL_PROVIDERS = 10;

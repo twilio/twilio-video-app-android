@@ -9,10 +9,12 @@ import android.Manifest;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.test.filters.LargeTest;
+import android.support.test.filters.SdkSuppress;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.TrackContainer;
+import com.twilio.video.testcategories.NetworkTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -33,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@NetworkTest
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
 public class SignalingRegionParameterizedTests extends BaseVideoTest {
@@ -116,6 +119,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
     @Parameters(source = SignalingRegion.class)
     public void shouldConnectToRegion(SignalingRegion region) throws InterruptedException {
         CountDownLatch connectedLatch = new CountDownLatch(1);
@@ -186,6 +190,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
      Supported media regions can be found here https://www.twilio.com/docs/video/ip-address-whitelisting#group-rooms-media-servers
     */
     @Test
+    @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
     @Parameters({
         "GLL, GLL, GLL",
         "GLL, BR1, US1",
@@ -601,6 +606,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
     @Parameters("fake-region1")
     public void shouldFailIfConnectingWithInvalidRegion(String region) throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);

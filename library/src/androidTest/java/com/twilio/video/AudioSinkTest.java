@@ -33,6 +33,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.util.Log;
 import com.twilio.video.base.BaseParticipantTest;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.util.Topology;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,6 +55,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@MediaTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class AudioSinkTest extends BaseParticipantTest {
@@ -63,7 +65,7 @@ public class AudioSinkTest extends BaseParticipantTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}});
     }
 
     private boolean didWriteWavHeader = false;
@@ -430,7 +432,7 @@ public class AudioSinkTest extends BaseParticipantTest {
                 };
 
         bobLocalAudioTrack.addSink(fileProxy);
-        Thread.sleep(5000);
+        TestUtils.blockingWait(TestUtils.THREE_SECONDS);
         bobLocalAudioTrack.removeSink(fileProxy);
 
         try {

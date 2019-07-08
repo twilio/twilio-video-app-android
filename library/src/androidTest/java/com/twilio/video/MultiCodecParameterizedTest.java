@@ -24,6 +24,7 @@ import android.support.test.filters.LargeTest;
 import android.util.Log;
 import com.twilio.video.base.BaseCodecTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.CodecTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import org.junit.runners.Parameterized;
 import org.webrtc.MediaCodecVideoDecoder;
 import org.webrtc.MediaCodecVideoEncoder;
 
+@CodecTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class MultiCodecParameterizedTest extends BaseCodecTest {

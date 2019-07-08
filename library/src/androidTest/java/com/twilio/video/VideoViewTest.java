@@ -30,6 +30,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.test.R;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.ui.VideoViewListViewAdapter;
 import com.twilio.video.ui.VideoViewRecyclerViewAdapter;
 import com.twilio.video.ui.VideoViewTestActivity;
@@ -45,9 +46,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(JUnitParamsRunner.class)
 public class VideoViewTest extends BaseVideoTest {
-    private static final int FRAME_DELAY_MS = 10000;
+    private static final int FRAME_DELAY_MS = 5000;
 
     @Rule
     public ActivityTestRule<VideoViewTestActivity> activityRule =

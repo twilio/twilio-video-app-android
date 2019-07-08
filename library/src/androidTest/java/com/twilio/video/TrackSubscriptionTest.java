@@ -17,6 +17,7 @@ import android.util.Pair;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.helper.TrackContainer;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@TrackTest
 @RunWith(Parameterized.class)
 public class TrackSubscriptionTest extends BaseVideoTest {
     private static final int PARTICIPANT_NUM = 3;
@@ -77,23 +79,14 @@ public class TrackSubscriptionTest extends BaseVideoTest {
     }
 
     @After
-    public void teardown() throws InterruptedException {
-        LocalAudioTrack audioTrack = (LocalAudioTrack) trackContainer.trackMap.get(AUDIO).second;
-        if (audioTrack != null) {
-            audioTrack.release();
-        }
-        LocalVideoTrack videoTrack = (LocalVideoTrack) trackContainer.trackMap.get(VIDEO).second;
-        if (videoTrack != null) {
-            videoTrack.release();
-        }
-        LocalDataTrack dataTrack = (LocalDataTrack) trackContainer.trackMap.get(DATA).second;
-        if (dataTrack != null) {
-            dataTrack.release();
-        }
+    public void teardown() {
         /*
          * After all participants have disconnected complete the room to clean up backend
          * resources.
          */
+        if (trackContainer != null) {
+            trackContainer.release();
+        }
         if (aliceRoom != null) {
             aliceRoom.disconnect();
         }

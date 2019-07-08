@@ -28,6 +28,7 @@ import android.support.test.filters.LargeTest;
 import android.util.Pair;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.RoomTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -44,6 +45,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@RoomTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {

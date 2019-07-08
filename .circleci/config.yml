@@ -113,9 +113,13 @@ aliases:
         - check-format
         - check-library-size
         - unit-test
-        - integration-virtual-device-test
-        - integration-physical-device-test
-        - integration-camera-test
+        - integration-media-tests
+        - integration-codec-tests
+        - integration-track-tests
+        - integration-participant-tests
+        - integration-stats-tests
+        - integration-room-tests
+        - integration-network-tests
 
   - &rc-defaults
     filters:
@@ -282,7 +286,7 @@ jobs:
       # Save cache
       - save-cache: *save-cache-gradle
 
-  integration-virtual-device-test:
+  integration-media-tests:
     <<: *test-defaults
     steps:
       # Setup
@@ -293,11 +297,12 @@ jobs:
 
       # Execute tests
       - run:
-          name: Integration Virtual Devices Tests
+          name: Integration Media Tests
           command: >
                     gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:library-virtual-device-tests
-  integration-physical-device-test:
+                    video-app-args.yaml:integration-media-tests 
+
+  integration-codec-tests:
     <<: *test-defaults
     steps:
       # Setup
@@ -308,12 +313,92 @@ jobs:
 
       # Execute tests
       - run:
-          name: Integration Physical Devices Tests
+          name: Integration Media Tests
           command: >
                     gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:library-physical-device-tests
+                    video-app-args.yaml:integration-codec-tests 
 
-  integration-camera-test:
+  integration-participant-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Participant Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:integration-participant-tests 
+
+  integration-network-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Network Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:integration-network-tests 
+  
+  integration-stats-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Stats Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:integration-stats-tests
+
+  integration-track-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Track Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:integration-track-tests
+
+  integration-room-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Room Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:integration-room-tests
+
+  integration-capturer-tests:
     <<: *test-defaults
     steps:
       # Setup
@@ -327,7 +412,7 @@ jobs:
           name: Instrumentation Camera Tests
           command: >
                     gcloud firebase test android run --no-record-video --project video-app-79418
-                    --async video-app-args.yaml:library-camera-tests
+                    --async video-app-args.yaml:integration-capturer-tests
 
   publish-library-snapshot:
     <<: *build-defaults
@@ -494,13 +579,25 @@ workflows:
       - unit-test:
           requires:
               - build-library
-      - integration-virtual-device-test:
+      - integration-media-tests:
           requires:
               - build-library
-      - integration-physical-device-test:
+      - integration-codec-tests:
           requires:
               - build-library
-      - integration-camera-test:
+      - integration-network-tests:
+          requires:
+              - build-library
+      - integration-participant-tests:
+          requires:
+              - build-library
+      - integration-track-tests:
+          requires:
+              - build-library
+      - integration-stats-tests:
+          requires:
+              - build-library
+      - integration-room-tests:
           requires:
               - build-library
 

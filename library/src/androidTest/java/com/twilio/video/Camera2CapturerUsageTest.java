@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseCamera2CapturerTest;
+import com.twilio.video.testcategories.CapturerTest;
 import com.twilio.video.util.DeviceUtils;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@CapturerTest
 @TargetApi(21)
 @RunWith(AndroidJUnit4.class)
 public class Camera2CapturerUsageTest extends BaseCamera2CapturerTest {

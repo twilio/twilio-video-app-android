@@ -26,6 +26,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.Topology;
@@ -41,13 +42,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@TrackTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     private final Topology topology;
@@ -350,7 +351,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 .setListener(bobDataTrackListener);
 
         // Wait to ensure the data channels reach opened state
-        Thread.sleep(1000);
+        TestUtils.blockingWait(TestUtils.ONE_SECOND);
 
         String firstExpectedMessage = "Hello";
         ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
@@ -474,7 +475,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 .setListener(bobDataTrackListener);
 
         // Wait to ensure the data channels reach opened state
-        Thread.sleep(1000);
+        TestUtils.blockingWait(TestUtils.ONE_SECOND);
 
         String firstExpectedMessage = "Hello";
         ByteBuffer firstExpectedBufferMessage = ByteBuffer.wrap(new byte[] {0x0, 0x1, 0x2, 0x3});
@@ -611,8 +612,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
         final RemoteDataTrack remoteDataTrack =
                 bobRemoteParticipant.getRemoteDataTracks().get(0).getRemoteDataTrack();
         // Wait to ensure the data channels reach opened state
-        Thread.sleep(1000);
-
+        TestUtils.blockingWait(TestUtils.ONE_SECOND);
         /*
          * Set listener on main thread
          */
@@ -690,7 +690,7 @@ public class DataTrackTopologyParameterizedTest extends BaseParticipantTest {
                 .setListener(dataTrackListener);
 
         // Wait to ensure the data channels reach opened state
-        Thread.sleep(1000);
+        TestUtils.blockingWait(TestUtils.ONE_SECOND);
     }
 
     private RemoteParticipant getRemoteParticipant(String identity, Room room) {

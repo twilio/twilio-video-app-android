@@ -16,6 +16,7 @@
 
 package com.twilio.video.base;
 
+import static com.twilio.video.TestUtils.ONE_SECOND;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -62,8 +63,7 @@ public abstract class BaseCodecTest extends BaseStatsTest {
         int retries = 0;
         do {
             // Give peer connection some time to get media flowing
-            Thread.sleep(1000);
-
+            TestUtils.blockingWait(ONE_SECOND);
             // Get stats for alice and bob
             CallbackHelper.FakeStatsListener aliceStatsListener =
                     new CallbackHelper.FakeStatsListener();

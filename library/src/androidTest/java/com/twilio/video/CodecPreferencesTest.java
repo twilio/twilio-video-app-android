@@ -24,6 +24,7 @@ import static org.junit.Assume.assumeTrue;
 
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseCodecTest;
+import com.twilio.video.testcategories.CodecTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
@@ -40,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.webrtc.MediaCodecVideoDecoder;
 import org.webrtc.MediaCodecVideoEncoder;
 
+@CodecTest
 @RunWith(JUnitParamsRunner.class)
 @LargeTest
 public class CodecPreferencesTest extends BaseCodecTest {
@@ -236,9 +238,6 @@ public class CodecPreferencesTest extends BaseCodecTest {
             new Object[] {Topology.GROUP, vp8Codec},
             new Object[] {Topology.GROUP, vp8WithSimulcastCodec},
             new Object[] {Topology.GROUP, h264Codec}
-
-            // TODO: Enable preferring VP9 when Group Rooms adds support VMS-1226
-            // new Object[]{Topology.GROUP, vp9Codec}
         };
     }
 }

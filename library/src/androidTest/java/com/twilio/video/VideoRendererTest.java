@@ -26,6 +26,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.widget.ImageView;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.test.R;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.ui.VideoRendererTestActivity;
 import com.twilio.video.util.BitmapVideoRenderer;
 import com.twilio.video.util.FakeVideoCapturer;
@@ -37,6 +38,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(AndroidJUnit4.class)
 public class VideoRendererTest extends BaseVideoTest {
     private static final int BITMAP_TIMEOUT_MS = 10000;

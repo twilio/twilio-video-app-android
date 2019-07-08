@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.ONE_SECOND;
 import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +26,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
 import java.util.List;
@@ -36,17 +38,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@TrackTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     private final Topology topology;
-    private static final long THREAD_SLEEP = 10000;
+    private static final long THREAD_SLEEP = 2500;
 
     public RemoteAudioTrackTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -117,7 +119,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                Thread.sleep(THREAD_SLEEP);
+                                TestUtils.blockingWait(THREAD_SLEEP);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -141,7 +143,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                Thread.sleep(THREAD_SLEEP);
+                                TestUtils.blockingWait(THREAD_SLEEP);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -180,7 +182,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                Thread.sleep(THREAD_SLEEP);
+                                TestUtils.blockingWait(THREAD_SLEEP);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -204,7 +206,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                Thread.sleep(THREAD_SLEEP);
+                                TestUtils.blockingWait(THREAD_SLEEP);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -226,7 +228,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                Thread.sleep(1000);
+                                TestUtils.blockingWait(ONE_SECOND);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }

@@ -27,6 +27,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseCameraCapturerTest;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(JUnitParamsRunner.class)
 public class VideoCapturerTest extends BaseVideoTest {
     private LocalVideoTrack localVideoTrack;

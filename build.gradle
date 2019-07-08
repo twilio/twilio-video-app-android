@@ -552,37 +552,6 @@ task publishLibraryJavadocs {
  * ensures a more stable CI test execution and prevents test runs from exceeding the
  * Firebase Test Lab physical device 30 minute time limit.
  */
-task firebaseTestLabCheckVirtualDevices(type: Exec) {
-    description = 'Runs subset of library instrumentation tests on Firebase Test Lab virtual ' +
-            'devices'
-    group = 'Test'
-    dependsOn 'library:assembleDebugAndroidTest'
-    commandLine 'gcloud',
-            'firebase',
-            'test',
-            'android',
-            'run',
-            '--no-record-video',
-            '--project',
-            'video-app-79418',
-            'video-app-args.yaml:library-virtual-device-tests'
-}
-
-task firebaseTestLabCheckPhysicalDevices(type: Exec) {
-    description = 'Runs subset of library instrumentation tests on Firebase Test Lab physical ' +
-            'devices'
-    group = 'Test'
-    dependsOn 'library:assembleDebugAndroidTest'
-    commandLine 'gcloud',
-            'firebase',
-            'test',
-            'android',
-            'run',
-            '--no-record-video',
-            '--project',
-            'video-app-79418',
-            'video-app-args.yaml:library-physical-device-tests'
-}
 
 task firebaseTestLabCheckLibraryCamera(type: Exec) {
     description = 'Runs library instrumentation tests that use camera on Firebase Test Lab'
@@ -597,7 +566,7 @@ task firebaseTestLabCheckLibraryCamera(type: Exec) {
             '--project',
             'video-app-79418',
             '--async',
-            'video-app-args.yaml:library-camera-tests'
+            'video-app-args.yaml:integration-capturer-tests'
 }
 
 task librarySizeReport(type: GradleBuild) {
