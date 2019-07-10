@@ -119,6 +119,7 @@ aliases:
         - integration-participant-tests
         - integration-stats-tests
         - integration-room-tests
+        - integration-recording-tests
         - integration-network-tests
 
   - &rc-defaults
@@ -398,6 +399,23 @@ jobs:
                     gcloud firebase test android run --no-record-video --project video-app-79418
                     video-app-args.yaml:integration-room-tests
 
+  integration-recording-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Integration Room Tests
+          command: >
+                    gcloud firebase test android run --no-record-video --project video-app-79418
+                    video-app-args.yaml:integration-recording-tests
+
+
   integration-capturer-tests:
     <<: *test-defaults
     steps:
@@ -600,6 +618,10 @@ workflows:
       - integration-room-tests:
           requires:
               - build-library
+      - integration-recording-tests:
+          requires:
+              - build-library
+
 
       # Publish
       - publish-library-snapshot:

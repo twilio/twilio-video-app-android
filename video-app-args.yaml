@@ -54,6 +54,17 @@ integration-room-tests:
     test-targets:
         - "annotation com.twilio.video.testcategories.RoomTest"
 
+integration-recording-tests:
+    timeout: 30m
+    type: instrumentation
+    app: library/ftl/library-dummy-test-app.apk
+    test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
+    device:
+        - {model: Nexus5, version: 21}
+        - {model: Pixel2, version: 28}
+    test-targets:
+        - "annotation com.twilio.video.testcategories.RecordingTest"
+
 integration-stats-tests:
     timeout: 30m
     type: instrumentation

@@ -21,7 +21,6 @@ import static com.twilio.video.TestUtils.SIP_TIMEOUT;
 import static com.twilio.video.TestUtils.SMALL_WAIT;
 import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
 import static com.twilio.video.util.VideoAssert.assertIsParticipantSid;
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
 import static org.apache.commons.lang3.RandomStringUtils.random;
@@ -45,6 +44,7 @@ import com.github.anrwatchdog.ANRError;
 import com.github.anrwatchdog.ANRWatchDog;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.RoomTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.ConnectivityUtils;
@@ -65,16 +65,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@RoomTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class RoomTopologyParameterizedTest extends BaseVideoTest {
-    @Parameterized.Parameters(name = "Topology: {0}, enableRecording: {1}")
+    @Parameterized.Parameters(name = "Topology: {0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
-                    {Topology.P2P, false},
-                    {Topology.GROUP, false},
-                    {Topology.GROUP, true},
+                    {Topology.P2P}, {Topology.GROUP},
                 });
     }
 
@@ -96,12 +95,10 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack localVideoTrack;
     private final Topology topology;
-    private final boolean enableRecording;
     private VideoRoom videoRoom;
 
-    public RoomTopologyParameterizedTest(Topology topology, boolean enableRecording) {
+    public RoomTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
-        this.enableRecording = enableRecording;
     }
 
     @Before
@@ -111,9 +108,11 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         identity = Constants.PARTICIPANT_ALICE;
         roomName = random(Constants.ROOM_NAME_LENGTH);
 
-        ConnectivityUtils.enableWifi(mediaTestActivity, true);
+        if (!TestUtils.isFTL(mediaTestActivity)) {
+            ConnectivityUtils.enableWifi(mediaTestActivity, true);
+        }
 
-        videoRoom = RoomUtils.createRoom(roomName, topology, enableRecording);
+        videoRoom = RoomUtils.createRoom(roomName, topology, false);
         assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(identity, topology);
     }
@@ -636,36 +635,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                     }
                 });
         assertTrue(connectFailure.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void shouldReturnValidRecordingState() throws InterruptedException {
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-        IceOptions iceOptions =
-                new IceOptions.Builder()
-                        .iceServersTimeout(ICE_TIMEOUT)
-                        .abortOnIceServersTimeout(true)
-                        .build();
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
-        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertNull(room.getLocalParticipant());
-        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-
-        if ((topology == Topology.GROUP && enableRecording)
-                || (topology == Topology.GROUP_SMALL && enableRecording)) {
-            assertTrue(room.isRecording());
-        } else {
-            assertFalse(room.isRecording());
-        }
-
-        room.disconnect();
-
-        // Wait for disconnect and validate recording state
-        assertTrue(
-                roomListener.onDisconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertFalse(room.isRecording());
     }
 
     @Test
