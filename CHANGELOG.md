@@ -3,17 +3,22 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Improvements
 
-- The Client uses a new WebSocket based signaling transport, and communicates with globally available signaling Servers.
-- Participants are considered to be reconnecting within 15 seconds, and are disconnected from a Room after 45 seconds of lost connectivity.
-- Added a `ConnectOptions.region` property. By default, the Client will connect to the nearest signaling Server determined by latency based routing. Setting a value other than `gll` bypasses routing and guarantees that signaling traffic will be terminated in the region that you prefer. If you are connecting to a Group Room created with the "gll" Media Region (either Ad-Hoc or via the REST API), then the Room's Media Region will be selected based upon your Client's region.
+- The SDK uses a new WebSocket based signaling transport, and communicates with globally available signaling Servers over IPv4 and IPv6 networks.
+- Added a ConnectOptions.region property. By default, the Client will connect to the nearest signaling Server determined by latency based routing. Setting a value other than "gll" bypasses routing and guarantees that signaling traffic will be terminated in the region that you prefer.
+- Participants are considered to be reconnecting within 15 seconds, and are disconnected from a Room after 45 seconds of lost connectivity. [#80](https://github.com/twilio/video-quickstart-android/issues/80)
 - Added and updated public API nullability annotations.
 
 Bug Fixes
 
 - Participants can send messages that are larger than 16 KB.
+- The “roomimpl.worker” thread is no longer needed.
 
 Known issues
 
+- Setting `LogModule.SIGNALING` does not produce any logging.
+- Future 5.0.0-beta releases will reduce the number of round-trips required to connect to a Room.
+- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 - Codec preferences do not function correctly in a hybrid codec Group Room with the following
@@ -23,6 +28,8 @@ codecs:
     - G722
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Rapidly connecting and disconnecting from a `Room` may cause a crash.
 
 ### 4.2.0
  Improvements
