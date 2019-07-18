@@ -52,7 +52,7 @@ import org.junit.runner.RunWith;
 @RunWith(JUnitParamsRunner.class)
 public class VideoTextureViewTest extends BaseVideoTest {
 
-    private static final int FRAME_DELAY_MS = 2500;
+    private static final int FRAME_DELAY_MS = (int) TestUtils.FIVE_SECONDS;
 
     @Rule
     public ActivityTestRule<VideoTextureViewTestActivity> activityRule =

@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.FIVE_SECONDS;
 import static com.twilio.video.TestUtils.ONE_SECOND;
 import static com.twilio.video.util.VideoAssert.assertIsTrackSid;
 import static junit.framework.TestCase.assertFalse;
@@ -48,7 +49,6 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     private final Topology topology;
-    private static final long THREAD_SLEEP = 2500;
 
     public RemoteAudioTrackTopologyParameterizedTest(Topology topology) {
         this.topology = topology;
@@ -119,7 +119,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                TestUtils.blockingWait(THREAD_SLEEP);
+                                TestUtils.blockingWait(FIVE_SECONDS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -143,7 +143,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                TestUtils.blockingWait(THREAD_SLEEP);
+                                TestUtils.blockingWait(FIVE_SECONDS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -182,7 +182,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                TestUtils.blockingWait(THREAD_SLEEP);
+                                TestUtils.blockingWait(FIVE_SECONDS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -206,7 +206,7 @@ public class RemoteAudioTrackTopologyParameterizedTest extends BaseParticipantTe
                 .runOnMainSync(
                         () -> {
                             try {
-                                TestUtils.blockingWait(THREAD_SLEEP);
+                                TestUtils.blockingWait(FIVE_SECONDS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }

@@ -7,6 +7,8 @@ public class TestUtils {
     public static final long ONE_SECOND = 1000;
     public static final long TWO_SECONDS = 2000;
     public static final long THREE_SECONDS = 3000;
+    public static final long FOUR_SECONDS = 4000;
+    public static final long FIVE_SECONDS = 5000;
 
     public static final long SMALL_WAIT = 5000;
     public static final long ICE_TIMEOUT = 15000;

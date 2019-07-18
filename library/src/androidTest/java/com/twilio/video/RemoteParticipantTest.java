@@ -17,8 +17,8 @@
 package com.twilio.video;
 
 import static com.twilio.video.TestUtils.ICE_TIMEOUT;
-import static com.twilio.video.TestUtils.ONE_SECOND;
 import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
+import static com.twilio.video.TestUtils.THREE_SECONDS;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
@@ -268,7 +268,7 @@ public class RemoteParticipantTest extends BaseVideoTest {
                          * Sleep to create race condition between receiving events and setting listener
                          */
                         try {
-                            TestUtils.blockingWait(ONE_SECOND);
+                            TestUtils.blockingWait(THREE_SECONDS);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

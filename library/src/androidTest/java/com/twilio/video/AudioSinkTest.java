@@ -432,7 +432,7 @@ public class AudioSinkTest extends BaseParticipantTest {
                 };
 
         bobLocalAudioTrack.addSink(fileProxy);
-        TestUtils.blockingWait(TestUtils.THREE_SECONDS);
+        TestUtils.blockingWait(TestUtils.FIVE_SECONDS);
         bobLocalAudioTrack.removeSink(fileProxy);
 
         try {

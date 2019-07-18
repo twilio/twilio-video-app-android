@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.TWO_SECONDS;
 import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -358,7 +359,7 @@ public class LocalVideoTrackTest extends BaseVideoTest {
                 .runOnMainSync(
                         () -> {
                             try {
-                                TestUtils.blockingWait(TestUtils.ONE_SECOND);
+                                TestUtils.blockingWait(TWO_SECONDS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
