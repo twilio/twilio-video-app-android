@@ -1,4 +1,35 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
+
+### 5.0.0-beta2
+
+Improvements
+
+- The Participant's signaling connection now conforms to Twilio's [TLS & Cipher Suite Policy](https://support.twilio.com/hc/en-us/articles/360007724794-Notice-Twilio-REST-API-s-TLS-and-Cipher-Suite-Security-Changes-for-June-2019). Support for TLS versions older than 1.2 has been removed.
+- Adjusted the buffer sizes used for signaling messages to reduce network fragmentation.
+- Setting `video::LogModule::kSignaling` enables logging of low-level connection events.
+
+Bug Fixes
+
+- WebSocket errors are handled immediately, rather than waiting for a timeout to occur.
+- Handle rare exceptions when constructing a WebSocket.
+
+Known issues
+
+- Future 5.0.0-beta releases will reduce the number of round-trips required to connect to a Room.
+- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Rapidly connecting and disconnecting from a `Room` may cause a crash.
+
 ### 5.0.0-beta1
 
 Improvements
