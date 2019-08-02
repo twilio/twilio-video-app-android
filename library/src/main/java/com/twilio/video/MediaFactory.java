@@ -168,6 +168,8 @@ class MediaFactory {
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     void testRelease() {
         if (nativeMediaFactoryHandle != 0) {
+            eglBaseProvider.release(this);
+            eglBaseProvider = null;
             nativeTestRelease(nativeMediaFactoryHandle);
             nativeMediaFactoryHandle = 0;
         }

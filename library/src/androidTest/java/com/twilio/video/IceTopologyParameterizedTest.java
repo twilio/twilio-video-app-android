@@ -173,6 +173,10 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                     }
 
                     @Override
+                    public void onDominantSpeakerChanged(
+                            @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {}
+
+                    @Override
                     public void onRecordingStarted(@NonNull Room room) {
                         fail();
                     }

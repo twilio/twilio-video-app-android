@@ -49,6 +49,7 @@ protected:
                                            std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
     virtual void onRecordingStarted(twilio::video::Room *room);
     virtual void onRecordingStopped(twilio::video::Room *room);
+    virtual void onDominantSpeakerChanged(const twilio::video::Room *room, std::shared_ptr<twilio::video::RemoteParticipant> remote_participant);
 
 private:
     JNIEnv *jni();
@@ -92,6 +93,7 @@ private:
     jmethodID j_on_connect_failure_;
     jmethodID j_on_participant_connected_;
     jmethodID j_on_participant_disconnected_;
+    jmethodID j_on_dominant_speaker_changed;
     jmethodID j_on_recording_started_;
     jmethodID j_on_recording_stopped_;
     jmethodID j_local_participant_ctor_id_;

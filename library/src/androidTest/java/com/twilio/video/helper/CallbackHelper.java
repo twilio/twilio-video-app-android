@@ -78,6 +78,7 @@ public class CallbackHelper {
         public CountDownLatch onReconnectingLatch;
         public CountDownLatch onReconnectedLatch;
         public CountDownLatch onDisconnectedLatch;
+        public CountDownLatch onDominantSpeakerChangedLatch;
         public CountDownLatch onParticipantConnectedLatch;
         public CountDownLatch onParticipantDisconnectedLatch;
         public CountDownLatch onRecordingStartedLatch;
@@ -86,6 +87,7 @@ public class CallbackHelper {
         private Room room;
         private TwilioException twilioException;
         private RemoteParticipant remoteParticipant;
+        private RemoteParticipant dominantSpeaker;
 
         @Override
         public void onConnected(@NonNull Room room) {
@@ -149,6 +151,16 @@ public class CallbackHelper {
         }
 
         @Override
+        public void onDominantSpeakerChanged(
+                @NonNull Room room,
+                @android.support.annotation.Nullable RemoteParticipant remoteParticipant) {
+            this.room = room;
+            this.dominantSpeaker = remoteParticipant;
+            triggerLatch(onDominantSpeakerChangedLatch);
+            addSequenceEvent(sequence, "onDominantSpeakerChanged");
+        }
+
+        @Override
         public void onRecordingStarted(@NonNull Room room) {
             this.room = room;
             triggerLatch(onRecordingStartedLatch);
@@ -172,6 +184,10 @@ public class CallbackHelper {
 
         public RemoteParticipant getRemoteParticipant() {
             return remoteParticipant;
+        }
+
+        public RemoteParticipant getDominantSpeaker() {
+            return dominantSpeaker;
         }
     }
 
@@ -200,6 +216,11 @@ public class CallbackHelper {
         @Override
         public void onParticipantDisconnected(
                 @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {}
+
+        @Override
+        public void onDominantSpeakerChanged(
+                @NonNull Room room,
+                @android.support.annotation.Nullable RemoteParticipant remoteParticipant) {}
 
         @Override
         public void onRecordingStarted(@NonNull Room room) {}

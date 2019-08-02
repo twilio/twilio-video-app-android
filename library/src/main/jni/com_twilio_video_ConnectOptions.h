@@ -37,6 +37,7 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_ConnectOptions_nativeCreate
          jobject,
          jboolean,
          jboolean,
+         jboolean,
          jlong,
          jobjectArray,
          jobjectArray,

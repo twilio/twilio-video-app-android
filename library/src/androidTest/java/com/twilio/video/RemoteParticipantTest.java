@@ -281,6 +281,10 @@ public class RemoteParticipantTest extends BaseVideoTest {
                             @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {}
 
                     @Override
+                    public void onDominantSpeakerChanged(
+                            @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {}
+
+                    @Override
                     public void onRecordingStarted(@NonNull Room room) {}
 
                     @Override

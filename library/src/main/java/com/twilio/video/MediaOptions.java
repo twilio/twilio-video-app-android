@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 /*
@@ -25,20 +27,38 @@ import android.support.annotation.VisibleForTesting;
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 class MediaOptions {
     /*
-     * Read from native media factory layer.
+     * Fields are read from native media factory layer.
      */
+
     @SuppressWarnings("unused")
     private final boolean enableH264;
 
+    @SuppressWarnings("unused")
+    @Nullable
+    private final String audioFilePath;
+
     private MediaOptions(Builder builder) {
         this.enableH264 = builder.enableH264;
+        this.audioFilePath = builder.audioFilePath;
     }
 
     static class Builder {
         private boolean enableH264;
+        private @Nullable String audioFilePath;
 
         Builder enableH264(boolean enableH264) {
             this.enableH264 = enableH264;
+            return this;
+        }
+
+        /*
+         * Provide a path to an audio file. Providing an audio file path configures the
+         * MediaFactory instance to use an audio device module that captures audio from the
+         * given file.
+         */
+        Builder audioFilePath(@NonNull String audioFilePath) {
+            Preconditions.checkNotNull("audioFilePath should not be null", audioFilePath);
+            this.audioFilePath = audioFilePath;
             return this;
         }
 

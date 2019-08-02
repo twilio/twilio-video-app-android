@@ -31,6 +31,9 @@
 #include "jni_utils.h"
 #include "webrtc/modules/utility/include/helpers_android.h"
 #include "webrtc/modules/utility/include/jvm_android.h"
+#include "test_audio_device.h"
+
+#include <sys/stat.h>
 
 namespace twilio_video_jni {
 
@@ -82,24 +85,47 @@ twilio::media::MediaOptions getMediaOptions(jobject j_media_options) {
     fake_video_encoder_factory->AddSupportedVideoCodec(vp8);
     fake_video_decoder_factory->AddSupportedVideoCodecType(webrtc::VideoCodecType::kVideoCodecVP8);
 
-    // Enable H264 based on media options
+    // Configure media options
     if (!IsNull(jni, j_media_options)) {
         jclass j_media_options_class = jni->GetObjectClass(j_media_options);
         jfieldID enable_h264_field =
                 jni->GetFieldID(j_media_options_class, "enableH264", "Z");
-        jboolean enable_h264 = jni->GetBooleanField(j_media_options, enable_h264_field);
+        jboolean j_enable_h264 = jni->GetBooleanField(j_media_options, enable_h264_field);
+        jfieldID audio_file_path_field =
+                jni->GetFieldID(j_media_options_class, "audioFilePath", "Ljava/lang/String;");
+        jstring j_audio_file_path = static_cast<jstring>(jni->GetObjectField(j_media_options,
+                audio_file_path_field));
 
-        if (enable_h264) {
+        if (j_enable_h264) {
             cricket::VideoCodec h264(webrtc::kVideoCodecH264, "H264");
             fake_video_encoder_factory->AddSupportedVideoCodec(h264);
             fake_video_decoder_factory->AddSupportedVideoCodecType(
                     webrtc::VideoCodecType::kVideoCodecH264);
         }
+
+        if (!IsNull(jni, j_audio_file_path)) {
+            std::string audio_file_path = JavaToUTF8StdString(jni, j_audio_file_path);
+
+            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                              twilio::video::LogLevel::kDebug,
+                              "Audio file path: %s", audio_file_path.c_str());
+
+            struct stat file_info{};
+            RTC_CHECK(stat(audio_file_path.c_str(), &file_info) == 0)
+                << "Provided audio file path that cannot be opened";
+
+            media_options.audio_device_module = TestAudioDeviceModule::CreateTestAudioDeviceModule(
+                    TestAudioDeviceModule::CreateBufferedWavFileReader(audio_file_path),
+                    TestAudioDeviceModule::CreateDiscardRenderer(48000),
+                    1.f);
+        }
     }
 
     // Set the fake encoder and decoder factories
-    media_options.video_encoder_factory = std::unique_ptr<cricket::WebRtcVideoEncoderFactory>(fake_video_encoder_factory);
-    media_options.video_decoder_factory = std::unique_ptr<cricket::WebRtcVideoDecoderFactory>(fake_video_decoder_factory);
+    media_options.video_encoder_factory =
+            std::unique_ptr<cricket::WebRtcVideoEncoderFactory>(fake_video_encoder_factory);
+    media_options.video_decoder_factory =
+            std::unique_ptr<cricket::WebRtcVideoDecoderFactory>(fake_video_decoder_factory);
 
     return media_options;
 }

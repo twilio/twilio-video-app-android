@@ -23,6 +23,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.getkeepsafe.relinker.ReLinker;
 import java.util.EnumMap;
@@ -196,6 +197,12 @@ public abstract class Video {
             public void onParticipantDisconnected(
                     @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
                 roomListener.onParticipantDisconnected(room, remoteParticipant);
+            }
+
+            @Override
+            public void onDominantSpeakerChanged(
+                    @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                roomListener.onDominantSpeakerChanged(room, remoteParticipant);
             }
 
             @Override

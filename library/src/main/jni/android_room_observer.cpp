@@ -89,6 +89,11 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                                     j_room_observer_class_.obj(),
                                     "onParticipantDisconnected",
                                     "(Lcom/twilio/video/Room;Lcom/twilio/video/RemoteParticipant;)V")),
+        j_on_dominant_speaker_changed(
+                webrtc::GetMethodID(env,
+                                    j_room_observer_class_.obj(),
+                                    "onDominantSpeakerChanged",
+                                    "(Lcom/twilio/video/Room;Lcom/twilio/video/RemoteParticipant;)V")),
         j_on_recording_started_(
                 webrtc::GetMethodID(env,
                                     j_room_observer_class_.obj(),
@@ -406,6 +411,38 @@ void AndroidRoomObserver::onParticipantConnected(twilio::video::Room *room,
                               j_participant);
         CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
     }
+}
+
+void AndroidRoomObserver::onDominantSpeakerChanged(const twilio::video::Room *room,
+                                                   std::shared_ptr<twilio::video::RemoteParticipant> remote_participant) {
+
+    webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
+    std::string func_name = std::string(__FUNCTION__);
+    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
+                      twilio::video::LogLevel::kDebug,
+                      "%s", func_name.c_str());
+
+    {
+        rtc::CritScope cs(&deletion_lock_);
+
+        if (!isObserverValid(func_name)) {
+            return;
+        }
+
+        jobject j_participant = nullptr;
+        if(remote_participant != nullptr) {
+            auto it = remote_participants_.find(remote_participant);
+            j_participant = it->second;
+        }
+
+        jni()->CallVoidMethod(j_room_observer_.obj(),
+                              j_on_dominant_speaker_changed,
+                              j_room_.obj(),
+                              j_participant);
+        CHECK_EXCEPTION(jni()) << "error during CallVoidMethod";
+
+    }
+
 }
 
 void AndroidRoomObserver::onParticipantDisconnected(twilio::video::Room *room,

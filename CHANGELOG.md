@@ -1,4 +1,41 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
+
+### 4.3.0
+
+API Changes
+
+- Implemented the Dominant Speaker functionality for Group Rooms. To enable the dominant speaker functionality, set the `ConnectOptions.dominantSpeakerEnabled` property to `true` when connecting to a Group Room. To determine the current dominant speaker, query the `Room.getDominantSpeaker()` method. When there is no dominant speaker, the `ConnectOptions.dominantSpeakerEnabled` property was set to `false` or when using a Peer-to-Peer room, the `Room.getDominantSpeaker()` method will always return `null`. When there is a dominant speaker, the `Room.getDominantSpeaker()` method will return the appropriate `RemoteParticipant`. Implementing `Room.Listener.onDominantSpeakerChanged()` method on your `Room.Listener` will allow you to receive callbacks when the dominant speaker in a Group Room changes. The `onDominantSpeakerChanged` argument will contain the `RemoteParticipant` of the dominant speaker, or `null` if there is no longer a dominant speaker.
+
+```.java
+ ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableDominantSpeaker(true)
+                        .build();
+Room room = Video.connect(context, connectOptions, roomListener);
+
+@Override
+void onDominantSpeakerChanged(
+                @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                // Handle dominant speaker change
+        }
+
+```
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
+
 ### 4.2.0
  Improvements
 
