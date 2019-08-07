@@ -4,7 +4,15 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 API Changes
 
-- Implemented the Dominant Speaker functionality for Group Rooms. To enable the dominant speaker functionality, set the `ConnectOptions.dominantSpeakerEnabled` property to `true` when connecting to a Group Room. To determine the current dominant speaker, query the `Room.getDominantSpeaker()` method. When there is no dominant speaker, the `ConnectOptions.dominantSpeakerEnabled` property was set to `false` or when using a Peer-to-Peer room, the `Room.getDominantSpeaker()` method will always return `null`. When there is a dominant speaker, the `Room.getDominantSpeaker()` method will return the appropriate `RemoteParticipant`. Implementing `Room.Listener.onDominantSpeakerChanged()` method on your `Room.Listener` will allow you to receive callbacks when the dominant speaker in a Group Room changes. The `onDominantSpeakerChanged` argument will contain the `RemoteParticipant` of the dominant speaker, or `null` if there is no longer a dominant speaker.
+## Dominant Speaker Detection API
+
+The Dominant Speaker Detection API sends events to your application every time the dominant speaker changes. You can use those events to improve the end user's experience by, for example, highlighting which participant is currently talking.
+
+The Dominant Speaker Detection API is only available for Group Rooms.  To enable dominant speaker detection, set the `ConnectOptions.dominantSpeakerEnabled` property to `true`. Use `Room.getDominantSpeaker()` to determine the current dominant speaker. Implement `Room.Listener.onDominantSpeakerChanged()` method to receive callbacks when the dominant speaker changes.
+
+For more information, refer to the [API docs](https://twilio.github.io/twilio-video-android/docs/latest/) and to the [dominant speaker tutorial](https://www.twilio.com/docs/video/detecting-dominant-speaker)
+
+This release is available [here](https://bintray.com/twilio/releases/video-android/4.3.0)
 
 ```.java
  ConnectOptions connectOptions =
