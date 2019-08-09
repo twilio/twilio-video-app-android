@@ -20,6 +20,11 @@
             android:title="@string/enable_automatic_track_subscription"
             android:defaultValue="true"
             />
+        <CheckBoxPreference
+            android:key="pref_enable_dominant_speaker"
+            android:title="@string/enable_dominant_speaker"
+            android:defaultValue="true"
+            />
         <ListPreference
             android:defaultValue="prod"
             android:entries="@array/environment_array"

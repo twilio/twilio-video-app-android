@@ -18,11 +18,13 @@
             android:layout_height="match_parent"
             app:overlaySurface="false"/>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/participant_badge"
-            android:layout_width="128dp"
-            android:layout_height="46dp"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
             android:background="@drawable/badge_background"
+            android:orientation="vertical"
             android:layout_marginTop="88dp"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp">
@@ -31,23 +33,30 @@
                 android:id="@+id/participant_video_identity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/participant_no_audio"
-                android:layout_width="10dp"
-                android:layout_height="11dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_toEndOf="@id/participant_video_identity"
-                android:layout_toRightOf="@id/participant_video_identity"
+                android:layout_width="15dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center|right"
+                android:layout_marginRight="8dp"
                 android:contentDescription="@string/audio_toggle"
                 app:srcCompat="@drawable/ic_thumbnail_no_audio_pillbox" />
 
-        </RelativeLayout>
+            <ImageView
+                android:id="@+id/dominant_speaker_img"
+                android:layout_width="15dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center|left"
+                android:layout_marginLeft="10dp"
+                app:srcCompat="@drawable/ic_dominant_speaker_img"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
 
     </FrameLayout>
 
@@ -77,7 +86,6 @@
             android:textColor="@android:color/white"
             android:textSize="24sp"
             android:textStyle="bold" />
-
     </RelativeLayout>
 
 </FrameLayout>

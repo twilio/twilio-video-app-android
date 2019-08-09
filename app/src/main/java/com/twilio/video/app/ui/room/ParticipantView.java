@@ -28,6 +28,7 @@ import android.support.annotation.StyleRes;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
@@ -52,7 +53,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     @Nullable
     @BindView(R.id.participant_badge)
-    RelativeLayout identityBadge;
+    LinearLayout identityBadge;
 
     @BindView(R.id.participant_video_identity)
     TextView videoIdentity;
@@ -65,6 +66,9 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     @BindView(R.id.participant_stub_image)
     ImageView stubImage;
+
+    @BindView(R.id.dominant_speaker_img)
+    ImageView dominantSpeakerImg;
 
     @BindView(R.id.participant_selected_identity)
     TextView selectedIdentity;
