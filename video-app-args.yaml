@@ -49,7 +49,7 @@ library-physical-device-tests:
         notClass: com.twilio.video.LocalParticipantTopologyTest,com.twilio.video.DataTrackTopologyParameterizedTest,com.twilio.video.StatsTest,com.twilio.video.StatsTopologyParameterizedTest,com.twilio.video.CodecPreferencesTest,com.twilio.video.MultiCodecParameterizedTest,com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[P2P],com.twilio.video.RemoteAudioTrackTopologyParameterizedTest#shouldAllowEnablePlayback[GROUP],com.twilio.video.IceTopologyParameterizedTest
 
 library-camera-tests:
-    timeout: 60m
+    timeout: 10m
     type: instrumentation
     app: library/ftl/library-dummy-test-app.apk
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
