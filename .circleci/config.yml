@@ -327,7 +327,7 @@ jobs:
           name: Instrumentation Camera Tests
           command: >
                     gcloud firebase test android run --no-record-video --project video-app-79418
-                    --async video-app-args.yaml:library-camera-tests
+                    video-app-args.yaml:library-camera-tests
 
   publish-library-snapshot:
     <<: *build-defaults
