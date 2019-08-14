@@ -111,7 +111,7 @@ library-camera-tests:
         - {model: sailfish, version: 26}
         - {model: sailfish, version: 27}
         - {model: sailfish, version: 28}
-        - {model: sawfish, version: 26}                │
+        - {model: sawfish, version: 26}
         - {model: shamu, version: 21}
         - {model: shamu, version: 22}
         - {model: shamu, version: 23}
