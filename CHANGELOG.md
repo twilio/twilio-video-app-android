@@ -42,6 +42,7 @@ codecs:
     - G722
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
 
 ### 4.2.0
