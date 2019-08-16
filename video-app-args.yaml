@@ -66,7 +66,6 @@ library-camera-tests:
     # - hammerhead
     device:
         - {model: A0001, version: 22}
-        - {model: FRT, version: 27}
         - {model: G8142, version: 25}
         - {model: G8441, version: 26}
         - {model: H8324, version: 26}
@@ -91,7 +90,6 @@ library-camera-tests:
         - {model: hammerhead, version: 21}
         - {model: hammerhead, version: 23}
         - {model: harpia, version: 23}
-        - {model: hero2lte, version: 23}
         - {model: heroqltevzw, version: 26}
         - {model: hlte, version: 19}
         - {model: htc_m8, version: 19}
@@ -111,7 +109,6 @@ library-camera-tests:
         - {model: sailfish, version: 26}
         - {model: sailfish, version: 27}
         - {model: sailfish, version: 28}
-        - {model: sawfish, version: 26}
         - {model: shamu, version: 21}
         - {model: shamu, version: 22}
         - {model: shamu, version: 23}
