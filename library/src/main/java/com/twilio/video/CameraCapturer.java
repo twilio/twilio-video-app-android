@@ -196,7 +196,7 @@ public class CameraCapturer implements VideoCapturer {
                         }
                     }
                     synchronized (stateLock) {
-                        state = State.STOPPING;
+                        state = State.IDLE;
                     }
                 }
 
