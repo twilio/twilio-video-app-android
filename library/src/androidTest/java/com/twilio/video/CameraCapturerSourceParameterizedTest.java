@@ -19,6 +19,7 @@ package com.twilio.video;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
@@ -119,7 +120,9 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                             public void onCameraSwitched() {}
 
                             @Override
-                            public void onError(@CameraCapturer.Error int errorCode) {}
+                            public void onError(@CameraCapturer.Error int errorCode) {
+                                fail();
+                            }
                         });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
         int frameCount = frameCountRenderer.getFrameCount();
@@ -231,7 +234,9 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                             public void onCameraSwitched() {}
 
                             @Override
-                            public void onError(@CameraCapturer.Error int errorCode) {}
+                            public void onError(@CameraCapturer.Error int errorCode) {
+                                fail();
+                            }
                         });
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
@@ -276,8 +281,26 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
     public void shouldAllowTakingPictureRightBeforeCapturerStarts() throws InterruptedException {
         final CountDownLatch shutterCallback = new CountDownLatch(1);
         final CountDownLatch pictureTaken = new CountDownLatch(1);
+        final CountDownLatch firstFrameReceived = new CountDownLatch(1);
 
-        cameraCapturer = new CameraCapturer(cameraCapturerActivity, cameraSource);
+        cameraCapturer = new CameraCapturer(
+                cameraCapturerActivity,
+                cameraSource,
+                new CameraCapturer.Listener() {
+                    @Override
+                    public void onFirstFrameAvailable() {
+                        firstFrameReceived.countDown();
+                    }
+
+                    @Override
+                    public void onCameraSwitched() {}
+
+                    @Override
+                    public void onError(@CameraCapturer.Error int errorCode) {
+                        fail();
+                    }
+                });
+
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
         CameraCapturer.PictureListener pictureListener =
@@ -310,7 +333,7 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
                         pictureTaken.countDown();
                     }
                 };
-
+        assertTrue(firstFrameReceived.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
         assertTrue(cameraCapturer.takePicture(pictureListener));
         assertTrue(shutterCallback.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));
         assertTrue(pictureTaken.await(CAMERA_CAPTURE_DELAY_MS, TimeUnit.MILLISECONDS));

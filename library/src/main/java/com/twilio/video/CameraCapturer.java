@@ -189,9 +189,11 @@ public class CameraCapturer implements VideoCapturer {
                     if (listener != null) {
                         if (errorMsg.equals(ERROR_MESSAGE_CAMERA_SERVER_DIED)) {
                             logger.e("Camera server stopped.");
+                            state = State.STOPPING;
                             listener.onError(CameraCapturer.ERROR_CAMERA_SERVER_STOPPED);
                         } else if (errorMsg.contains(ERROR_MESSAGE_UNKNOWN)) {
                             logger.e("Unknown camera error occurred.");
+                            state = State.STOPPING;
                             listener.onError(CameraCapturer.ERROR_UNKNOWN);
                         }
                     }
@@ -201,6 +203,7 @@ public class CameraCapturer implements VideoCapturer {
                 public void onCameraFreezed(String s) {
                     logger.e("Camera froze.");
                     if (listener != null) {
+                        state = State.STOPPING;
                         listener.onError(CameraCapturer.ERROR_CAMERA_FREEZE);
                     }
                 }
@@ -255,6 +258,7 @@ public class CameraCapturer implements VideoCapturer {
                 public void onCameraSwitchError(String errorMessage) {
                     logger.e("Failed to switch to camera source " + cameraSource);
                     if (listener != null) {
+                        state = State.STOPPING;
                         listener.onError(ERROR_CAMERA_SWITCH_FAILED);
                     }
                 }
@@ -588,6 +592,7 @@ public class CameraCapturer implements VideoCapturer {
         if (!Util.permissionGranted(context, Manifest.permission.CAMERA)) {
             logger.e("CAMERA permission must be granted to start capturer");
             if (listener != null) {
+                state = State.STOPPING;
                 listener.onError(ERROR_CAMERA_PERMISSION_NOT_GRANTED);
             }
             return false;
@@ -598,6 +603,7 @@ public class CameraCapturer implements VideoCapturer {
         if (cameraId < 0 || deviceName == null) {
             logger.e("Failed to find camera source");
             if (listener != null) {
+                state = State.STOPPING;
                 listener.onError(ERROR_UNSUPPORTED_SOURCE);
             }
             return false;
