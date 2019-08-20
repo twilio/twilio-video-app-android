@@ -283,23 +283,24 @@ public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTes
         final CountDownLatch pictureTaken = new CountDownLatch(1);
         final CountDownLatch firstFrameReceived = new CountDownLatch(1);
 
-        cameraCapturer = new CameraCapturer(
-                cameraCapturerActivity,
-                cameraSource,
-                new CameraCapturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {
-                        firstFrameReceived.countDown();
-                    }
+        cameraCapturer =
+                new CameraCapturer(
+                        cameraCapturerActivity,
+                        cameraSource,
+                        new CameraCapturer.Listener() {
+                            @Override
+                            public void onFirstFrameAvailable() {
+                                firstFrameReceived.countDown();
+                            }
 
-                    @Override
-                    public void onCameraSwitched() {}
+                            @Override
+                            public void onCameraSwitched() {}
 
-                    @Override
-                    public void onError(@CameraCapturer.Error int errorCode) {
-                        fail();
-                    }
-                });
+                            @Override
+                            public void onError(@CameraCapturer.Error int errorCode) {
+                                fail();
+                            }
+                        });
 
         localVideoTrack = LocalVideoTrack.create(cameraCapturerActivity, true, cameraCapturer);
 
