@@ -189,17 +189,14 @@ public class CameraCapturer implements VideoCapturer {
                     if (listener != null) {
                         if (errorMsg.equals(ERROR_MESSAGE_CAMERA_SERVER_DIED)) {
                             logger.e("Camera server stopped.");
-                            synchronized (stateLock) {
-                                state = State.STOPPING;
-                            }
                             listener.onError(CameraCapturer.ERROR_CAMERA_SERVER_STOPPED);
                         } else if (errorMsg.contains(ERROR_MESSAGE_UNKNOWN)) {
                             logger.e("Unknown camera error occurred.");
-                            synchronized (stateLock) {
-                                state = State.STOPPING;
-                            }
                             listener.onError(CameraCapturer.ERROR_UNKNOWN);
                         }
+                    }
+                    synchronized (stateLock) {
+                        state = State.STOPPING;
                     }
                 }
 
