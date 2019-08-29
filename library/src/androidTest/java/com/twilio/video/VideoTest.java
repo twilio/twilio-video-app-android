@@ -27,6 +27,7 @@ import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.RoomTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -44,6 +45,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@RoomTest
 @RunWith(AndroidJUnit4.class)
 public class VideoTest extends BaseVideoTest {
     @Rule

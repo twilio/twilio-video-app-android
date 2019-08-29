@@ -28,6 +28,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.ParticipantTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -47,6 +48,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@ParticipantTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class LocalParticipantTopologyTest extends BaseVideoTest {

@@ -27,6 +27,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.util.StringUtils;
 import java.nio.ByteBuffer;
 import org.junit.After;
@@ -34,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@TrackTest
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class LocalDataTrackTest extends BaseVideoTest {

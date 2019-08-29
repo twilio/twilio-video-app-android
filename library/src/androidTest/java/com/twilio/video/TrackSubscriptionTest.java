@@ -13,6 +13,7 @@ import android.support.test.rule.GrantPermissionRule;
 import android.util.Pair;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@TrackTest
 @RunWith(Parameterized.class)
 public class TrackSubscriptionTest extends BaseVideoTest {
     public static final String VIDEO = "video";
@@ -94,7 +96,11 @@ public class TrackSubscriptionTest extends BaseVideoTest {
     }
 
     @After
-    public void teardown() throws InterruptedException {
+    public void teardown() {
+        /*
+         * After all participants have disconnected complete the room to clean up backend
+         * resources.
+         */
         LocalAudioTrack audioTrack = (LocalAudioTrack) trackContainer.trackMap.get(AUDIO).second;
         if (audioTrack != null) {
             audioTrack.release();
@@ -107,10 +113,7 @@ public class TrackSubscriptionTest extends BaseVideoTest {
         if (dataTrack != null) {
             dataTrack.release();
         }
-        /*
-         * After all participants have disconnected complete the room to clean up backend
-         * resources.
-         */
+
         if (aliceRoom != null) {
             aliceRoom.disconnect();
         }

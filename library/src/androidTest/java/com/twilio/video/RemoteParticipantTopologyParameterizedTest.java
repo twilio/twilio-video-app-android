@@ -29,6 +29,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.ParticipantTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -46,13 +47,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@ParticipantTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     private Context context;

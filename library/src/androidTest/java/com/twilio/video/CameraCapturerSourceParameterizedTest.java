@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseCameraCapturerTest;
 import com.twilio.video.test.R;
+import com.twilio.video.testcategories.CapturerTest;
 import com.twilio.video.util.DeviceUtils;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -43,6 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@CapturerTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class CameraCapturerSourceParameterizedTest extends BaseCameraCapturerTest {

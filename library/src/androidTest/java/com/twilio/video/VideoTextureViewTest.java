@@ -32,6 +32,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.ui.VideoTextureViewListViewAdapter;
 import com.twilio.video.ui.VideoTextureViewRecyclerViewAdapter;
 import com.twilio.video.ui.VideoTextureViewTestActivity;
@@ -47,10 +48,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(JUnitParamsRunner.class)
 public class VideoTextureViewTest extends BaseVideoTest {
 
-    private static final int FRAME_DELAY_MS = 10000;
+    private static final int FRAME_DELAY_MS = (int) TestUtils.FIVE_SECONDS;
 
     @Rule
     public ActivityTestRule<VideoTextureViewTestActivity> activityRule =
@@ -157,7 +159,7 @@ public class VideoTextureViewTest extends BaseVideoTest {
             onView(withContentDescription(recyclerViewContentDescription))
                     .perform(RecyclerViewActions.scrollToPosition(i));
             // Sleep to give recycler view time to scroll to position to prevent NPE
-            Thread.sleep(250);
+            TestUtils.blockingWait(250);
             VideoTextureViewRecyclerViewAdapter.VideoViewHolder videoViewHolder =
                     (VideoTextureViewRecyclerViewAdapter.VideoViewHolder)
                             recyclerView.findViewHolderForAdapterPosition(i);

@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@MediaTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class LocalVideoTrackVideoConstraintsParameterizedTest extends BaseVideoTest {

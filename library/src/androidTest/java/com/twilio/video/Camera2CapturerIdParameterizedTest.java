@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.support.annotation.NonNull;
 import com.twilio.video.base.BaseCamera2CapturerTest;
+import com.twilio.video.testcategories.CapturerTest;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@CapturerTest
 @RunWith(Parameterized.class)
 public class Camera2CapturerIdParameterizedTest extends BaseCamera2CapturerTest {
     @Parameterized.Parameters(name = "{0}")

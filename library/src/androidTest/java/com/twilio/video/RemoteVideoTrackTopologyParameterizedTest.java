@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseParticipantTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FrameCountRenderer;
 import com.twilio.video.util.Topology;
@@ -38,15 +39,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@MediaTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTest {
-    private static final int VIDEO_TRACK_TEST_DELAY_MS = 10000;
+    private static final int VIDEO_TRACK_TEST_DELAY_MS = 5000;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     private final Topology topology;

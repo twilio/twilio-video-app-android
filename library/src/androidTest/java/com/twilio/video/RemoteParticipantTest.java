@@ -18,7 +18,7 @@ package com.twilio.video;
 
 import static com.twilio.video.TestUtils.ICE_TIMEOUT;
 import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
-import static junit.framework.Assert.fail;
+import static com.twilio.video.TestUtils.THREE_SECONDS;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,6 +33,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.ParticipantTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -51,6 +52,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@ParticipantTest
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class RemoteParticipantTest extends BaseVideoTest {
@@ -266,9 +268,9 @@ public class RemoteParticipantTest extends BaseVideoTest {
                          * Sleep to create race condition between receiving events and setting listener
                          */
                         try {
-                            Thread.sleep(3000);
+                            TestUtils.blockingWait(THREE_SECONDS);
                         } catch (InterruptedException e) {
-                            fail(e.getMessage());
+                            e.printStackTrace();
                         }
 
                         Log.d(TAG, "Alice sets bobRemoteParticipant listener");

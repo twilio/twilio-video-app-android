@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import android.support.test.InstrumentationRegistry;
 import com.getkeepsafe.relinker.ReLinker;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.MediaTest;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@MediaTest
 @RunWith(Parameterized.class)
 public class JniUtilsUtf8StringsParameterizedTest extends BaseVideoTest {
     private static final int NUM_RANDOM_STRINGS = 100;

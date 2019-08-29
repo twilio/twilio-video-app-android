@@ -28,6 +28,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.StringUtils;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@TrackTest
 @RunWith(AndroidJUnit4.class)
 @SmallTest
 public class LocalAudioTrackTest extends BaseVideoTest {

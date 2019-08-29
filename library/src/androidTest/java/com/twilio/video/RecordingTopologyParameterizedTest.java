@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,47 +17,84 @@
 package com.twilio.video;
 
 import static com.twilio.video.TestUtils.ICE_TIMEOUT;
+import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import android.Manifest;
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.RecordingTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
+import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;
 import com.twilio.video.util.Topology;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-@com.twilio.video.testcategories.RoomTest
-@RunWith(AndroidJUnit4.class)
-public class RoomTest extends BaseVideoTest {
-    private Context context;
+@RecordingTest
+@RunWith(Parameterized.class)
+@LargeTest
+public class RecordingTopologyParameterizedTest extends BaseVideoTest {
+    @Parameterized.Parameters(name = "Topology: {0}, enableRecording: {1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(
+                new Object[][] {
+                    {Topology.P2P, false},
+                    {Topology.GROUP, false},
+                    {Topology.GROUP, true},
+                });
+    }
+
+    @Rule
+    public GrantPermissionRule recordAudioPermissionRule =
+            GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO);
+
+    @Rule
+    public ActivityTestRule<MediaTestActivity> activityRule =
+            new ActivityTestRule<>(MediaTestActivity.class);
+
+    private MediaTestActivity mediaTestActivity;
     private String identity;
-    private String roomName;
     private String token;
+    private String roomName;
     private final CallbackHelper.FakeRoomListener roomListener =
             new CallbackHelper.FakeRoomListener();
     private Room room;
+    private LocalAudioTrack localAudioTrack;
+    private LocalVideoTrack localVideoTrack;
+    private final Topology topology;
+    private final boolean enableRecording;
     private VideoRoom videoRoom;
+
+    public RecordingTopologyParameterizedTest(Topology topology, boolean enableRecording) {
+        this.topology = topology;
+        this.enableRecording = enableRecording;
+    }
 
     @Before
     public void setup() throws InterruptedException {
         super.setup();
-        context = InstrumentationRegistry.getTargetContext();
+        mediaTestActivity = activityRule.getActivity();
         identity = Constants.PARTICIPANT_ALICE;
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        Topology topology = Topology.GROUP;
-        videoRoom = RoomUtils.createRoom(roomName, topology);
+
+        videoRoom = RoomUtils.createRoom(roomName, topology, enableRecording);
         assertNotNull(videoRoom);
         token = CredentialsUtils.getAccessToken(identity, topology);
     }
@@ -68,7 +105,6 @@ public class RoomTest extends BaseVideoTest {
             roomListener.onDisconnectedLatch = new CountDownLatch(1);
             room.disconnect();
             assertTrue(
-                    "Did not receive disconnect callback",
                     roomListener.onDisconnectedLatch.await(
                             TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         }
@@ -79,15 +115,22 @@ public class RoomTest extends BaseVideoTest {
         if (room != null) {
             RoomUtils.completeRoom(room);
         }
-        RoomUtils.completeRoom(videoRoom);
+        if (videoRoom != null) {
+            RoomUtils.completeRoom(videoRoom);
+        }
+        if (localAudioTrack != null) {
+            localAudioTrack.release();
+        }
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
+        }
         assertTrue(MediaFactory.isReleased());
     }
 
     @Test
-    public void disconnect_shouldBeIdempotent() throws InterruptedException {
+    public void shouldReturnValidRecordingState() throws InterruptedException {
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
-
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .iceServersTimeout(ICE_TIMEOUT)
@@ -95,34 +138,22 @@ public class RoomTest extends BaseVideoTest {
                         .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
-        room = Video.connect(context, connectOptions, roomListener);
-        room.disconnect();
-        room.disconnect();
-        assertTrue(
-                roomListener.onDisconnectedLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-    }
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertNull(room.getLocalParticipant());
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
-    @Test
-    public void getStats_canBeCalledAfterDisconnect() throws InterruptedException {
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        if ((topology == Topology.GROUP && enableRecording)
+                || (topology == Topology.GROUP_SMALL && enableRecording)) {
+            assertTrue(room.isRecording());
+        } else {
+            assertFalse(room.isRecording());
+        }
 
-        IceOptions iceOptions =
-                new IceOptions.Builder()
-                        .iceServersTimeout(ICE_TIMEOUT)
-                        .abortOnIceServersTimeout(true)
-                        .build();
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
-        room = Video.connect(context, connectOptions, roomListener);
         room.disconnect();
-        room.getStats(
-                statsReports -> {
-                    // Do nothing
-                });
+
+        // Wait for disconnect and validate recording state
         assertTrue(
-                roomListener.onDisconnectedLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+                roomListener.onDisconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertFalse(room.isRecording());
     }
 }

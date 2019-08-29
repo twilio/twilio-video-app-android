@@ -16,6 +16,8 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.FOUR_SECONDS;
+import static com.twilio.video.TestUtils.TWO_SECONDS;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,6 +43,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.test.R;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.ui.ScreenCapturerTestActivity;
 import com.twilio.video.util.DeviceUtils;
 import java.util.concurrent.CountDownLatch;
@@ -53,12 +56,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(AndroidJUnit4.class)
 @TargetApi(21)
 public class ScreenCapturerTest extends BaseVideoTest {
-    private static final int SCREEN_CAPTURER_DELAY_MS = 4000;
-    private static final int PERMISSIONS_DIALOG_DELAY_MS = 2000;
     private static final String START_CAPTURE_BUTTON_ID = "android:id/button1";
+    private static final long SCREEN_CAPTURER_DELAY_MS = FOUR_SECONDS;
+    private static final long PERMISSIONS_DIALOG_DELAY_MS = TWO_SECONDS;
 
     @Rule
     public ActivityTestRule<ScreenCapturerTestActivity> activityRule =
@@ -334,11 +338,10 @@ public class ScreenCapturerTest extends BaseVideoTest {
                         .get()
                         .await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
+        TestUtils.blockingWait(TWO_SECONDS);
+
         VideoDimensions videoDimensions = screenCapturer.getVideoDimensions();
 
-        if (videoDimensions == null || videoDimensions.width == 0 || videoDimensions.height == 0) {
-            fail();
-        }
         assertTrue(videoDimensions.height > videoDimensions.width);
 
         uiDevice.setOrientationLeft();

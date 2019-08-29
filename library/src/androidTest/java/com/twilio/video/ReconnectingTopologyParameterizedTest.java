@@ -8,6 +8,7 @@ import android.Manifest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseParticipantTest;
+import com.twilio.video.testcategories.NetworkTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Sequence;
 import com.twilio.video.util.Topology;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@NetworkTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class ReconnectingTopologyParameterizedTest extends BaseParticipantTest {

@@ -19,10 +19,12 @@ package com.twilio.video;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.CapturerTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
+@CapturerTest
 public class Camera2CapturerTest extends BaseVideoTest {
 
     /*

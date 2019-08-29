@@ -16,6 +16,7 @@
 
 package com.twilio.video;
 
+import static com.twilio.video.TestUtils.TWO_SECONDS;
 import static com.twilio.video.util.VideoAssert.assertNoFramesRendered;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -32,6 +33,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.FakeVideoRenderer;
 import com.twilio.video.util.FrameCountRenderer;
@@ -46,6 +48,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@MediaTest
 @RunWith(AndroidJUnit4.class)
 @SmallTest
 public class LocalVideoTrackTest extends BaseVideoTest {
@@ -356,7 +359,7 @@ public class LocalVideoTrackTest extends BaseVideoTest {
                 .runOnMainSync(
                         () -> {
                             try {
-                                Thread.sleep(2000);
+                                TestUtils.blockingWait(TWO_SECONDS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }

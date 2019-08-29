@@ -23,9 +23,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import com.twilio.video.base.BaseStatsTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.StatsTest;
 import com.twilio.video.util.FakeVideoCapturer;
 import com.twilio.video.util.Topology;
 import java.util.Arrays;
@@ -40,15 +42,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@StatsTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class StatsTopologyParameterizedTest extends BaseStatsTest {
-    private static final int MAX_RETRIES = 10;
+    private static final int MAX_RETRIES = 5;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     public StatsTopologyParameterizedTest(Topology topology) {
@@ -336,6 +338,59 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertTrue(0 < remoteVideoTrackStats.dimensions.height);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void shouldFailWithNullListener() throws InterruptedException {
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName);
+        aliceRoom.getStats(null);
+    }
+
+    @Test
+    public void shouldReceiveStatsInEmptyRoom() throws InterruptedException {
+        aliceRoom = createRoom(aliceToken, aliceListener, roomName);
+
+        CallbackHelper.FakeStatsListener aliceStatsListener =
+                new CallbackHelper.FakeStatsListener();
+        aliceStatsListener.onStatsLatch = new CountDownLatch(1);
+        aliceRoom.getStats(aliceStatsListener);
+        assertTrue(
+                aliceStatsListener.onStatsLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertTrue(1 >= aliceStatsListener.getStatsReports().size());
+    }
+
+    @Test
+    public void shouldInvokeListenerOnCallingThread() throws InterruptedException {
+        // Connect Alice to room with local audio track only
+        aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        aliceRoom =
+                createRoom(
+                        aliceToken,
+                        aliceListener,
+                        roomName,
+                        Collections.singletonList(aliceLocalAudioTrack));
+        aliceListener.onParticipantConnectedLatch = new CountDownLatch(1);
+        final CountDownLatch statsCallback = new CountDownLatch(1);
+
+        /*
+         * Run on UI thread to avoid thread hopping between the test runner thread and the UI
+         * thread.
+         */
+        InstrumentationRegistry.getInstrumentation()
+                .runOnMainSync(
+                        () -> {
+                            final long callingThreadId = Thread.currentThread().getId();
+                            StatsListener statsListener =
+                                    statsReports -> {
+                                        assertEquals(
+                                                callingThreadId, Thread.currentThread().getId());
+                                        statsCallback.countDown();
+                                    };
+                            aliceRoom.getStats(statsListener);
+                        });
+
+        assertTrue(statsCallback.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+    }
+
     @Test
     @Ignore
     public void shouldReceiveEmptyReportsIfRoomGetsDisconnected() throws InterruptedException {
@@ -365,7 +420,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // let's give peer connection some time to get media flowing
-        Thread.sleep(2000);
+        TestUtils.blockingWait(TestUtils.ONE_SECOND);
 
         // send getStats() requests
         CallbackHelper.FakeStatsListener aliceStatsListener =
@@ -449,7 +504,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
 
         do {
             // Give peer connection some time to get media flowing
-            Thread.sleep(1000);
+            TestUtils.blockingWait(TestUtils.ONE_SECOND);
 
             CallbackHelper.FakeStatsListener aliceStatsListener =
                     new CallbackHelper.FakeStatsListener();

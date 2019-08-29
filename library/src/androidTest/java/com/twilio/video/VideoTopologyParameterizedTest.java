@@ -28,6 +28,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
+import com.twilio.video.testcategories.TrackTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
@@ -49,13 +50,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@TrackTest
 @RunWith(Parameterized.class)
 @LargeTest
 public class VideoTopologyParameterizedTest extends BaseVideoTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] {{Topology.P2P}, {Topology.GROUP}, {Topology.GROUP_SMALL}});
+        return Arrays.asList(new Object[][] {{Topology.P2P}, {Topology.GROUP}});
     }
 
     @Rule
@@ -386,7 +387,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
 
         // Add sleep to ensure that connect has started
-        Thread.sleep(200);
+        TestUtils.blockingWait(200);
 
         localVideoTrack.release();
         assertTrue(
@@ -426,7 +427,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
 
         // Add sleep to ensure that connect has started
-        Thread.sleep(200);
+        TestUtils.blockingWait(200);
 
         localDataTrack.release();
         assertTrue(
@@ -469,7 +470,7 @@ public class VideoTopologyParameterizedTest extends BaseVideoTest {
         room = Video.connect(mediaTestActivity, connectOptions, roomListener);
 
         // Add sleep to ensure that connect has started
-        Thread.sleep(200);
+        TestUtils.blockingWait(200);
 
         localAudioTrack.release();
         assertTrue(
