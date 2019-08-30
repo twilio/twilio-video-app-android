@@ -26,6 +26,8 @@ codecs:
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
 - Server side deflate compression is disabled due to occasional errors when reading messages.
+- Rapidly connecting and disconnecting from a `Room` may cause a crash.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
 ### 5.0.0-beta2
 
@@ -56,6 +58,7 @@ codecs:
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
 - Server side deflate compression is disabled due to occasional errors when reading messages.
 - Rapidly connecting and disconnecting from a `Room` may cause a crash.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
 ### 5.0.0-beta1
 
@@ -78,6 +81,64 @@ Known issues
 - In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
 - Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
+### 4.3.1
+
+Bug Fixes
+
+- Fixed updating `CameraCapturer.State` when error occurs.
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
+### 4.3.0
+
+API Changes
+
+## Dominant Speaker Detection API
+
+The Dominant Speaker Detection API sends events to your application every time the dominant speaker changes. You can use those events to improve the end user's experience by, for example, highlighting which participant is currently talking.
+
+The Dominant Speaker Detection API is only available for Group Rooms.  To enable dominant speaker detection, set the `ConnectOptions.dominantSpeakerEnabled` property to `true`. Use `Room.getDominantSpeaker()` to determine the current dominant speaker. Implement `Room.Listener.onDominantSpeakerChanged()` method to receive callbacks when the dominant speaker changes.
+
+For more information, refer to the [API docs](https://twilio.github.io/twilio-video-android/docs/latest/) and to the [dominant speaker tutorial](https://www.twilio.com/docs/video/detecting-dominant-speaker)
+
+This release is available [here](https://bintray.com/twilio/releases/video-android/4.3.0)
+
+```.java
+ ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableDominantSpeaker(true)
+                        .build();
+Room room = Video.connect(context, connectOptions, roomListener);
+
+@Override
+void onDominantSpeakerChanged(
+                @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                // Handle dominant speaker change
+        }
+
+```
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
 - Codec preferences do not function correctly in a hybrid codec Group Room with the following
 codecs:
@@ -88,6 +149,7 @@ codecs:
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
 - Server side deflate compression is disabled due to occasional errors when reading messages.
 - Rapidly connecting and disconnecting from a `Room` may cause a crash.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
 ### 4.2.0
  Improvements

@@ -68,8 +68,10 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     protected LocalVideoTrack bobLocalVideoTrack;
     protected LocalAudioTrack bobLocalAudioTrack;
     protected LocalDataTrack bobLocalDataTrack;
+    protected LocalAudioTrack charlieLocalAudioTrack;
     protected String aliceToken;
     protected String bobToken;
+    protected String charlieToken;
     protected Room aliceRoom;
     protected LocalParticipant aliceLocalParticipant;
     protected RemoteParticipant aliceRemoteParticipant;
@@ -226,6 +228,9 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         }
         if (charlieLocalDataTrack != null) {
             charlieLocalDataTrack.release();
+        }
+        if (charlieLocalAudioTrack != null) {
+            charlieLocalAudioTrack.release();
         }
     }
 

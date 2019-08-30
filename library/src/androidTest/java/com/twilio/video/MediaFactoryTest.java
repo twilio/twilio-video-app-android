@@ -18,17 +18,26 @@ package com.twilio.video;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.fail;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.testcategories.MediaTest;
 import com.twilio.video.util.FakeVideoCapturer;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Random;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,10 +46,48 @@ import org.junit.runner.RunWith;
 @LargeTest
 public class MediaFactoryTest extends BaseVideoTest {
     private static final int NUM_TRACKS = 10;
+    private static final String AUDIO_WAV_FILE_NAME = "audio_dtx16.wav";
+    private static final String AUDIO_WAV_FILE_INTERNAL_STORAGE_PATH_TEMPLATE = "%s/%s";
+    private static String audioFilePath;
+    private static File audioFile;
 
     private final Random random = new Random();
     private Context context;
     private MediaFactory mediaFactory;
+
+    @BeforeClass
+    public static void copyAudioFile() {
+        Context context = InstrumentationRegistry.getContext();
+        AssetManager assetManager = context.getAssets();
+        String internalStoragePath = context.getFilesDir().getAbsolutePath();
+        try (InputStream is = assetManager.open(AUDIO_WAV_FILE_NAME)) {
+            String audioFilePathString =
+                    String.format(
+                            AUDIO_WAV_FILE_INTERNAL_STORAGE_PATH_TEMPLATE,
+                            internalStoragePath,
+                            AUDIO_WAV_FILE_NAME);
+            audioFile = new File(audioFilePathString);
+
+            final int BUFFER_SIZE = 4 * 1024;
+            try {
+                try (OutputStream output = new FileOutputStream(audioFile)) {
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    int read;
+
+                    while ((read = is.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                    }
+
+                    output.flush();
+                }
+            } finally {
+                is.close();
+            }
+            audioFilePath = audioFile.getPath();
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
 
     @Before
     public void setup() throws InterruptedException {
@@ -53,6 +100,11 @@ public class MediaFactoryTest extends BaseVideoTest {
     public void teardown() {
         mediaFactory.release(this);
         assertTrue(MediaFactory.isReleased());
+    }
+
+    @AfterClass
+    public static void removeAudioFile() {
+        assertTrue(audioFile.delete());
     }
 
     @Test(expected = NullPointerException.class)
@@ -332,5 +384,13 @@ public class MediaFactoryTest extends BaseVideoTest {
             MediaFactory mediaFactory = MediaFactory.instance(this, context);
             mediaFactory.release(this);
         }
+    }
+
+    @Test
+    public void canCreateTestMediaFactoryWithAudioFilePath() {
+        MediaOptions mediaOptions =
+                new MediaOptions.Builder().enableH264(false).audioFilePath(audioFilePath).build();
+        MediaFactory testMediaFactory = MediaFactory.testCreate(context, mediaOptions);
+        testMediaFactory.testRelease();
     }
 }

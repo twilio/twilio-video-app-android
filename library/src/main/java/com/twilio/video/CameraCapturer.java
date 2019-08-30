@@ -195,6 +195,9 @@ public class CameraCapturer implements VideoCapturer {
                             listener.onError(CameraCapturer.ERROR_UNKNOWN);
                         }
                     }
+                    synchronized (stateLock) {
+                        state = State.IDLE;
+                    }
                 }
 
                 @Override
@@ -202,6 +205,9 @@ public class CameraCapturer implements VideoCapturer {
                     logger.e("Camera froze.");
                     if (listener != null) {
                         listener.onError(CameraCapturer.ERROR_CAMERA_FREEZE);
+                    }
+                    synchronized (stateLock) {
+                        state = State.IDLE;
                     }
                 }
 
@@ -256,6 +262,9 @@ public class CameraCapturer implements VideoCapturer {
                     logger.e("Failed to switch to camera source " + cameraSource);
                     if (listener != null) {
                         listener.onError(ERROR_CAMERA_SWITCH_FAILED);
+                    }
+                    synchronized (stateLock) {
+                        state = State.IDLE;
                     }
                 }
             };
@@ -590,6 +599,9 @@ public class CameraCapturer implements VideoCapturer {
             if (listener != null) {
                 listener.onError(ERROR_CAMERA_PERMISSION_NOT_GRANTED);
             }
+            synchronized (stateLock) {
+                state = State.IDLE;
+            }
             return false;
         }
         int cameraId = formatProvider.getCameraId(cameraSource);
@@ -599,6 +611,9 @@ public class CameraCapturer implements VideoCapturer {
             logger.e("Failed to find camera source");
             if (listener != null) {
                 listener.onError(ERROR_UNSUPPORTED_SOURCE);
+            }
+            synchronized (stateLock) {
+                state = State.IDLE;
             }
             return false;
         }
