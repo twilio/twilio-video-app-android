@@ -2,7 +2,33 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ### 5.0.0-beta3
 
+## Dominant Speaker Detection API
+
+The Dominant Speaker Detection API sends events to your application every time the dominant speaker changes. You can use those events to improve the end user's experience by, for example, highlighting which participant is currently talking.
+
+The Dominant Speaker Detection API is only available for Group Rooms.  To enable dominant speaker detection, set the `ConnectOptions.dominantSpeakerEnabled` property to `true`. Use `Room.getDominantSpeaker()` to determine the current dominant speaker. Implement `Room.Listener.onDominantSpeakerChanged()` method to receive callbacks when the dominant speaker changes.
+
+For more information, refer to the [API docs](https://twilio.github.io/twilio-video-android/docs/5.0.0-beta3/) and to the [dominant speaker tutorial](https://www.twilio.com/docs/video/detecting-dominant-speaker)
+
+```.java
+ ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableDominantSpeaker(true)
+                        .build();
+Room room = Video.connect(context, connectOptions, roomListener);
+
+@Override
+void onDominantSpeakerChanged(
+                @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                // Handle dominant speaker change
+        }
+
+```
+
+
 Enhancements
+
 - Reduced connection times by removing a round trip when:
   - Reconnecting after a signaling connection failure
   - Connecting with `ConnectOptions.iceOptions`, and overridden Servers
@@ -11,6 +37,7 @@ Enhancements
 Bug Fixes
 
 - Ensure the `WSS::Impl` is always destroyed by the `io_context` designated thread. Prevents crash when rapidly connecting and disconnecting from a room.
+- Fixed updating `CameraCapturer.State` when error occurs.
 
 Known issues
 
