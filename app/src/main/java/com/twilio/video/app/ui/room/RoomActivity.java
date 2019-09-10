@@ -16,7 +16,9 @@
 
 package com.twilio.video.app.ui.room;
 
-import static com.twilio.video.AspectRatio.*;
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
 import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
@@ -695,7 +697,7 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    private boolean getEnableAutomaticTrackSubscription(String key, boolean defaultValue) {
+    private boolean getPreferenceByKeyWithDefault(String key, boolean defaultValue) {
         return sharedPreferences.getBoolean(key, defaultValue);
     }
 
@@ -1037,8 +1039,14 @@ public class RoomActivity extends BaseActivity {
                                     Preferences.ENABLE_INSIGHTS_DEFAULT);
 
                     boolean enableAutomaticTrackSubscription =
-                            getEnableAutomaticTrackSubscription(
-                                    Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION, true);
+                            getPreferenceByKeyWithDefault(
+                                    Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION,
+                                    Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT);
+
+                    boolean enableDominantSpeaker =
+                            getPreferenceByKeyWithDefault(
+                                    Preferences.ENABLE_DOMINANT_SPEAKER,
+                                    Preferences.ENABLE_DOMINANT_SPEAKER_DEFAULT);
 
                     VideoCodec preferedVideoCodec =
                             getVideoCodecPreference(
@@ -1052,6 +1060,7 @@ public class RoomActivity extends BaseActivity {
                             new ConnectOptions.Builder(token)
                                     .roomName(roomName)
                                     .enableAutomaticSubscription(enableAutomaticTrackSubscription)
+                                    .enableDominantSpeaker(enableDominantSpeaker)
                                     .enableInsights(enableInsights);
 
                     int maxVideoBitrate =
@@ -1348,6 +1357,23 @@ public class RoomActivity extends BaseActivity {
         for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
             addParticipant(remoteParticipant, isFirstParticipant);
             isFirstParticipant = false;
+            if (room.getDominantSpeaker() != null) {
+                if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
+                    VideoTrack videoTrack =
+                            (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                    ? remoteParticipant
+                                            .getRemoteVideoTracks()
+                                            .get(0)
+                                            .getRemoteVideoTrack()
+                                    : null;
+                    if (videoTrack != null) {
+                        ParticipantView participantView =
+                                participantController.getThumb(
+                                        remoteParticipant.getSid(), videoTrack);
+                        participantController.setDominantSpeaker(participantView);
+                    }
+                }
+            }
         }
     }
 
@@ -1428,6 +1454,40 @@ public class RoomActivity extends BaseActivity {
                 removeParticipant(remoteParticipant);
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
+            }
+
+            @Override
+            public void onDominantSpeakerChanged(
+                    @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                if (remoteParticipant == null) {
+                    participantController.setDominantSpeaker(null);
+                    return;
+                }
+                VideoTrack videoTrack =
+                        (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                ? remoteParticipant
+                                        .getRemoteVideoTracks()
+                                        .get(0)
+                                        .getRemoteVideoTrack()
+                                : null;
+                if (videoTrack != null) {
+                    ParticipantView participantView =
+                            participantController.getThumb(remoteParticipant.getSid(), videoTrack);
+                    if (participantView != null) {
+                        participantController.setDominantSpeaker(participantView);
+                    } else {
+                        String remoteIdentity = remoteParticipant.getIdentity();
+                        ParticipantPrimaryView primaryParticipantView =
+                                participantController.getPrimaryView();
+                        if (primaryParticipantView.identity.equals(
+                                remoteParticipant.getIdentity())) {
+                            participantController.setDominantSpeaker(
+                                    participantController.getPrimaryView());
+                        } else {
+                            participantController.setDominantSpeaker(null);
+                        }
+                    }
+                }
             }
 
             @Override

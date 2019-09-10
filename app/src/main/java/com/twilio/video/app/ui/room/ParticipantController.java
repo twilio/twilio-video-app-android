@@ -16,11 +16,13 @@
 
 package com.twilio.video.app.ui.room;
 
+import android.view.View;
 import android.view.ViewGroup;
 import com.twilio.video.VideoTrack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /** ParticipantController is main controlling party for rendering participants. */
 public class ParticipantController {
@@ -353,6 +355,20 @@ public class ParticipantController {
 
     public void setListener(ItemClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setDominantSpeaker(@Nullable ParticipantView participantView) {
+        clearDominantSpeaker();
+        if (participantView != null) {
+            participantView.dominantSpeakerImg.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void clearDominantSpeaker() {
+        getPrimaryView().dominantSpeakerImg.setVisibility(View.GONE);
+        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
+            entry.getValue().dominantSpeakerImg.setVisibility(View.GONE);
+        }
     }
 
     private boolean hasThumb(String sid, VideoTrack videoTrack) {

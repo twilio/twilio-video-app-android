@@ -43,6 +43,7 @@ public class Room {
     private Room.State state;
     private Map<String, RemoteParticipant> participantMap = new HashMap<>();
     private LocalParticipant localParticipant;
+    private RemoteParticipant dominantSpeaker;
     private final Room.Listener listener;
     private final Handler handler;
     private Queue<Pair<Handler, StatsListener>> statsListenersQueue;
@@ -189,6 +190,23 @@ public class Room {
                 }
 
                 @Override
+                public void onDominantSpeakerChanged(
+                        @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                    handler.post(
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onDominantSpeakerChanged()");
+
+                                // Update room state
+                                Room.this.dominantSpeaker = remoteParticipant;
+
+                                // Notify developer
+                                Room.this.listener.onDominantSpeakerChanged(
+                                        room, remoteParticipant);
+                            });
+                }
+
+                @Override
                 public void onRecordingStarted(@NonNull final Room room) {
                     handler.post(
                             () -> {
@@ -249,6 +267,28 @@ public class Room {
     @NonNull
     public synchronized Room.State getState() {
         return state;
+    }
+
+    /**
+     * Returns the dominant speaker of the {@link Room}.
+     *
+     * <p>To enable this feature, add an invocation of {@link
+     * ConnectOptions.Builder#enableDominantSpeaker} with {@code true} when building your {@link
+     * ConnectOptions}. This method returns {@code null} when one of the following conditions are
+     * true:
+     *
+     * <p>
+     *
+     * <ul>
+     *   <li>The {@link Room} topology is P2P.
+     *   <li>The dominant speaker feature was not enabled via {@link
+     *       ConnectOptions.Builder#enableDominantSpeaker}.
+     *   <li>There is currently no dominant speaker.
+     * </ul>
+     */
+    @Nullable
+    public RemoteParticipant getDominantSpeaker() {
+        return dominantSpeaker;
     }
 
     /** Returns whether any media in the Room is being recorded. */
@@ -472,6 +512,31 @@ public class Room {
          */
         void onParticipantDisconnected(
                 @NonNull Room room, @NonNull RemoteParticipant remoteParticipant);
+
+        /**
+         * This method is called when the dominant speaker in the {@link Room} changes. Either there
+         * is a new dominant speaker, in which case {@link Room#getDominantSpeaker} returns the
+         * {@link RemoteParticipant} included in the event or there is no longer a dominant speaker,
+         * in which case {@link Room#getDominantSpeaker} returns {@code null}.
+         *
+         * <p>This method will not be called when one of the following conditions are true:
+         *
+         * <p>
+         *
+         * <ul>
+         *   <li>The {@link Room} topology is P2P.
+         *   <li>The dominant speaker feature was not enabled via {@link
+         *       ConnectOptions.Builder#enableDominantSpeaker}.
+         * </ul>
+         *
+         * @param room The {@link Room} in which the dominant speaker changed.
+         * @param remoteParticipant The {@link RemoteParticipant} that is currently the dominant
+         *     speaker or {@code null}.
+         */
+        default void onDominantSpeakerChanged(
+                @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+            logger.d("onDominantSpeakerChanged");
+        }
 
         /**
          * This method is only called when a {@link Room} which was not previously recording starts

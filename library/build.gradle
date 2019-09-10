@@ -9,6 +9,7 @@ def compilerVersion = "clang-3.8"
 
 configurations {
     preCompile
+    documentation
 }
 
 android {
@@ -237,6 +238,7 @@ task androidSourcesJar(type: Jar) {
 artifacts {
     archives androidSourcesJar
     archives androidJavadocsJar
+    documentation classifier: "acknowledgements", file: file("${rootDir}/ACKNOWLEDGEMENTS.md")
 }
 
 /*

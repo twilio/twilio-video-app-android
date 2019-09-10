@@ -40,6 +40,9 @@ public class Preferences {
     public static final String ENABLE_INSIGHTS = "pref_enable_insights";
     public static final String ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION =
             "pref_enable_automatic_subscription";
+    public static final boolean ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT = true;
+    public static final String ENABLE_DOMINANT_SPEAKER = "pref_enable_dominant_speaker";
+    public static final boolean ENABLE_DOMINANT_SPEAKER_DEFAULT = true;
     public static final boolean ENABLE_INSIGHTS_DEFAULT = true;
     public static final String VIDEO_CODEC = "pref_video_codecs";
     public static final String VIDEO_CODEC_DEFAULT = Vp8Codec.NAME;

@@ -99,6 +99,7 @@
     <string name="profile_picture">Profile picture</string>
     <string name="number">Number</string>
     <string name="enable_automatic_track_subscription">Enable Automatic Track Subscription</string>
+    <string name="enable_dominant_speaker">Enable Dominant Speaker</string>
     <string name="record_participants_on_connect">Record Participants on Connect</string>
 
     <string-array name="environment_array">

@@ -625,6 +625,10 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                     }
 
                     @Override
+                    public void onDominantSpeakerChanged(
+                            @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {}
+
+                    @Override
                     public void onRecordingStarted(@NonNull Room room) {
                         fail();
                     }
@@ -695,6 +699,10 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                             @NonNull Room room, @NonNull RemoteParticipant participant) {
                         fail();
                     }
+
+                    @Override
+                    public void onDominantSpeakerChanged(
+                            @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {}
 
                     @Override
                     public void onRecordingStarted(@NonNull Room room) {

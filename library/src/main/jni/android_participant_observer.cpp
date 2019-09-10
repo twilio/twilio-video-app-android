@@ -585,6 +585,7 @@ void AndroidParticipantObserver::onAudioTrackUnsubscribed(twilio::video::RemoteP
         auto track_it = remote_audio_track_map_.find(remote_audio_track_publication->getRemoteTrack());
         jobject j_remote_audio_track = track_it->second;
         jobject j_remote_audio_track_publication = remote_audio_track_publication_map_[remote_audio_track_publication];
+
         jni()->CallVoidMethod(j_remote_participant_observer_.obj(),
                               j_on_audio_track_unsubscribed_,
                               j_remote_participant_.obj(),

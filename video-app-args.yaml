@@ -113,23 +113,55 @@ integration-capturer-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: A0001, version: 22}
-        - {model: athene, version: 23}
+        - {model: G8142, version: 25}
+        - {model: G8441, version: 26}
+        - {model: H8324, version: 26}
+        - {model: HWMHA, version: 24}
+        - {model: OnePlus3T, version: 26}
+        - {model: OnePlus6T, version: 28}
+        - {model: a5y17lte, version: 24}
+        - {model: albus, version: 26}
+        - {model: aljeter_n, version: 26}
+        - {model: athene , version: 23}
         - {model: athene_f, version: 23}
-        - {model: hwALE-H, version: 21}
+        - {model: blueline, version: 28}
+        - {model: blueline, version: Q-beta-3}
+        - {model: cheryl, version: 25}
+        - {model: crownqlteue, version: 27}
+        - {model: flo, version: 19}
+        - {model: flo, version: 21}
         - {model: g3, version: 19}
         - {model: hero2lte, version: 23}
         - {model: lucye, version: 24}
         - {model: hlte, version: 19}
+        - {model: htc_m8, version: 19}
+        - {model: htc_ocndugl, version: 26}
+        - {model: hwALE-H, version: 21}
+        - {model: j1acevelte, version: 22}
         - {model: j7xelte, version: 23}
+        - {model: james, version: 26}
         - {model: lt02wifi, version: 19}
-        - {model: m0, version: 18}
+        - {model: lucye, version: 24}
+        - {model: lv0, version: 23}
+        - {model: m0, version:  18}
+        - {model: mata, version: 25}
+        - {model: mlv1, version: 23}
+        - {model: potter, version: 24}
         - {model: sailfish, version: 25}
+        - {model: sailfish, version: 26}
         - {model: sailfish, version: 27}
+        - {model: sailfish, version: 28}
+        - {model: shamu, version: 21}
+        - {model: shamu, version: 22}
+        - {model: shamu, version: 23}
+        - {model: star2qlteue, version: 26}
+        - {model: starqlteue, version: 26}
+        - {model: taimen, version: 26}
+        - {model: taimen, version: 27}
+        - {model: victara, version: 19}
         - {model: walleye, version: 26}
         - {model: walleye, version: 27}
         - {model: walleye, version: 28}
-        - {model: shamu, version: 22}
         - {model: zeroflte, version: 23}
-        - {model: shamu, version: 22}
     test-targets:
         - "annotation com.twilio.video.testcategories.CapturerTest"

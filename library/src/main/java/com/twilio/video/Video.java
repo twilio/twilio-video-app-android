@@ -201,6 +201,12 @@ public abstract class Video {
             }
 
             @Override
+            public void onDominantSpeakerChanged(
+                    @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                roomListener.onDominantSpeakerChanged(room, remoteParticipant);
+            }
+
+            @Override
             public void onRecordingStarted(@NonNull Room room) {
                 roomListener.onRecordingStarted(room);
             }

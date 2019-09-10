@@ -51,6 +51,7 @@ public class ConnectOptions {
     private final IceOptions iceOptions;
     private final boolean enableInsights;
     private final boolean enableAutomaticSubscription;
+    private final boolean enableDominantSpeaker;
     private final List<AudioCodec> preferredAudioCodecs;
     private final List<VideoCodec> preferredVideoCodecs;
     private final EncodingParameters encodingParameters;
@@ -106,6 +107,7 @@ public class ConnectOptions {
         this.iceOptions = builder.iceOptions;
         this.enableInsights = builder.enableInsights;
         this.enableAutomaticSubscription = builder.enableAutomaticSubscription;
+        this.enableDominantSpeaker = builder.enableDominantSpeaker;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
         this.region = builder.region;
@@ -217,6 +219,7 @@ public class ConnectOptions {
                 iceOptions,
                 enableInsights,
                 enableAutomaticSubscription,
+                enableDominantSpeaker,
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
                 getVideoCodecsArray(),
@@ -233,6 +236,7 @@ public class ConnectOptions {
             IceOptions iceOptions,
             boolean enableInsights,
             boolean enableAutomaticSubscription,
+            boolean enableDominantSpeaker,
             long platformInfoNativeHandle,
             AudioCodec[] preferredAudioCodecs,
             VideoCodec[] preferredVideoCodecs,
@@ -253,6 +257,7 @@ public class ConnectOptions {
         private List<LocalDataTrack> dataTracks;
         private boolean enableInsights = true;
         private boolean enableAutomaticSubscription = true;
+        private boolean enableDominantSpeaker = false;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
         private String region = "gll";
@@ -324,6 +329,19 @@ public class ConnectOptions {
         @NonNull
         public Builder enableAutomaticSubscription(boolean enableAutomaticSubscription) {
             this.enableAutomaticSubscription = enableAutomaticSubscription;
+            return this;
+        }
+
+        /**
+         * Enable reporting of a {@link Room}'s dominant speaker. This option has no effect if the
+         * {@link Room} topology is P2P.
+         *
+         * @see Room#getDominantSpeaker()
+         * @see Room.Listner#onDominantSpeakerChanged()
+         */
+        @NonNull
+        public Builder enableDominantSpeaker(boolean enableDominantSpeaker) {
+            this.enableDominantSpeaker = enableDominantSpeaker;
             return this;
         }
 
