@@ -321,7 +321,7 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
 // Ensure that our pre build tasks are executed
 afterEvaluate {
     android.libraryVariants.all { variant ->
-        variant.preBuild.dependsOn(localizeWebRtcJniLoadUnLoad)
+        variant.preBuildProvider.get().dependsOn(localizeWebRtcJniLoadUnLoad)
     }
 }
 

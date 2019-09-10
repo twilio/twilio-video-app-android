@@ -69,6 +69,7 @@ aliases:
       echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
       echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
       echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
   - &install-cmake
     name: Install Cmake
     command:

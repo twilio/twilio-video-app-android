@@ -125,7 +125,9 @@ dependencies {
     implementation "com.android.support:preference-v14:${versions.preferenceLibrary}"
     implementation "com.jakewharton.timber:timber:${versions.timber}"
     implementation "com.appyvet:materialrangebar:${versions.materialrangebar}"
-    implementation "com.jakewharton:butterknife:${versions.butterknife}"
+    implementation ("com.jakewharton:butterknife:${versions.butterknife}") {
+        exclude group: "com.android.support", module: "support-compat"
+    }
     implementation "com.google.guava:guava:${versions.guava}"
     implementation "com.android.support:support-v4:${versions.supportLibrary}"
     implementation "com.android.support:multidex:${versions.multidex}"
