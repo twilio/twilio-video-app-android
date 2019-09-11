@@ -100,6 +100,13 @@ using JSON files. The table below provides a short summary of required credentia
     BINTRAY_USERNAME=your-bintray-username
     BINTRAY_PASSWORD=your-bintray-apikey
     ```
+    #### Setting up Gradle Configuration
+    In order to allocate enough memory for the Java heap space used by the Gradle daemon, add the line below to
+    your system level gradle.properties file.
+    ```
+    org.gradle.jvmargs=-Xmx4608m
+    ```
+    If you don't add this line, you will see Gradle build failures related to the Java heap space.
 
 ## Project Modules
 

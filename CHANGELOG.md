@@ -109,6 +109,27 @@ Known issues
 - Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
+### 4.3.2
+
+Bug Fix
+
+- Fixed issue [#430](https://github.com/twilio/video-quickstart-android/issues/430) raised in the video-quickstart-android repository.
+Consuming applications of the video SDK no longer crash when using the latest Gradle plugin (3.5.0).
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
 - Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
 ### 4.3.1
