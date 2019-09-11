@@ -68,3 +68,6 @@ sdk/libs/
 secrets.tar.gz
 secrets.tar
 secrets/
+
+# CXX directories
+**/.cxx/

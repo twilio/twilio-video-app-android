@@ -13,6 +13,7 @@ import android.support.test.filters.SdkSuppress;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
+import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.helper.TrackContainer;
 import com.twilio.video.testcategories.NetworkTest;
 import com.twilio.video.twilioapi.model.VideoRoom;
@@ -81,7 +82,6 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     private Map<String, TrackContainer> trackMap = new HashMap<>();
     private String roomName;
     private VideoRoom videoRoom;
-    private String region;
 
     public SignalingRegionParameterizedTests() {}
 
@@ -633,7 +633,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                     public void onConnectFailure(
                             @NonNull Room room, @NonNull TwilioException twilioException) {
                         assertEquals(
-                                TwilioException.SIGNALING_CONNECTION_ERROR_EXCEPTION,
+                                TwilioException.SIGNALING_DNS_RESOLUTION_ERROR_EXCEPTION,
                                 twilioException.getCode());
                         latch.countDown();
                     }
@@ -665,5 +665,41 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                 });
 
         assertTrue(latch.await(TestUtils.INVALID_REGION_TIMEOUT, TimeUnit.SECONDS));
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
+    @Parameters
+    public void shouldConnectWithDefaultRegion(@Nullable String region)
+            throws InterruptedException {
+        CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(tokens.get(ALICE))
+                        .iceOptions(
+                                new IceOptions.Builder()
+                                        .abortOnIceServersTimeout(true)
+                                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                                        .build())
+                        .region(region)
+                        .roomName(roomName)
+                        .build();
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.INVALID_REGION_TIMEOUT, TimeUnit.SECONDS));
+        room.disconnect();
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        // TODO: Add validation of local participant signaling region GSDK-1972
+    }
+
+    // Provides parameters to test shouldConnectWithDefaultRegion
+    @SuppressWarnings("unused")
+    private Object parametersForShouldConnectWithDefaultRegion() {
+        return new Object[] {new Object[] {""}, new Object[] {null}};
     }
 }
