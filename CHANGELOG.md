@@ -26,6 +26,13 @@ void onDominantSpeakerChanged(
 
 ```
 
+API Changes
+
+- Introduced TVIErrorSignalingDnsResolutionError, which is now raised instead of TVIErrorSignalingConnectionError in the following scenarios:
+  - The device has misconfigured DNS Server(s) on its active network interface.
+  - The region provided in TVIConnectOptions was invalid.
+  - The device lost its Internet connection before the query could complete.
+
 
 Enhancements
 
