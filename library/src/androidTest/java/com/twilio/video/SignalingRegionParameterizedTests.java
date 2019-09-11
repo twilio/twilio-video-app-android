@@ -670,7 +670,8 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     @Test
     @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
     @Parameters
-    public void shouldConnectWithDefaultRegion(@Nullable String region) throws InterruptedException {
+    public void shouldConnectWithDefaultRegion(@Nullable String region)
+            throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -684,24 +685,20 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                         .region(region)
                         .roomName(roomName)
                         .build();
-        Room room = Video.connect(
-                mediaTestActivity,
-                connectOptions,
-                roomListener);
+        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
 
-        assertTrue(roomListener.onConnectedLatch.await(TestUtils.INVALID_REGION_TIMEOUT,
-                TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.INVALID_REGION_TIMEOUT, TimeUnit.SECONDS));
         room.disconnect();
-        assertTrue(roomListener.onDisconnectedLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT,
-                TimeUnit.SECONDS));
+        assertTrue(
+                roomListener.onDisconnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     // Provides parameters to test shouldConnectWithDefaultRegion
     @SuppressWarnings("unused")
     private Object parametersForShouldConnectWithDefaultRegion() {
-        return new Object[]{
-                new Object[]{""},
-                new Object[]{null}
-        };
+        return new Object[] {new Object[] {""}, new Object[] {null}};
     }
 }

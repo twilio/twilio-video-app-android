@@ -46,9 +46,9 @@ Bug Fixes
 - Fixed crash that occurred when rapidly connecting and disconnecting from a room.
 - Fixed updating `CameraCapturer.State` when error occurs.
 - Setting `ConnectOptions.region` to an empty or null value results in the default region being
-used. 
+used.
 - Fixed a bug where native memory was leaked after disconnecting from a `Room`.
-- Fixed a bug where network monitoring would continue on closed connections in a Peer-to-Peer Room. 
+- Fixed a bug where network monitoring would continue on closed connections in a Peer-to-Peer Room.
 
 Known issues
 
