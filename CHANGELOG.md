@@ -43,8 +43,12 @@ Enhancements
 
 Bug Fixes
 
-- Ensure the `WSS::Impl` is always destroyed by the `io_context` designated thread. Prevents crash when rapidly connecting and disconnecting from a room.
+- Fixed crash that occurred when rapidly connecting and disconnecting from a room.
 - Fixed updating `CameraCapturer.State` when error occurs.
+- Setting `ConnectOptions.region` to an empty or null value results in the default region being
+used. 
+- Fixed a bug where native memory was leaked after disconnecting from a `Room`.
+- Fixed a bug where network monitoring would continue on closed connections in a Peer-to-Peer Room. 
 
 Known issues
 
@@ -60,7 +64,6 @@ codecs:
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
 - Server side deflate compression is disabled due to occasional errors when reading messages.
-- Rapidly connecting and disconnecting from a `Room` may cause a crash.
 - Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
 ### 5.0.0-beta2
