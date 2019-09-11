@@ -694,6 +694,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
         assertTrue(
                 roomListener.onDisconnectedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        // TODO: Add validation of local participant signaling region GSDK-1972
     }
 
     // Provides parameters to test shouldConnectWithDefaultRegion
