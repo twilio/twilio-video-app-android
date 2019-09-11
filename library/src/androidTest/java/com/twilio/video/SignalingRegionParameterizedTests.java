@@ -633,7 +633,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                     public void onConnectFailure(
                             @NonNull Room room, @NonNull TwilioException twilioException) {
                         assertEquals(
-                                TwilioException.SIGNALING_CONNECTION_ERROR_EXCEPTION,
+                                TwilioException.SIGNALING_DNS_RESOLUTION_ERROR_EXCEPTION,
                                 twilioException.getCode());
                         latch.countDown();
                     }
