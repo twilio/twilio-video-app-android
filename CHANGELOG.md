@@ -2,10 +2,9 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 ### 4.3.2
 
-Bug Fix
+Enhancement
 
-- Fixed issue [#430](https://github.com/twilio/video-quickstart-android/issues/430) raised in the video-quickstart-android repository.
-Consuming applications of the video SDK no longer crash when using the latest Gradle plugin (3.5.0).
+- Upgraded the Gradle plugin used to build the SDK to 3.5.0.
 
 Known issues
 
