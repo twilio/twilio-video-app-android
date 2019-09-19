@@ -21,6 +21,7 @@ import static junit.framework.Assert.fail;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 import android.Manifest;
 import android.support.annotation.NonNull;
@@ -47,7 +48,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,7 +73,6 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
     private MediaTestActivity mediaTestActivity;
     private String aliceToken;
     private String bobToken;
-    private LocalVideoTrack aliceLocalVideoTrack;
     private LocalAudioTrack aliceLocalAudioTrack;
     private LocalVideoTrack bobLocalVideoTrack;
     private LocalAudioTrack bobLocalAudioTrack;
@@ -101,9 +100,6 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         RoomUtils.completeRoom(videoRoom);
         if (aliceLocalAudioTrack != null) {
             aliceLocalAudioTrack.release();
-        }
-        if (aliceLocalVideoTrack != null) {
-            aliceLocalVideoTrack.release();
         }
         if (bobLocalAudioTrack != null) {
             bobLocalAudioTrack.release();
@@ -190,9 +186,13 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         assertTrue(connectFailure.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
-    @Ignore
     @Test
     public void shouldConnectWithWrongIceServers() throws InterruptedException {
+        /*
+         * Attempting to connect with incorrect ICE servers may result in a failure to connect in
+         * FTL restrictive network.
+         */
+        assumeFalse(TestUtils.isFTL(mediaTestActivity));
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
@@ -268,7 +268,7 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
 
         IceOptions iceOptions =
                 new IceOptions.Builder()
-                        .iceServersTimeout(60000)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT * 2)
                         .abortOnIceServersTimeout(true)
                         .build();
         ConnectOptions connectOptions =
@@ -289,9 +289,13 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         RoomUtils.completeRoom(room);
     }
 
-    @Ignore
     @Test
     public void shouldConnectWithValidStunServers() throws InterruptedException {
+        /*
+         * Attempting to connect with only stun servers may result in a failure to connect in FTL
+         * restrictive network.
+         */
+        assumeFalse(TestUtils.isFTL(mediaTestActivity));
         Set<IceServer> iceServers = new HashSet<>();
         iceServers.add(new IceServer("stun:stun.l.google.com:19302"));
         iceServers.add(new IceServer("stun:stun1.l.google.com:19302"));
@@ -327,7 +331,6 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         RoomUtils.completeRoom(aliceRoom);
     }
 
-    @Ignore
     @Test
     public void shouldConnectWithValidTurnServers() throws InterruptedException {
         CallbackHelper.FakeRoomListener aliceListener = new CallbackHelper.FakeRoomListener();
@@ -340,6 +343,8 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .iceServers(iceServers)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .abortOnIceServersTimeout(true)
                         .iceTransportPolicy(IceTransportPolicy.RELAY)
                         .build();
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);

@@ -4,6 +4,14 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion "${versions.buildTools}"
 
+    lintOptions {
+        warningsAsErrors true
+        /*
+         * Disable errors caused by code references in jjwt that are not used in project code
+         */
+        disable "InvalidPackage"
+    }
+
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -28,7 +36,6 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:${versions.supportLibrary}"
     implementation "io.jsonwebtoken:jjwt:${versions.jjwt}"
 
     testImplementation "junit:junit:${versions.junit}"

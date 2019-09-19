@@ -107,8 +107,9 @@ public class VideoViewTest extends BaseVideoTest {
                         });
     }
 
-    // GSDK-1881: This test has been proven to be unreliable enough in FTL to skip in our test suite
-    @Ignore
+    @Ignore(
+            "GSDK-1881: This test has been proven to be unreliable enough in FTL to skip in our"
+                    + "test suite")
     @Test
     public void canBeRenderedInRecyclerView() throws InterruptedException {
         final int numItems = 100;

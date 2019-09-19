@@ -11,10 +11,9 @@ public class TestUtils {
     public static final long FIVE_SECONDS = 5000;
 
     public static final long SMALL_WAIT = 5000;
-    public static final long ICE_TIMEOUT = 15000;
+    public static final long ICE_TIMEOUT = 30000;
     public static final long SIP_TIMEOUT = 125;
     public static final long STATE_TRANSITION_TIMEOUT = 15;
-    public static final long INVALID_REGION_TIMEOUT = 60;
 
     /**
      * See

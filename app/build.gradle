@@ -12,6 +12,12 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion "${versions.buildTools}"
 
+    lintOptions {
+        warningsAsErrors true
+        // TODO: Fix all baseline app warnings and errors GSDK-1984
+        baseline file("lint-baseline.xml")
+    }
+
     packagingOptions {
         exclude 'META-INF/LICENSE'
     }
@@ -35,10 +41,6 @@ android {
     compileOptions {
         sourceCompatibility versions.java
         targetCompatibility versions.java
-    }
-
-    lintOptions {
-        disable 'BinaryOperationInTimber'
     }
 
     /**
