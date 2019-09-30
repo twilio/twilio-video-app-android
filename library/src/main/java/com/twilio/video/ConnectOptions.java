@@ -51,6 +51,7 @@ public class ConnectOptions {
     private final boolean enableInsights;
     private final boolean enableAutomaticSubscription;
     private final boolean enableDominantSpeaker;
+    private final boolean enableNetworkQuality;
     private final List<AudioCodec> preferredAudioCodecs;
     private final List<VideoCodec> preferredVideoCodecs;
     private final EncodingParameters encodingParameters;
@@ -107,6 +108,7 @@ public class ConnectOptions {
         this.enableInsights = builder.enableInsights;
         this.enableAutomaticSubscription = builder.enableAutomaticSubscription;
         this.enableDominantSpeaker = builder.enableDominantSpeaker;
+        this.enableNetworkQuality = builder.enableNetworkQuality;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
         this.encodingParameters = builder.encodingParameters;
@@ -139,6 +141,10 @@ public class ConnectOptions {
 
     boolean isInsightsEnabled() {
         return enableInsights;
+    }
+
+    boolean isNetworkQualityEnabled() {
+        return enableNetworkQuality;
     }
 
     private LocalAudioTrack[] getLocalAudioTracksArray() {
@@ -213,6 +219,7 @@ public class ConnectOptions {
                 iceOptions,
                 enableInsights,
                 enableAutomaticSubscription,
+                enableNetworkQuality,
                 enableDominantSpeaker,
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
@@ -229,6 +236,7 @@ public class ConnectOptions {
             IceOptions iceOptions,
             boolean enableInsights,
             boolean enableAutomaticSubscription,
+            boolean enableNetworkQuality,
             boolean enableDominantSpeaker,
             long platformInfoNativeHandle,
             AudioCodec[] preferredAudioCodecs,
@@ -250,6 +258,7 @@ public class ConnectOptions {
         private boolean enableInsights = true;
         private boolean enableAutomaticSubscription = true;
         private boolean enableDominantSpeaker = false;
+        private boolean enableNetworkQuality = false;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
         private EncodingParameters encodingParameters;
@@ -329,6 +338,18 @@ public class ConnectOptions {
         @NonNull
         public Builder enableDominantSpeaker(boolean enableDominantSpeaker) {
             this.enableDominantSpeaker = enableDominantSpeaker;
+            return this;
+        }
+
+        /**
+         * Enable or disable the Network Quality API.
+         *
+         * <p>Set this to {@code true} to enable the Network Quality API when using Group Rooms.
+         * This option has no effect in Peer-to-Peer Rooms. The default value is {@code false}.
+         */
+        @NonNull
+        public Builder enableNetworkQuality(boolean enableNetworkQuality) {
+            this.enableNetworkQuality = enableNetworkQuality;
             return this;
         }
 

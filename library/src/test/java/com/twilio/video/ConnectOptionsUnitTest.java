@@ -125,4 +125,30 @@ public class ConnectOptionsUnitTest {
         codecs.add(null);
         new ConnectOptions.Builder("token").preferAudioCodecs(codecs).build();
     }
+
+    @Test
+    public void networkQualityShouldBeDisabledByDefault() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").build();
+
+        assertFalse(connectOptions.isNetworkQualityEnabled());
+    }
+
+    @Test
+    public void shouldEnableNetworkQuality() {
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("token")
+                        .enableNetworkQuality(false)
+                        .enableNetworkQuality(true)
+                        .build();
+
+        assertTrue(connectOptions.isNetworkQualityEnabled());
+    }
+
+    @Test
+    public void shouldDisableNetworkQuality() {
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("token").enableNetworkQuality(false).build();
+
+        assertFalse(connectOptions.isNetworkQualityEnabled());
+    }
 }

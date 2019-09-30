@@ -31,6 +31,8 @@ public class LocalParticipant implements Participant {
     private long nativeLocalParticipantHandle;
     private final String sid;
     private final String identity;
+    private NetworkQualityLevel networkQualityLevel =
+            NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN;
     private final List<AudioTrackPublication> audioTrackPublications;
     private final List<LocalAudioTrackPublication> localAudioTrackPublications;
     private final List<VideoTrackPublication> videoTrackPublications;
@@ -49,7 +51,7 @@ public class LocalParticipant implements Participant {
      * The listener proxy is bound at JNI level.
      */
     @SuppressWarnings("unused")
-    private final Listener localParticipantListenerProxy =
+    final Listener localParticipantListenerProxy =
             new Listener() {
                 @Override
                 public void onAudioTrackPublished(
@@ -180,6 +182,23 @@ public class LocalParticipant implements Participant {
                             });
                 }
 
+                @Override
+                public void onNetworkQualityLevelChanged(
+                        @NonNull final LocalParticipant localParticipant,
+                        @NonNull final NetworkQualityLevel networkQualityLevel) {
+                    handler.post(
+                            () -> {
+                                logger.d("onNetworkQualityLevelChanged");
+                                Listener listener = listenerReference.get();
+                                localParticipant.networkQualityLevel = networkQualityLevel;
+
+                                if (listener != null) {
+                                    listener.onNetworkQualityLevelChanged(
+                                            localParticipant, networkQualityLevel);
+                                }
+                            });
+                }
+
                 private void checkPublishedCallback(
                         LocalParticipant localParticipant,
                         TrackPublication trackPublication,
@@ -221,6 +240,11 @@ public class LocalParticipant implements Participant {
     @Override
     public String getIdentity() {
         return identity;
+    }
+
+    /** Returns the network quality of the local participant. */
+    public @NonNull NetworkQualityLevel getNetworkQualityLevel() {
+        return networkQualityLevel;
     }
 
     /** Returns read-only list of audio track publications. */
@@ -561,6 +585,17 @@ public class LocalParticipant implements Participant {
                 @NonNull LocalParticipant localParticipant,
                 @NonNull LocalDataTrack localDataTrack,
                 @NonNull TwilioException twilioException);
+
+        /**
+         * This method notifies the listener that the {@link LocalParticipant}'s {@link
+         * NetworkQualityLevel} has changed.
+         *
+         * @param localParticipant The {@link LocalParticipant} The local participant.
+         * @param networkQualityLevel The new {@link NetworkQualityLevel}.
+         */
+        default void onNetworkQualityLevelChanged(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull NetworkQualityLevel networkQualityLevel) {}
     }
 
     private native boolean nativePublishAudioTrack(
