@@ -40,6 +40,7 @@ public class Room {
     private Context context;
     private String name;
     private String sid;
+    private String mediaRegion = null;
     private Room.State state;
     private Map<String, RemoteParticipant> participantMap = new HashMap<>();
     private LocalParticipant localParticipant;
@@ -263,6 +264,23 @@ public class Room {
         return sid;
     }
 
+    /**
+     * Returns the region where media is processed. This property is set in Group Rooms by the time
+     * the {@link Room} reaches {@link State#CONNECTED}. This method returns {@code null} under the
+     * following conditions:
+     *
+     * <p>
+     *
+     * <ul>
+     *   <li>The {@link Room} has not reached the {@link Room.State#CONNECTED} state.
+     *   <li>The instance represents a peer-to-peer Room.
+     * </ul>
+     */
+    @Nullable
+    public String getMediaRegion() {
+        return mediaRegion;
+    }
+
     /** Returns the current room state. */
     @NonNull
     public synchronized Room.State getState() {
@@ -383,10 +401,12 @@ public class Room {
     @SuppressWarnings("unused")
     private synchronized void setConnected(
             String roomSid,
+            String mediaRegion,
             LocalParticipant localParticipant,
             List<RemoteParticipant> remoteParticipants) {
         logger.d("setConnected()");
         this.sid = roomSid;
+        this.mediaRegion = mediaRegion.isEmpty() ? null : mediaRegion;
         if (this.name == null || this.name.isEmpty()) {
             this.name = roomSid;
         }

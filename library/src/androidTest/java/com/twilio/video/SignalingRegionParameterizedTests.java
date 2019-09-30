@@ -1,7 +1,10 @@
 package com.twilio.video;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -82,6 +85,10 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     private Map<String, TrackContainer> trackMap = new HashMap<>();
     private String roomName;
     private VideoRoom videoRoom;
+    private Room aliceRoom;
+    private CountDownLatch aliceDisconnectedLatch;
+    private Room bobRoom;
+    private CountDownLatch bobDisconnectedLatch;
 
     public SignalingRegionParameterizedTests() {}
 
@@ -112,18 +119,34 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
         }
         trackMap.clear();
 
+        if (aliceRoom != null) {
+            aliceRoom.disconnect();
+            assertTrue(
+                    aliceDisconnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        }
+
+        if (bobRoom != null) {
+            bobRoom.disconnect();
+            assertTrue(
+                    bobDisconnectedLatch.await(
+                            TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        }
+
         if (videoRoom != null) {
             RoomUtils.completeRoom(videoRoom);
         }
+
         assertTrue(MediaFactory.isReleased());
     }
 
     @Test
     @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
     @Parameters(source = SignalingRegion.class)
-    public void shouldConnectToRegion(SignalingRegion region) throws InterruptedException {
+    public void shouldConnectToRegion(SignalingRegion expectedSignalingRegion)
+            throws InterruptedException {
         CountDownLatch connectedLatch = new CountDownLatch(1);
-        CountDownLatch disconnectedLatch = new CountDownLatch(1);
+        aliceDisconnectedLatch = new CountDownLatch(1);
         IceOptions iceOptions =
                 new IceOptions.Builder()
                         .abortOnIceServersTimeout(true)
@@ -131,10 +154,10 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                         .build();
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(tokens.get(ALICE))
-                        .region(region.value)
+                        .region(expectedSignalingRegion.value)
                         .iceOptions(iceOptions)
                         .build();
-        Room room =
+        aliceRoom =
                 Video.connect(
                         mediaTestActivity,
                         connectOptions,
@@ -162,7 +185,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                             @Override
                             public void onDisconnected(
                                     @NonNull Room room, @Nullable TwilioException twilioException) {
-                                disconnectedLatch.countDown();
+                                aliceDisconnectedLatch.countDown();
                             }
 
                             @Override
@@ -182,8 +205,10 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                             public void onRecordingStopped(@NonNull Room room) {}
                         });
         assertTrue(connectedLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        room.disconnect();
-        assertTrue(disconnectedLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        assertNotEquals(
+                SignalingRegion.GLL.value, aliceRoom.getLocalParticipant().getSignalingRegion());
+        assertNotNull(aliceRoom.getLocalParticipant().getSignalingRegion());
+        assertFalse(aliceRoom.getLocalParticipant().getSignalingRegion().isEmpty());
     }
 
     /*
@@ -199,7 +224,6 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     public void shouldAllowConnectFromDifferentRegionsWithTracks(
             MediaRegion mediaRegion, SignalingRegion aliceRegion, SignalingRegion bobRegion)
             throws InterruptedException {
-        final int DATA_MESSAGES = 1;
         String uniqueRoomName = RandomStringUtils.random(12);
         videoRoom =
                 RoomUtils.createRoom(
@@ -220,9 +244,9 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
         trackMap.put(BOB, bobTrackContainer);
 
         CountDownLatch aliceOnConnectedLatch = new CountDownLatch(1);
-        CountDownLatch aliceOnDisconnectedLatch = new CountDownLatch(1);
+        aliceDisconnectedLatch = new CountDownLatch(1);
         CountDownLatch bobOnConnectedLatch = new CountDownLatch(1);
-        CountDownLatch bobOnDisconnectedLatch = new CountDownLatch(1);
+        bobDisconnectedLatch = new CountDownLatch(1);
 
         CountDownLatch aliceSubscribedToTracks = new CountDownLatch(1);
         CountDownLatch bobSubscribedToTracks = new CountDownLatch(1);
@@ -477,7 +501,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                     @Override
                     public void onDisconnected(
                             @NonNull Room room, @Nullable TwilioException twilioException) {
-                        aliceOnDisconnectedLatch.countDown();
+                        aliceDisconnectedLatch.countDown();
                     }
 
                     @Override
@@ -517,7 +541,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                     @Override
                     public void onDisconnected(
                             @NonNull Room room, @Nullable TwilioException twilioException) {
-                        bobOnDisconnectedLatch.countDown();
+                        bobDisconnectedLatch.countDown();
                     }
 
                     @Override
@@ -549,7 +573,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                         .iceOptions(iceOptions)
                         .build();
 
-        Room aliceRoom = Video.connect(mediaTestActivity, aliceConnectOptions, aliceRoomListener);
+        aliceRoom = Video.connect(mediaTestActivity, aliceConnectOptions, aliceRoomListener);
         assertTrue(
                 aliceOnConnectedLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
@@ -561,7 +585,7 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                         .iceOptions(iceOptions)
                         .build();
 
-        Room bobRoom = Video.connect(mediaTestActivity, bobConnectOptions, bobRoomListener);
+        bobRoom = Video.connect(mediaTestActivity, bobConnectOptions, bobRoomListener);
 
         assertTrue(bobOnConnectedLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         bobRoom.getRemoteParticipants().get(0).setListener(bobRemoteParticipantListener);
@@ -573,6 +597,24 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                 bobSubscribedToTracks.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         CountDownLatch statsReceived = new CountDownLatch(2);
+
+        if (aliceRegion != SignalingRegion.GLL) {
+            assertEquals(aliceRegion.value, aliceRoom.getLocalParticipant().getSignalingRegion());
+        } else {
+            assertNotEquals(
+                    SignalingRegion.GLL.value,
+                    aliceRoom.getLocalParticipant().getSignalingRegion());
+            assertNotNull(aliceRoom.getLocalParticipant().getSignalingRegion());
+            assertFalse(aliceRoom.getLocalParticipant().getSignalingRegion().isEmpty());
+        }
+        if (bobRegion != SignalingRegion.GLL) {
+            assertEquals(bobRegion.value, bobRoom.getLocalParticipant().getSignalingRegion());
+        } else {
+            assertNotEquals(
+                    SignalingRegion.GLL.value, bobRoom.getLocalParticipant().getSignalingRegion());
+            assertNotNull(bobRoom.getLocalParticipant().getSignalingRegion());
+            assertFalse(bobRoom.getLocalParticipant().getSignalingRegion().isEmpty());
+        }
 
         // Allow enough time to gather stats
         TestUtils.blockingWait(TestUtils.STATE_TRANSITION_TIMEOUT * 1000);
@@ -594,15 +636,6 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                 });
 
         assertTrue(statsReceived.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-
-        aliceRoom.disconnect();
-        bobRoom.disconnect();
-
-        assertTrue(
-                aliceOnDisconnectedLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        assertTrue(
-                bobOnDisconnectedLatch.await(TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     @Test
@@ -674,7 +707,8 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
             throws InterruptedException {
         CallbackHelper.FakeRoomListener roomListener = new CallbackHelper.FakeRoomListener();
         roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        aliceDisconnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = aliceDisconnectedLatch;
         ConnectOptions connectOptions =
                 new ConnectOptions.Builder(tokens.get(ALICE))
                         .iceOptions(
@@ -685,16 +719,16 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
                         .region(region)
                         .roomName(roomName)
                         .build();
-        Room room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        aliceRoom = Video.connect(mediaTestActivity, connectOptions, roomListener);
 
         assertTrue(
                 roomListener.onConnectedLatch.await(
                         TestUtils.INVALID_REGION_TIMEOUT, TimeUnit.SECONDS));
-        room.disconnect();
-        assertTrue(
-                roomListener.onDisconnectedLatch.await(
-                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        // TODO: Add validation of local participant signaling region GSDK-1972
+
+        assertNotEquals(
+                SignalingRegion.GLL.value, aliceRoom.getLocalParticipant().getSignalingRegion());
+        assertNotNull(aliceRoom.getLocalParticipant().getSignalingRegion());
+        assertFalse(aliceRoom.getLocalParticipant().getSignalingRegion().isEmpty());
     }
 
     // Provides parameters to test shouldConnectWithDefaultRegion

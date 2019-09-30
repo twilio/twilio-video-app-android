@@ -358,6 +358,7 @@ jobject createJavaLocalParticipant(JNIEnv *env,
     local_participant_context->local_participant = local_participant;
     jstring j_sid = JavaUTF16StringFromStdString(env, local_participant->getSid());
     jstring j_identity = JavaUTF16StringFromStdString(env, local_participant->getIdentity());
+    jstring j_signaling_region = JavaUTF16StringFromStdString(env, local_participant->getSignalingRegion());
     jobject j_published_audio_tracks = createLocalAudioTrackPublications(env,
                                                                          local_participant_context,
                                                                          j_array_list_class,
@@ -390,6 +391,7 @@ jobject createJavaLocalParticipant(JNIEnv *env,
                                                  j_local_participant_context,
                                                  j_sid,
                                                  j_identity,
+                                                 j_signaling_region,
                                                  j_published_audio_tracks,
                                                  j_published_video_tracks,
                                                  j_published_data_tracks,

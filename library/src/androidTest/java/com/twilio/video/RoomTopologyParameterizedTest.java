@@ -23,8 +23,10 @@ import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
 import static com.twilio.video.util.VideoAssert.assertIsParticipantSid;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
+import static junit.framework.TestCase.assertFalse;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -820,5 +822,36 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Unregister broadcast receiver
         mediaTestActivity.getApplicationContext().unregisterReceiver(connectivityChangeReceiver);
         ConnectivityUtils.enableWifi(mediaTestActivity, true);
+    }
+
+    @Test
+    public void shouldProvideMediaRegion() throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .audioTracks(Collections.singletonList(localAudioTrack))
+                        .videoTracks(Collections.singletonList(localVideoTrack))
+                        .iceOptions(iceOptions)
+                        .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertNull(room.getMediaRegion());
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        if (topology == Topology.P2P) {
+            assertNull(room.getMediaRegion());
+        } else {
+            assertNotNull(room.getMediaRegion());
+            assertFalse(room.getMediaRegion().isEmpty());
+            assertNotEquals("gll", room.getMediaRegion());
+        }
     }
 }

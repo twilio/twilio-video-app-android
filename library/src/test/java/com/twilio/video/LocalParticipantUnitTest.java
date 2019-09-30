@@ -31,6 +31,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class LocalParticipantUnitTest {
     private static final int INT_MAX = 25;
+    private static final String REGION_US1 = "us1";
 
     private final Random random = new Random();
     private LocalParticipant localParticipant;
@@ -49,6 +50,7 @@ public class LocalParticipantUnitTest {
                         random.nextLong(),
                         Constants.MOCK_PARTICIPANT_SID,
                         String.valueOf(random.nextInt(INT_MAX)),
+                        REGION_US1,
                         Collections.singletonList(mockLocalAudioTrackPublication),
                         Collections.singletonList(mockLocalVideoTrackPublicationOne),
                         Collections.singletonList(mockLocalDataTrackPublication),
@@ -61,6 +63,7 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 null,
                 String.valueOf(random.nextInt(INT_MAX)),
+                REGION_US1,
                 Collections.singletonList(mockLocalAudioTrackPublication),
                 Collections.singletonList(mockLocalVideoTrackPublicationOne),
                 Collections.singletonList(mockLocalDataTrackPublication),
@@ -72,6 +75,7 @@ public class LocalParticipantUnitTest {
         new LocalParticipant(
                 random.nextLong(),
                 "",
+                REGION_US1,
                 String.valueOf(random.nextInt(INT_MAX)),
                 Collections.singletonList(mockLocalAudioTrackPublication),
                 Collections.singletonList(mockLocalVideoTrackPublicationOne),
@@ -85,6 +89,7 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 null,
+                REGION_US1,
                 Collections.singletonList(mockLocalAudioTrackPublication),
                 Collections.singletonList(mockLocalVideoTrackPublicationOne),
                 Collections.singletonList(mockLocalDataTrackPublication),
@@ -97,6 +102,7 @@ public class LocalParticipantUnitTest {
                 random.nextLong(),
                 Constants.MOCK_PARTICIPANT_SID,
                 String.valueOf(random.nextInt(INT_MAX)),
+                REGION_US1,
                 Collections.singletonList(mockLocalAudioTrackPublication),
                 Collections.singletonList(mockLocalVideoTrackPublicationOne),
                 Collections.singletonList(mockLocalDataTrackPublication),
