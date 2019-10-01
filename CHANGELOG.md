@@ -1,5 +1,61 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.0.0-beta5
+
+#### Network Quality API
+
+- Implemented the Network Quality functionality for Group Rooms:
+- The Network Quality feature is disabled by default, to enable it set the `ConnectOptions.Builder.enableNetworkQuality` property to `true` when connecting to a Group Room.
+    - To determine the current network quality level for your Local Participant, call `LocalParticipant.getNetworkQualityLevel()`. Note, this will return `NETWORK_QUALITY_LEVEL_UNKNOWN` if:
+        - The `ConnectOptions.networkQualityEnabled` property was set to `false`
+        - Using a Peer-to-Peer room
+        - The network quality level has not yet been computed
+    - Network Quality Level for Remote Participants will be available in a future release
+    - Implementing the `onNetworkQualityLevelChanged` method on your `LocalParticipant.Listener` will allow you to receive callbacks when the network quality level changes
+
+```.java
+// Enable network quality
+ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableNetworkQuality(true)
+                        .build();
+
+// Override onNetworkLevelChanged to observe network quality level changes
+LocalParticipant.Listener localParticipantListener = new LocalParticipant.Listener() {
+    ...
+
+    @Override
+    public void onNetworkQualityLevelChanged(
+        @NonNull LocalParticipant localParticipant,
+        @NonNull NetworkQualityLevel networkQualityLevel) {}
+}
+
+// Connect to room and register listener
+Room room = Video.connect(context, connectOptions, roomListener);
+LocalParticipant localParticipant = room.getLocalParticipant();
+localParticipant.setListener(localParticipantListener);
+
+// Get current network quality
+localParticipant.getNetworkQualityLevel();
+```
+
+Known issues
+
+- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
 ### 5.0.0-beta4
 
 API Changes
