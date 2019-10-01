@@ -6,6 +6,17 @@ API Changes
 
 - Added `LocalParticipant.signalingRegion`. You can use this property to determine where your Participant connected to a Room, especially when using the default value of "gll" for `ConnectOptions.Builder.region`.
 - Added `Room.mediaRegion`. You can use this property to determine where media is being processed in a Group Room.
+- `EncodingParameters` now expresses maximum bitrates in Kilobits per second (Kbps) instead of bits per second (bps).
+
+```
+// Before
+EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+```
+
+```
+// After
+EncodingParameters encodingParameters = new EncodingParameters(64, 800);
+```
 
 Enhancements
 
