@@ -42,6 +42,7 @@ localParticipant.getNetworkQualityLevel();
 
 API Changes
 
+- When a Participant connects to a `Room`, the WebSocket handshake is required to complete in 15 seconds or less, otherwise `TwilioException.SIGNALING_CONNECTION_ERROR_EXCEPTION` is raised.
 - Added `LocalParticipant.signalingRegion`. You can use this property to determine where your Participant connected to a Room, especially when using the default value of "gll" for `ConnectOptions.Builder.region`.
 - Added `Room.mediaRegion`. You can use this property to determine where media is being processed in a Group Room.
 - `EncodingParameters` now expresses maximum bitrates in Kilobits per second (Kbps) instead of bits per second (bps).
@@ -66,7 +67,7 @@ Bug Fixes
 
 Known issues
 
-- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- In a two Participant P2P room, the last Participant might not be disconnected when there are terminal media failures.
 - Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
@@ -129,6 +130,7 @@ Bug Fixes
 used.
 - Fixed a bug where native memory was leaked after disconnecting from a `Room`.
 - Fixed a bug where network monitoring would continue on closed connections in a Peer-to-Peer Room.
+- Fixed a bug where Participants remain connected to a Room even after terminal media failures.
 
 Known issues
 
