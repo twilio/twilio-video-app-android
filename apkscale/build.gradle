@@ -10,6 +10,10 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion "${versions.buildTools}"
 
+    lintOptions {
+        warningsAsErrors true
+    }
+
     defaultConfig {
         applicationId "com.twilio.app.apkscale"
         minSdkVersion versions.minSdk
@@ -66,8 +70,6 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:${versions.supportLibrary}"
-
     // Include Video SDK in dedicated flavor
     withVideoSdkImplementation videoAndroidSdkDep
 

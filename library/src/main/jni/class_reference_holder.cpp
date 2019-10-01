@@ -79,6 +79,7 @@ ClassReferenceHolder::ClassReferenceHolder(JNIEnv* jni) {
     LoadClass(jni, "com/twilio/video/IceCandidatePairState");
     LoadClass(jni, "com/twilio/video/VideoDimensions");
     LoadClass(jni, "com/twilio/video/VideoFormat");
+    LoadClass(jni, "com/twilio/video/NetworkQualityLevel");
 }
 
 ClassReferenceHolder::~ClassReferenceHolder() {

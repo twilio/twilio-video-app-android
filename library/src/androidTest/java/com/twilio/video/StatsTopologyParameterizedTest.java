@@ -268,7 +268,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("GSDK-1983")
     public void reportShouldHaveNonEmptyValues() throws InterruptedException {
         // Connect Alice to room with both video and audio track
         aliceLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
@@ -392,7 +392,7 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("GSDK-1983")
     public void shouldReceiveEmptyReportsIfRoomGetsDisconnected() throws InterruptedException {
         final int numberOfRequests = 10;
 

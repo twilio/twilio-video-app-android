@@ -8,7 +8,7 @@ def coreHome = "${buildDir}/prebuilt/twilio-video"
 def compilerVersion = "clang-3.8"
 
 configurations {
-    preCompile
+    preImplementation
     documentation
 }
 
@@ -18,6 +18,10 @@ android {
 
     packagingOptions {
         exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        warningsAsErrors true
     }
 
     defaultConfig {
@@ -121,7 +125,7 @@ android.testOptions.unitTests.all {
 }
 
 dependencies {
-    preCompile "com.twilio.sdk:twilio-video:${versions.videoCpp}:android@tar.bz2"
+    preImplementation "com.twilio.sdk:twilio-video:${versions.videoCpp}:android@tar.bz2"
 
     testImplementation "junit:junit:${versions.junit}"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"
@@ -199,7 +203,7 @@ task unpackPrebuilts(type: Copy) {
 
     onlyIf { !target.exists() }
 
-    configurations.preCompile.each { dependency ->
+    configurations.preImplementation.each { dependency ->
         from tarTree(dependency)
         into target
     }

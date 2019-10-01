@@ -29,6 +29,7 @@ import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.LocalVideoTrackPublication;
+import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteDataTrack;
@@ -453,9 +454,12 @@ public class CallbackHelper {
         public CountDownLatch onVideoTrackPublicationFailedLatch;
         public CountDownLatch onPublishedDataTrackLatch;
         public CountDownLatch onDataTrackPublicationFailedLatch;
+        public CountDownLatch onNetworkQualityLevelChangedLatch;
         public final Map<Track, TwilioException> publicationFailures =
-                Collections.synchronizedMap(new HashMap<Track, TwilioException>());
+                Collections.synchronizedMap(new HashMap<>());
         public final List<String> localParticipantEvents = new ArrayList<>();
+        public List<NetworkQualityLevel> onNetworkLevelChangedEvents =
+                Collections.synchronizedList(new ArrayList<>());
 
         @Override
         public void onAudioTrackPublished(
@@ -509,6 +513,15 @@ public class CallbackHelper {
             localParticipantEvents.add("onDataTrackPublicationFailed");
             publicationFailures.put(localDataTrack, twilioException);
             triggerLatch(onDataTrackPublicationFailedLatch);
+        }
+
+        @Override
+        public void onNetworkQualityLevelChanged(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull NetworkQualityLevel networkQualityLevel) {
+            localParticipantEvents.add("onNetworkQualityLevelChanged");
+            onNetworkLevelChangedEvents.add(networkQualityLevel);
+            triggerLatch(onNetworkQualityLevelChangedLatch);
         }
     }
 

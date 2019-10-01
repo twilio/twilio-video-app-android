@@ -98,6 +98,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobject j_ice_options,
                                                   jboolean j_enable_insights,
                                                   jboolean j_enable_automatic_subscription,
+                                                  jboolean j_enable_network_quality,
                                                   jboolean j_enable_dominant_speaker,
                                                   jlong j_platform_info_handle,
                                                   jobjectArray j_preferred_audio_codecs,
@@ -237,6 +238,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
 
     builder->enableInsights(j_enable_insights);
     builder->enableAutomaticSubscription(j_enable_automatic_subscription);
+    builder->enableNetworkQuality(j_enable_network_quality);
     builder->enableDominantSpeaker(j_enable_dominant_speaker);
 
     return webrtc::NativeToJavaPointer(builder);
