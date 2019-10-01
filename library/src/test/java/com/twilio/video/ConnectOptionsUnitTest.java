@@ -168,4 +168,30 @@ public class ConnectOptionsUnitTest {
     public void shouldNotAllowNullEncodingParameters() {
         new ConnectOptions.Builder("token").encodingParameters(null).build();
     }
+
+    @Test
+    public void networkQualityShouldBeDisabledByDefault() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").build();
+
+        assertFalse(connectOptions.isNetworkQualityEnabled());
+    }
+
+    @Test
+    public void shouldEnableNetworkQuality() {
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("token")
+                        .enableNetworkQuality(false)
+                        .enableNetworkQuality(true)
+                        .build();
+
+        assertTrue(connectOptions.isNetworkQualityEnabled());
+    }
+
+    @Test
+    public void shouldDisableNetworkQuality() {
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("token").enableNetworkQuality(false).build();
+
+        assertFalse(connectOptions.isNetworkQualityEnabled());
+    }
 }

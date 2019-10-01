@@ -4,6 +4,10 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion "${versions.buildTools}"
 
+    lintOptions {
+        warningsAsErrors true
+    }
+
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk

@@ -82,6 +82,7 @@ private:
     const webrtc::ScopedJavaGlobalRef<jclass> j_published_video_track_class_;
     const webrtc::ScopedJavaGlobalRef<jclass> j_published_data_track_class_;
     const webrtc::ScopedJavaGlobalRef<jclass> j_twilio_exception_class_;
+    const webrtc::ScopedJavaGlobalRef<jclass> j_network_quality_level_class_;
 
     jmethodID j_on_published_audio_track_;
     jmethodID j_on_audio_track_publication_failed_;
@@ -89,6 +90,7 @@ private:
     jmethodID j_on_video_track_publication_failed_;
     jmethodID j_on_published_data_track_;
     jmethodID j_on_data_track_publication_failed_;
+    jmethodID j_on_network_quality_level_changed_;
     jmethodID j_published_audio_track_ctor_id_;
     jmethodID j_published_video_track_ctor_id_;
     jmethodID j_published_data_track_ctor_id_;

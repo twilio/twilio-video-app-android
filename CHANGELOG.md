@@ -162,12 +162,67 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
+### 4.4.0
+
+API Changes
+
+#### Network Quality API
+
+- Implemented the Network Quality functionality for Group Rooms:
+- The Network Quality feature is disabled by default, to enable it set the `ConnectOptions.Builder.enableNetworkQuality` property to `true` when connecting to a Group Room.
+    - To determine the current network quality level for your Local Participant, call `LocalParticipant.getNetworkQualityLevel()`. Note, this will return `NETWORK_QUALITY_LEVEL_UNKNOWN` if:
+        - The `ConnectOptions.networkQualityEnabled` property was set to `false`
+        - Using a Peer-to-Peer room
+        - The network quality level has not yet been computed
+    - Network Quality Level for Remote Participants will be available in a future release
+    - Implementing the `onNetworkQualityLevelChanged` method on your `LocalParticipant.Listener` will allow you to receive callbacks when the network quality level changes
+
+```.java
+// Enable network quality
+ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableNetworkQuality(true)
+                        .build();
+
+// Override onNetworkLevelChanged to observe network quality level changes
+LocalParticipant.Listener localParticipantListener = new LocalParticipant.Listener() {
+    ...
+
+    @Override
+    public void onNetworkQualityLevelChanged(
+        @NonNull LocalParticipant localParticipant,
+        @NonNull NetworkQualityLevel networkQualityLevel) {}
+}
+
+// Connect to room and register listener
+Room room = Video.connect(context, connectOptions, roomListener);
+LocalParticipant localParticipant = room.getLocalParticipant();
+localParticipant.setListener(localParticipantListener);
+
+// Get current network quality
+localParticipant.getNetworkQualityLevel();
+```
+
+Known issues
+
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
 ### 4.3.2
 
-Bug Fix
+Enhancement
 
-- Fixed issue [#430](https://github.com/twilio/video-quickstart-android/issues/430) raised in the video-quickstart-android repository.
-Consuming applications of the video SDK no longer crash when using the latest Gradle plugin (3.5.0).
+- Upgraded the Gradle plugin used to build the SDK to 3.5.0.
 
 Known issues
 
@@ -591,6 +646,12 @@ features required to build the 3.x Video Android SDK:
 - Upgraded to Android NDK 16.
 
 
+Bug Fixes
+
+- The SDK is compatible with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- The SDK is compatible with Firefox 63+ in a Peer-to-Peer Room. [#35](https://github.com/twilio/video-quickstart-android/issues/377)
+
+
 Known issues
 
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
@@ -616,6 +677,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.2.0
 
@@ -631,6 +694,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.1.1
 
@@ -644,6 +709,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.1.0
 
@@ -665,6 +732,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.2
 
@@ -683,6 +752,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.1
 
@@ -702,6 +773,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0
 
@@ -713,6 +786,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-beta5
 
@@ -726,6 +801,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-beta4
 
@@ -785,6 +862,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-beta3
 
@@ -807,6 +886,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-beta2
 
@@ -820,6 +901,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-beta1
 
@@ -835,6 +918,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview9
 
@@ -852,6 +937,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview8
 
@@ -876,6 +963,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview7
 
@@ -895,6 +984,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview6
 
@@ -931,6 +1022,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview5
 
@@ -977,6 +1070,8 @@ Known issues
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview4
 
@@ -1074,9 +1169,9 @@ Known issues
 - Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
 - Participant disconnect event can take up to 120 seconds to occur [#80](https://github.com/twilio/video-quickstart-android/issues/80) [#73](https://github.com/twilio/video-quickstart-android/issues/73)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
-- DataTrack support for Group Rooms is currently available only on JavaScript. DataTrack support
-for Group Rooms will be available on iOS and Android soon.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview3
 
@@ -1098,6 +1193,8 @@ Known issues
 - Track and room names with certain UTF-8 characters are not encoded properly [#179](https://github.com/twilio/video-quickstart-android/issues/179)
 - Codec preferences do not function correctly in a hybrid codec Group Room.
 - The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Data Tracks might not be subscribed with Chrome 76+ in a Peer-to-Peer Room. [#433](https://github.com/twilio/video-quickstart-android/issues/433)
+- In a P2P room, participants will not receive any media or data tracks published by participants using Firefox 63 or later. [#377](https://github.com/twilio/video-quickstart-android/issues/377)
 
 ####2.0.0-preview2
 

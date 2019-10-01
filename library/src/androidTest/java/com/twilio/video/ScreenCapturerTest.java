@@ -51,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -172,7 +171,6 @@ public class ScreenCapturerTest extends BaseVideoTest {
     }
 
     @Test
-    @Ignore
     public void shouldInvokeScreenCapturerListenerCallbacksOnCreationThread()
             throws InterruptedException {
         final CountDownLatch screenCaptureError = new CountDownLatch(1);

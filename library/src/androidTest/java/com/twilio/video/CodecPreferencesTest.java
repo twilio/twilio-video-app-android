@@ -69,7 +69,7 @@ public class CodecPreferencesTest extends BaseCodecTest {
         super.teardown();
     }
 
-    @Ignore
+    @Ignore("Triage this test flakiness GSDK-1982")
     @Test
     @Parameters
     public void canPreferAudioCodec(Topology topology, AudioCodec expectedAudioCodec)
