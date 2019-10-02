@@ -69,5 +69,5 @@ secrets.tar.gz
 secrets.tar
 secrets/
 
-# Android Studio 3.5
+# CXX directories
 **/.cxx/

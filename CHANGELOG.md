@@ -1,5 +1,207 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.0.0-beta4
+
+#### Network Quality API
+
+- Implemented the Network Quality functionality for Group Rooms:
+- The Network Quality feature is disabled by default, to enable it set the `ConnectOptions.Builder.enableNetworkQuality` property to `true` when connecting to a Group Room.
+    - To determine the current network quality level for your Local Participant, call `LocalParticipant.getNetworkQualityLevel()`. Note, this will return `NETWORK_QUALITY_LEVEL_UNKNOWN` if:
+        - The `ConnectOptions.networkQualityEnabled` property was set to `false`
+        - Using a Peer-to-Peer room
+        - The network quality level has not yet been computed
+    - Network Quality Level for Remote Participants will be available in a future release
+    - Implementing the `onNetworkQualityLevelChanged` method on your `LocalParticipant.Listener` will allow you to receive callbacks when the network quality level changes
+
+```.java
+// Enable network quality
+ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableNetworkQuality(true)
+                        .build();
+
+// Override onNetworkLevelChanged to observe network quality level changes
+LocalParticipant.Listener localParticipantListener = new LocalParticipant.Listener() {
+    ...
+
+    @Override
+    public void onNetworkQualityLevelChanged(
+        @NonNull LocalParticipant localParticipant,
+        @NonNull NetworkQualityLevel networkQualityLevel) {}
+}
+
+// Connect to room and register listener
+Room room = Video.connect(context, connectOptions, roomListener);
+LocalParticipant localParticipant = room.getLocalParticipant();
+localParticipant.setListener(localParticipantListener);
+
+// Get current network quality
+localParticipant.getNetworkQualityLevel();
+```
+
+API Changes
+
+- When a Participant connects to a `Room`, the WebSocket handshake is required to complete in 15 seconds or less, otherwise `TwilioException.SIGNALING_CONNECTION_ERROR_EXCEPTION` is raised.
+- Added `LocalParticipant.signalingRegion`. You can use this property to determine where your Participant connected to a Room, especially when using the default value of "gll" for `ConnectOptions.Builder.region`.
+- Added `Room.mediaRegion`. You can use this property to determine where media is being processed in a Group Room.
+- `EncodingParameters` now expresses maximum bitrates in Kilobits per second (Kbps) instead of bits per second (bps).
+
+```
+// Before
+EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+```
+
+```
+// After
+EncodingParameters encodingParameters = new EncodingParameters(64, 800);
+```
+
+Enhancements
+
+- Increased the reliability of `LocalDataTrack` by monitoring its send buffer. Sending too many messages, or sending single messages larger than 16 KB no longer causes the underlying channel(s) to close. These requests are ignored instead.
+
+Bug Fixes
+
+- `LocalDataTrack` should no longer end up in an inconsistent state after attempting to send a message larger than 16 KB.
+
+Known issues
+
+- In a two Participant P2P room, the last Participant might not be disconnected when there are terminal media failures.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
+### 5.0.0-beta3
+
+## Dominant Speaker Detection API
+
+The Dominant Speaker Detection API sends events to your application every time the dominant speaker changes. You can use those events to improve the end user's experience by, for example, highlighting which participant is currently talking.
+
+The Dominant Speaker Detection API is only available for Group Rooms.  To enable dominant speaker detection, set the `ConnectOptions.dominantSpeakerEnabled` property to `true`. Use `Room.getDominantSpeaker()` to determine the current dominant speaker. Implement `Room.Listener.onDominantSpeakerChanged()` method to receive callbacks when the dominant speaker changes.
+
+For more information, refer to the [API docs](https://twilio.github.io/twilio-video-android/docs/5.0.0-beta3/) and to the [dominant speaker tutorial](https://www.twilio.com/docs/video/detecting-dominant-speaker)
+
+```.java
+ ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .enableDominantSpeaker(true)
+                        .build();
+Room room = Video.connect(context, connectOptions, roomListener);
+
+@Override
+void onDominantSpeakerChanged(
+                @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
+                // Handle dominant speaker change
+        }
+
+```
+
+API Changes
+
+- Introduced `TwilioException.SIGNALING_DNS_RESOLUTION_ERROR_EXCEPTION`, which is now raised instead of `TwilioException.SIGNALING_CONNECTION_ERROR_EXCEPTION` in the following scenarios:
+  - The device has misconfigured DNS Server(s) on its active network interface.
+  - The region provided in `ConnectOptions` was invalid.
+  - The device lost its Internet connection before the query could complete.
+
+
+Enhancements
+
+- Reduced connection times by removing a round trip when:
+  - Reconnecting after a signaling connection failure
+  - Connecting with `ConnectOptions.iceOptions`, and overridden Servers
+  - Connecting with default ICE servers (us1 only)
+
+Bug Fixes
+
+- Fixed crash that occurred when rapidly connecting and disconnecting from a room.
+- Fixed updating `CameraCapturer.State` when error occurs.
+- Setting `ConnectOptions.region` to an empty or null value results in the default region being
+used.
+- Fixed a bug where native memory was leaked after disconnecting from a `Room`.
+- Fixed a bug where network monitoring would continue on closed connections in a Peer-to-Peer Room.
+- Fixed a bug where Participants remain connected to a Room even after terminal media failures.
+
+Known issues
+
+- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
+### 5.0.0-beta2
+
+Improvements
+
+- The Participant's signaling connection now conforms to Twilio's [TLS & Cipher Suite Policy](https://support.twilio.com/hc/en-us/articles/360007724794-Notice-Twilio-REST-API-s-TLS-and-Cipher-Suite-Security-Changes-for-June-2019). Support for TLS versions older than 1.2 has been removed.
+- Adjusted the buffer sizes used for signaling messages to reduce network fragmentation.
+- Setting `video::LogModule::kSignaling` enables logging of low-level connection events.
+
+Bug Fixes
+
+- WebSocket errors are handled immediately, rather than waiting for a timeout to occur.
+- Handle rare exceptions when constructing a WebSocket.
+
+Known issues
+
+- Future 5.0.0-beta releases will reduce the number of round-trips required to connect to a Room.
+- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- The SDK is not side-by-side compatible with other WebRTC based libraries [#340](https://github.com/twilio/video-quickstart-android/issues/340)
+- Codec preferences do not function correctly in a hybrid codec Group Room with the following
+codecs:
+    - ISAC
+    - PCMA
+    - G722
+    - VP9
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Server side deflate compression is disabled due to occasional errors when reading messages.
+- Rapidly connecting and disconnecting from a `Room` may cause a crash.
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
+### 5.0.0-beta1
+
+Improvements
+
+- The SDK uses a new WebSocket based signaling transport, and communicates with globally available signaling Servers over IPv4 and IPv6 networks.
+- Added a ConnectOptions.region property. By default, the Client will connect to the nearest signaling Server determined by latency based routing. Setting a value other than "gll" bypasses routing and guarantees that signaling traffic will be terminated in the region that you prefer.
+- Participants are considered to be reconnecting within 15 seconds, and are disconnected from a Room after 45 seconds of lost connectivity. [#80](https://github.com/twilio/video-quickstart-android/issues/80)
+- Added and updated public API nullability annotations.
+
+Bug Fixes
+
+- Participants can send messages that are larger than 16 KB.
+- The “roomimpl.worker” thread is no longer needed.
+
+Known issues
+
+- Setting `LogModule.SIGNALING` does not produce any logging.
+- Future 5.0.0-beta releases will reduce the number of round-trips required to connect to a Room.
+- In rare cases, the SDK might timeout during a TCP handshake and should be more aggressive at establishing a connection.
+- Only Constrained Baseline Profile is supported when H.264 is the preferred video codec.
+- Network handoff, and subsequent connection renegotiation is not supported for IPv6 networks [#72](https://github.com/twilio/video-quickstart-android/issues/72)
+- Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
+
 ### 4.4.0
 
 API Changes
@@ -96,7 +298,6 @@ codecs:
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
 - Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
 
-
 ### 4.3.0
 
 API Changes
@@ -139,8 +340,8 @@ codecs:
     - G722
     - VP9
 - Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+- Rapidly connecting and disconnecting from a `Room` may cause a crash.
 - Using Camera2Capturer with a camera ID that does not support ImageFormat.PRIVATE capture outputs results in a runtime exception. Reference [this](https://github.com/twilio/video-quickstart-android/issues/431) issue for guidance on a temporary work around.
-
 
 ### 4.2.0
  Improvements

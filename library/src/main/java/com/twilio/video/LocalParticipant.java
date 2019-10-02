@@ -31,6 +31,7 @@ public class LocalParticipant implements Participant {
     private long nativeLocalParticipantHandle;
     private final String sid;
     private final String identity;
+    private final String signalingRegion;
     private NetworkQualityLevel networkQualityLevel =
             NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN;
     private final List<AudioTrackPublication> audioTrackPublications;
@@ -242,6 +243,17 @@ public class LocalParticipant implements Participant {
         return identity;
     }
 
+    /**
+     * Where the {@link LocalParticipant}'s signaling traffic enters and exits Twilio's
+     * communications cloud. This property reflects the region passed to {@link
+     * ConnectOptions.Builder#region(String)} and when `gll` (the default value) is provided, the
+     * region that was selected using latency based routing.
+     */
+    @NonNull
+    public String getSignalingRegion() {
+        return signalingRegion;
+    }
+
     /** Returns the network quality of the local participant. */
     public @NonNull NetworkQualityLevel getNetworkQualityLevel() {
         return networkQualityLevel;
@@ -427,6 +439,7 @@ public class LocalParticipant implements Participant {
             long nativeLocalParticipantHandle,
             @NonNull String sid,
             @NonNull String identity,
+            @NonNull String signalingRegion,
             @NonNull List<LocalAudioTrackPublication> localAudioTrackPublications,
             @NonNull List<LocalVideoTrackPublication> localVideoTrackPublications,
             @NonNull List<LocalDataTrackPublication> localDataTrackPublications,
@@ -434,9 +447,11 @@ public class LocalParticipant implements Participant {
         Preconditions.checkNotNull(sid, "SID must not be null");
         Preconditions.checkArgument(!sid.isEmpty(), "SID must not be empty");
         Preconditions.checkNotNull(identity, "Identity must not be null");
+        Preconditions.checkNotNull(signalingRegion, "Signaling region must not be null");
         this.nativeLocalParticipantHandle = nativeLocalParticipantHandle;
         this.sid = sid;
         this.identity = identity;
+        this.signalingRegion = signalingRegion;
         this.localAudioTrackPublications = localAudioTrackPublications;
         this.audioTrackPublications = new ArrayList<>(localAudioTrackPublications.size());
         addAudioTracks(localAudioTrackPublications);

@@ -23,9 +23,10 @@ import static com.twilio.video.TestUtils.STATE_TRANSITION_TIMEOUT;
 import static com.twilio.video.util.VideoAssert.assertIsParticipantSid;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
+import static junit.framework.TestCase.assertFalse;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -58,7 +59,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -565,10 +565,10 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                                 == TwilioException.SIGNALING_CONNECTION_DISCONNECTED_EXCEPTION
                         | roomListener.getTwilioException().getCode()
                                 == TwilioException.MEDIA_CONNECTION_ERROR_EXCEPTION));
-        // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
-        room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
         // Reinitialize Reconnected latch
         roomListener.onReconnectedLatch = new CountDownLatch(1);
+        // Fire {@link Video.NetworkChangeEvent.CONNECTION_CHANGED} event
+        room.onNetworkChanged(Video.NetworkChangeEvent.CONNECTION_CHANGED);
         // Assert that network disruption during RECONNECTING can still transition to RECONNECTED
         assertTrue(
                 roomListener.onReconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
@@ -641,35 +641,6 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
                     }
                 });
         assertTrue(connectFailure.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void shouldReturnValidRecordingState() throws InterruptedException {
-        roomListener.onConnectedLatch = new CountDownLatch(1);
-        roomListener.onDisconnectedLatch = new CountDownLatch(1);
-        IceOptions iceOptions =
-                new IceOptions.Builder()
-                        .iceServersTimeout(ICE_TIMEOUT)
-                        .abortOnIceServersTimeout(true)
-                        .build();
-        ConnectOptions connectOptions =
-                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
-        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
-        assertNull(room.getLocalParticipant());
-        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-
-        if (topology == Topology.GROUP || topology == Topology.GROUP_SMALL) {
-            Assert.assertTrue(room.isRecording());
-        } else {
-            assertFalse(room.isRecording());
-        }
-
-        room.disconnect();
-
-        // Wait for disconnect and validate recording state
-        assertTrue(
-                roomListener.onDisconnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        Assert.assertFalse(room.isRecording());
     }
 
     @Test
@@ -851,5 +822,36 @@ public class RoomTopologyParameterizedTest extends BaseVideoTest {
         // Unregister broadcast receiver
         mediaTestActivity.getApplicationContext().unregisterReceiver(connectivityChangeReceiver);
         ConnectivityUtils.enableWifi(mediaTestActivity, true);
+    }
+
+    @Test
+    public void shouldProvideMediaRegion() throws InterruptedException {
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        roomListener.onDisconnectedLatch = new CountDownLatch(1);
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(ICE_TIMEOUT)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token)
+                        .roomName(roomName)
+                        .audioTracks(Collections.singletonList(localAudioTrack))
+                        .videoTracks(Collections.singletonList(localVideoTrack))
+                        .iceOptions(iceOptions)
+                        .build();
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertNull(room.getMediaRegion());
+        assertTrue(roomListener.onConnectedLatch.await(STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+
+        if (topology == Topology.P2P) {
+            assertNull(room.getMediaRegion());
+        } else {
+            assertNotNull(room.getMediaRegion());
+            assertFalse(room.getMediaRegion().isEmpty());
+            assertNotEquals("gll", room.getMediaRegion());
+        }
     }
 }

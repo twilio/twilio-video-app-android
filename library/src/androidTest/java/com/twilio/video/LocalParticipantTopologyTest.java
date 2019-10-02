@@ -53,6 +53,8 @@ import org.junit.runners.Parameterized;
 @LargeTest
 public class LocalParticipantTopologyTest extends BaseVideoTest {
     private static final int TRACK_NAME_LENGTH_MAX = 256;
+    private static final int TEST_MAX_AUDIO_BITRATE_KBPS = 64;
+    private static final int TEST_MAX_VIDEO_BITRATE_KBPS = 800;
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() {
@@ -666,7 +668,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
                 localParticipantListener.onPublishedVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         room.disconnect();
-        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+        EncodingParameters encodingParameters =
+                new EncodingParameters(TEST_MAX_AUDIO_BITRATE_KBPS, TEST_MAX_VIDEO_BITRATE_KBPS);
         localParticipant.setEncodingParameters(encodingParameters);
     }
 
@@ -675,7 +678,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
-        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+        EncodingParameters encodingParameters =
+                new EncodingParameters(TEST_MAX_AUDIO_BITRATE_KBPS, TEST_MAX_VIDEO_BITRATE_KBPS);
         roomListener.onConnectedLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
@@ -711,7 +715,8 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
         FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
-        EncodingParameters encodingParameters = new EncodingParameters(64000, 800000);
+        EncodingParameters encodingParameters =
+                new EncodingParameters(TEST_MAX_AUDIO_BITRATE_KBPS, TEST_MAX_VIDEO_BITRATE_KBPS);
         roomListener.onConnectedLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedAudioTrackLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);

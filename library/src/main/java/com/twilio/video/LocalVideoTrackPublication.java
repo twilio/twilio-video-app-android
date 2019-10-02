@@ -60,7 +60,12 @@ public class LocalVideoTrackPublication implements VideoTrackPublication {
         return localVideoTrack.isEnabled();
     }
 
-    /** Returns the base video track object of the published local video track. */
+    /**
+     * Unlike {@link VideoTrackPublication} or {@link RemoteVideoTrackPublication} this {@link
+     * VideoTrack} is guaranteed to be non null.
+     *
+     * @return Returns the base video track object of the published local video track.
+     */
     @NonNull
     @Override
     public VideoTrack getVideoTrack() {

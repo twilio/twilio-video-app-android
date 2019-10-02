@@ -21,27 +21,28 @@ import android.support.annotation.NonNull;
 /**
  * Defines audio and video encoding parameters. Maximum bitrate is specified as Transport
  * Independent Application Specific Maximum (TIAS) bitrate <a
- * href="https://tools.ietf.org/html/rfc3890">RFC3890</a> in bits per second (bps) excluding
+ * href="https://tools.ietf.org/html/rfc3890">RFC3890</a> in Kilobits per second (Kbps) excluding
  * IP/UDP/TCP headers. These encoding parameters are applied for each PeerConnection. For
  * peer-to-peer Rooms, there is a separate PeerConnection for each participant, i.e., if you set
- * maximum video bitrate to 1 Mbps and you have two {@link RemoteParticipant}`s in the Room, the
- * client sends up to 2 Mbps. For group Rooms, there is a single PeerConnection to Twilio's Media
- * Server. If you are publishing multiple video tracks (e.g., video and screen share), each tracks
- * receives the maximum bitrate specified, i.e., if you set maximum video bitrate to 1 Mbps and you
- * publish both video and screen share, client sends out 2 Mbps. You may update encoding parameters
- * any time using {@link LocalParticipant#setEncodingParameters(EncodingParameters)}.
+ * maximum video bitrate to 1,000 Kbps and you have two {@link RemoteParticipant}`s in the Room, the
+ * client sends up to 2,000 Kbps. For group Rooms, there is a single PeerConnection to Twilio's
+ * Media Server. If you are publishing multiple video tracks (e.g., video and screen share), each
+ * tracks receives the maximum bitrate specified, i.e., if you set maximum video bitrate to 1,000
+ * Kbps and you publish both video and screen share, client sends out 2,000 Kbps. You may update
+ * encoding parameters any time using {@link
+ * LocalParticipant#setEncodingParameters(EncodingParameters)}.
  */
 public class EncodingParameters {
     /**
-     * Maximum audio send bitrate in bits per second. Zero indicates the WebRTC default value, which
-     * is codec dependent. The maximum bitrate for <a href="http://opus-codec.org/">Opus</a> is 510
-     * kbps.
+     * Maximum audio send bitrate in Kilobits per second (Kbps). Zero indicates the WebRTC default
+     * value, which is codec dependent. The maximum bitrate for <a
+     * href="http://opus-codec.org/">Opus</a> is 510 Kbps.
      */
     public final int maxAudioBitrate;
 
     /**
-     * Maximum video send bitrate in bits per second. Zero indicates the WebRTC default value, which
-     * is 2 Mbps.
+     * Maximum video send bitrate in Kilobits per second (Kbps). Zero indicates the WebRTC default
+     * value, which is 2,000 Kbps.
      */
     public final int maxVideoBitrate;
 

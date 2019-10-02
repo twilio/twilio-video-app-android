@@ -56,12 +56,15 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-landroid")
 # undefined symbols that are clearly defined in the static libraries then reorder these
 # libraries accordingly.
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
-        ${CORE_STATIC_LIB_DIR}/libresiprocate.a
         ${CORE_STATIC_LIB_DIR}/libPocoNet.a
         ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a
         ${CORE_STATIC_LIB_DIR}/libPocoUtil.a
         ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a
         ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
+        ${CORE_STATIC_LIB_DIR}/libboost_system.a
+        ${CORE_STATIC_LIB_DIR}/libboost_coroutine.a
+        ${CORE_STATIC_LIB_DIR}/libboost_context.a
+        ${CORE_STATIC_LIB_DIR}/libboost_thread.a
         # Several WebRTC classes use native JNI code that are only
         # called from Java classes. The compiler will incorrectly strip some
         # of these native objects during linking because it believes

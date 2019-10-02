@@ -60,7 +60,12 @@ public class LocalAudioTrackPublication implements AudioTrackPublication {
         return localAudioTrack.isEnabled();
     }
 
-    /** Returns the base audio track object of the published local audio track. */
+    /**
+     * Unlike {@link AudioTrackPublication} or {@link RemoteAudioTrackPublication} this {@link
+     * AudioTrack} is guaranteed to be non null.
+     *
+     * @return Returns the base audio track object of the published local audio track.
+     */
     @NonNull
     @Override
     public AudioTrack getAudioTrack() {

@@ -44,6 +44,7 @@ public class ConnectOptions {
 
     private final String accessToken;
     private final String roomName;
+    private final String region;
     private final List<LocalAudioTrack> audioTracks;
     private final List<LocalVideoTrack> videoTracks;
     private final List<LocalDataTrack> dataTracks;
@@ -111,6 +112,7 @@ public class ConnectOptions {
         this.enableNetworkQuality = builder.enableNetworkQuality;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
+        this.region = builder.region;
         this.encodingParameters = builder.encodingParameters;
         this.mediaFactory = builder.mediaFactory;
     }
@@ -133,6 +135,10 @@ public class ConnectOptions {
 
     List<LocalDataTrack> getDataTracks() {
         return dataTracks;
+    }
+
+    String getRegion() {
+        return region;
     }
 
     IceOptions getIceOptions() {
@@ -224,6 +230,7 @@ public class ConnectOptions {
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
                 getVideoCodecsArray(),
+                region,
                 encodingParameters);
     }
 
@@ -241,6 +248,7 @@ public class ConnectOptions {
             long platformInfoNativeHandle,
             AudioCodec[] preferredAudioCodecs,
             VideoCodec[] preferredVideoCodecs,
+            String region,
             EncodingParameters encodingParameters);
 
     /**
@@ -261,23 +269,26 @@ public class ConnectOptions {
         private boolean enableNetworkQuality = false;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
+        private String region = "gll";
         private EncodingParameters encodingParameters;
         private MediaFactory mediaFactory;
 
         public Builder(@NonNull String accessToken) {
+            Preconditions.checkNotNull(accessToken);
             this.accessToken = accessToken;
         }
 
         /** The name of the room. */
         @NonNull
-        public Builder roomName(String roomName) {
+        public Builder roomName(@NonNull String roomName) {
+            Preconditions.checkNotNull(roomName);
             this.roomName = roomName;
             return this;
         }
 
         /** Audio tracks that will be published upon connection. */
         @NonNull
-        public Builder audioTracks(List<LocalAudioTrack> audioTracks) {
+        public Builder audioTracks(@NonNull List<LocalAudioTrack> audioTracks) {
             Preconditions.checkNotNull(audioTracks, "LocalAudioTrack List must not be null");
             this.audioTracks = new ArrayList<>(audioTracks);
             return this;
@@ -285,7 +296,7 @@ public class ConnectOptions {
 
         /** Video tracks that will be published upon connection. */
         @NonNull
-        public Builder videoTracks(List<LocalVideoTrack> videoTracks) {
+        public Builder videoTracks(@NonNull List<LocalVideoTrack> videoTracks) {
             Preconditions.checkNotNull(videoTracks, "LocalVideoTrack List must not be null");
             this.videoTracks = new ArrayList<>(videoTracks);
             return this;
@@ -293,14 +304,16 @@ public class ConnectOptions {
 
         /** Data tracks that will be published upon connection. */
         @NonNull
-        public Builder dataTracks(List<LocalDataTrack> dataTracks) {
+        public Builder dataTracks(@NonNull List<LocalDataTrack> dataTracks) {
+            Preconditions.checkNotNull(dataTracks);
             this.dataTracks = dataTracks;
             return this;
         }
 
         /** Custom ICE configuration used to connect to a Room. */
         @NonNull
-        public Builder iceOptions(IceOptions iceOptions) {
+        public Builder iceOptions(@NonNull IceOptions iceOptions) {
+            Preconditions.checkNotNull(iceOptions);
             this.iceOptions = iceOptions;
             return this;
         }
@@ -380,7 +393,8 @@ public class ConnectOptions {
          * </code></pre>
          */
         @NonNull
-        public Builder preferAudioCodecs(List<AudioCodec> preferredAudioCodecs) {
+        public Builder preferAudioCodecs(@NonNull List<AudioCodec> preferredAudioCodecs) {
+            Preconditions.checkNotNull(preferredAudioCodecs);
             this.preferredAudioCodecs = new ArrayList<>(preferredAudioCodecs);
             return this;
         }
@@ -412,14 +426,34 @@ public class ConnectOptions {
          * </code></pre>
          */
         @NonNull
-        public Builder preferVideoCodecs(List<VideoCodec> preferredVideoCodecs) {
+        public Builder preferVideoCodecs(@NonNull List<VideoCodec> preferredVideoCodecs) {
+            Preconditions.checkNotNull(preferredVideoCodecs);
             this.preferredVideoCodecs = new ArrayList<>(preferredVideoCodecs);
+            return this;
+        }
+
+        /**
+         * The region of the signaling Server the Client will use. By default, the Client will
+         * connect to the nearest signaling Server determined by <a
+         * href="https://www.twilio.com/docs/video/ip-address-whitelisting#signaling-communication">latency
+         * based routing</a>. Setting a value other than "gll" bypasses routing and guarantees that
+         * signaling traffic will be terminated in the region that you prefer. If you are connecting
+         * to a Group Room created with the "gll" Media Region (either <a
+         * href="https://www.twilio.com/console/video/configure">Ad-Hoc</a> or via the <a
+         * href="https://www.twilio.com/docs/video/api/rooms-resource#room-instance-resource">REST
+         * API</a>), then the Room's Media Region will be selected based upon your Client's region.
+         * The default value is `gll`.
+         */
+        @NonNull
+        public Builder region(@NonNull String region) {
+            this.region = region;
             return this;
         }
 
         /** Set {@link EncodingParameters} for audio and video tracks shared to a {@link Room}. */
         @NonNull
-        public Builder encodingParameters(@Nullable EncodingParameters encodingParameters) {
+        public Builder encodingParameters(@NonNull EncodingParameters encodingParameters) {
+            Preconditions.checkNotNull(encodingParameters);
             this.encodingParameters = encodingParameters;
             return this;
         }

@@ -46,8 +46,8 @@ public class RemoteDataTrackPublication implements DataTrackPublication {
     }
 
     /**
-     * Returns the base data track object of the published remote data track. {@code null} is
-     * returned if the track is not subscribed to.
+     * @return Returns the published remote data track. {@code null} is returned if the track is not
+     *     subscribed to.
      */
     @Override
     @Nullable

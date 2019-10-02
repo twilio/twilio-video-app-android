@@ -20,7 +20,18 @@ import android.support.annotation.Nullable;
 
 /** A published audio track represents an audio track that has been shared with a {@link Room}. */
 public interface AudioTrackPublication extends TrackPublication {
-    /** Returns the published audio track. */
+    /**
+     * {@link LocalAudioTrackPublication} and {@link RemoteAudioTrackPublication} extend {@link
+     * AudioTrackPublication} and each interface implements getAudioTrack with different nullability
+     * behavior. {@link LocalAudioTrackPublication#getAudioTrack} is annotated as @NonNull and
+     * {@link RemoteAudioTrackPublication#getAudioTrack} is annotated as @Nullable.
+     *
+     * <p>This method is marked as @Nullable because at least one of the subclasses returns null.
+     *
+     * @see LocalAudioTrackPublication
+     * @see RemoteAudioTrackPublication
+     * @return the published audio track.
+     */
     @Nullable
     AudioTrack getAudioTrack();
 }

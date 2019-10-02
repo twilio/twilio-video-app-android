@@ -127,6 +127,49 @@ public class ConnectOptionsUnitTest {
     }
 
     @Test
+    public void shouldSetRegion() {
+        String region = "de1";
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").region(region).build();
+        assertEquals(connectOptions.getRegion(), region);
+    }
+
+    @Test
+    public void shouldHaveDefaultRegion() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").build();
+        assertEquals(connectOptions.getRegion(), "gll");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullAudioTracks() {
+        new ConnectOptions.Builder("token").audioTracks(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullVideoTracks() {
+        new ConnectOptions.Builder("token").videoTracks(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullDataTracks() {
+        new ConnectOptions.Builder("token").dataTracks(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullRoomName() {
+        new ConnectOptions.Builder("token").roomName(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullIceOptions() {
+        new ConnectOptions.Builder("token").iceOptions(null).build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullEncodingParameters() {
+        new ConnectOptions.Builder("token").encodingParameters(null).build();
+    }
+
+    @Test
     public void networkQualityShouldBeDisabledByDefault() {
         ConnectOptions connectOptions = new ConnectOptions.Builder("token").build();
 

@@ -17,7 +17,7 @@ buildscript {
             'java': JavaVersion.VERSION_1_8,
 
             // Dependencies
-            'videoCpp': '3.5.0',
+            'videoCpp': '4.0.0',
             'junit': '4.12',
             'mockito': '1.10.19',
             'guava': '19.0',
@@ -169,7 +169,13 @@ task incrementRc {
     dependsOn 'validateReleaseCandidateTag'
 
     doLast {
-        def gitBranch = "master"
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "bash", "-c", "git remote show origin | grep HEAD | cut -d: -f2-"
+            standardOutput stdOut
+        }
+        println("DEFAULT BRANCH = " + stdOut.toString())
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
@@ -250,7 +256,14 @@ task incrementVersionAfterRelease {
     group = 'Git'
 
     doLast {
-        def gitBranch = "master"
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "bash", "-c", "git remote show origin | grep HEAD | cut -d: -f2-"
+            standardOutput stdOut
+        }
+        println("DEFAULT BRANCH = " + stdOut.toString())
+
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
@@ -367,7 +380,13 @@ task incrementVersionAfterPreRelease {
     group = 'Git'
 
     doLast {
-        def gitBranch = "master"
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "bash", "-c", "git remote show origin | grep HEAD | cut -d: -f2-"
+            standardOutput stdOut
+        }
+        println("DEFAULT BRANCH = " + stdOut.toString())
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
         def circleTag = System.getenv("CIRCLE_TAG")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"

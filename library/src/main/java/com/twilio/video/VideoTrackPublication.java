@@ -16,11 +16,22 @@
 
 package com.twilio.video;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /** A published video track represents a video track that has been shared with a {@link Room}. */
 public interface VideoTrackPublication extends TrackPublication {
-    /** Returns the published video track. */
-    @NonNull
+    /**
+     * {@link LocalVideoTrackPublication} and {@link RemoteVideoTrackPublication} extend {@link
+     * VideoTrackPublication} and each interface implements getVideoTrack with different nullability
+     * behavior. {@link LocalVideoTrackPublication#getVideoTrack} is annotated as @NonNull and
+     * {@link RemoteVideoTrackPublication#getVideoTrack} is annotated as @Nullable.
+     *
+     * <p>This method is marked as @Nullable because at least one of the subclasses returns null.
+     *
+     * @see LocalVideoTrackPublication
+     * @see RemoteVideoTrackPublication
+     * @return the published video track.
+     */
+    @Nullable
     VideoTrack getVideoTrack();
 }

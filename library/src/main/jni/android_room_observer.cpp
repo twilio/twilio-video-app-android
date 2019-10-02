@@ -55,7 +55,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc::GetMethodID(env,
                                     j_room_class_.obj(),
                                     "setConnected",
-                                    "(Ljava/lang/String;Lcom/twilio/video/LocalParticipant;Ljava/util/List;)V")),
+                                    "(Ljava/lang/String;Ljava/lang/String;Lcom/twilio/video/LocalParticipant;Ljava/util/List;)V")),
         j_on_connected_(
                 webrtc::GetMethodID(env,
                                     j_room_observer_class_.obj(),
@@ -229,6 +229,7 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
         }
 
         jstring j_room_sid = JavaUTF16StringFromStdString(jni(), room->getSid());
+        jstring j_media_region = JavaUTF16StringFromStdString(jni(), room->getMediaRegion());
         std::shared_ptr<twilio::video::LocalParticipant> local_participant =
                 room->getLocalParticipant();
         jobject j_local_audio_tracks = getLocalAudioTracks();
@@ -255,6 +256,7 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
         jni()->CallVoidMethod(j_room_.obj(),
                               j_set_connected_,
                               j_room_sid,
+                              j_media_region,
                               j_local_participant,
                               j_participants);
         CHECK_EXCEPTION(jni()) << "error calling setConnected";

@@ -41,6 +41,7 @@ public class TwilioException extends Exception {
         SIGNALING_CONNECTION_TIMEOUT_EXCEPTION,
         SIGNALING_INCOMING_MESSAGE_INVALID_EXCEPTION,
         SIGNALING_OUTGOING_MESSAGE_INVALID_EXCEPTION,
+        SIGNALING_DNS_RESOLUTION_ERROR_EXCEPTION,
         ROOM_NAME_INVALID_EXCEPTION,
         ROOM_NAME_TOO_LONG_EXCEPTION,
         ROOM_NAME_CHARS_INVALID_EXCEPTION,
@@ -95,6 +96,7 @@ public class TwilioException extends Exception {
     public static final int SIGNALING_CONNECTION_TIMEOUT_EXCEPTION = 53002;
     public static final int SIGNALING_INCOMING_MESSAGE_INVALID_EXCEPTION = 53003;
     public static final int SIGNALING_OUTGOING_MESSAGE_INVALID_EXCEPTION = 53004;
+    public static final int SIGNALING_DNS_RESOLUTION_ERROR_EXCEPTION = 53005;
     public static final int ROOM_NAME_INVALID_EXCEPTION = 53100;
     public static final int ROOM_NAME_TOO_LONG_EXCEPTION = 53101;
     public static final int ROOM_NAME_CHARS_INVALID_EXCEPTION = 53102;
@@ -138,8 +140,7 @@ public class TwilioException extends Exception {
     private final int code;
     private final String explanation;
 
-    TwilioException(
-            @TwilioException.Code int code, @NonNull String message, @Nullable String explanation) {
+    TwilioException(@Code int code, @NonNull String message, @Nullable String explanation) {
         super(message);
         this.code = code;
         this.explanation = explanation;

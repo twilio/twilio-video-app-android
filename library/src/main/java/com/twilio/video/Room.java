@@ -40,7 +40,8 @@ public class Room {
     private Context context;
     private String name;
     private String sid;
-    private Room.State roomState;
+    private String mediaRegion = null;
+    private Room.State state;
     private Map<String, RemoteParticipant> participantMap = new HashMap<>();
     private LocalParticipant localParticipant;
     private RemoteParticipant dominantSpeaker;
@@ -85,7 +86,7 @@ public class Room {
                                 logger.d("onConnectFailure()");
 
                                 // Update room state
-                                Room.this.roomState = Room.State.DISCONNECTED;
+                                Room.this.state = Room.State.DISCONNECTED;
 
                                 // Release native room delegate
                                 release();
@@ -104,7 +105,7 @@ public class Room {
                                 logger.d("onReconnecting()");
 
                                 // Update room state
-                                Room.this.roomState = State.RECONNECTING;
+                                Room.this.state = State.RECONNECTING;
 
                                 // Notify developer
                                 Room.this.listener.onReconnecting(room, twilioException);
@@ -119,7 +120,7 @@ public class Room {
                                 logger.d("onReconnected()");
 
                                 // Notify developer
-                                Room.this.roomState = State.CONNECTED;
+                                Room.this.state = State.CONNECTED;
                                 Room.this.listener.onReconnected(room);
                             });
                 }
@@ -142,7 +143,7 @@ public class Room {
                                 logger.d("onDisconnected()");
 
                                 // Update room state
-                                Room.this.roomState = Room.State.DISCONNECTED;
+                                Room.this.state = Room.State.DISCONNECTED;
 
                                 // Release native room delegate
                                 release();
@@ -242,7 +243,7 @@ public class Room {
         this.context = context;
         this.name = name;
         this.sid = "";
-        this.roomState = Room.State.DISCONNECTED;
+        this.state = Room.State.DISCONNECTED;
         this.listener = listener;
         this.handler = handler;
         this.statsListenersQueue = new ConcurrentLinkedQueue<>();
@@ -263,10 +264,27 @@ public class Room {
         return sid;
     }
 
+    /**
+     * Returns the region where media is processed. This property is set in Group Rooms by the time
+     * the {@link Room} reaches {@link State#CONNECTED}. This method returns {@code null} under the
+     * following conditions:
+     *
+     * <p>
+     *
+     * <ul>
+     *   <li>The {@link Room} has not reached the {@link Room.State#CONNECTED} state.
+     *   <li>The instance represents a peer-to-peer Room.
+     * </ul>
+     */
+    @Nullable
+    public String getMediaRegion() {
+        return mediaRegion;
+    }
+
     /** Returns the current room state. */
     @NonNull
     public synchronized Room.State getState() {
-        return roomState;
+        return state;
     }
 
     /**
@@ -293,7 +311,7 @@ public class Room {
 
     /** Returns whether any media in the Room is being recorded. */
     public synchronized boolean isRecording() {
-        return roomState == Room.State.CONNECTED && nativeIsRecording(nativeRoomDelegate);
+        return state == Room.State.CONNECTED && nativeIsRecording(nativeRoomDelegate);
     }
 
     /**
@@ -323,7 +341,7 @@ public class Room {
      */
     public synchronized void getStats(@NonNull StatsListener statsListener) {
         Preconditions.checkNotNull(statsListener, "StatsListener must not be null");
-        if (roomState == Room.State.DISCONNECTED) {
+        if (state == Room.State.DISCONNECTED) {
             return;
         }
         statsListenersQueue.offer(new Pair<>(Util.createCallbackHandler(), statsListener));
@@ -332,7 +350,7 @@ public class Room {
 
     /** Disconnects from the room. */
     public synchronized void disconnect() {
-        if (roomState != Room.State.DISCONNECTED && nativeRoomDelegate != 0) {
+        if (state != Room.State.DISCONNECTED && nativeRoomDelegate != 0) {
             if (localParticipant != null) {
                 localParticipant.release();
             }
@@ -373,7 +391,7 @@ public class Room {
                             statsListenerProxy,
                             mediaFactory.getNativeMediaFactoryHandle(),
                             handler);
-            roomState = Room.State.CONNECTING;
+            state = Room.State.CONNECTING;
         }
     }
 
@@ -383,10 +401,12 @@ public class Room {
     @SuppressWarnings("unused")
     private synchronized void setConnected(
             String roomSid,
+            String mediaRegion,
             LocalParticipant localParticipant,
             List<RemoteParticipant> remoteParticipants) {
         logger.d("setConnected()");
         this.sid = roomSid;
+        this.mediaRegion = mediaRegion.isEmpty() ? null : mediaRegion;
         if (this.name == null || this.name.isEmpty()) {
             this.name = roomSid;
         }
@@ -394,7 +414,7 @@ public class Room {
         for (RemoteParticipant remoteParticipant : remoteParticipants) {
             participantMap.put(remoteParticipant.getSid(), remoteParticipant);
         }
-        this.roomState = Room.State.CONNECTED;
+        this.state = Room.State.CONNECTED;
     }
 
     /*
