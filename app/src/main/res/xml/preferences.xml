@@ -25,6 +25,10 @@
             android:title="@string/enable_dominant_speaker"
             android:defaultValue="true"
             />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enable_network_quality_level"
+            android:title="@string/enable_network_quality_level"/>
         <ListPreference
             android:defaultValue="prod"
             android:entries="@array/environment_array"

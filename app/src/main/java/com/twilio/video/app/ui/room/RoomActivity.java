@@ -53,6 +53,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.BindView;
@@ -68,8 +69,13 @@ import com.twilio.video.G722Codec;
 import com.twilio.video.H264Codec;
 import com.twilio.video.IsacCodec;
 import com.twilio.video.LocalAudioTrack;
+import com.twilio.video.LocalAudioTrackPublication;
+import com.twilio.video.LocalDataTrack;
+import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
+import com.twilio.video.LocalVideoTrackPublication;
+import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.OpusCodec;
 import com.twilio.video.PcmaCodec;
 import com.twilio.video.PcmuCodec;
@@ -603,6 +609,12 @@ public class RoomActivity extends BaseActivity {
                         : R.drawable.ic_videocam_off_gray_24px);
     }
 
+    private boolean isNetworkQualityEnabled() {
+        return sharedPreferences.getBoolean(
+                Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
+                Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT);
+    }
+
     private String getDisplayName() {
         String displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
 
@@ -1061,7 +1073,8 @@ public class RoomActivity extends BaseActivity {
                                     .roomName(roomName)
                                     .enableAutomaticSubscription(enableAutomaticTrackSubscription)
                                     .enableDominantSpeaker(enableDominantSpeaker)
-                                    .enableInsights(enableInsights);
+                                    .enableInsights(enableInsights)
+                                    .enableNetworkQuality(isNetworkQualityEnabled());
 
                     int maxVideoBitrate =
                             sharedPreferences.getInt(
@@ -1162,7 +1175,7 @@ public class RoomActivity extends BaseActivity {
                             participantSid, participantIdentity, remoteVideoTrack, muted, false));
         } else {
             participantController.addThumb(
-                    participantSid, participantIdentity, remoteVideoTrack, muted, false);
+                    participantSid, participantIdentity, remoteVideoTrack, muted, false, false);
         }
     }
 
@@ -1348,8 +1361,12 @@ public class RoomActivity extends BaseActivity {
                 getString(R.string.you),
                 cameraVideoTrack,
                 localAudioTrack == null,
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA,
+                isNetworkQualityEnabled());
 
+        localParticipant.setListener(
+                new LocalParticipantListener(
+                        participantController.getThumb(localParticipantSid, cameraVideoTrack)));
         participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
 
         // add existing room participants thumbs
@@ -1500,6 +1517,68 @@ public class RoomActivity extends BaseActivity {
                 Timber.i("onRecordingStopped: " + room.getName());
             }
         };
+    }
+
+    private class LocalParticipantListener implements LocalParticipant.Listener {
+
+        private ImageView networkQualityImage;
+
+        LocalParticipantListener(ParticipantView primaryView) {
+            networkQualityImage = primaryView.networkQualityLevelImg;
+        }
+
+        @Override
+        public void onAudioTrackPublished(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalAudioTrackPublication localAudioTrackPublication) {}
+
+        @Override
+        public void onAudioTrackPublicationFailed(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalAudioTrack localAudioTrack,
+                @NonNull TwilioException twilioException) {}
+
+        @Override
+        public void onVideoTrackPublished(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalVideoTrackPublication localVideoTrackPublication) {}
+
+        @Override
+        public void onVideoTrackPublicationFailed(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalVideoTrack localVideoTrack,
+                @NonNull TwilioException twilioException) {}
+
+        @Override
+        public void onDataTrackPublished(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalDataTrackPublication localDataTrackPublication) {}
+
+        @Override
+        public void onDataTrackPublicationFailed(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull LocalDataTrack localDataTrack,
+                @NonNull TwilioException twilioException) {}
+
+        @Override
+        public void onNetworkQualityLevelChanged(
+                @NonNull LocalParticipant localParticipant,
+                @NonNull NetworkQualityLevel networkQualityLevel) {
+            if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
+                    || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+                networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
+            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
+                networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
+            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
+                networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
+            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
+                networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
+            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
+                networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
+            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
+                networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
+            }
+        }
     }
 
     private class ParticipantListener implements RemoteParticipant.Listener {

@@ -25,10 +25,10 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
+import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
@@ -49,11 +49,11 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     protected boolean overlaySurface = true;
 
     @BindView(R.id.participant_video_layout)
-    FrameLayout videoLayout;
+    ConstraintLayout videoLayout;
 
     @Nullable
     @BindView(R.id.participant_badge)
-    LinearLayout identityBadge;
+    ConstraintLayout identityBadge;
 
     @BindView(R.id.participant_video_identity)
     TextView videoIdentity;
@@ -69,6 +69,9 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     @BindView(R.id.dominant_speaker_img)
     ImageView dominantSpeakerImg;
+
+    @BindView(R.id.network_quality_level_img)
+    ImageView networkQualityLevelImg;
 
     @BindView(R.id.participant_selected_identity)
     TextView selectedIdentity;
@@ -183,6 +186,10 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
             stylables.recycle();
         }
+    }
+
+    public void showNetworkQualityLevel(Boolean showNetworkQualityLevel) {
+        networkQualityLevelImg.setVisibility(showNetworkQualityLevel ? VISIBLE : GONE);
     }
 
     @IntDef({

@@ -123,6 +123,7 @@ dependencies {
     implementation project(':twilioapi')
     implementation project(':env')
     implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"
+    implementation "com.android.support.constraint:constraint-layout:1.1.3"
     implementation "com.android.support:design:${versions.designLibrary}"
     implementation "com.android.support:preference-v14:${versions.preferenceLibrary}"
     implementation "com.jakewharton.timber:timber:${versions.timber}"

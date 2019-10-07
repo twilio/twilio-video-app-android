@@ -16,6 +16,8 @@
     <string name="video_constraints">Video Constraints</string>
     <string name="statistics">Statistics</string>
     <string name="enable_stats">Enable Stats</string>
+    <string name="enable_network_quality_level">Enable Network Quality Level</string>
+    <string name="enable_network_quality_level_description">Network Quality Level</string>
     <string name="enable_insights">Enable Insights</string>
     <string name="local">Local Media</string>
     <string name="remote">Remote Media</string>
