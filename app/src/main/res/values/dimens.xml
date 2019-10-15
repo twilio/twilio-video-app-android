@@ -1,0 +1,11 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="local_video_size">90dp</dimen>
+    <dimen name="preference_video_dimensions_height">120dp</dimen>
+    <dimen name="preference_aspect_ratio_height">72dp</dimen>
+    <dimen name="username_margin_top">94.5dp</dimen>
+    <dimen name="login_components_margin_top">10dp</dimen>
+</resources>
