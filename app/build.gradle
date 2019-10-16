@@ -117,6 +117,7 @@ android {
 }
 
 dependencies {
+    // TODO See if twilioapi and env are really necessary
     implementation project(':twilioapi')
     implementation project(':env')
     implementation "com.twilio:video-android:4.4.0"
