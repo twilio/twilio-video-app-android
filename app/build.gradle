@@ -152,8 +152,6 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${versions.rxJava2Adapter}"
 
     annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
-
-    communityImplementation project(':token')
 }
 
 def getHockeyAppApiToken() {
