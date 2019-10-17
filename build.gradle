@@ -1,0 +1,759 @@
+buildscript {
+    apply from: "$rootProject.projectDir/common.gradle"
+    ext.versions = [
+            // Android
+            'compileSdk': 28,
+            'buildTools': '28.0.3',
+            'minSdk': 16,
+            'targetSdk': 28,
+
+            // Plugins
+            'androidGradlePlugin': '3.5.0',
+            'googleServices': '3.2.1',
+            'gradleHockeyPlugin': '3.6',
+            'fabricPlugin': '1.31.0',
+
+            // Java
+            'java': JavaVersion.VERSION_1_8,
+
+            // Dependencies
+            'junit': '4.12',
+            'mockito': '1.10.19',
+            'guava': '19.0',
+            'retrofit': '1.9.0',
+            'supportLibrary': '27.1.1',
+            'designLibrary': '27.1.1',
+            'preferenceLibrary': '27.1.1',
+            'espresso': '3.0.0',
+            'testSupportLibrary': '1.0.0',
+            'uiAutomator': '2.1.2',
+            'gson': '2.7',
+            'apacheCommons': '3.6',
+            'junitParams': '1.1.1',
+            'relinker': '1.2.2',
+            'jjwt': '0.7.0',
+            'hockey': '3.5.0',
+            'timber': '4.1.0',
+            'materialrangebar': '1.3',
+            'butterknife': '9.0.0',
+            'multidex': '1.0.3',
+            'firebase': '16.0.1',
+            'firebaseAuth': '16.0.2',
+            'crashlytics': '2.9.5',
+            'playServices': '15.0.1',
+            'playServicesAuth': '15.0.1',
+            'dagger': '2.10',
+            'rxJava2': '2.0.6',
+            'rxJava2Adapter': '1.0.0',
+            'rxAndroid2': '2.0.1',
+            'retrofit2': '2.1.0'
+    ]
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
+        maven {
+            url  "https://twilio.bintray.com/releases"
+        }
+        maven {
+            url  "https://twilio.bintray.com/internal-releases"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
+        }
+        maven {
+            url  "https://twilio.bintray.com/snapshots"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
+        }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:${versions.androidGradlePlugin}"
+        classpath "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
+        classpath "com.google.gms:google-services:${versions.googleServices}"
+        classpath "de.felixschulze.gradle:gradle-hockeyapp-plugin:${versions.gradleHockeyPlugin}"
+        classpath "io.fabric.tools:gradle:${versions.fabricPlugin}"
+    }
+}
+
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.13.0"
+}
+apply plugin: "com.diffplug.gradle.spotless"
+spotless {
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        target '**/*.java'
+        googleJavaFormat().aosp()
+    }
+}
+
+allprojects {
+    apply from: "$rootProject.projectDir/common.gradle"
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven {
+            url  "https://twilio.bintray.com/releases"
+        }
+        maven {
+            url  "https://twilio.bintray.com/internal-releases"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
+        }
+        maven {
+            url  "https://twilio.bintray.com/snapshots"
+            credentials {
+                username "${getBintrayUsername()}"
+                password "${getBintrayPassword()}"
+            }
+        }
+        maven {
+            url 'https://jitpack.io'
+        }
+    }
+}
+
+task validateReleaseCandidateTag {
+    description = 'Validate the release candidate tag matches the release candidate version ' +
+            'present on commit'
+    group = 'Git'
+
+    doLast {
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def tagsMatch = (matchesRcVersion( circleTag)) ? ("true") : ("false")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine tagsMatch
+        }
+    }
+}
+
+task validateReleaseTag {
+    description = 'Validate the release tag matches the release version ' +
+            'present on commit'
+    group = 'Git'
+
+    doLast {
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def tagsMatch = (matchesVersion(circleTag)) ? ("true") : ("false")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine tagsMatch
+        }
+    }
+}
+
+task incrementRc {
+    description = 'Increment the current release candidate version'
+    group = 'Git'
+
+    dependsOn 'validateReleaseCandidateTag'
+
+    doLast {
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "bash", "-c", "git remote show origin | grep HEAD | cut -d: -f2-"
+            standardOutput stdOut
+        }
+        println("DEFAULT BRANCH = " + stdOut.toString())
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
+        def nextVersionRc = "${versionRc + 1}"
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
+        def tmpProjectPropertiesFile = new FileOutputStream("${buildDir}/gradle.properties")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from next command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
+        }
+
+        /*
+         * Only update the RC version on upstream branch if the version matches tag. It is possible
+         * these values do not match if an RC job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesRcVersion(circleTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing RC from ${versionRc} to ${nextVersionRc}"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionRc=.*@versionRc=${nextVersionRc}@",
+                        "gradle.properties"
+                standardOutput tmpProjectPropertiesFile
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump RC version [skip ci]\""
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
+        }
+    }
+}
+
+task incrementVersionAfterRelease {
+    description = 'Increment the SDK version after a release'
+    group = 'Git'
+
+    doLast {
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "bash", "-c", "git remote show origin | grep HEAD | cut -d: -f2-"
+            standardOutput stdOut
+        }
+        println("DEFAULT BRANCH = " + stdOut.toString())
+
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
+        def nextVersionPatch = versionPatch + 1
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from next command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
+        }
+
+        /*
+         * Only update the version on upstream branch if the version matches tag. It is possible
+         * these values do not match if a job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesVersion(circleTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing from versionPatch ${versionPatch} to " +
+                        "${nextVersionPatch}"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionPatch=.*@versionPatch=${nextVersionPatch}@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Resetting versionRc to 1"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@versionRc=.*@versionRc=1@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Resetting phaseNumber to 1"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@phaseNumber=.*@phaseNumber=1@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump patch and reset rc version [skip ci]\""
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
+        }
+    }
+}
+
+task incrementVersionAfterPreRelease {
+    description = 'Increment the SDK version after a pre-release'
+    group = 'Git'
+
+    doLast {
+        def stdOut = new ByteArrayOutputStream()
+        exec {
+            commandLine "bash", "-c", "git remote show origin | grep HEAD | cut -d: -f2-"
+            standardOutput stdOut
+        }
+        println("DEFAULT BRANCH = " + stdOut.toString())
+        def gitBranch = stdOut.toString().replaceAll("\\s","")
+        def circleTag = System.getenv("CIRCLE_TAG")
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
+        def nextPhaseNumber = phaseNumber + 1
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
+        // Ignore gitBranch checked out by circle and use latest from following command
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "branch", "-D", "${gitBranch}"
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "-b", "${gitBranch}", "remotes/${remote}/${gitBranch}"
+        }
+
+        /*
+         * Only update the phase on upstream branch if the version matches tag. It is possible
+         * these values do not match if a job is performed on an earlier commit and a PR
+         * with a version update occurs later in history.
+         */
+        if (matchesVersion(circleTag)) {
+            exec {
+                workingDir "${rootDir}"
+                commandLine "echo", "Incrementing from phaseNumber ${phaseNumber} to " +
+                        "${nextPhaseNumber}"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "sed",
+                        "s@phaseNumber=.*@phaseNumber=${nextPhaseNumber}@",
+                        "gradle.properties"
+                standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "commit", "gradle.properties", "-m", "\"Bump phase number [skip ci]\""
+            }
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "git", "push", "--quiet", "${remote}", "${gitBranch}"
+                standardOutput pushNullFile
+            }
+        }
+    }
+}
+
+task incrementVersion(type: GradleBuild) {
+    description = 'Increment the SDK version'
+    group = 'Git'
+    dependsOn validateReleaseTag
+    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
+            ("") :
+            (System.getenv("CIRCLE_TAG"))
+    def incrementVersionTask = releaseVersion.contains("preview") ||
+            releaseVersion.contains("beta") ?
+            ('incrementVersionAfterPreRelease') :
+            ('incrementVersionAfterRelease')
+    tasks = [incrementVersionTask]
+}
+
+task publishLibraryJavadocs {
+    description = 'Publish Video Android Javadocs to gh-pages branch'
+    group = 'Publishing'
+    dependsOn validateReleaseTag
+    dependsOn 'library:createJavadocs'
+    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
+            ("") :
+            (System.getenv("CIRCLE_TAG"))
+    boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
+    def pinLatestDocsCommand = preRelease ?
+            // Pin command is a no-op for pre releases
+            (["true"]) :
+            (["ln", "-sfn", "${releaseVersion}", "docs/latest"])
+    def githubToken = System.getenv("GITHUB_TOKEN")
+    def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
+    def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+    def remote = "upstream"
+    def pushNullFile = new FileOutputStream("/dev/null")
+
+    doLast {
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "-b", "gh-pages", "remotes/${remote}/gh-pages"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "library/build/docs/javadoc", "docs/${releaseVersion}"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine pinLatestDocsCommand
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "add", "docs/${releaseVersion}", "docs/latest"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "commit", "-m", "\"${releaseVersion} release docs [skip ci]\""
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "--quiet", "${remote}", "gh-pages"
+            standardOutput pushNullFile
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "checkout", "${releaseVersion}"
+        }
+    }
+}
+
+/*
+ * Any tests that are network intensive are run on virtual devices because they do not run
+ * on the same congested network as physical devices. Running select tests on virtual devices
+ * ensures a more stable CI test execution and prevents test runs from exceeding the
+ * Firebase Test Lab physical device 30 minute time limit.
+ */
+
+task firebaseTestLabCheckLibraryCamera(type: Exec) {
+    description = 'Runs library instrumentation tests that use camera on Firebase Test Lab'
+    group = 'Test'
+    dependsOn 'library:assembleDebugAndroidTest'
+    commandLine 'gcloud',
+            'firebase',
+            'test',
+            'android',
+            'run',
+            '--no-record-video',
+            '--project',
+            'video-app-79418',
+            '--async',
+            'video-app-args.yaml:integration-capturer-tests'
+}
+
+task librarySizeReport(type: GradleBuild) {
+    description = 'Calculate Video Android SDK Size Impact'
+    group = 'Analyze'
+
+    buildFile = file('apkscale/build.gradle')
+    tasks = ['clean', 'assembleRelease']
+    startParameter.projectProperties += gradle.startParameter.projectProperties
+
+    doLast {
+        def videoAndroidSizeReport = "Size Report\n" +
+                "\n" +
+                "| ABI             | APK Size Impact |\n" +
+                "| --------------- | --------------- |\n"
+        def apkSizeImpactMap = [:]
+        ["universal", "armeabi-v7a", "arm64-v8a", "x86", "x86_64"].each { arch ->
+            def outputStream = new ByteArrayOutputStream()
+
+            // Perform diff between APK with and without Video Android SDK
+            exec {
+                workingDir "${rootDir}"
+                commandLine "apkanalyzer",
+                        '--human-readable',
+                        'apk',
+                        'compare',
+                        '--different-only',
+                        "apkscale/build/outputs/apk/withoutVideoSdk/release/apkscale-" +
+                                "withoutVideoSdk-${arch}-release-unsigned.apk",
+                        "apkscale/build/outputs/apk/withVideoSdk/release/apkscale-withVideoSdk-" +
+                                "${arch}-release-unsigned.apk"
+                standardOutput outputStream
+            }
+
+            /*
+             * The line format of apkanalyzer is
+             *
+             * old size / new size / size difference / path
+             *
+             * The first line represents the difference between the entire APKs followed by file
+             * and directory differrences. Extract the total size difference to determine the APK
+             * size impact.
+             */
+            def apkSizeImpact = outputStream.toString().split()[2]
+
+            // Cache impact in table
+            apkSizeImpactMap.put(arch, apkSizeImpact)
+        }
+
+        // Build out the table
+        apkSizeImpactMap.each { arch, apkSizeImpact ->
+            videoAndroidSizeReport += "| ${arch.padRight(16)}| ${apkSizeImpact.padRight(16)}|\n"
+
+        }
+
+        // Print report
+        println(videoAndroidSizeReport)
+
+        // Post PR comment with report
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
+        if (System.env.CIRCLE_PULL_REQUEST) {
+            def githubPullRequestNumber = Arrays.asList(
+                    System.env.CIRCLE_PULL_REQUEST.split("/")).last()
+            def githubPullRequestUrl = new URL("https://api.github.com/repos/" +
+                    "${repoSlug}/issues/${githubPullRequestNumber}/comments")
+            exec {
+                workingDir "${rootDir}"
+                commandLine "curl",
+                        "-H", "Authorization: token ${System.env.GITHUB_TOKEN}",
+                        "-X", 'POST',
+                        // Escape new lines for json body
+                        "-d", "{\"body\":\"${videoAndroidSizeReport.replace('\n', '\\n')}\"}",
+                        "${githubPullRequestUrl}"
+            }
+        }
+
+        // Append report to Github Release
+        if (System.env.CIRCLE_TAG) {
+            def githubReleasesTagUrl = new URL("https://api.github.com/repos/" +
+                    "${repoSlug}/releases/tags/${System.env.CIRCLE_TAG}")
+            def githubReleasesUrlString = "https://api.github.com/repos/" +
+                    "${repoSlug}/releases/"
+            def outputStream = new ByteArrayOutputStream()
+
+            // Get the current release body
+            exec {
+                workingDir "${rootDir}"
+                commandLine "curl",
+                        "-H", "Authorization: token ${System.env.GITHUB_TOKEN}",
+                        "-X", 'GET',
+                        "-s",
+                        "${githubReleasesTagUrl}"
+                standardOutput outputStream
+            }
+
+            // Append the size report to the release
+            def slurper = new groovy.json.JsonSlurper()
+            def releaseResponse = slurper.parseText(outputStream.toString())
+            releaseResponse.body += "\n\n" + videoAndroidSizeReport
+            def githubReleasesUrl = new URL(githubReleasesUrlString + releaseResponse.id)
+
+            exec {
+                workingDir "${rootDir}"
+                commandLine "curl",
+                        "-H", "Authorization: token ${System.env.GITHUB_TOKEN}",
+                        "-X", 'PATCH',
+                        "-d", groovy.json.JsonOutput.toJson(releaseResponse),
+                        "-s",
+                        "${githubReleasesUrl}"
+            }
+        }
+    }
+}
+
+task bintrayLibrarySnapshotUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR snapshot to Bintray'
+    group = 'Publishing'
+    buildFile = file('library/build.gradle')
+    tasks = ['assembleRelease', 'uploadArchives']
+    startParameter.projectProperties += gradle.startParameter.projectProperties + [
+            'snapshot': true,
+            'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
+            'maven.username': "${getBintrayUsername()}",
+            'maven.password': "${getBintrayPassword()}"
+    ]
+}
+
+task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR release candidate to internal Bintray'
+    group = 'Publishing'
+    dependsOn 'validateReleaseCandidateTag'
+    buildFile = file('library/build.gradle')
+    tasks = ['clean', 'assembleRelease', 'uploadArchives']
+    startParameter.projectProperties += gradle.startParameter.projectProperties + [
+            'releaseCandidate': true,
+            'maven.repo': 'https://api.bintray.com/maven/twilio/internal-releases/video-android/;publish=1',
+            'maven.username': "${getBintrayUsername()}",
+            'maven.password': "${getBintrayPassword()}"
+    ]
+}
+
+task bintrayLibraryReleaseUpload(type: GradleBuild) {
+    description = 'Publish Video Android AAR to release Bintray'
+    group = 'Publishing'
+    dependsOn validateReleaseTag
+    buildFile = file('library/build.gradle')
+    tasks = ['clean', 'assembleRelease', 'uploadArchives']
+    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
+            ("") :
+            (System.getenv("CIRCLE_TAG"))
+    boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
+    startParameter.projectProperties += gradle.startParameter.projectProperties + [
+            'preRelease': preRelease,
+            'maven.repo': 'https://api.bintray.com/maven/twilio/releases/video-android/;publish=1',
+            'maven.username': "${getBintrayUsername()}",
+            'maven.password': "${getBintrayPassword()}"
+    ]
+}
+
+/*
+ * Checks if a RC tag matches version and RC of current commit
+ */
+def matchesRcVersion(versionTag) {
+    def properties = new Properties()
+    file("${rootDir}/gradle.properties").withInputStream { properties.load(it) }
+    def rcTag = "${properties.getProperty("versionMajor")}." +
+            "${properties.getProperty("versionMinor")}." +
+            "${properties.getProperty("versionPatch")}-" +
+            "rc${properties.getProperty("versionRc")}"
+
+    return rcTag == versionTag
+}
+
+/*
+ * Checks if release tag matches version and current commit
+ */
+def matchesVersion(versionTag) {
+    def properties = new Properties()
+    boolean preRelease = versionTag.contains("preview") || versionTag.contains("beta")
+    file("${rootDir}/gradle.properties").withInputStream { properties.load(it) }
+    def releaseTag = "${properties.getProperty("versionMajor")}." +
+            "${properties.getProperty("versionMinor")}." +
+            "${properties.getProperty("versionPatch")}"
+
+    if (preRelease) {
+        releaseTag += "-${properties.getProperty("phase").replaceAll("\"", "")}" +
+                "${properties.getProperty("phaseNumber")}"
+    }
+
+    return releaseTag == versionTag
+}

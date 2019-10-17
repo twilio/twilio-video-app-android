@@ -1,0 +1,229 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'de.felixschulze.gradle.hockeyapp'
+
+hockeyapp {
+    apiToken = "${getHockeyAppApiToken()}"
+    notify = 1
+    status = 2
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion "${versions.buildTools}"
+
+    lintOptions {
+        warningsAsErrors true
+        // TODO: Fix all baseline app warnings and errors GSDK-1984
+        baseline file("lint-baseline.xml")
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
+
+    defaultConfig {
+        applicationId "com.twilio.video.app"
+
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+
+        versionName generateVersionName()
+        versionCode generateVersionCode()
+
+        buildConfigField 'String', 'HOCKEY_APP_ID', "${getHockeyAppId()}"
+
+        vectorDrawables.useSupportLibrary = true
+
+        multiDexEnabled true
+    }
+
+    compileOptions {
+        sourceCompatibility versions.java
+        targetCompatibility versions.java
+    }
+
+    /**
+     * Use the debug keystore to sign all variants of the test app
+     * since this is only used internally.
+     */
+    signingConfigs {
+        release {
+            storeFile file(keystore)
+            storePassword keystorePassword
+            keyAlias releaseKeyAlias
+            keyPassword releaseKeyPassword
+        }
+        debug {
+            storeFile file('video-android-app.keystore')
+            storePassword 'android'
+            keyAlias 'debug'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            ndk {
+                debuggable true
+            }
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    flavorDimensions "environment"
+
+    productFlavors {
+        internal {
+            dimension "environment"
+            applicationId "com.twilio.video.app.internal"
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"group"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
+        }
+
+        twilio {
+            dimension "environment"
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"group"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
+        }
+
+        community {
+            dimension "environment"
+            applicationId "com.twilio.video.app.community"
+            buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"peer-to-peer"'
+            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
+            buildConfigField("java.util.Map<String, String>",
+                    "twilioCredentials",
+                    "${getTwilioVideoAppConfig()}")
+        }
+    }
+
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+
+        // Ignore twilio debug and community release builds
+        if ((names.contains("twilio") && variant.buildType.name == "debug") ||
+                (names.contains("community") && variant.buildType.name == "release")) {
+            setIgnore(true)
+        }
+    }
+}
+
+dependencies {
+    // TODO See if twilioapi and env are really necessary
+    implementation project(':twilioapi')
+    implementation project(':env')
+    implementation "com.twilio:video-android:4.4.0"
+    implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"
+    implementation "com.android.support.constraint:constraint-layout:1.1.3"
+    implementation "com.android.support:design:${versions.designLibrary}"
+    implementation "com.android.support:preference-v14:${versions.preferenceLibrary}"
+    implementation "com.jakewharton.timber:timber:${versions.timber}"
+    implementation "com.appyvet:materialrangebar:${versions.materialrangebar}"
+    implementation ("com.jakewharton:butterknife:${versions.butterknife}") {
+        exclude group: "com.android.support", module: "support-compat"
+    }
+    implementation "com.google.guava:guava:${versions.guava}"
+    implementation "com.android.support:support-v4:${versions.supportLibrary}"
+    implementation "com.android.support:multidex:${versions.multidex}"
+    implementation "com.google.firebase:firebase-core:${versions.firebase}"
+    implementation "com.google.firebase:firebase-auth:${versions.firebaseAuth}"
+    implementation "com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}"
+    implementation "com.google.android.gms:play-services-auth:${versions.playServicesAuth}"
+
+    implementation "com.google.dagger:dagger:${versions.dagger}"
+    implementation "com.google.dagger:dagger-android:${versions.dagger}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${versions.dagger}"
+
+    implementation "io.reactivex.rxjava2:rxjava:${versions.rxJava2}"
+    implementation "io.reactivex.rxjava2:rxandroid:${versions.rxAndroid2}"
+
+    implementation "com.squareup.retrofit2:retrofit:${versions.retrofit2}"
+    implementation "com.squareup.retrofit2:converter-gson:${versions.retrofit2}"
+    implementation "com.squareup.retrofit2:converter-scalars:${versions.retrofit2}"
+
+    implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${versions.rxJava2Adapter}"
+
+    annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
+
+    communityImplementation project(':token')
+}
+
+def getHockeyAppApiToken() {
+    // Attempt to get it from the environment variable
+    def hockeyAppApiToken  = System.getenv("HOCKEY_APP_API_TOKEN");
+
+    if (hockeyAppApiToken == null) {
+        logger.log(LogLevel.INFO, "Could not locate HOCKEY_APP_API_TOKEN environment variable. " +
+                "Trying local.properties")
+        Properties properties = new Properties()
+        if (project.rootProject.file('local.properties').exists()) {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            hockeyAppApiToken = properties.getProperty('HOCKEY_APP_API_TOKEN')
+        }
+    }
+
+    if (hockeyAppApiToken == null) {
+        logger.log(LogLevel.WARN, "HockeyApp API token unavailable.")
+    }
+
+    return hockeyAppApiToken;
+}
+
+def getHockeyAppId() {
+    def hockeyAppId = "\"\""
+
+    if (project.hasProperty("hockeyAppId")) {
+        hockeyAppId = "\"${project.property("hockeyAppId")}\""
+        logger.log(LogLevel.INFO, "HockeyApp ID: ${hockeyAppId}")
+    } else {
+        logger.log(LogLevel.INFO, "No HockeyApp ID provided")
+    }
+
+    return hockeyAppId
+}
+
+def getTwilioVideoAppConfig() {
+    if (project.file('twilio-video-app.json').exists()) {
+        def slurper = new groovy.json.JsonSlurper()
+        def twilioVideoConfig = slurper.parse(project.file('twilio-video-app.json'));
+
+        // Validate that mandatory credentials are set
+        assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
+        assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
+
+        // Generate credential HashMap
+        def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
+        def hashMapSuffix = "}}";
+        def hashMap = hashMapPrefix;
+
+        twilioVideoConfig.credentials.each { credentialsEntry ->
+            def hashMapEntry = "    put(\"${credentialsEntry.key}\", " +
+                    "\"${credentialsEntry.value}\");\n";
+            hashMap += hashMapEntry
+        }
+
+        return hashMap + hashMapSuffix;
+    } else {
+        logger.log(LogLevel.WARN, "Could not find twilio-video-app.json in " +
+                project.projectDir.toString() + ". Community variant cannot connect to room" +
+                " without credentials")
+    }
+}
+
+def assertCredentialDefined(credentials, credentialKey) {
+    assert credentials.containsKey(credentialKey) :
+            "twilio-video-app.json must contain key " + credentialKey;
+    assert credentials.get(credentialKey) != null : credentialKey + " must not be null";
+    assert !credentials.get(credentialKey).equals("") : credentialKey + " must not be empty";
+}
+
+apply plugin: 'com.google.gms.google-services'

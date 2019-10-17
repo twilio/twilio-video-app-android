@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#cc2b33</color>
+    <color name="colorPrimaryDark">#a52229</color>
+    <color name="colorAccent">#b0bec5</color>
+    <color name="colorButtonText">#80fffffe</color>
+
+    <!-- Login Screen Colors -->
+    <color name="login_hint">#80ffffff</color>
+
+    <color name="lobbyColorPrimary">#757575</color>
+    <color name="lobbyColorPrimaryDark">#424242</color>
+    <color name="lobbyColorAccent">#9E9E9E</color>
+
+    <color name="lobbyToolbar">#66000000</color>
+    <color name="lobbyStatusBar">#e0e0e0</color>
+    <color name="lobbySecondaryText">#80ffffff</color>
+    <color name="lobbyEditTextUnderline">#1fffffff</color>
+    <color name="lobbyHint">#80ffffff</color>
+    <color name="lobbyMediaControls">#CC9B9B9B</color>
+    <color name="lobbyHangup">#CC2B33</color>
+
+    <color name="joinLayoutTextColor">#ccffffff</color>
+    <color name="lobbyStatsDrawerBg">#CC000000</color>
+    <color name="colorFadedRed">#cc2b33</color>
+
+    <!-- RemoteParticipant view colors -->
+    <color name="participantBackground">#66000000</color>
+    <color name="participantSelectedBackground">#cc000000</color>
+</resources>

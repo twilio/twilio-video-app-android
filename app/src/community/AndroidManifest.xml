@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.twilio.video.app">
+
+    <application tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".ui.login.CommunityLoginActivity"
+            android:theme="@style/AppTheme.LoginScreen"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
+        </activity>
+    </application>
+</manifest>
