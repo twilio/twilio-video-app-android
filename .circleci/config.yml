@@ -49,8 +49,8 @@ jobs:
 
       # Build app
       - run:
-          name: Build quickstartKotlin
-          command: ./gradlew -q quickstartKotlin:assemble
+          name: Build app
+          command: ./gradlew -q app:assemble
 
       # Save cache
       - save-cache: *save-cache-gradle
