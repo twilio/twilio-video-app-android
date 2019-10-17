@@ -16,6 +16,35 @@ aliases:
     paths:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
+  - &decrypt-secrets
+    name: Decrypt secrets
+    command: |
+      # Untar secrets
+      openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
+      tar -xf secrets.tar
+  - &install-secrets
+    name: Install secrets
+    command: |
+      # Internal debug google services
+      mkdir -p app/src/internal/debug || true
+      cp secrets/internal-debug-google-services.json app/src/internal/debug/google-services.json
+      # Internal release google services
+      mkdir -p app/src/internal/release || true
+      cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
+      # Twilio release google services
+      mkdir -p app/src/twilio/release || true
+      cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
+      # Video Android Twilio Credentials
+      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > library/twilio-video.json
+      # Video App Development Variant Credentials
+      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > app/twilio-video-app.json
+      # Android Keystore
+      mkdir -p ~/.gradle
+      echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
+      echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
 
   # Containers
   - &build-defaults
@@ -33,6 +62,11 @@ jobs:
       # Setup code and workspace for downstream jobs
       - checkout
       - restore-cache: *restore-cache-gradle
+      - run: *decrypt-secrets
+      - persist_to_workspace:
+          root: .
+          paths:
+            - secrets
 
       # Save cache
       - save-cache: *save-cache-gradle
@@ -46,6 +80,7 @@ jobs:
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
+      - run: *install-secrets
 
       # Build app
       - run:
