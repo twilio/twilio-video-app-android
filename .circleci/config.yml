@@ -1,0 +1,69 @@
+version: 2.0
+
+aliases:
+  # Workspace
+  - &workspace
+      ~/twilio-video-app-android
+
+  - &gradle-cache-key
+    key: jars-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+  - &restore-cache-gradle
+    <<: *gradle-cache-key
+    name: Restore Gradle Cache
+  - &save-cache-gradle
+    <<: *gradle-cache-key
+    name: Save Gradle Cache
+    paths:
+      - ~/.gradle/caches
+      - ~/.gradle/wrapper
+
+  # Containers
+  - &build-defaults
+    working_directory: *workspace
+    docker:
+      - image: circleci/android:api-28-node
+    environment:
+      - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+
+jobs:
+  setup-workspace:
+    <<: *build-defaults
+    resource_class: medium+
+    steps:
+      # Setup code and workspace for downstream jobs
+      - checkout
+      - restore-cache: *restore-cache-gradle
+
+      # Save cache
+      - save-cache: *save-cache-gradle
+
+  build-app:
+    <<: *build-defaults
+    resource_class: large
+      steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+
+      # Build app
+      - run:
+          name: Build quickstartKotlin
+          command: ./gradlew -q quickstartKotlin:assemble
+
+      # Save cache
+      - save-cache: *save-cache-gradle
+
+workflows:
+  version: 2
+
+  build:
+    jobs:
+      # Setup
+      - setup-workspace
+
+      # Build
+      - build-app:
+          requires:
+            - setup-workspace
