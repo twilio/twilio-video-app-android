@@ -67,9 +67,6 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
-            ndk {
-                debuggable true
-            }
             signingConfig signingConfigs.debug
         }
     }
