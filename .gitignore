@@ -57,6 +57,7 @@ sdk/libs/
 
 # Google Play Services
 **/google-services.json
+!app/src/community/google-services.json
 
 # CI Secrets
 secrets.tar.gz
