@@ -1,17 +1,6 @@
 apply from: "$rootProject.projectDir/gradle.properties"
 
 /**
- * These are only needed if we are publishing artifacts so we conditionally
- * set them based on properties
- */
-ext.mavenRepo = (project.hasProperty('maven.repo') ?
-        project.property("maven.repo") : '')
-ext.mavenUsername = (project.hasProperty('maven.username') ?
-        project.property("maven.username") : '')
-ext.mavenPassword = (project.hasProperty('maven.password') ?
-        project.property("maven.password") : '')
-
-/**
  * Properties used for signing release builds. Note that these properties must be set in order
  * to build proper releases. We set placeholder values so developers are not required to set these
  * properties for local development
