@@ -34,8 +34,6 @@ aliases:
       # Twilio release google services
       mkdir -p app/src/twilio/release || true
       cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
-      # Video Android Twilio Credentials
-      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > library/twilio-video.json
       # Video App Development Variant Credentials
       echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > app/twilio-video-app.json
       # Android Keystore
