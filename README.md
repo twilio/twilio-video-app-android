@@ -6,7 +6,7 @@ Before running the app, follow the steps below to provide an access token requir
 
 1. Login to the [Twilio Console](https://www.twilio.com/login), or create a free account [here](https://twilio.com/try-twilio).
 
-2. Type in an identity and click on "Generate Access Token" from the Testing Tools page.
+2. Type in an identity and click on "Generate Access Token" from the [Testing Tools Page](https://www.twilio.com/console/video/runtime/testing-tools).
 <img width="700px" src="images/community-variant/generate_access_token.png"/>
 
 3. Add the access token string copied from the console to a variable named `TWILIO_ACCESS_TOKEN` 
