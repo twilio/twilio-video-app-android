@@ -99,9 +99,9 @@ android {
             applicationId "com.twilio.video.app.community"
             buildConfigField 'String', 'TOPOLOGY_DEFAULT', '"peer-to-peer"'
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
-            buildConfigField("java.util.Map<String, String>",
-                    "twilioCredentials",
-                    "${getTwilioVideoAppConfig()}")
+            buildConfigField("String",
+                    "TWILIO_ACCESS_TOKEN",
+                    "\"${getLocalProperty("TWILIO_ACCESS_TOKEN")}\"")
         }
     }
 
@@ -152,8 +152,6 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${versions.rxJava2Adapter}"
 
     annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
-
-    communityImplementation project(':token')
 }
 
 def getHockeyAppApiToken() {
@@ -190,40 +188,18 @@ def getHockeyAppId() {
     return hockeyAppId
 }
 
-def getTwilioVideoAppConfig() {
-    if (project.file('twilio-video-app.json').exists()) {
-        def slurper = new groovy.json.JsonSlurper()
-        def twilioVideoConfig = slurper.parse(project.file('twilio-video-app.json'));
-
-        // Validate that mandatory credentials are set
-        assertCredentialDefined(twilioVideoConfig.credentials, "account_sid");
-        assertCredentialDefined(twilioVideoConfig.credentials, "api_key");
-        assertCredentialDefined(twilioVideoConfig.credentials, "api_key_secret");
-
-        // Generate credential HashMap
-        def hashMapPrefix = "new java.util.HashMap<String , String>() {{\n";
-        def hashMapSuffix = "}}";
-        def hashMap = hashMapPrefix;
-
-        twilioVideoConfig.credentials.each { credentialsEntry ->
-            def hashMapEntry = "    put(\"${credentialsEntry.key}\", " +
-                    "\"${credentialsEntry.value}\");\n";
-            hashMap += hashMapEntry
-        }
-
-        return hashMap + hashMapSuffix;
+def getLocalProperty(key) {
+    def value = null
+    if (project.rootProject.file('local.properties').exists()) {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        value = properties.getProperty(key)
+        return value
     } else {
-        logger.log(LogLevel.WARN, "Could not find twilio-video-app.json in " +
-                project.projectDir.toString() + ". Community variant cannot connect to room" +
+        logger.log(LogLevel.WARN, "Could not find local.properties in " +
+                project.rootProject.toString() + ". Community variant cannot connect to room" +
                 " without credentials")
     }
-}
-
-def assertCredentialDefined(credentials, credentialKey) {
-    assert credentials.containsKey(credentialKey) :
-            "twilio-video-app.json must contain key " + credentialKey;
-    assert credentials.get(credentialKey) != null : credentialKey + " must not be null";
-    assert !credentials.get(credentialKey).equals("") : credentialKey + " must not be empty";
 }
 
 apply plugin: 'com.google.gms.google-services'

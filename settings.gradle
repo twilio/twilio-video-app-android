@@ -1,1 +1,1 @@
-include ':app', ':env', ':twilioapi', ':token'
+include ':app', ':env', ':twilioapi'

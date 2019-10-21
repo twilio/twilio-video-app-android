@@ -58,12 +58,6 @@ sdk/libs/
 # Google Play Services
 **/google-services.json
 
-# Twilio Video Config
-**/twilio-video.json
-
-# Twilio Video App Config
-**/twilio-video-app.json
-
 # CI Secrets
 secrets.tar.gz
 secrets.tar
