@@ -127,11 +127,11 @@ generates access tokens locally. Please follow the
 
 ## Video App
 
-### WARNING 
+### WARNING
 
-This app module is no longer the customer facing reference application. 
+This app module is no longer the customer facing reference application.
 Please refer to the [video app](https://github.com/twilio/twilio-video-app-android)
-for that. There is work in progress to determine how to directly link 
+for that. There is work in progress to determine how to directly link
 to the video app repo via a subtree in this repository.
 
 ### Description
