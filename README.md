@@ -127,6 +127,15 @@ generates access tokens locally. Please follow the
 
 ## Video App
 
+### WARNING 
+
+This app module is no longer the customer facing reference application. 
+Please refer to the [video app](https://github.com/twilio/twilio-video-app-android)
+for that. There is work in progress to determine how to directly link 
+to the video app repo via a subtree in this repository.
+
+### Description
+
 The Video App demonstrates a multi-party voice and video application built with the Android
 SDK. The application consists of the following [product flavors](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Product-flavors):
 
