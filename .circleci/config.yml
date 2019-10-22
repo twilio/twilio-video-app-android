@@ -31,9 +31,9 @@ aliases:
       # Gradle Properties
       mkdir -p ~/.gradle
       mkdir -p $PWD/secrets
-      echo $VIDEO_APP_KEYSTORE | base64 -di > $PWD/secrets/android.keystore
-      keyStorePassword=$(echo $VIDEO_APP_KEYSTORE_PASSWORD | base64 -di)
-      releaseKeyPassword=$(echo $VIDEO_APP_RELEASE_KEY_PASSWORD | base64 -di)
+      echo $VIDEO_APP_KEYSTORE | base64 -d > $PWD/secrets/android.keystore
+      keyStorePassword=$(echo $VIDEO_APP_KEYSTORE_PASSWORD | base64 -d)
+      releaseKeyPassword=$(echo $VIDEO_APP_RELEASE_KEY_PASSWORD | base64 -d)
       echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
       echo "androidKeystorePassword=$keyStorePassword" >> ~/.gradle/gradle.properties
       echo "androidReleaseKeyAlias=$VIDEO_APP_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
