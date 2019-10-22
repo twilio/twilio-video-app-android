@@ -49,10 +49,10 @@ android {
      */
     signingConfigs {
         release {
-            storeFile file(keystore)
-            storePassword keystorePassword
-            keyAlias releaseKeyAlias
-            keyPassword releaseKeyPassword
+            storeFile file('video-android-app.keystore')
+            storePassword 'android'
+            keyAlias 'debug'
+            keyPassword 'android'
         }
         debug {
             storeFile file('video-android-app.keystore')
