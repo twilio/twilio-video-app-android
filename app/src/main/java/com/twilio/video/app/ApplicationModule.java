@@ -1,3 +1,5 @@
+package com.twilio.video.app;
+
 /*
  * Copyright (C) 2017 Twilio, Inc.
  *
@@ -13,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.twilio.video.app;
-
 import android.app.Application;
 import dagger.Module;
 import dagger.Provides;

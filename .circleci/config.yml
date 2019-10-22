@@ -1,0 +1,91 @@
+version: 2.17.3
+
+aliases:
+  # Workspace
+  - &workspace
+      ~/twilio-video-app-android
+
+  - &gradle-cache-key
+    key: jars-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+  - &restore-cache-gradle
+    <<: *gradle-cache-key
+    name: Restore Gradle Cache
+  - &save-cache-gradle
+    <<: *gradle-cache-key
+    name: Save Gradle Cache
+    paths:
+      - ~/.gradle/caches
+      - ~/.gradle/wrapper
+  - &setup-google-services
+    name: Setup google services
+    command: |
+      # Internal debug google services
+      mkdir -p app/src/internal/debug || true
+      echo $GOOGLE_SERVICES_INTERNAL_DEBUG_JSON | base64 -di > app/src/internal/debug/google-services.json
+      # Internal release google services
+      mkdir -p app/src/internal/release || true
+      echo $GOOGLE_SERVICES_INTERNAL_RELEASE_JSON | base64 -di > app/src/internal/release/google-services.json
+      # Twilio release google services
+      mkdir -p app/src/twilio/release || true
+      echo $GOOGLE_SERVICES_TWILIO_RELEASE_JSON | base64 -di > app/src/twilio/release/google-services.json
+      # Gradle Properties
+      mkdir -p ~/.gradle
+      mkdir -p $PWD/secrets
+      echo $VIDEO_APP_KEYSTORE | base64 -d > $PWD/secrets/android.keystore
+      echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
+      echo "androidKeystorePassword=$VIDEO_APP_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyAlias=$VIDEO_APP_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyPassword=$VIDEO_APP_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
+
+  # Containers
+  - &build-defaults
+    working_directory: *workspace
+    docker:
+      - image: circleci/android:api-28-node
+    environment:
+      - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+
+jobs:
+  setup-workspace:
+    <<: *build-defaults
+    resource_class: medium+
+    steps:
+      # Setup code and workspace for downstream jobs
+      - checkout
+      - restore-cache: *restore-cache-gradle
+
+      # Save cache
+      - save-cache: *save-cache-gradle
+
+  build-app:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *setup-google-services
+
+      # Build app
+      - run:
+          name: Build app
+          command: ./gradlew -q app:assemble
+
+      # Save cache
+      - save-cache: *save-cache-gradle
+
+workflows:
+  version: 2
+
+  build:
+    jobs:
+      # Setup
+      - setup-workspace
+
+      # Build
+      - build-app:
+          requires:
+            - setup-workspace
