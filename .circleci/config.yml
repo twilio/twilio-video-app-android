@@ -48,11 +48,6 @@ jobs:
       # Setup code and workspace for downstream jobs
       - checkout
       - restore-cache: *restore-cache-gradle
-      - run: *decrypt-secrets
-      - persist_to_workspace:
-          root: .
-          paths:
-            - secrets
 
       # Save cache
       - save-cache: *save-cache-gradle
