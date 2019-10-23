@@ -43,10 +43,6 @@ android {
         targetCompatibility versions.java
     }
 
-    /**
-     * Use the debug keystore to sign all variants of the test app
-     * since this is only used internally.
-     */
     signingConfigs {
         release {
             storeFile file(keystore)
