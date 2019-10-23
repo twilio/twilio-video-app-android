@@ -16,7 +16,9 @@
 
 package com.twilio.video.app.util;
 
-import com.twilio.video.twilioapi.TwilioApiUtils;
+
+import static com.twilio.video.app.data.api.TwilioApiEnvironmentKt.TWILIO_API_DEV_ENV;
+import static com.twilio.video.app.data.api.TwilioApiEnvironmentKt.TWILIO_API_STAGE_ENV;
 
 public class EnvUtil {
     private static final String TWILIO_DEV_ENV = "Development";
@@ -25,9 +27,9 @@ public class EnvUtil {
     public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
     public static String getNativeEnvironmentVariableValue(String environment) {
-        if (environment.equals(TwilioApiUtils.DEV)) {
+        if (environment.equals(TWILIO_API_DEV_ENV)) {
             return TWILIO_DEV_ENV;
-        } else if (environment.equals(TwilioApiUtils.STAGE)) {
+        } else if (environment.equals(TWILIO_API_STAGE_ENV)) {
             return TWILIO_STAGE_ENV;
         } else {
             return TWILIO_PROD_ENV;

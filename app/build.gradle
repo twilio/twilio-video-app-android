@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 hockeyapp {
     apiToken = "${getHockeyAppApiToken()}"
@@ -110,8 +112,6 @@ android {
 }
 
 dependencies {
-    // TODO See if twilioapi and env are really necessary
-    implementation project(':twilioapi')
     implementation project(':env')
     implementation "com.twilio:video-android:4.4.0"
     implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"
