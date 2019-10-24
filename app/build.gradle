@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 hockeyapp {
     apiToken = "${getHockeyAppApiToken()}"
@@ -43,10 +45,6 @@ android {
         targetCompatibility versions.java
     }
 
-    /**
-     * Use the debug keystore to sign all variants of the test app
-     * since this is only used internally.
-     */
     signingConfigs {
         release {
             storeFile file(keystore)
@@ -71,9 +69,6 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
-            ndk {
-                debuggable true
-            }
             signingConfig signingConfigs.debug
         }
     }
@@ -117,8 +112,6 @@ android {
 }
 
 dependencies {
-    // TODO See if twilioapi and env are really necessary
-    implementation project(':twilioapi')
     implementation project(':env')
     implementation "com.twilio:video-android:4.4.0"
     implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"

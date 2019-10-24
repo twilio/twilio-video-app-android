@@ -1,5 +1,6 @@
 buildscript {
     apply from: "$rootProject.projectDir/common.gradle"
+    ext.kotlin_version='1.3.41'
     ext.versions = [
             // Android
             'compileSdk': 28,
@@ -79,7 +80,7 @@ buildscript {
         classpath "com.google.gms:google-services:${versions.googleServices}"
         classpath "de.felixschulze.gradle:gradle-hockeyapp-plugin:${versions.gradleHockeyPlugin}"
         classpath "io.fabric.tools:gradle:${versions.fabricPlugin}"
-    }
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" }
 }
 
 plugins {
@@ -678,51 +679,6 @@ task librarySizeReport(type: GradleBuild) {
             }
         }
     }
-}
-
-task bintrayLibrarySnapshotUpload(type: GradleBuild) {
-    description = 'Publish Video Android AAR snapshot to Bintray'
-    group = 'Publishing'
-    buildFile = file('library/build.gradle')
-    tasks = ['assembleRelease', 'uploadArchives']
-    startParameter.projectProperties += gradle.startParameter.projectProperties + [
-            'snapshot': true,
-            'maven.repo': 'https://api.bintray.com/maven/twilio/snapshots/video-android/;publish=1',
-            'maven.username': "${getBintrayUsername()}",
-            'maven.password': "${getBintrayPassword()}"
-    ]
-}
-
-task bintrayLibraryReleaseCandidateUpload(type: GradleBuild) {
-    description = 'Publish Video Android AAR release candidate to internal Bintray'
-    group = 'Publishing'
-    dependsOn 'validateReleaseCandidateTag'
-    buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assembleRelease', 'uploadArchives']
-    startParameter.projectProperties += gradle.startParameter.projectProperties + [
-            'releaseCandidate': true,
-            'maven.repo': 'https://api.bintray.com/maven/twilio/internal-releases/video-android/;publish=1',
-            'maven.username': "${getBintrayUsername()}",
-            'maven.password': "${getBintrayPassword()}"
-    ]
-}
-
-task bintrayLibraryReleaseUpload(type: GradleBuild) {
-    description = 'Publish Video Android AAR to release Bintray'
-    group = 'Publishing'
-    dependsOn validateReleaseTag
-    buildFile = file('library/build.gradle')
-    tasks = ['clean', 'assembleRelease', 'uploadArchives']
-    def releaseVersion = System.getenv("CIRCLE_TAG") == null ?
-            ("") :
-            (System.getenv("CIRCLE_TAG"))
-    boolean preRelease = releaseVersion.contains("preview") || releaseVersion.contains("beta")
-    startParameter.projectProperties += gradle.startParameter.projectProperties + [
-            'preRelease': preRelease,
-            'maven.repo': 'https://api.bintray.com/maven/twilio/releases/video-android/;publish=1',
-            'maven.username': "${getBintrayUsername()}",
-            'maven.password': "${getBintrayPassword()}"
-    ]
 }
 
 /*

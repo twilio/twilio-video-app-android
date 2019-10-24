@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.twilio.video.app.data.api;
+package com.twilio.video.app.data.api
 
-import com.twilio.video.app.data.api.model.RoomProperties;
-import io.reactivex.Single;
+import com.twilio.video.app.data.api.model.RoomProperties
+import io.reactivex.Single
 
-public interface TokenService {
-    Single<String> getToken(String identity, RoomProperties roomProperties);
+interface TokenService {
+    fun getToken(identity: String, roomProperties: RoomProperties): Single<String>
 }
