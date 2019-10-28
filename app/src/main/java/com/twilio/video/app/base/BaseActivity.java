@@ -22,23 +22,23 @@ import com.google.common.base.Strings;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.util.BuildConfigUtils;
 import dagger.android.AndroidInjection;
-import net.hockeyapp.android.UpdateManager;
 
 public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        if (registerForHockeyAppUpdates()) {
-            UpdateManager.register(this, BuildConfig.HOCKEY_APP_ID);
-        }
+        // TODO Replace with auto updates from AppCenter
+//        if (registerForHockeyAppUpdates()) {
+//            UpdateManager.register(this, BuildConfig.HOCKEY_APP_ID);
+//        }
     }
 
     @Override
     protected void onDestroy() {
-        if (registerForHockeyAppUpdates()) {
-            UpdateManager.unregister();
-        }
+//        if (registerForHockeyAppUpdates()) {
+//            UpdateManager.unregister();
+//        }
         super.onDestroy();
     }
 

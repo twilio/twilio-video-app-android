@@ -1,14 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'de.felixschulze.gradle.hockeyapp'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
-hockeyapp {
-    apiToken = "${getHockeyAppApiToken()}"
-    notify = 1
-    status = 2
-}
 
 android {
     compileSdkVersion versions.compileSdk
@@ -114,7 +107,6 @@ android {
 dependencies {
     implementation project(':env')
     implementation "com.twilio:video-android:4.4.0"
-    implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"
     implementation "com.android.support.constraint:constraint-layout:1.1.3"
     implementation "com.android.support:design:${versions.designLibrary}"
     implementation "com.android.support:preference-v14:${versions.preferenceLibrary}"
@@ -147,25 +139,25 @@ dependencies {
     annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
 }
 
-def getHockeyAppApiToken() {
+def getAppCenterApiToken() {
     // Attempt to get it from the environment variable
-    def hockeyAppApiToken  = System.getenv("HOCKEY_APP_API_TOKEN");
+    def hockeyAppApiToken  = System.getenv("APPCENTER_API_TOKEN");
 
     if (hockeyAppApiToken == null) {
-        logger.log(LogLevel.INFO, "Could not locate HOCKEY_APP_API_TOKEN environment variable. " +
+        logger.log(LogLevel.INFO, "Could not locate APPCENTER_API_TOKEN environment variable. " +
                 "Trying local.properties")
         Properties properties = new Properties()
         if (project.rootProject.file('local.properties').exists()) {
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            hockeyAppApiToken = properties.getProperty('HOCKEY_APP_API_TOKEN')
+            appCenterApiToken = properties.getProperty('APPCENTER_API_TOKEN')
         }
     }
 
-    if (hockeyAppApiToken == null) {
-        logger.log(LogLevel.WARN, "HockeyApp API token unavailable.")
+    if (appCenterApiToken == null) {
+        logger.log(LogLevel.WARN, "AppCenter API token unavailable.")
     }
 
-    return hockeyAppApiToken;
+    return appCenterApiToken
 }
 
 def getHockeyAppId() {

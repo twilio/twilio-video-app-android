@@ -11,7 +11,6 @@ buildscript {
             // Plugins
             'androidGradlePlugin': '3.5.0',
             'googleServices': '3.2.1',
-            'gradleHockeyPlugin': '3.6',
             'fabricPlugin': '1.31.0',
 
             // Java
@@ -33,7 +32,6 @@ buildscript {
             'junitParams': '1.1.1',
             'relinker': '1.2.2',
             'jjwt': '0.7.0',
-            'hockey': '3.5.0',
             'timber': '4.1.0',
             'materialrangebar': '1.3',
             'butterknife': '9.0.0',
@@ -78,7 +76,6 @@ buildscript {
         classpath "com.android.tools.build:gradle:${versions.androidGradlePlugin}"
         classpath "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
         classpath "com.google.gms:google-services:${versions.googleServices}"
-        classpath "de.felixschulze.gradle:gradle-hockeyapp-plugin:${versions.gradleHockeyPlugin}"
         classpath "io.fabric.tools:gradle:${versions.fabricPlugin}"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" }
 }
