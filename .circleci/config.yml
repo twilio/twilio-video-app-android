@@ -47,45 +47,47 @@ aliases:
       - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
 jobs:
-  setup-workspace:
-    <<: *build-defaults
-    resource_class: medium+
-    steps:
-      # Setup code and workspace for downstream jobs
-      - checkout
-      - restore-cache: *restore-cache-gradle
-
-      # Save cache
-      - save-cache: *save-cache-gradle
-
   build-app:
     <<: *build-defaults
     resource_class: large
     steps:
-      # Setup
       - checkout
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
       - run: *setup-google-services
-
-      # Build app
       - run:
           name: Build app
           command: ./gradlew -q app:assemble
-
-      # Save cache
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/build
       - save-cache: *save-cache-gradle
+
+  publish-to-appcenter:
+    <<: *build-defaults
+    resource_class: medium+
+    name: Publish to AppCenter
+    steps:
+      - attach_workspace:
+          at: *workspace
+      - run:
+          command: |
+            sudo npm install webpack
+            echo no | sudo npm install -g appcenter-cli
+            appcenter login --token $APPCENTER_API_TOKEN
+            appcenter distribute release -f $PWD/app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-App-Internal
 
 workflows:
   version: 2
 
-  build:
+  build-test-publish:
     jobs:
-      # Setup
-      - setup-workspace
-
-      # Build
-      - build-app:
+      - build-app
+      - publish-to-appcenter:
           requires:
-            - setup-workspace
+            - build-app
+          filters:
+            branches:
+              only: master
