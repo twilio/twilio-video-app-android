@@ -23,8 +23,8 @@ android {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
 
-        versionName generateVersionName()
-        versionCode generateVersionCode()
+        versionName "0.1.0"
+        versionCode 1
 
         buildConfigField 'String', 'HOCKEY_APP_ID', "${getHockeyAppId()}"
 

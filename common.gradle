@@ -14,22 +14,6 @@ ext.releaseKeyAlias = (project.hasProperty('androidReleaseKeyAlias') ?
 ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
         project.property('androidReleaseKeyPassword') : 'fakepassword')
 
-ext.generateVersionName = {
-    return "${versionMajor}.${versionMinor}.${versionPatch}" +
-           ((project.hasProperty("preRelease") && project.property("preRelease").toBoolean() == true) ?
-                   "-${project.property("phase")}${project.property("phaseNumber")}" : '') +
-           ((project.hasProperty("releaseCandidate") && project.property("releaseCandidate").toBoolean() == true) ?
-                   "-rc${project.property("versionRc")}" : '') +
-           ((project.hasProperty("snapshot") && project.property("snapshot").toBoolean() == true) ? "-SNAPSHOT" : '')
-}
-
-ext.generateVersionCode = {
-    def version = "${versionMajor}.${versionMinor}.${versionPatch}"
-    def build = version.toString().replace(".", "") as int
-
-    return build * 1000
-}
-
 ext.getBintrayUsername = {
     def bintrayUsername  = System.getenv("BINTRAY_USERNAME");
 
