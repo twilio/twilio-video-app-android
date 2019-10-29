@@ -5,6 +5,7 @@ apply from: "$rootProject.projectDir/gradle.properties"
  * to build proper releases. We set placeholder values so developers are not required to set these
  * properties for local development
  */
+// TODO Move all to project level build.gradle
 ext.keystore = (project.hasProperty('androidKeystore') ?
         project.property('androidKeystore') : '/fake/path/to/keystore')
 ext.keystorePassword = (project.hasProperty('androidKeystorePassword') ?
@@ -13,22 +14,6 @@ ext.releaseKeyAlias = (project.hasProperty('androidReleaseKeyAlias') ?
         project.property('androidReleaseKeyAlias') : 'fakealias')
 ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
         project.property('androidReleaseKeyPassword') : 'fakepassword')
-
-ext.generateVersionName = {
-    return "${versionMajor}.${versionMinor}.${versionPatch}" +
-           ((project.hasProperty("preRelease") && project.property("preRelease").toBoolean() == true) ?
-                   "-${project.property("phase")}${project.property("phaseNumber")}" : '') +
-           ((project.hasProperty("releaseCandidate") && project.property("releaseCandidate").toBoolean() == true) ?
-                   "-rc${project.property("versionRc")}" : '') +
-           ((project.hasProperty("snapshot") && project.property("snapshot").toBoolean() == true) ? "-SNAPSHOT" : '')
-}
-
-ext.generateVersionCode = {
-    def version = "${versionMajor}.${versionMinor}.${versionPatch}"
-    def build = version.toString().replace(".", "") as int
-
-    return build * 1000
-}
 
 ext.getBintrayUsername = {
     def bintrayUsername  = System.getenv("BINTRAY_USERNAME");

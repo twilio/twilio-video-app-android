@@ -1,14 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'de.felixschulze.gradle.hockeyapp'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-
-hockeyapp {
-    apiToken = "${getHockeyAppApiToken()}"
-    notify = 1
-    status = 2
-}
 
 android {
     compileSdkVersion versions.compileSdk
@@ -30,10 +23,8 @@ android {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
 
-        versionName generateVersionName()
-        versionCode generateVersionCode()
-
-        buildConfigField 'String', 'HOCKEY_APP_ID', "${getHockeyAppId()}"
+        versionName "0.1.0"
+        versionCode 1
 
         vectorDrawables.useSupportLibrary = true
 
@@ -114,7 +105,6 @@ android {
 dependencies {
     implementation project(':env')
     implementation "com.twilio:video-android:4.4.0"
-    implementation "net.hockeyapp.android:HockeySDK:${versions.hockey}"
     implementation "com.android.support.constraint:constraint-layout:1.1.3"
     implementation "com.android.support:design:${versions.designLibrary}"
     implementation "com.android.support:preference-v14:${versions.preferenceLibrary}"
@@ -145,40 +135,6 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${versions.rxJava2Adapter}"
 
     annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
-}
-
-def getHockeyAppApiToken() {
-    // Attempt to get it from the environment variable
-    def hockeyAppApiToken  = System.getenv("HOCKEY_APP_API_TOKEN");
-
-    if (hockeyAppApiToken == null) {
-        logger.log(LogLevel.INFO, "Could not locate HOCKEY_APP_API_TOKEN environment variable. " +
-                "Trying local.properties")
-        Properties properties = new Properties()
-        if (project.rootProject.file('local.properties').exists()) {
-            properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            hockeyAppApiToken = properties.getProperty('HOCKEY_APP_API_TOKEN')
-        }
-    }
-
-    if (hockeyAppApiToken == null) {
-        logger.log(LogLevel.WARN, "HockeyApp API token unavailable.")
-    }
-
-    return hockeyAppApiToken;
-}
-
-def getHockeyAppId() {
-    def hockeyAppId = "\"\""
-
-    if (project.hasProperty("hockeyAppId")) {
-        hockeyAppId = "\"${project.property("hockeyAppId")}\""
-        logger.log(LogLevel.INFO, "HockeyApp ID: ${hockeyAppId}")
-    } else {
-        logger.log(LogLevel.INFO, "No HockeyApp ID provided")
-    }
-
-    return hockeyAppId
 }
 
 def getLocalProperty(key) {
