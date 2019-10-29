@@ -26,8 +26,6 @@ android {
         versionName "0.1.0"
         versionCode 1
 
-        buildConfigField 'String', 'HOCKEY_APP_ID', "${getHockeyAppId()}"
-
         vectorDrawables.useSupportLibrary = true
 
         multiDexEnabled true
@@ -137,40 +135,6 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${versions.rxJava2Adapter}"
 
     annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
-}
-
-def getAppCenterApiToken() {
-    // Attempt to get it from the environment variable
-    def hockeyAppApiToken  = System.getenv("APPCENTER_API_TOKEN");
-
-    if (hockeyAppApiToken == null) {
-        logger.log(LogLevel.INFO, "Could not locate APPCENTER_API_TOKEN environment variable. " +
-                "Trying local.properties")
-        Properties properties = new Properties()
-        if (project.rootProject.file('local.properties').exists()) {
-            properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            appCenterApiToken = properties.getProperty('APPCENTER_API_TOKEN')
-        }
-    }
-
-    if (appCenterApiToken == null) {
-        logger.log(LogLevel.WARN, "AppCenter API token unavailable.")
-    }
-
-    return appCenterApiToken
-}
-
-def getHockeyAppId() {
-    def hockeyAppId = "\"\""
-
-    if (project.hasProperty("hockeyAppId")) {
-        hockeyAppId = "\"${project.property("hockeyAppId")}\""
-        logger.log(LogLevel.INFO, "HockeyApp ID: ${hockeyAppId}")
-    } else {
-        logger.log(LogLevel.INFO, "No HockeyApp ID provided")
-    }
-
-    return hockeyAppId
 }
 
 def getLocalProperty(key) {
