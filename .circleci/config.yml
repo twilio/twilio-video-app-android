@@ -90,6 +90,6 @@ workflows:
       - publish-to-appcenter:
           requires:
             - build-app
-#          filters:
-#            branches:
-#              only: master
+          filters:
+            branches:
+              only: master
