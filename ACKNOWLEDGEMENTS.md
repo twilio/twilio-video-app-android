@@ -2,7 +2,7 @@
 
 This software includes the following software dependencies under their corresponding licenses:
  
-- Twilio Android Video - [https://www.twilio.com/legal/tos]
+- Twilio Video Android - [https://www.twilio.com/legal/tos]
 
 - Generic [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.txt).
 
