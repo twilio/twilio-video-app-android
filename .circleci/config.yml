@@ -63,7 +63,6 @@ jobs:
           root: .
           paths:
             - app/build
-            - CHANGELOG.md
       - save-cache: *save-cache-gradle
 
   publish-to-appcenter:
@@ -75,11 +74,12 @@ jobs:
           at: *workspace
       - run:
           # TODO Ticket to improve build time here https://issues.corp.twilio.com/browse/AHOYAPPS-67
+          # TODO Ticket to add latest changelog update https://issues.corp.twilio.com/browse/AHOYAPPS-94
           command: |
             sudo npm install webpack
             echo no | sudo npm install -g appcenter-cli
             appcenter login --token $APPCENTER_API_TOKEN
-            appcenter distribute release -R CHANGELOG.md -f app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-App-Internal
+            appcenter distribute release -f app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-App-Internal
 
 workflows:
   version: 2
