@@ -13,8 +13,9 @@ android {
     buildToolsVersion "${versions.buildTools}"
 
     lintOptions {
-        warningsAsErrors true
         // TODO: Fix all baseline app warnings and errors GSDK-1984
+        abortOnError false
+        warningsAsErrors true
         baseline file("lint-baseline.xml")
     }
 
