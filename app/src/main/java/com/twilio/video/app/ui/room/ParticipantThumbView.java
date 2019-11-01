@@ -19,10 +19,12 @@ package com.twilio.video.app.ui.room;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.core.content.ContextCompat;
+
 import butterknife.ButterKnife;
 import com.twilio.video.app.R;
 

@@ -18,8 +18,10 @@ package com.twilio.video.app.dialog;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AlertDialog;
+
 import com.twilio.video.app.R;
 import com.twilio.video.app.model.TwilioIceServer;
 import java.util.List;

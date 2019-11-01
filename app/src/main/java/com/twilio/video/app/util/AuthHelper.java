@@ -19,9 +19,11 @@ package com.twilio.video.app.util;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 import android.content.Context;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
