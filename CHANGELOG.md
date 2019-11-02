@@ -1,5 +1,28 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.0.1
+
+* Programmable Video Android SDK 5.0.1 [[bintray]](https://bintray.com/twilio/releases/video-android/5.0.1), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.0.1/)
+
+Bug Fixes
+
+- Fixed a deadlock that could occur when destroying a `Room` without waiting for `Room.Listener.onDisconnected(...)` to arrive.
+- Fixed a crash which could occur when disconnecting from a  `Room` with dominant speaker enabled.
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
+### 5.0.0
+
+* Programmable Video Android SDK 5.0.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.0.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.0.0/)
+
+5.0 is now generally available. Thank you for all the feedback from our beta adopters. This release includes Global low latency (GLL) signaling with IPv4 and IPv6 support.
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
 ### 5.0.0-beta4
 
 #### Network Quality API
