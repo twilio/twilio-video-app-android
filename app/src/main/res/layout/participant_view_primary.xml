@@ -7,7 +7,7 @@
 
     <!-- RemoteParticipant layout with video track -->
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/participant_video_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             app:overlaySurface="false"/>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/participant_badge"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
@@ -75,9 +75,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- RemoteParticipant layout without video track -->
 

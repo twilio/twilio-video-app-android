@@ -18,8 +18,10 @@ package com.twilio.video.app.data;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.preference.DialogPreference;
 import android.util.AttributeSet;
+
+import androidx.preference.DialogPreference;
+
 import com.twilio.video.app.R;
 import java.util.Locale;
 

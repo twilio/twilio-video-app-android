@@ -17,8 +17,10 @@
 package com.twilio.video.app.util;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Pair;
+
+import androidx.annotation.NonNull;
+
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.VideoCapturer;

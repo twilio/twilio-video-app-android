@@ -20,13 +20,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
+
 import com.twilio.video.app.R;
 
 /**
