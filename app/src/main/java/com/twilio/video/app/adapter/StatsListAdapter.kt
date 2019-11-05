@@ -143,9 +143,10 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
     }
 
     fun updateStatsData(
-            statsReports: List<StatsReport>,
-            remoteParticipants: List<RemoteParticipant>,
-            localVideoTrackNames: Map<String, String>) {
+        statsReports: List<StatsReport>,
+        remoteParticipants: List<RemoteParticipant>,
+        localVideoTrackNames: Map<String, String>
+    ) {
         /*
          * Generate new items on a separate list to ensure statsListItems changes are only
          * performed on the UI thread to meet the threading requirement of RecyclerView.Adapter.
@@ -191,11 +192,11 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
             }
             var trackCount = 0
             for (remoteAudioTrackStats in report.remoteAudioTrackStats) {
-                val trackName = (getParticipantName(remoteAudioTrackStats.trackSid, true, remoteParticipants)
-                        + " "
-                        + context.getString(R.string.audio_track)
-                        + " "
-                        + trackCount)
+                val trackName = (getParticipantName(remoteAudioTrackStats.trackSid, true, remoteParticipants) +
+                        " " +
+                        context.getString(R.string.audio_track) +
+                        " " +
+                        trackCount)
                 val item = StatsListItem.Builder()
                         .baseTrackInfo(remoteAudioTrackStats)
                         .bytes(remoteAudioTrackStats.bytesReceived)
@@ -211,11 +212,11 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
             trackCount = 0
             for (remoteVideoTrackStats in report.remoteVideoTrackStats) {
                 val trackName = (getParticipantName(
-                        remoteVideoTrackStats.trackSid, false, remoteParticipants)
-                        + " "
-                        + context.getString(R.string.video_track)
-                        + " "
-                        + trackCount)
+                        remoteVideoTrackStats.trackSid, false, remoteParticipants) +
+                        " " +
+                        context.getString(R.string.video_track) +
+                        " " +
+                        trackCount)
                 val item = StatsListItem.Builder()
                         .baseTrackInfo(remoteVideoTrackStats)
                         .bytes(remoteVideoTrackStats.bytesReceived)
@@ -238,7 +239,10 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
     }
 
     private fun getParticipantName(
-            trackSid: String, isAudioTrack: Boolean, remoteParticipants: List<RemoteParticipant>): String {
+        trackSid: String,
+        isAudioTrack: Boolean,
+        remoteParticipants: List<RemoteParticipant>
+    ): String {
         for (remoteParticipant in remoteParticipants) {
             if (isAudioTrack) {
                 val remoteAudioTrack = getAudioTrack(remoteParticipant, trackSid)
@@ -266,7 +270,9 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
     }
 
     private fun getRemoteVideoTrack(
-            remoteParticipant: RemoteParticipant, trackSid: String): RemoteVideoTrack? {
+        remoteParticipant: RemoteParticipant,
+        trackSid: String
+    ): RemoteVideoTrack? {
         for (remoteVideoTrackPublication in remoteParticipant.remoteVideoTracks) {
             if (remoteVideoTrackPublication.trackSid == trackSid) {
                 return remoteVideoTrackPublication.remoteVideoTrack

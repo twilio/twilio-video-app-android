@@ -8,10 +8,11 @@ import io.reactivex.Single
 import timber.log.Timber
 
 class VideoAppServiceDelegate(
-        private val sharedPreferences: SharedPreferences,
-        private val videoAppServiceDev: VideoAppService,
-        private val videoAppServiceStage: VideoAppService,
-        private val videoAppServiceProd: VideoAppService) : TokenService {
+    private val sharedPreferences: SharedPreferences,
+    private val videoAppServiceDev: VideoAppService,
+    private val videoAppServiceStage: VideoAppService,
+    private val videoAppServiceProd: VideoAppService
+) : TokenService {
 
     override fun getToken(identity: String, roomProperties: RoomProperties): Single<String> {
         val env = sharedPreferences.getString(
@@ -30,7 +31,7 @@ class VideoAppServiceDelegate(
 
     private fun resolveAppEnvironment(appFlavor: String): String {
         // Video App Service only accepts internal and production for app environment
-        return if(TWILIO_API_DEV_ENV == appFlavor) {
+        return if (TWILIO_API_DEV_ENV == appFlavor) {
             "internal"
         } else "production"
     }
