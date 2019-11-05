@@ -1,47 +1,6 @@
 buildscript {
-    ext.kotlin_version='1.3.41'
     ext.versions = [
-            // Android
-            'compileSdk': 28,
-            'buildTools': '28.0.3',
-            'minSdk': 16,
-            'targetSdk': 28,
-
-            // Plugins
-            'androidGradlePlugin': '3.5.0',
-            'googleServices': '3.2.1',
-            'fabricPlugin': '1.31.0',
-
-            // Java
-            'java': JavaVersion.VERSION_1_8,
-
-            // Dependencies
-            'junit': '4.12',
-            'mockito': '1.10.19',
-            'guava': '19.0',
-            'retrofit': '1.9.0',
-            'supportLibrary': '27.1.1',
-            'espresso': '3.0.0',
-            'testSupportLibrary': '1.0.0',
-            'uiAutomator': '2.1.2',
-            'gson': '2.7',
-            'apacheCommons': '3.6',
-            'junitParams': '1.1.1',
-            'relinker': '1.2.2',
-            'jjwt': '0.7.0',
-            'materialrangebar': '1.3',
-            'butterknife': '9.0.0',
-            'multidex': '1.0.3',
-            'firebase': '16.0.1',
-            'firebaseAuth': '16.0.2',
-            'crashlytics': '2.9.5',
-            'playServices': '15.0.1',
-            'playServicesAuth': '15.0.1',
-            'dagger': '2.10',
-            'rxJava2': '2.0.6',
-            'rxJava2Adapter': '1.0.0',
-            'rxAndroid2': '2.0.1',
-            'retrofit2': '2.1.0'
+            'butterknife' : '10.2.0',
     ]
 
     ext.keystore = (project.hasProperty('androidKeystore') ?
@@ -119,11 +78,11 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:${versions.androidGradlePlugin}"
+        classpath "com.android.tools.build:gradle:3.5.0"
         classpath "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
-        classpath "com.google.gms:google-services:${versions.googleServices}"
-        classpath "io.fabric.tools:gradle:${versions.fabricPlugin}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.gms:google-services:3.2.1"
+        classpath "io.fabric.tools:gradle:1.31.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.41"
     }
 }
 
