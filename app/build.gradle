@@ -104,7 +104,7 @@ android {
 
 dependencies {
     def butterknife = '10.2.0'
-    def dagger = '2.10'
+    def dagger = '2.15'
     def retrofit = '2.1.0'
     implementation 'com.twilio:twilio-android-env:1.0.0'
     implementation "com.twilio:video-android:5.0.0"
@@ -137,11 +137,10 @@ dependencies {
 }
 
 def getLocalProperty(key) {
-    def value = null
     if (project.rootProject.file('local.properties').exists()) {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        value = properties.getProperty(key)
+        def value = properties.getProperty(key)
         return value
     } else {
         logger.log(LogLevel.WARN, "Could not find local.properties in " +

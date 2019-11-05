@@ -23,11 +23,11 @@ import android.content.Context;
 import androidx.multidex.MultiDex;
 
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasDispatchingActivityInjector;
+import dagger.android.HasActivityInjector;
 import javax.inject.Inject;
 import timber.log.Timber;
 
-public class VideoApplication extends Application implements HasDispatchingActivityInjector {
+public class VideoApplication extends Application implements HasActivityInjector {
     @Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
     @Inject Timber.Tree tree;
 
