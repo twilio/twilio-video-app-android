@@ -18,9 +18,7 @@ package com.twilio.video.app.ui.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
-
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.ui.room.RoomActivity;

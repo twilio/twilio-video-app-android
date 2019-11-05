@@ -47,7 +47,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -56,12 +55,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-
 import com.google.android.material.snackbar.Snackbar;
 import com.twilio.androidenv.Env;
 import com.twilio.video.AspectRatio;

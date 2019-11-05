@@ -20,14 +20,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
-
 import com.twilio.video.AudioCodec;
 import com.twilio.video.G722Codec;
 import com.twilio.video.H264Codec;

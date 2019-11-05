@@ -19,10 +19,8 @@ package com.twilio.video.app.data;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-
 import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
-
 import com.twilio.video.app.R;
 import java.util.Locale;
 

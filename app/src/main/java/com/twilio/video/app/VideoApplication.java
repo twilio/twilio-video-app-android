@@ -19,9 +19,7 @@ package com.twilio.video.app;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-
 import androidx.multidex.MultiDex;
-
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import javax.inject.Inject;

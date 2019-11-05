@@ -18,9 +18,7 @@ package com.twilio.video.app.ui.room;
 
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.Nullable;
-
 import com.twilio.video.VideoTrack;
 import java.util.ArrayList;
 import java.util.HashMap;

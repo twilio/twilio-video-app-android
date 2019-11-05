@@ -8,9 +8,7 @@ import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import androidx.core.content.res.ResourcesCompat;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

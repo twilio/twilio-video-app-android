@@ -26,9 +26,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-
 import androidx.appcompat.app.AppCompatDialogFragment;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

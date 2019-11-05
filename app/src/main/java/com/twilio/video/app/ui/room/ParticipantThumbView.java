@@ -22,9 +22,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import androidx.core.content.ContextCompat;
-
 import butterknife.ButterKnife;
 import com.twilio.video.app.R;
 

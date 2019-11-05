@@ -25,11 +25,9 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
-
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
-
 import com.appyvet.rangebar.IRangeBarFormatter;
 import com.appyvet.rangebar.RangeBar;
 import com.twilio.video.app.R;

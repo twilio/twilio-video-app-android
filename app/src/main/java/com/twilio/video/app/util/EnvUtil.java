@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.util;
 
-
 import static com.twilio.video.app.data.api.TwilioApiEnvironmentKt.TWILIO_API_DEV_ENV;
 import static com.twilio.video.app.data.api.TwilioApiEnvironmentKt.TWILIO_API_STAGE_ENV;
 

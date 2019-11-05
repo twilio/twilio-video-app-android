@@ -24,11 +24,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-
 import com.twilio.video.app.R;
 
 /**

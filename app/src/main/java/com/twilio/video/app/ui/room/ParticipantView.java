@@ -25,14 +25,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.AttrRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import butterknife.BindView;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
