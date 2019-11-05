@@ -102,6 +102,10 @@ spotless {
         target '**/*.java'
         googleJavaFormat().aosp()
     }
+    kotlin {
+        target '**/*.kt'
+        ktlint()
+    }
 }
 
 allprojects {
