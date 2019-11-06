@@ -33,12 +33,10 @@ import com.twilio.video.app.R;
  * ClearableEditText is an extension for standard EditText with an extra option to setup clear icon
  * with as right compound drawable, which handles clear icon touch event as erase for the contents
  * of user input.
- *
- * @attr name clearIcon - clear action icon to display to the right of EditText input.
  */
 public class ClearableEditText extends AppCompatEditText {
 
-    /** Clear icon drawable. */
+    /** Clear action icon to display to the right of EditText input. */
     private Drawable clearDrawable;
 
     public ClearableEditText(Context context) {

@@ -35,16 +35,6 @@ import com.twilio.video.app.R;
 /**
  * RangeBarPreference allows to save any range in default shared preferences by saving range start
  * and range end values.
- *
- * <p>Customizable options:
- *
- * @attr name entries - collection of string to use as display value
- * @attr name heightResId - range bar height
- * @attr name startTick - range bar start
- * @attr name endTick - range bar end
- * @attr name pinRadius - size of pin1
- * @attr name startKey - string used as key to save value in shared preferences.
- * @attr name endKey - string used as key to save value in shared preferences.
  */
 public class RangeBarPreference extends Preference {
 
