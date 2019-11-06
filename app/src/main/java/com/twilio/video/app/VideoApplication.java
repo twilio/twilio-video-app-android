@@ -29,8 +29,6 @@ public class VideoApplication extends Application implements HasActivityInjector
     @Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
     @Inject Timber.Tree tree;
 
-    private VideoApplicationComponent applicationComponent;
-
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -42,10 +40,9 @@ public class VideoApplication extends Application implements HasActivityInjector
         super.onCreate();
 
         // Create application component and inject application
-        applicationComponent =
-                DaggerVideoApplicationComponent.builder()
-                        .applicationModule(new ApplicationModule(this))
-                        .build();
+        VideoApplicationComponent applicationComponent = DaggerVideoApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .build();
         applicationComponent.inject(this);
 
         // Setup logging

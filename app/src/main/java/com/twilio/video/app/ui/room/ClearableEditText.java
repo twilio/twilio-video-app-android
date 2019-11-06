@@ -37,8 +37,6 @@ import com.twilio.video.app.R;
  * @attr name clearIcon - clear action icon to display to the right of EditText input.
  */
 public class ClearableEditText extends AppCompatEditText {
-    /** Clear icon resource id. */
-    private int clearIconResId;
 
     /** Clear icon drawable. */
     private Drawable clearDrawable;
@@ -66,7 +64,8 @@ public class ClearableEditText extends AppCompatEditText {
                             .obtainStyledAttributes(attrs, R.styleable.ClearableEditText, 0, 0);
 
             // obtain clear icon resource id
-            clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
+            /** Clear icon resource id. */
+            int clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
             if (clearIconResId != -1) {
                 clearDrawable = VectorDrawableCompat.create(getResources(), clearIconResId, null);
             }

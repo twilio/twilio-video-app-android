@@ -51,9 +51,6 @@ public class RangeBarPreference extends Preference {
     /** Default shared preferences instance. */
     private SharedPreferences sharedPreferences;
 
-    /** Customizable range bar. */
-    private RangeBar rangeBar;
-
     /**
      * RangeBar pin visible text formatter. If entries array is provided utilizes string values from
      * the provided array, otherwise falls back to integers.
@@ -110,10 +107,11 @@ public class RangeBarPreference extends Preference {
         // obtain resources for range bar height calculations.
         Resources resources = holder.itemView.getContext().getResources();
 
-        rangeBar = (RangeBar) holder.findViewById(R.id.range_bar);
+        /** Customizable range bar. */
+        RangeBar rangeBar1 = (RangeBar) holder.findViewById(R.id.range_bar);
 
         // apply custom height
-        rangeBar.setLayoutParams(
+        rangeBar1.setLayoutParams(
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         resources.getDimensionPixelSize(heightResId)));
@@ -124,8 +122,8 @@ public class RangeBarPreference extends Preference {
             endTick = entries.length - 1;
         }
 
-        rangeBar.setTickStart(startTick);
-        rangeBar.setTickEnd(endTick);
+        rangeBar1.setTickStart(startTick);
+        rangeBar1.setTickEnd(endTick);
 
         // obtain selected range
         int start = sharedPreferences.getInt(startKey, -1);
@@ -139,22 +137,22 @@ public class RangeBarPreference extends Preference {
             end = endTick;
         }
 
-        rangeBar.setRangePinsByValue(start, end);
+        rangeBar1.setRangePinsByValue(start, end);
 
         // apply pin size
         if (pinRadius != -1.0f) {
-            rangeBar.setPinRadius(pinRadius);
+            rangeBar1.setPinRadius(pinRadius);
         }
 
         // apply range bar value text formatter visible on choosing pins
-        if (rangeBar != null) {
+        if (rangeBar1 != null) {
 
             if (formatter != null) {
-                rangeBar.setFormatter(formatter);
+                rangeBar1.setFormatter(formatter);
             }
 
             // save all changes prefs while moving pins
-            rangeBar.setOnRangeBarChangeListener(
+            rangeBar1.setOnRangeBarChangeListener(
                     (rangeBar, leftPinIndex, rightPinIndex, leftPinValue, rightPinValue) ->
                             sharedPreferences
                                     .edit()

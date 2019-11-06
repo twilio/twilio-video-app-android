@@ -33,8 +33,11 @@ public class CameraCapturerCompat {
     private Camera2Capturer camera2Capturer;
     private Pair<CameraCapturer.CameraSource, String> frontCameraPair;
     private Pair<CameraCapturer.CameraSource, String> backCameraPair;
-    private final Camera2Capturer.Listener camera2Listener =
-            new Camera2Capturer.Listener() {
+
+    public CameraCapturerCompat(Context context, CameraCapturer.CameraSource cameraSource) {
+        if (Camera2Capturer.isSupported(context)) {
+            setCameraPairs(context);
+            Camera2Capturer.Listener camera2Listener = new Camera2Capturer.Listener() {
                 @Override
                 public void onFirstFrameAvailable() {
                     Timber.i("onFirstFrameAvailable");
@@ -50,10 +53,6 @@ public class CameraCapturerCompat {
                     Timber.e(camera2CapturerException);
                 }
             };
-
-    public CameraCapturerCompat(Context context, CameraCapturer.CameraSource cameraSource) {
-        if (Camera2Capturer.isSupported(context)) {
-            setCameraPairs(context);
             camera2Capturer =
                     new Camera2Capturer(context, getCameraId(cameraSource), camera2Listener);
         } else {
