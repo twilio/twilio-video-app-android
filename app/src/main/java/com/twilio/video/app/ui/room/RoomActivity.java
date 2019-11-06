@@ -232,7 +232,7 @@ public class RoomActivity extends BaseActivity {
             new ScreenCapturer.Listener() {
                 @Override
                 public void onScreenCaptureError(@NonNull String errorDescription) {
-                    Timber.e("Screen capturer error: " + errorDescription);
+                    Timber.e("Screen capturer error: %s", errorDescription);
                     stopScreenCapture();
                     Snackbar.make(
                                     primaryVideoView,
@@ -1422,12 +1422,12 @@ public class RoomActivity extends BaseActivity {
             @Override
             public void onReconnecting(
                     @NonNull Room room, @NonNull TwilioException twilioException) {
-                Timber.i("onReconnecting: " + room.getName());
+                Timber.i("onReconnecting: %s", room.getName());
             }
 
             @Override
             public void onReconnected(@NonNull Room room) {
-                Timber.i("onReconnected: " + room.getName());
+                Timber.i("onReconnected: %s", room.getName());
             }
 
             @Override
@@ -1509,12 +1509,12 @@ public class RoomActivity extends BaseActivity {
 
             @Override
             public void onRecordingStarted(@NonNull Room room) {
-                Timber.i("onRecordingStarted: " + room.getName());
+                Timber.i("onRecordingStarted: %s", room.getName());
             }
 
             @Override
             public void onRecordingStopped(@NonNull Room room) {
-                Timber.i("onRecordingStopped: " + room.getName());
+                Timber.i("onRecordingStopped: %s", room.getName());
             }
         };
     }
@@ -1587,8 +1587,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteParticipant remoteParticipant,
                 @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
             Timber.i(
-                    "onAudioTrackPublished: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onAudioTrackPublished: remoteParticipant: %s, audio: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1602,8 +1601,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteParticipant remoteParticipant,
                 @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication) {
             Timber.i(
-                    "onAudioTrackUnpublished: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onAudioTrackUnpublished: remoteParticipant: %s, audio: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1616,8 +1614,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteParticipant remoteParticipant,
                 @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {
             Timber.i(
-                    "onVideoTrackPublished: remoteParticipant: %s, video: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onVideoTrackPublished: remoteParticipant: %s, video: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
@@ -1630,8 +1627,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteParticipant remoteParticipant,
                 @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication) {
             Timber.i(
-                    "onVideoTrackUnpublished: remoteParticipant: %s, video: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onVideoTrackUnpublished: remoteParticipant: %s, video: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
@@ -1645,8 +1641,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
                 @NonNull RemoteAudioTrack remoteAudioTrack) {
             Timber.i(
-                    "onAudioTrackSubscribed: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onAudioTrackSubscribed: remoteParticipant: %s, audio: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1672,8 +1667,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
                 @NonNull TwilioException twilioException) {
             Timber.w(
-                    "onAudioTrackSubscriptionFailed: remoteParticipant: %s, video: %s, "
-                            + "exception: %s",
+                    "onAudioTrackSubscriptionFailed: remoteParticipant: %s, video: %s, exception: %s",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     twilioException.getMessage());
@@ -1688,8 +1682,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteAudioTrackPublication remoteAudioTrackPublication,
                 @NonNull RemoteAudioTrack remoteAudioTrack) {
             Timber.i(
-                    "onAudioTrackUnsubscribed: remoteParticipant: %s, audio: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onAudioTrackUnsubscribed: remoteParticipant: %s, audio: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteAudioTrackPublication.getTrackSid(),
                     remoteAudioTrackPublication.isTrackEnabled(),
@@ -1716,8 +1709,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
                 @NonNull RemoteVideoTrack remoteVideoTrack) {
             Timber.i(
-                    "onVideoTrackSubscribed: remoteParticipant: %s, video: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onVideoTrackSubscribed: remoteParticipant: %s, video: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
@@ -1747,8 +1739,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication,
                 @NonNull TwilioException twilioException) {
             Timber.w(
-                    "onVideoTrackSubscriptionFailed: remoteParticipant: %s, video: %s, "
-                            + "exception: %s",
+                    "onVideoTrackSubscriptionFailed: remoteParticipant: %s, video: %s, exception: %s",
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     twilioException.getMessage());
@@ -1830,8 +1821,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
                 @NonNull RemoteDataTrack remoteDataTrack) {
             Timber.i(
-                    "onDataTrackSubscribed: remoteParticipant: %s, data: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onDataTrackSubscribed: remoteParticipant: %s, data: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled(),
@@ -1844,8 +1834,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
                 @NonNull TwilioException twilioException) {
             Timber.w(
-                    "onDataTrackSubscriptionFailed: remoteParticipant: %s, video: %s, "
-                            + "exception: %s",
+                    "onDataTrackSubscriptionFailed: remoteParticipant: %s, video: %s, exception: %s",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     twilioException.getMessage());
@@ -1860,8 +1849,7 @@ public class RoomActivity extends BaseActivity {
                 @NonNull RemoteDataTrackPublication remoteDataTrackPublication,
                 @NonNull RemoteDataTrack remoteDataTrack) {
             Timber.i(
-                    "onDataTrackUnsubscribed: remoteParticipant: %s, data: %s, enabled: %b, "
-                            + "subscribed: %b",
+                    "onDataTrackUnsubscribed: remoteParticipant: %s, data: %s, enabled: %b, subscribed: %b",
                     remoteParticipant.getIdentity(),
                     remoteDataTrackPublication.getTrackSid(),
                     remoteDataTrackPublication.isTrackEnabled(),
