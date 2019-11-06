@@ -112,7 +112,7 @@ public class ClearableEditText extends AppCompatEditText {
      *
      * @param show pass true to display icon, otherwise false to hide.
      */
-    public void showClearIcon(boolean show) {
+    private void showClearIcon(boolean show) {
         // TODO: should probably use setVisibility method, but seems to not working.
         if (clearDrawable != null) {
             clearDrawable.setAlpha(show ? 255 : 0);
@@ -124,7 +124,7 @@ public class ClearableEditText extends AppCompatEditText {
      *
      * @return true if active, otherwise - false.
      */
-    public boolean isClearVisible() {
+    private boolean isClearVisible() {
         return clearDrawable != null && DrawableCompat.getAlpha(clearDrawable) == 255;
     }
 }

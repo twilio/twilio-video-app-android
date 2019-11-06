@@ -672,8 +672,8 @@ public class RoomActivity extends BaseActivity {
         videoConstraints = builder.build();
     }
 
-    private VideoCodec getVideoCodecPreference(String key, String defaultValue) {
-        final String videoCodecName = sharedPreferences.getString(key, defaultValue);
+    private VideoCodec getVideoCodecPreference(String key) {
+        final String videoCodecName = sharedPreferences.getString(key, Preferences.VIDEO_CODEC_DEFAULT);
 
         switch (videoCodecName) {
             case Vp8Codec.NAME:
@@ -690,8 +690,8 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    private AudioCodec getAudioCodecPreference(String key, String defaultValue) {
-        final String audioCodecName = sharedPreferences.getString(key, defaultValue);
+    private AudioCodec getAudioCodecPreference() {
+        final String audioCodecName = sharedPreferences.getString(Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT);
 
         switch (audioCodecName) {
             case IsacCodec.NAME:
@@ -887,7 +887,7 @@ public class RoomActivity extends BaseActivity {
         if (setFocus) {
             savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
             savedIsMicrophoneMute = audioManager.isMicrophoneMute();
-            setMicrophoneMute(false);
+            setMicrophoneMute();
             savedAudioMode = audioManager.getMode();
             // Request audio focus before making any device switch.
             requestAudioFocus();
@@ -929,12 +929,12 @@ public class RoomActivity extends BaseActivity {
     }
 
     /** Sets the microphone mute state. */
-    private void setMicrophoneMute(boolean on) {
+    private void setMicrophoneMute() {
         boolean wasMuted = audioManager.isMicrophoneMute();
-        if (wasMuted == on) {
+        if (!wasMuted) {
             return;
         }
-        audioManager.setMicrophoneMute(on);
+        audioManager.setMicrophoneMute(false);
     }
 
     private void setVolumeControl(boolean setVolumeControl) {
@@ -1062,11 +1062,11 @@ public class RoomActivity extends BaseActivity {
 
                     VideoCodec preferedVideoCodec =
                             getVideoCodecPreference(
-                                    Preferences.VIDEO_CODEC, Preferences.VIDEO_CODEC_DEFAULT);
+                                    Preferences.VIDEO_CODEC);
 
                     AudioCodec preferredAudioCodec =
                             getAudioCodecPreference(
-                                    Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT);
+                            );
 
                     ConnectOptions.Builder connectOptionsBuilder =
                             new ConnectOptions.Builder(token)

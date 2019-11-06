@@ -115,15 +115,13 @@ public class AuthHelper {
 
     public static GoogleApiClient buildGoogleAPIClient(
             final FragmentActivity activity, final ErrorListener errorListener) {
-        GoogleApiClient client =
-                new GoogleApiClient.Builder(activity)
-                        .enableAutoManage(
-                                activity,
-                                connectionResult ->
-                                        errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
-                        .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
-                        .build();
-        return client;
+        return new GoogleApiClient.Builder(activity)
+                .enableAutoManage(
+                        activity,
+                        connectionResult ->
+                                errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
+                .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
+                .build();
     }
 
     private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {
