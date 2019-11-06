@@ -42,11 +42,11 @@ import java.lang.annotation.RetentionPolicy;
 
 abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
-    protected String identity = "";
-    protected int state = State.NO_VIDEO;
-    protected boolean mirror = false;
-    protected int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
-    protected boolean overlaySurface = true;
+    String identity = "";
+    int state = State.NO_VIDEO;
+    boolean mirror = false;
+    int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
+    private boolean overlaySurface = true;
 
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
@@ -96,7 +96,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public ParticipantView(
+    ParticipantView(
             @NonNull Context context,
             @Nullable AttributeSet attrs,
             @AttrRes int defStyleAttr,
@@ -143,7 +143,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         videoView.setMirror(this.mirror);
     }
 
-    public void setScaleType(int scaleType) {
+    void setScaleType(int scaleType) {
         this.scaleType = scaleType;
         videoView.setVideoScaleType(VideoScaleType.values()[this.scaleType]);
     }
@@ -157,7 +157,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         videoView.renderFrame(frame);
     }
 
-    protected void initParams(Context context, AttributeSet attrs) {
+    void initParams(Context context, AttributeSet attrs) {
         if (attrs != null) {
             TypedArray stylables =
                     context.getTheme()

@@ -22,7 +22,7 @@ public class RoomProperties {
     @NonNull private Topology topology;
     private boolean recordParticipantsOnConnect;
 
-    RoomProperties(
+    private RoomProperties(
             @NonNull final String name,
             @NonNull final Topology topology,
             boolean recordParticipantsOnConnect) {

@@ -16,7 +16,7 @@
 
 package com.twilio.video.app.util;
 
-public interface TreeRanger {
+interface TreeRanger {
     void inform(String message);
 
     void caution(String message);

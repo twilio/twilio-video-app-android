@@ -19,7 +19,7 @@ package com.twilio.video.app.model;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-public class TwilioIceResponse {
+class TwilioIceResponse {
 
     public static final String ICE_TRANSPORT_POLICY = "ice_transport_type";
     public static final String ICE_SELECTED_SERVERS = "ice_selected_servers";

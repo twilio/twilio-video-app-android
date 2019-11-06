@@ -16,6 +16,6 @@
 
 package com.twilio.video.app;
 
-public interface VideoApplicationGraph {
+interface VideoApplicationGraph {
     void inject(VideoApplication videoApplication);
 }

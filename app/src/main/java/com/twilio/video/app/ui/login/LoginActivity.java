@@ -237,7 +237,7 @@ public class LoginActivity extends BaseActivity
         progressDialog.show();
     }
 
-    public void onSignInSuccess() {
+    private void onSignInSuccess() {
         dismissAuthenticatingDialog();
         startLobbyActivity();
     }
