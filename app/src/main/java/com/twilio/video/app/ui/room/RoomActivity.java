@@ -622,7 +622,7 @@ public class RoomActivity extends BaseActivity {
          * Append serial number for internal or development flavor so the same account can be used
          * across different devices.
          */
-        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isDevelopmentFlavor()
+        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isCommunityFlavor()
                 ? displayName
                         + String.format(Locale.getDefault(), " %d", System.currentTimeMillis())
                 : displayName;

@@ -34,6 +34,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 
+// TODO Remove this class as part of this ticket https://issues.corp.twilio.com/browse/AHOYAPPS-63
 public class AuthHelper {
 
     @Retention(SOURCE)
