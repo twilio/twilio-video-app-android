@@ -47,7 +47,7 @@ public class CameraCapturerCompat {
 
                 @Override
                 public void onError(@NonNull Camera2Capturer.Exception camera2CapturerException) {
-                    Timber.e(camera2CapturerException.getMessage());
+                    Timber.e(camera2CapturerException);
                 }
             };
 
