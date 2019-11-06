@@ -214,7 +214,6 @@ public class LoginActivity extends BaseActivity
     }
 
     private void showUnauthorizedEmailDialog() {
-        AlertDialog dialog =
                 new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
                         .setTitle(getString(R.string.unauthorized_title))
                         .setMessage(getString(R.string.unauthorized_desc))

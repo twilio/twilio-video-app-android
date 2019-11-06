@@ -68,16 +68,6 @@ public class StatsListItem {
             return this;
         }
 
-        public Builder codec(String codec) {
-            this.codec = codec;
-            return this;
-        }
-
-        public Builder packetsLost(int packetsLost) {
-            this.packetsLost = packetsLost;
-            return this;
-        }
-
         public Builder bytes(long bytes) {
             this.bytes = bytes;
             return this;

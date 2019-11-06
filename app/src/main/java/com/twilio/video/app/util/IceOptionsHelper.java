@@ -32,36 +32,6 @@ import java.util.Set;
 
 public class IceOptionsHelper {
 
-    private static Type listType = new TypeToken<List<TwilioIceServer>>() {}.getType();
-
-    public static List<TwilioIceServer> convertToTwilioIceServerList(String json) {
-        if (json == null || json.equals("")) {
-            return new ArrayList<>();
-        }
-        Gson gson = new GsonBuilder().create();
-        return gson.fromJson(json, listType);
-    }
-
-    public static String convertToJson(List<TwilioIceServer> twilioIceServers) {
-        Gson gson = new GsonBuilder().create();
-        return gson.toJson(twilioIceServers, listType);
-    }
-
-    public static Set<IceServer> convertToIceServersSet(List<TwilioIceServer> twilioIceServers) {
-        Set<IceServer> result = new HashSet<>();
-        if (twilioIceServers != null && twilioIceServers.size() > 0) {
-            for (TwilioIceServer twilioIceServer : twilioIceServers) {
-                IceServer iceServer =
-                        new IceServer(
-                                twilioIceServer.getUrl(),
-                                twilioIceServer.getUsername(),
-                                twilioIceServer.getCredential());
-                result.add(iceServer);
-            }
-        }
-        return result;
-    }
-
     public static List<TwilioIceServer> getSelectedServersFromListView(
             ListView iceServersListView) {
         List<TwilioIceServer> selectedServers = new ArrayList<>();
@@ -75,12 +45,5 @@ public class IceOptionsHelper {
             }
         }
         return selectedServers;
-    }
-
-    public static IceTransportPolicy convertToIceTransportPolicy(String iceTransportStr) {
-        if (iceTransportStr.equalsIgnoreCase("relay")) {
-            return IceTransportPolicy.RELAY;
-        }
-        return IceTransportPolicy.ALL;
     }
 }

@@ -1493,7 +1493,7 @@ public class RoomActivity extends BaseActivity {
                     if (participantView != null) {
                         participantController.setDominantSpeaker(participantView);
                     } else {
-                        String remoteIdentity = remoteParticipant.getIdentity();
+                        remoteParticipant.getIdentity();
                         ParticipantPrimaryView primaryParticipantView =
                                 participantController.getPrimaryView();
                         if (primaryParticipantView.identity.equals(

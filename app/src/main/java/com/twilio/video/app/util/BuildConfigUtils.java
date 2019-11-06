@@ -29,8 +29,4 @@ public class BuildConfigUtils {
     public static boolean isInternalFlavor() {
         return BuildConfig.FLAVOR.equals(INTERNAL_FLAVOR);
     }
-
-    public static boolean isInternalRelease() {
-        return isInternalFlavor() && !BuildConfig.DEBUG;
-    }
 }

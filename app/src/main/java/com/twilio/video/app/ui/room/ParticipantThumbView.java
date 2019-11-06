@@ -30,27 +30,27 @@ public class ParticipantThumbView extends ParticipantView {
 
     public ParticipantThumbView(Context context) {
         super(context);
-        init(context, null);
+        init(context);
     }
 
     public ParticipantThumbView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
     public ParticipantThumbView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        init(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantThumbView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context, attrs);
+        init(context);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void init(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.participant_view, this);
         ButterKnife.bind(this, view);
 
