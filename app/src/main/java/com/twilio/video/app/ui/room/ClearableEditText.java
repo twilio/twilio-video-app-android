@@ -29,7 +29,8 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import com.twilio.video.app.R;
 
-// TODO Replace custom view with TextInputLayout Material Component as part of https://issues.corp.twilio.com/browse/AHOYAPPS-109
+// TODO Replace custom view with TextInputLayout Material Component as part of
+// https://issues.corp.twilio.com/browse/AHOYAPPS-109
 /**
  * ClearableEditText is an extension for standard EditText with an extra option to setup clear icon
  * with as right compound drawable, which handles clear icon touch event as erase for the contents
@@ -64,7 +65,8 @@ public class ClearableEditText extends AppCompatEditText {
 
             // obtain clear icon resource id
             /** Clear icon resource id. */
-            int clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
+            int clearIconResId =
+                    stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
             if (clearIconResId != -1) {
                 clearDrawable = VectorDrawableCompat.create(getResources(), clearIconResId, null);
             }
@@ -105,7 +107,7 @@ public class ClearableEditText extends AppCompatEditText {
                         }
                     }
 
-                    if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                         view.performClick();
                     }
 

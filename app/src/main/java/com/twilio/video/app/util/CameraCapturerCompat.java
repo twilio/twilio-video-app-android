@@ -37,22 +37,24 @@ public class CameraCapturerCompat {
     public CameraCapturerCompat(Context context, CameraCapturer.CameraSource cameraSource) {
         if (Camera2Capturer.isSupported(context)) {
             setCameraPairs(context);
-            Camera2Capturer.Listener camera2Listener = new Camera2Capturer.Listener() {
-                @Override
-                public void onFirstFrameAvailable() {
-                    Timber.i("onFirstFrameAvailable");
-                }
+            Camera2Capturer.Listener camera2Listener =
+                    new Camera2Capturer.Listener() {
+                        @Override
+                        public void onFirstFrameAvailable() {
+                            Timber.i("onFirstFrameAvailable");
+                        }
 
-                @Override
-                public void onCameraSwitched(@NonNull String newCameraId) {
-                    Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
-                }
+                        @Override
+                        public void onCameraSwitched(@NonNull String newCameraId) {
+                            Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
+                        }
 
-                @Override
-                public void onError(@NonNull Camera2Capturer.Exception camera2CapturerException) {
-                    Timber.e(camera2CapturerException);
-                }
-            };
+                        @Override
+                        public void onError(
+                                @NonNull Camera2Capturer.Exception camera2CapturerException) {
+                            Timber.e(camera2CapturerException);
+                        }
+                    };
             camera2Capturer =
                     new Camera2Capturer(context, getCameraId(cameraSource), camera2Listener);
         } else {

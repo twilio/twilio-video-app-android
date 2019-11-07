@@ -40,9 +40,10 @@ public class VideoApplication extends Application implements HasActivityInjector
         super.onCreate();
 
         // Create application component and inject application
-        VideoApplicationComponent applicationComponent = DaggerVideoApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(this))
-                .build();
+        VideoApplicationComponent applicationComponent =
+                DaggerVideoApplicationComponent.builder()
+                        .applicationModule(new ApplicationModule(this))
+                        .build();
         applicationComponent.inject(this);
 
         // Setup logging

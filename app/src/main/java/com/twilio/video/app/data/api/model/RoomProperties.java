@@ -16,7 +16,6 @@
 package com.twilio.video.app.data.api.model;
 
 import androidx.annotation.NonNull;
-
 import org.jetbrains.annotations.NotNull;
 
 public class RoomProperties {

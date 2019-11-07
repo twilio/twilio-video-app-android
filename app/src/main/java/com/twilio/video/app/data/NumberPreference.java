@@ -19,8 +19,6 @@ package com.twilio.video.app.data;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-
-import androidx.annotation.Nullable;
 import androidx.preference.DialogPreference;
 import com.twilio.video.app.R;
 import java.util.Locale;
@@ -85,7 +83,8 @@ public class NumberPreference extends DialogPreference {
         return a.getInt(index, 0);
     }
 
-    // TODO Use non deprecated method and use SharedPreferences to get persisted value https://issues.corp.twilio.com/browse/AHOYAPPS-111
+    // TODO Use non deprecated method and use SharedPreferences to get persisted value
+    // https://issues.corp.twilio.com/browse/AHOYAPPS-111
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         setNumber(restorePersistedValue ? getPersistedInt(number) : (int) defaultValue);

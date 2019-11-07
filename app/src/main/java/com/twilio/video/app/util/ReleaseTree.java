@@ -17,9 +17,7 @@
 package com.twilio.video.app.util;
 
 import android.util.Log;
-
 import org.jetbrains.annotations.NotNull;
-
 import timber.log.Timber;
 
 public class ReleaseTree extends Timber.Tree {

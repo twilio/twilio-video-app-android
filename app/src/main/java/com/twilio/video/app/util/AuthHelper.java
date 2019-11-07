@@ -117,8 +117,7 @@ public class AuthHelper {
         return new GoogleApiClient.Builder(activity)
                 .enableAutoManage(
                         activity,
-                        connectionResult ->
-                                errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
+                        connectionResult -> errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
                 .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
                 .build();
     }

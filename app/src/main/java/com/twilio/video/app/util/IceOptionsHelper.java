@@ -18,17 +18,9 @@ package com.twilio.video.app.util;
 
 import android.util.SparseBooleanArray;
 import android.widget.ListView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.twilio.video.IceServer;
-import com.twilio.video.IceTransportPolicy;
 import com.twilio.video.app.model.TwilioIceServer;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class IceOptionsHelper {
 

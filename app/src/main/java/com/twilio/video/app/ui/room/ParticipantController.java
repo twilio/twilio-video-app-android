@@ -45,8 +45,7 @@ class ParticipantController {
     /** Each participant thumb click listener. */
     private ItemClickListener listener;
 
-    ParticipantController(
-            ViewGroup thumbsViewContainer, ParticipantPrimaryView primaryVideoView) {
+    ParticipantController(ViewGroup thumbsViewContainer, ParticipantPrimaryView primaryVideoView) {
 
         this.thumbsViewContainer = thumbsViewContainer;
         this.primaryView = primaryVideoView;
@@ -197,8 +196,7 @@ class ParticipantController {
      * @param oldVideo video track to replace.
      * @param newVideo new video track to insert.
      */
-    void addOrUpdateThumb(
-            String sid, String identity, VideoTrack oldVideo, VideoTrack newVideo) {
+    void addOrUpdateThumb(String sid, String identity, VideoTrack oldVideo, VideoTrack newVideo) {
 
         if (hasThumb(sid, oldVideo)) {
             updateThumb(sid, oldVideo, newVideo);
@@ -455,8 +453,7 @@ class ParticipantController {
 
         boolean showNetworkQualityLevel;
 
-        Item(
-                String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
+        Item(String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
 
             this.sid = sid;
             this.identity = identity;

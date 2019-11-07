@@ -34,11 +34,9 @@ import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.IceServerAdapter;
 import com.twilio.video.app.model.TwilioIceServer;
 import com.twilio.video.app.util.IceOptionsHelper;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 // TODO Cleanup unused references https://issues.corp.twilio.com/browse/AHOYAPPS-112
 public class IceServersDialogFragment extends AppCompatDialogFragment {

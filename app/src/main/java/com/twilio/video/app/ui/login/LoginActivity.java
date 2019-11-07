@@ -215,11 +215,11 @@ public class LoginActivity extends BaseActivity
     }
 
     private void showUnauthorizedEmailDialog() {
-                new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                        .setTitle(getString(R.string.unauthorized_title))
-                        .setMessage(getString(R.string.unauthorized_desc))
-                        .setPositiveButton("OK", null)
-                        .show();
+        new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                .setTitle(getString(R.string.unauthorized_title))
+                .setMessage(getString(R.string.unauthorized_desc))
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void dismissAuthenticatingDialog() {
