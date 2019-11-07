@@ -85,7 +85,7 @@ public class NumberPreference extends DialogPreference {
         return a.getInt(index, 0);
     }
 
-    // TODO Use non deprecated method and use SharedPreferences to get persisted value
+    // TODO Use non deprecated method and use SharedPreferences to get persisted value https://issues.corp.twilio.com/browse/AHOYAPPS-111
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         setNumber(restorePersistedValue ? getPersistedInt(number) : (int) defaultValue);
