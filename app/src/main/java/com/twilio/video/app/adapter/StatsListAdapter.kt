@@ -40,7 +40,7 @@ import java.util.ArrayList
 class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<StatsListAdapter.ViewHolder>() {
 
     private val statsListItems = ArrayList<StatsListItem>()
-    private val handler: Handler
+    private val handler: Handler = Handler(Looper.getMainLooper())
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         @BindView(R.id.stats_track_name)
@@ -94,10 +94,6 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
         init {
             ButterKnife.bind(this, itemView)
         }
-    }
-
-    init {
-        handler = Handler(Looper.getMainLooper())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

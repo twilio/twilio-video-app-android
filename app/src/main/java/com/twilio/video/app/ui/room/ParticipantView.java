@@ -46,7 +46,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     int state = State.NO_VIDEO;
     boolean mirror = false;
     int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
-    private boolean overlaySurface = true;
 
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
@@ -180,9 +179,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
                     stylables.getInt(
                             R.styleable.ParticipantView_type,
                             VideoScaleType.ASPECT_BALANCED.ordinal());
-
-            // obtain overlay
-            overlaySurface = stylables.getBoolean(R.styleable.ParticipantView_overlaySurface, true);
 
             stylables.recycle();
         }
