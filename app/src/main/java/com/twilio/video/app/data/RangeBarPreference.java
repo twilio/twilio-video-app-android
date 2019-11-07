@@ -135,21 +135,19 @@ public class RangeBarPreference extends Preference {
         }
 
         // apply range bar value text formatter visible on choosing pins
-        if (rangeBar1 != null) {
 
-            if (formatter != null) {
-                rangeBar1.setFormatter(formatter);
-            }
-
-            // save all changes prefs while moving pins
-            rangeBar1.setOnRangeBarChangeListener(
-                    (rangeBar, leftPinIndex, rightPinIndex, leftPinValue, rightPinValue) ->
-                            sharedPreferences
-                                    .edit()
-                                    .putInt(startKey, leftPinIndex)
-                                    .putInt(endKey, rightPinIndex)
-                                    .apply());
+        if (formatter != null) {
+            rangeBar1.setFormatter(formatter);
         }
+
+        // save all changes prefs while moving pins
+        rangeBar1.setOnRangeBarChangeListener(
+                (rangeBar, leftPinIndex, rightPinIndex, leftPinValue, rightPinValue) ->
+                        sharedPreferences
+                                .edit()
+                                .putInt(startKey, leftPinIndex)
+                                .putInt(endKey, rightPinIndex)
+                                .apply());
     }
 
     private void init(Context context, @Nullable AttributeSet attrs) {

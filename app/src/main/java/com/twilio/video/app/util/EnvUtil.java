@@ -26,12 +26,14 @@ public class EnvUtil {
     public static final String TWILIO_ENV_KEY = "TWILIO_ENVIRONMENT";
 
     public static String getNativeEnvironmentVariableValue(String environment) {
-        if (environment.equals(TWILIO_API_DEV_ENV)) {
-            return TWILIO_DEV_ENV;
-        } else if (environment.equals(TWILIO_API_STAGE_ENV)) {
-            return TWILIO_STAGE_ENV;
-        } else {
-            return TWILIO_PROD_ENV;
+        if (environment != null) {
+            if (environment.equals(TWILIO_API_DEV_ENV)) {
+                return TWILIO_DEV_ENV;
+            } else if (environment.equals(TWILIO_API_STAGE_ENV)) {
+                return TWILIO_STAGE_ENV;
+            }
         }
+
+        return TWILIO_PROD_ENV;
     }
 }

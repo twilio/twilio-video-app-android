@@ -16,6 +16,8 @@
 
 package com.twilio.video.app.model;
 
+import org.jetbrains.annotations.NotNull;
+
 public class TwilioIceServer {
     private String url;
 
@@ -27,6 +29,7 @@ public class TwilioIceServer {
         return url;
     }
 
+    @NotNull
     public String toString() {
         return url;
     }

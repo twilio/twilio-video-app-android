@@ -117,7 +117,11 @@ public class LoginActivity extends BaseActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
-                AuthHelper.signInWithGoogle(account, this, errorListener);
+                if(account != null) {
+                    AuthHelper.signInWithGoogle(account, this, errorListener);
+                } else {
+                    // TODO: failed to sign in with google
+                }
             } else {
                 // TODO: failed to sign in with google
             }

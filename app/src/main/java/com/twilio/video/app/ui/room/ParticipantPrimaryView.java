@@ -50,7 +50,9 @@ public class ParticipantPrimaryView extends ParticipantView {
     }
 
     public void showIdentityBadge(boolean show) {
-        identityBadge.setVisibility(show ? VISIBLE : GONE);
+        if(identityBadge != null) {
+            identityBadge.setVisibility(show ? VISIBLE : GONE);
+        }
     }
 
     private void init(Context context) {

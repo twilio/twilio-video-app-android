@@ -67,7 +67,7 @@ public class CommunityLoginActivity extends BaseActivity {
     @OnClick(R.id.login_button)
     public void onLoginButton(View view) {
         String name = nameEditText.getText().toString();
-        if (name != null && name.length() > 0) {
+        if (name.length() > 0) {
             saveIdentity(name);
             startLobbyActivity();
         }

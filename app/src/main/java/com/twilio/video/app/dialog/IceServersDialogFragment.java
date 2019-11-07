@@ -34,6 +34,9 @@ import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.IceServerAdapter;
 import com.twilio.video.app.model.TwilioIceServer;
 import com.twilio.video.app.util.IceOptionsHelper;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,20 +70,21 @@ public class IceServersDialogFragment extends AppCompatDialogFragment {
         this.listener = listener;
     }
 
+    @NotNull
     @Override
     public android.app.Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
         @SuppressLint("InflateParams")
         View iceOptionsView = inflater.inflate(R.layout.ice_options_layout, null);
         unbinder = ButterKnife.bind(this, iceOptionsView);
 
-        IceServerAdapter iceServerAdapter = new IceServerAdapter(getActivity(), iceServers);
+        IceServerAdapter iceServerAdapter = new IceServerAdapter(requireActivity(), iceServers);
         iceServersListView.setAdapter(iceServerAdapter);
 
         ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter =
                 ArrayAdapter.createFromResource(
-                        getActivity(),
+                        requireActivity(),
                         R.array.ice_trans_policy_array,
                         android.R.layout.simple_spinner_item);
         iceTransPolicyArrayAdapter.setDropDownViewResource(

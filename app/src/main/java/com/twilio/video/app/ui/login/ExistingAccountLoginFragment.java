@@ -86,9 +86,7 @@ public class ExistingAccountLoginFragment extends Fragment {
     public void onLoginButton(View view) {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-        if (email != null
-                && email.length() > 0
-                && password != null
+        if (email.length() > 0
                 && password.length() > 0
                 && Patterns.EMAIL_ADDRESS.matcher(email).matches()
                 && (mListener != null)) {

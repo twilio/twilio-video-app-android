@@ -161,7 +161,7 @@ public class SettingsActivity extends BaseActivity {
 
                 if (dialogFragment != null) {
                     dialogFragment.setTargetFragment(this, 0);
-                    dialogFragment.show(getFragmentManager(), PREFERENCE_FRAGMENT_TAG);
+                    dialogFragment.show(requireFragmentManager(), PREFERENCE_FRAGMENT_TAG);
                 }
 
             } else {
