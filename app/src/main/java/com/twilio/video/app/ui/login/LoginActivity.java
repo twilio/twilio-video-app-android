@@ -117,16 +117,13 @@ public class LoginActivity extends BaseActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
-                if(account != null) {
+                if (account != null) {
                     AuthHelper.signInWithGoogle(account, this, errorListener);
-                } else {
-                    // TODO: failed to sign in with google
                 }
-            } else {
                 // TODO: failed to sign in with google
             }
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     // LoginLandingFragment
@@ -231,7 +228,7 @@ public class LoginActivity extends BaseActivity
         }
     }
 
-    private void showAuthenticatingDialog() {
+    void showAuthenticatingDialog() {
         progressDialog = new ProgressDialog(this, R.style.Authenticating);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setMessage("Authenticating");

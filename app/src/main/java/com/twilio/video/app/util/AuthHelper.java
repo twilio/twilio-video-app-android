@@ -75,7 +75,6 @@ public class AuthHelper {
                             task -> {
                                 if (!task.isSuccessful()) {
                                     errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                    return;
                                 }
                             });
         } else {
@@ -101,7 +100,6 @@ public class AuthHelper {
                         task -> {
                             if (!task.isSuccessful()) {
                                 errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                return;
                             }
                         });
     }

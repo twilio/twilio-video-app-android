@@ -533,7 +533,7 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.local_audio_image_button)
     void toggleLocalAudio() {
-        int icon = 0;
+        int icon;
         if (localAudioTrack == null) {
             localAudioTrack = LocalAudioTrack.create(this, true);
             if (localParticipant != null && localAudioTrack != null) {
@@ -722,8 +722,6 @@ public class RoomActivity extends BaseActivity {
             switch (audioCodecName) {
                 case IsacCodec.NAME:
                     return new IsacCodec();
-                case OpusCodec.NAME:
-                    return new OpusCodec();
                 case PcmaCodec.NAME:
                     return new PcmaCodec();
                 case PcmuCodec.NAME:

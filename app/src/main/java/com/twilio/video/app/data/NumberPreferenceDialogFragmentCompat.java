@@ -54,7 +54,7 @@ public class NumberPreferenceDialogFragmentCompat extends PreferenceDialogFragme
         super.onBindDialogView(view);
 
         // init input field
-        numberInput = (EditText) view.findViewById(R.id.edit);
+        numberInput = view.findViewById(R.id.edit);
 
         // obtain reference to preference
         DialogPreference preference = getPreference();
