@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.twilio.video.app.util;
 
 import android.util.Log;
+import org.jetbrains.annotations.NotNull;
 import timber.log.Timber;
 
 public class DebugTree extends Timber.DebugTree {
@@ -27,7 +28,7 @@ public class DebugTree extends Timber.DebugTree {
     }
 
     @Override
-    protected void log(int priority, String tag, String message, Throwable throwable) {
+    protected void log(int priority, String tag, @NotNull String message, Throwable throwable) {
         // Always log in debug
         super.log(priority, tag, message, throwable);
 

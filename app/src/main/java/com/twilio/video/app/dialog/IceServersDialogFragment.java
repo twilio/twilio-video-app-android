@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-
 import androidx.appcompat.app.AppCompatDialogFragment;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -38,7 +36,9 @@ import com.twilio.video.app.model.TwilioIceServer;
 import com.twilio.video.app.util.IceOptionsHelper;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
+// TODO Cleanup unused references https://issues.corp.twilio.com/browse/AHOYAPPS-112
 public class IceServersDialogFragment extends AppCompatDialogFragment {
 
     public interface Listener {
@@ -68,20 +68,21 @@ public class IceServersDialogFragment extends AppCompatDialogFragment {
         this.listener = listener;
     }
 
+    @NotNull
     @Override
     public android.app.Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
         @SuppressLint("InflateParams")
         View iceOptionsView = inflater.inflate(R.layout.ice_options_layout, null);
         unbinder = ButterKnife.bind(this, iceOptionsView);
 
-        IceServerAdapter iceServerAdapter = new IceServerAdapter(getActivity(), iceServers);
+        IceServerAdapter iceServerAdapter = new IceServerAdapter(requireActivity(), iceServers);
         iceServersListView.setAdapter(iceServerAdapter);
 
         ArrayAdapter<CharSequence> iceTransPolicyArrayAdapter =
                 ArrayAdapter.createFromResource(
-                        getActivity(),
+                        requireActivity(),
                         R.array.ice_trans_policy_array,
                         android.R.layout.simple_spinner_item);
         iceTransPolicyArrayAdapter.setDropDownViewResource(

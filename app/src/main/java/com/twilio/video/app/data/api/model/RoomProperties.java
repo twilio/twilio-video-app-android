@@ -15,16 +15,15 @@
  */
 package com.twilio.video.app.data.api.model;
 
-
 import androidx.annotation.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class RoomProperties {
-    @NonNull
-    private String name;
+    @NonNull private String name;
     @NonNull private Topology topology;
     private boolean recordParticipantsOnConnect;
 
-    RoomProperties(
+    private RoomProperties(
             @NonNull final String name,
             @NonNull final Topology topology,
             boolean recordParticipantsOnConnect) {
@@ -33,10 +32,12 @@ public class RoomProperties {
         this.recordParticipantsOnConnect = recordParticipantsOnConnect;
     }
 
+    @NotNull
     public Topology getTopology() {
         return topology;
     }
 
+    @NotNull
     public String getName() {
         return name;
     }

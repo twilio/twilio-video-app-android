@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,16 +65,6 @@ public class StatsListItem {
 
         public Builder trackName(String trackName) {
             this.trackName = trackName;
-            return this;
-        }
-
-        public Builder codec(String codec) {
-            this.codec = codec;
-            return this;
-        }
-
-        public Builder packetsLost(int packetsLost) {
-            this.packetsLost = packetsLost;
             return this;
         }
 

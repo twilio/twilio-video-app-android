@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@ package com.twilio.video.app.util;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 import android.content.Context;
-
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -36,6 +34,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 
+// TODO Remove this class as part of this ticket https://issues.corp.twilio.com/browse/AHOYAPPS-63
 public class AuthHelper {
 
     @Retention(SOURCE)
@@ -76,7 +75,6 @@ public class AuthHelper {
                             task -> {
                                 if (!task.isSuccessful()) {
                                     errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                    return;
                                 }
                             });
         } else {
@@ -102,7 +100,6 @@ public class AuthHelper {
                         task -> {
                             if (!task.isSuccessful()) {
                                 errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                return;
                             }
                         });
     }
@@ -117,15 +114,12 @@ public class AuthHelper {
 
     public static GoogleApiClient buildGoogleAPIClient(
             final FragmentActivity activity, final ErrorListener errorListener) {
-        GoogleApiClient client =
-                new GoogleApiClient.Builder(activity)
-                        .enableAutoManage(
-                                activity,
-                                connectionResult ->
-                                        errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
-                        .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
-                        .build();
-        return client;
+        return new GoogleApiClient.Builder(activity)
+                .enableAutoManage(
+                        activity,
+                        connectionResult -> errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
+                .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
+                .build();
     }
 
     private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {

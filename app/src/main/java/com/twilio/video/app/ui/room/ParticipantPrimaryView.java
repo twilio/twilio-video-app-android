@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,31 +29,33 @@ public class ParticipantPrimaryView extends ParticipantView {
 
     public ParticipantPrimaryView(Context context) {
         super(context);
-        init(context, null);
+        init(context);
     }
 
     public ParticipantPrimaryView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
     public ParticipantPrimaryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        init(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantPrimaryView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context, attrs);
+        init(context);
     }
 
     public void showIdentityBadge(boolean show) {
-        identityBadge.setVisibility(show ? VISIBLE : GONE);
+        if (identityBadge != null) {
+            identityBadge.setVisibility(show ? VISIBLE : GONE);
+        }
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void init(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.participant_view_primary, this);
         ButterKnife.bind(this, view);
 

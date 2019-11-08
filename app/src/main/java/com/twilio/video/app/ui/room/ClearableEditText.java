@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +24,21 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-
 import com.twilio.video.app.R;
 
+// TODO Replace custom view with TextInputLayout Material Component as part of
+// https://issues.corp.twilio.com/browse/AHOYAPPS-109
 /**
  * ClearableEditText is an extension for standard EditText with an extra option to setup clear icon
  * with as right compound drawable, which handles clear icon touch event as erase for the contents
  * of user input.
- *
- * @attr name clearIcon - clear action icon to display to the right of EditText input.
  */
 public class ClearableEditText extends AppCompatEditText {
-    /** Clear icon resource id. */
-    private int clearIconResId;
 
-    /** Clear icon drawable. */
+    /** Clear action icon to display to the right of EditText input. */
     private Drawable clearDrawable;
 
     public ClearableEditText(Context context) {
@@ -68,7 +64,9 @@ public class ClearableEditText extends AppCompatEditText {
                             .obtainStyledAttributes(attrs, R.styleable.ClearableEditText, 0, 0);
 
             // obtain clear icon resource id
-            clearIconResId = stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
+            /** Clear icon resource id. */
+            int clearIconResId =
+                    stylables.getResourceId(R.styleable.ClearableEditText_clearIcon, -1);
             if (clearIconResId != -1) {
                 clearDrawable = VectorDrawableCompat.create(getResources(), clearIconResId, null);
             }
@@ -76,7 +74,10 @@ public class ClearableEditText extends AppCompatEditText {
 
         // setup initial clear icon state
         setCompoundDrawablesWithIntrinsicBounds(null, null, clearDrawable, null);
-        showClearIcon(getText().toString().length() > 0);
+        Editable text = getText();
+        if (text != null) {
+            showClearIcon(text.toString().length() > 0);
+        }
 
         // update clear icon state after every text change
         addTextChangedListener(
@@ -106,6 +107,10 @@ public class ClearableEditText extends AppCompatEditText {
                         }
                     }
 
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        view.performClick();
+                    }
+
                     return false;
                 });
     }
@@ -115,7 +120,7 @@ public class ClearableEditText extends AppCompatEditText {
      *
      * @param show pass true to display icon, otherwise false to hide.
      */
-    public void showClearIcon(boolean show) {
+    private void showClearIcon(boolean show) {
         // TODO: should probably use setVisibility method, but seems to not working.
         if (clearDrawable != null) {
             clearDrawable.setAlpha(show ? 255 : 0);
@@ -127,7 +132,7 @@ public class ClearableEditText extends AppCompatEditText {
      *
      * @return true if active, otherwise - false.
      */
-    public boolean isClearVisible() {
+    private boolean isClearVisible() {
         return clearDrawable != null && DrawableCompat.getAlpha(clearDrawable) == 255;
     }
 }

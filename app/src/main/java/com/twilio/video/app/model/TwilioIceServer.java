@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,20 @@
 
 package com.twilio.video.app.model;
 
+import org.jetbrains.annotations.NotNull;
+
 public class TwilioIceServer {
     private String url;
-    private String username;
-    private String credential;
 
     public TwilioIceServer() {
         url = "";
-        username = "";
-        credential = "";
     }
 
     public String getUrl() {
         return url;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getCredential() {
-        return credential;
-    }
-
+    @NotNull
     public String toString() {
         return url;
     }

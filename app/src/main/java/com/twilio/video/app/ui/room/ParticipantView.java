@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.AttrRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import butterknife.BindView;
 import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
@@ -44,11 +42,10 @@ import java.lang.annotation.RetentionPolicy;
 
 abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
-    protected String identity = "";
-    protected int state = State.NO_VIDEO;
-    protected boolean mirror = false;
-    protected int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
-    protected boolean overlaySurface = true;
+    String identity = "";
+    int state = State.NO_VIDEO;
+    boolean mirror = false;
+    int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
 
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
@@ -98,7 +95,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public ParticipantView(
+    ParticipantView(
             @NonNull Context context,
             @Nullable AttributeSet attrs,
             @AttrRes int defStyleAttr,
@@ -145,7 +142,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         videoView.setMirror(this.mirror);
     }
 
-    public void setScaleType(int scaleType) {
+    void setScaleType(int scaleType) {
         this.scaleType = scaleType;
         videoView.setVideoScaleType(VideoScaleType.values()[this.scaleType]);
     }
@@ -159,7 +156,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         videoView.renderFrame(frame);
     }
 
-    protected void initParams(Context context, AttributeSet attrs) {
+    void initParams(Context context, AttributeSet attrs) {
         if (attrs != null) {
             TypedArray stylables =
                     context.getTheme()
@@ -182,9 +179,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
                     stylables.getInt(
                             R.styleable.ParticipantView_type,
                             VideoScaleType.ASPECT_BALANCED.ordinal());
-
-            // obtain overlay
-            overlaySurface = stylables.getBoolean(R.styleable.ParticipantView_overlaySurface, true);
 
             stylables.recycle();
         }

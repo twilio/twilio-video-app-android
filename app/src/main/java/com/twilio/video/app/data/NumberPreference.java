@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ package com.twilio.video.app.data;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-
 import androidx.preference.DialogPreference;
-
 import com.twilio.video.app.R;
 import java.util.Locale;
 
@@ -85,6 +83,8 @@ public class NumberPreference extends DialogPreference {
         return a.getInt(index, 0);
     }
 
+    // TODO Use non deprecated method and use SharedPreferences to get persisted value
+    // https://issues.corp.twilio.com/browse/AHOYAPPS-111
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         setNumber(restorePersistedValue ? getPersistedInt(number) : (int) defaultValue);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package com.twilio.video.app.util;
 
 import android.content.Context;
 import android.util.Pair;
-
 import androidx.annotation.NonNull;
-
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.VideoCapturer;
@@ -35,27 +33,28 @@ public class CameraCapturerCompat {
     private Camera2Capturer camera2Capturer;
     private Pair<CameraCapturer.CameraSource, String> frontCameraPair;
     private Pair<CameraCapturer.CameraSource, String> backCameraPair;
-    private final Camera2Capturer.Listener camera2Listener =
-            new Camera2Capturer.Listener() {
-                @Override
-                public void onFirstFrameAvailable() {
-                    Timber.i("onFirstFrameAvailable");
-                }
-
-                @Override
-                public void onCameraSwitched(@NonNull String newCameraId) {
-                    Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
-                }
-
-                @Override
-                public void onError(@NonNull Camera2Capturer.Exception camera2CapturerException) {
-                    Timber.e(camera2CapturerException.getMessage());
-                }
-            };
 
     public CameraCapturerCompat(Context context, CameraCapturer.CameraSource cameraSource) {
         if (Camera2Capturer.isSupported(context)) {
             setCameraPairs(context);
+            Camera2Capturer.Listener camera2Listener =
+                    new Camera2Capturer.Listener() {
+                        @Override
+                        public void onFirstFrameAvailable() {
+                            Timber.i("onFirstFrameAvailable");
+                        }
+
+                        @Override
+                        public void onCameraSwitched(@NonNull String newCameraId) {
+                            Timber.i("onCameraSwitched: newCameraId = %s", newCameraId);
+                        }
+
+                        @Override
+                        public void onError(
+                                @NonNull Camera2Capturer.Exception camera2CapturerException) {
+                            Timber.e(camera2CapturerException);
+                        }
+                    };
             camera2Capturer =
                     new Camera2Capturer(context, getCameraId(cameraSource), camera2Listener);
         } else {

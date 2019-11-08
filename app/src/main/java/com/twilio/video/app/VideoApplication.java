@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,15 @@ package com.twilio.video.app;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-
 import androidx.multidex.MultiDex;
-
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasDispatchingActivityInjector;
+import dagger.android.HasActivityInjector;
 import javax.inject.Inject;
 import timber.log.Timber;
 
-public class VideoApplication extends Application implements HasDispatchingActivityInjector {
+public class VideoApplication extends Application implements HasActivityInjector {
     @Inject DispatchingAndroidInjector<Activity> dispatchingActivityInjector;
     @Inject Timber.Tree tree;
-
-    private VideoApplicationComponent applicationComponent;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -44,7 +40,7 @@ public class VideoApplication extends Application implements HasDispatchingActiv
         super.onCreate();
 
         // Create application component and inject application
-        applicationComponent =
+        VideoApplicationComponent applicationComponent =
                 DaggerVideoApplicationComponent.builder()
                         .applicationModule(new ApplicationModule(this))
                         .build();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,12 @@ package com.twilio.video.app.util;
 import com.twilio.video.app.BuildConfig;
 
 public class BuildConfigUtils {
-    private static final String INTERNAL_FLAVOR = "internal";
-    private static final String DEVELOPMENT_FLAVOR = "development";
 
-    public static boolean isDevelopmentFlavor() {
-        return BuildConfig.FLAVOR.equals(DEVELOPMENT_FLAVOR);
+    public static boolean isCommunityFlavor() {
+        return BuildConfig.FLAVOR.equals("community");
     }
 
     public static boolean isInternalFlavor() {
-        return BuildConfig.FLAVOR.equals(INTERNAL_FLAVOR);
-    }
-
-    public static boolean isInternalRelease() {
-        return isInternalFlavor() && !BuildConfig.DEBUG;
+        return BuildConfig.FLAVOR.equals("internal");
     }
 }

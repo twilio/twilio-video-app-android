@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package com.twilio.video.app.ui.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
-
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.ui.room.RoomActivity;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import timber.log.Timber;
 
-public class FirebaseAuthInterceptor implements Interceptor {
+class FirebaseAuthInterceptor implements Interceptor {
     private static final int FIREBASE_TOKEN_TIMEOUT_MS = 10000;
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String FIREBASE_TOKEN_TASK_FAILED = "Failed to get Firebase Token";

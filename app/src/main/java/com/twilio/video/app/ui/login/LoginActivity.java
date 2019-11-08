@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2019 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.ViewGroup;
-
 import androidx.appcompat.app.AlertDialog;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.google.android.gms.auth.api.Auth;
@@ -119,12 +117,13 @@ public class LoginActivity extends BaseActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
-                AuthHelper.signInWithGoogle(account, this, errorListener);
-            } else {
+                if (account != null) {
+                    AuthHelper.signInWithGoogle(account, this, errorListener);
+                }
                 // TODO: failed to sign in with google
             }
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     // LoginLandingFragment
@@ -216,12 +215,11 @@ public class LoginActivity extends BaseActivity
     }
 
     private void showUnauthorizedEmailDialog() {
-        AlertDialog dialog =
-                new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                        .setTitle(getString(R.string.unauthorized_title))
-                        .setMessage(getString(R.string.unauthorized_desc))
-                        .setPositiveButton("OK", null)
-                        .show();
+        new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                .setTitle(getString(R.string.unauthorized_title))
+                .setMessage(getString(R.string.unauthorized_desc))
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void dismissAuthenticatingDialog() {
@@ -230,7 +228,7 @@ public class LoginActivity extends BaseActivity
         }
     }
 
-    private void showAuthenticatingDialog() {
+    void showAuthenticatingDialog() {
         progressDialog = new ProgressDialog(this, R.style.Authenticating);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setMessage("Authenticating");
@@ -239,7 +237,7 @@ public class LoginActivity extends BaseActivity
         progressDialog.show();
     }
 
-    public void onSignInSuccess() {
+    private void onSignInSuccess() {
         dismissAuthenticatingDialog();
         startLobbyActivity();
     }
