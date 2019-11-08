@@ -36,7 +36,7 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    FirebaseEmailFacade providesEmailAuthenticator() {
-        return new FirebaseEmailFacade();
+    FirebaseFacade providesEmailAuthenticator() {
+        return new FirebaseFacade();
     }
 }
