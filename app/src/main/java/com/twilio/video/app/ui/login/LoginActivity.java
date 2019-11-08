@@ -26,8 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -51,7 +51,7 @@ public class LoginActivity extends BaseActivity
     @Inject SharedPreferences sharedPreferences;
 
     private ProgressDialog progressDialog;
-    private GoogleApiClient googleApiClient;
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,14 +72,10 @@ public class LoginActivity extends BaseActivity
     protected void onResume() {
         Intent intent = getIntent();
         if (intent.getBooleanExtra(EXTRA_SIGN_OUT, false)) {
-            if (googleApiClient == null) {
-                googleApiClient = AuthHelper.buildGoogleAPIClient(this, null);
+            if (googleSignInClient == null) {
+                googleSignInClient = AuthHelper.buildGoogleAPIClient(this);
             }
-            AuthHelper.signOut(
-                    googleApiClient,
-                    status -> {
-                        // TODO: stop spinning
-                    });
+            AuthHelper.signOut(googleSignInClient);
         }
         super.onResume();
     }
@@ -129,10 +125,10 @@ public class LoginActivity extends BaseActivity
     // LoginLandingFragment
     @Override
     public void onSignInWithGoogle() {
-        if (googleApiClient == null) {
-            googleApiClient = AuthHelper.buildGoogleAPIClient(this, errorListener);
+        if (googleSignInClient == null) {
+            googleSignInClient = AuthHelper.buildGoogleAPIClient(this);
         }
-        Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+        Intent intent = googleSignInClient.getSignInIntent();
         showAuthenticatingDialog();
         startActivityForResult(intent, GOOGLE_SIGN_IN);
     }

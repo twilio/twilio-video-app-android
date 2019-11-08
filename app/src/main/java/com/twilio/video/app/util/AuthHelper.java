@@ -16,23 +16,24 @@
 
 package com.twilio.video.app.util;
 
-import static java.lang.annotation.RetentionPolicy.SOURCE;
-
 import android.content.Context;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-import com.google.android.gms.auth.api.Auth;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.twilio.video.app.R;
+
 import java.lang.annotation.Retention;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 // TODO Remove this class as part of this ticket https://issues.corp.twilio.com/browse/AHOYAPPS-63
 public class AuthHelper {
@@ -104,22 +105,14 @@ public class AuthHelper {
                         });
     }
 
-    public static void signOut(
-            @NonNull GoogleApiClient googleApiClient, ResultCallback<Status> resultCallback) {
+    public static void signOut(GoogleSignInClient googleSignInClient) {
         FirebaseAuth.getInstance().signOut();
-        if (googleApiClient.isConnected()) {
-            Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(resultCallback);
-        }
+        googleSignInClient.signOut();
     }
 
-    public static GoogleApiClient buildGoogleAPIClient(
-            final FragmentActivity activity, final ErrorListener errorListener) {
-        return new GoogleApiClient.Builder(activity)
-                .enableAutoManage(
-                        activity,
-                        connectionResult -> errorListener.onError(ERROR_GOOGLE_PLAY_SERVICE_ERROR))
-                .addApi(Auth.GOOGLE_SIGN_IN_API, buildGoogleSignInOptions(activity))
-                .build();
+    public static GoogleSignInClient buildGoogleAPIClient(
+            final FragmentActivity activity) {
+        return GoogleSignIn.getClient(activity, buildGoogleSignInOptions(activity));
     }
 
     private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {
