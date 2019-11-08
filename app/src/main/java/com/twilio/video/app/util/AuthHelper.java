@@ -16,20 +16,7 @@
 
 package com.twilio.video.app.util;
 
-import android.content.Context;
-
 import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.twilio.video.app.R;
 
 import java.lang.annotation.Retention;
 
@@ -60,31 +47,5 @@ public class AuthHelper {
 
     public interface ErrorListener {
         void onError(@AuthHelper.Error int errorCode);
-    }
-
-    public static void signInWithEmail(
-            @NonNull String email,
-            @NonNull String password,
-            FragmentActivity activity,
-            final ErrorListener errorListener) {
-        if (email == null || email.length() == 0) {
-            throw new IllegalArgumentException("Email can't be empty");
-        }
-        if (password == null || password.length() == 0) {
-            throw new IllegalArgumentException("Password can't be empty");
-        }
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(
-                        activity,
-                        task -> {
-                            if (!task.isSuccessful()) {
-                                errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                            }
-                        });
-    }
-
-    public static void signOut() {
-        FirebaseAuth.getInstance().signOut();
     }
 }

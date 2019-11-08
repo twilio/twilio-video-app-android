@@ -24,4 +24,8 @@ class FirebaseFacade {
                     }
                 }
     }
+
+    fun signOut() {
+        FirebaseAuth.getInstance().signOut()
+    }
 }

@@ -80,7 +80,7 @@ public class LoginActivity extends BaseActivity
             if (googleSignInClient == null) {
                 googleSignInClient = googleAuthFacade.buildGoogleAPIClient(this);
             }
-            AuthHelper.signOut();
+            firebaseFacade.signOut();
             googleAuthFacade.signOut(googleSignInClient);
         }
         super.onResume();
@@ -153,7 +153,7 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onExistingAccountCredentials(String email, String password) {
         showAuthenticatingDialog();
-        AuthHelper.signInWithEmail(email, password, this, errorListener);
+        firebaseFacade.signInWithEmail(email, password, this, errorListener);
     }
 
     private void startLobbyActivity() {
