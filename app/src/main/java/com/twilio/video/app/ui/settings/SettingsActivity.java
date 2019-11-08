@@ -94,9 +94,6 @@ public class SettingsActivity extends BaseActivity {
         sharedPreferences.edit().clear().apply();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 
-        // Invoke authenticator logout
-        authenticator.logout();
-
         // Return to login activity
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         loginIntent.putExtra(LoginActivity.EXTRA_SIGN_OUT, true);
