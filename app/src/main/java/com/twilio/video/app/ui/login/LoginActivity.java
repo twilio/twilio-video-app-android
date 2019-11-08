@@ -32,6 +32,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.R;
+import com.twilio.video.app.auth.EmailAuthenticator;
+import com.twilio.video.app.auth.GoogleAuthenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
@@ -49,6 +51,8 @@ public class LoginActivity extends BaseActivity
     ViewGroup rootView;
 
     @Inject SharedPreferences sharedPreferences;
+    @Inject GoogleAuthenticator googleAuthenticator;
+    @Inject EmailAuthenticator emailAuthenticator;
 
     private ProgressDialog progressDialog;
     private GoogleSignInClient googleSignInClient;

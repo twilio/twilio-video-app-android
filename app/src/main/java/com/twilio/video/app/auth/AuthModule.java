@@ -27,4 +27,16 @@ public class AuthModule {
     Authenticator providesAuthenticator() {
         return new FirebaseAuthenticator();
     }
+
+    @Provides
+    @ApplicationScope
+    GoogleAuthenticator providesGoogleAuthenticator() {
+        return new GoogleAuthenticator();
+    }
+
+    @Provides
+    @ApplicationScope
+    EmailAuthenticator providesEmailAuthenticator() {
+        return new EmailAuthenticator();
+    }
 }
