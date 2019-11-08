@@ -30,13 +30,13 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    GoogleAuthenticator providesGoogleAuthenticator() {
-        return new GoogleAuthenticator();
+    GoogleAuthFacade providesGoogleAuthenticator() {
+        return new GoogleAuthFacade();
     }
 
     @Provides
     @ApplicationScope
-    EmailAuthenticator providesEmailAuthenticator() {
-        return new EmailAuthenticator();
+    FirebaseEmailFacade providesEmailAuthenticator() {
+        return new FirebaseEmailFacade();
     }
 }

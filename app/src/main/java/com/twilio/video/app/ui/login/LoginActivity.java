@@ -32,8 +32,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.R;
-import com.twilio.video.app.auth.EmailAuthenticator;
-import com.twilio.video.app.auth.GoogleAuthenticator;
+import com.twilio.video.app.auth.FirebaseEmailFacade;
+import com.twilio.video.app.auth.GoogleAuthFacade;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
@@ -51,8 +51,8 @@ public class LoginActivity extends BaseActivity
     ViewGroup rootView;
 
     @Inject SharedPreferences sharedPreferences;
-    @Inject GoogleAuthenticator googleAuthenticator;
-    @Inject EmailAuthenticator emailAuthenticator;
+    @Inject GoogleAuthFacade googleAuthFacade;
+    @Inject FirebaseEmailFacade firebaseEmailFacade;
 
     private ProgressDialog progressDialog;
     private GoogleSignInClient googleSignInClient;
@@ -77,7 +77,7 @@ public class LoginActivity extends BaseActivity
         Intent intent = getIntent();
         if (intent.getBooleanExtra(EXTRA_SIGN_OUT, false)) {
             if (googleSignInClient == null) {
-                googleSignInClient = AuthHelper.buildGoogleAPIClient(this);
+                googleSignInClient = googleAuthFacade.buildGoogleAPIClient(this);
             }
             AuthHelper.signOut(googleSignInClient);
         }
@@ -118,7 +118,7 @@ public class LoginActivity extends BaseActivity
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 if (account != null) {
-                    AuthHelper.signInWithGoogle(account, this, errorListener);
+                    googleAuthFacade.signInWithGoogle(account, this, errorListener);
                 }
                 // TODO: failed to sign in with google
             }
@@ -130,7 +130,7 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onSignInWithGoogle() {
         if (googleSignInClient == null) {
-            googleSignInClient = AuthHelper.buildGoogleAPIClient(this);
+            googleSignInClient = googleAuthFacade.buildGoogleAPIClient(this);
         }
         Intent intent = googleSignInClient.getSignInIntent();
         showAuthenticatingDialog();
