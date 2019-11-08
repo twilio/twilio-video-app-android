@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package com.twilio.video.app.auth;
+package com.twilio.video.app.auth
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.twilio.video.app.base.BaseActivity;
-import com.twilio.video.app.ui.login.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth
+import com.twilio.video.app.base.BaseActivity
+import com.twilio.video.app.ui.login.LoginActivity
 
-public class FirebaseAuthenticator implements Authenticator {
-    @Override
-    public Class<? extends BaseActivity> getLoginActivity() {
-        return LoginActivity.class;
+class FirebaseAuthenticator : Authenticator {
+    override val loginActivity = LoginActivity::class.java
+
+    override fun loggedIn(): Boolean {
+        return FirebaseAuth.getInstance().currentUser != null
     }
 
-    @Override
-    public boolean loggedIn() {
-        return FirebaseAuth.getInstance().getCurrentUser() != null;
-    }
-
-    @Override
-    public void logout() {
-        FirebaseAuth.getInstance().signOut();
+    override fun logout() {
+        FirebaseAuth.getInstance().signOut()
     }
 }

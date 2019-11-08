@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.twilio.video.app.auth;
+package com.twilio.video.app.auth
 
-import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.base.BaseActivity
 
-public interface Authenticator {
-    Class<? extends BaseActivity> getLoginActivity();
+interface Authenticator {
+    val loginActivity: Class<out BaseActivity>
 
-    boolean loggedIn();
+    fun loggedIn(): Boolean
 
-    void logout();
+    fun logout()
 }
