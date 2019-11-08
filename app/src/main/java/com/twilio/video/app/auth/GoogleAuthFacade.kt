@@ -1,6 +1,8 @@
 package com.twilio.video.app.auth
 
+import android.content.Intent
 import androidx.fragment.app.FragmentActivity
+import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -48,6 +50,8 @@ class GoogleAuthFacade {
                 .build()
     }
 
+    fun getSignInResultFromIntent(data: Intent) = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+    
     fun signOut(googleSignInClient: GoogleSignInClient) {
         googleSignInClient.signOut()
     }

@@ -21,10 +21,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.ViewGroup;
+
 import androidx.appcompat.app.AlertDialog;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import com.google.android.gms.auth.api.Auth;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -38,7 +37,11 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.AuthHelper;
+
 import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class LoginActivity extends BaseActivity
@@ -52,8 +55,7 @@ public class LoginActivity extends BaseActivity
 
     @Inject SharedPreferences sharedPreferences;
     @Inject GoogleAuthFacade googleAuthFacade;
-    @Inject
-    FirebaseFacade firebaseFacade;
+    @Inject FirebaseFacade firebaseFacade;
 
     private ProgressDialog progressDialog;
     private GoogleSignInClient googleSignInClient;
@@ -116,7 +118,7 @@ public class LoginActivity extends BaseActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GOOGLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            GoogleSignInResult result = googleAuthFacade.getSignInResultFromIntent(data);
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 if (account != null) {
