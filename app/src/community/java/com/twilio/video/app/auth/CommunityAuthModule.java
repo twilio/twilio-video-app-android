@@ -28,4 +28,10 @@ public class CommunityAuthModule {
     Authenticator providesAuthenticator(SharedPreferences preferences) {
         return new CommunityAuthenticator(preferences);
     }
+
+    @Provides
+    @ApplicationScope
+    CommunityAuthenticator providesCommunityAuthenticator(SharedPreferences preferences) {
+        return new CommunityAuthenticator(preferences);
+    }
 }

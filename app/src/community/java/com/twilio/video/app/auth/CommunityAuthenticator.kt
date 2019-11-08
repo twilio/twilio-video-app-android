@@ -21,8 +21,12 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.login.CommunityLoginActivity
 
 class CommunityAuthenticator(private val preferences: SharedPreferences) : Authenticator {
+
     override val loginActivity = CommunityLoginActivity::class.java
 
+    fun login(displayName: String) {
+        preferences.edit().putString(Preferences.DISPLAY_NAME, displayName).apply()
+    }
 
     override fun loggedIn(): Boolean {
         return !preferences.getString(Preferences.DISPLAY_NAME, null).isNullOrEmpty()

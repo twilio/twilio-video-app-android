@@ -30,13 +30,17 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.twilio.video.app.R;
+import com.twilio.video.app.auth.Authenticator;
+import com.twilio.video.app.auth.CommunityAuthenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
 import javax.inject.Inject;
 
 public class CommunityLoginActivity extends BaseActivity {
-    @Inject SharedPreferences sharedPreferences;
+
+    @Inject
+    CommunityAuthenticator authenticator;
 
     @BindView(R.id.name_edittext)
     EditText nameEditText;
@@ -73,8 +77,8 @@ public class CommunityLoginActivity extends BaseActivity {
         }
     }
 
-    private void saveIdentity(String name) {
-        sharedPreferences.edit().putString(Preferences.DISPLAY_NAME, name).apply();
+    private void saveIdentity(String displayName) {
+        authenticator.login(displayName);
     }
 
     private void startLobbyActivity() {
