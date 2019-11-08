@@ -79,7 +79,8 @@ public class LoginActivity extends BaseActivity
             if (googleSignInClient == null) {
                 googleSignInClient = googleAuthFacade.buildGoogleAPIClient(this);
             }
-            AuthHelper.signOut(googleSignInClient);
+            AuthHelper.signOut();
+            googleAuthFacade.signOut(googleSignInClient);
         }
         super.onResume();
     }

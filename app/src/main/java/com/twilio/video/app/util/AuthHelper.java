@@ -62,27 +62,6 @@ public class AuthHelper {
         void onError(@AuthHelper.Error int errorCode);
     }
 
-    public static void signInWithGoogle(
-            GoogleSignInAccount account,
-            FragmentActivity activity,
-            final ErrorListener errorListener) {
-        if (account.getEmail().endsWith("@twilio.com")) {
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            AuthCredential credential =
-                    GoogleAuthProvider.getCredential(account.getIdToken(), null);
-            mAuth.signInWithCredential(credential)
-                    .addOnCompleteListener(
-                            activity,
-                            task -> {
-                                if (!task.isSuccessful()) {
-                                    errorListener.onError(ERROR_AUTHENTICATION_FAILED);
-                                }
-                            });
-        } else {
-            errorListener.onError(ERROR_UNAUTHORIZED_EMAIL);
-        }
-    }
-
     public static void signInWithEmail(
             @NonNull String email,
             @NonNull String password,
@@ -105,22 +84,7 @@ public class AuthHelper {
                         });
     }
 
-    public static void signOut(GoogleSignInClient googleSignInClient) {
+    public static void signOut() {
         FirebaseAuth.getInstance().signOut();
-        googleSignInClient.signOut();
-    }
-
-    public static GoogleSignInClient buildGoogleAPIClient(
-            final FragmentActivity activity) {
-        return GoogleSignIn.getClient(activity, buildGoogleSignInOptions(activity));
-    }
-
-    private static GoogleSignInOptions buildGoogleSignInOptions(final FragmentActivity activity) {
-        Context context = activity.getBaseContext();
-        return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.default_web_client_id))
-                .requestEmail()
-                .setHostedDomain("twilio.com")
-                .build();
     }
 }
