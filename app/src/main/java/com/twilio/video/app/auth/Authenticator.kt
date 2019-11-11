@@ -16,12 +16,9 @@
 
 package com.twilio.video.app.auth
 
-import com.twilio.video.app.base.BaseActivity
-
 interface Authenticator {
-    val loginActivity: Class<out BaseActivity>
 
-    fun loggedIn(): Boolean
+    fun loggedIn() : Boolean
 
     fun logout()
 }

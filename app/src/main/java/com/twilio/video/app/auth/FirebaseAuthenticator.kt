@@ -22,11 +22,6 @@ import com.twilio.video.app.ui.login.LoginActivity
 import com.twilio.video.app.util.AuthHelper
 
 class FirebaseAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
-    override val loginActivity = LoginActivity::class.java
-
-    override fun loggedIn(): Boolean {
-        return firebaseWrapper.instance.currentUser != null
-    }
 
     override fun logout() {
         firebaseWrapper.instance.signOut()
@@ -48,6 +43,10 @@ class FirebaseAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Auth
                         errorListener.onError(AuthHelper.ERROR_AUTHENTICATION_FAILED)
                     }
                 }
+    }
+
+    override fun loggedIn(): Boolean {
+        return firebaseWrapper.instance.currentUser != null
     }
 
     fun addAuthStateListener(listener: FirebaseAuth.AuthStateListener ) {
