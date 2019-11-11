@@ -16,18 +16,45 @@
 
 package com.twilio.video.app.auth
 
+import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.ui.login.LoginActivity
+import com.twilio.video.app.util.AuthHelper
 
-class FirebaseAuthenticator : Authenticator {
+class FirebaseAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
     override val loginActivity = LoginActivity::class.java
 
     override fun loggedIn(): Boolean {
-        return FirebaseAuth.getInstance().currentUser != null
+        return firebaseWrapper.instance.currentUser != null
     }
 
     override fun logout() {
-        FirebaseAuth.getInstance().signOut()
+        firebaseWrapper.instance.signOut()
+    }
+
+    fun login(
+            email: String,
+            password: String,
+            activity: FragmentActivity,
+            errorListener: AuthHelper.ErrorListener) {
+        require(!(email == null || email.length == 0)) { "Email can't be empty" }
+        require(!(password == null || password.length == 0)) { "Password can't be empty" }
+        val mAuth = firebaseWrapper.instance
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(
+                        activity
+                ) { task ->
+                    if (!task.isSuccessful) {
+                        errorListener.onError(AuthHelper.ERROR_AUTHENTICATION_FAILED)
+                    }
+                }
+    }
+
+    fun addAuthStateListener(listener: FirebaseAuth.AuthStateListener ) {
+        firebaseWrapper.instance.addAuthStateListener(listener)
+    }
+
+    fun removeAuthStateListener(listener: FirebaseAuth.AuthStateListener) {
+        firebaseWrapper.instance.removeAuthStateListener(listener)
     }
 }

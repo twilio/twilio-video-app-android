@@ -22,10 +22,17 @@ import dagger.Provides;
 
 @Module
 public class AuthModule {
+
     @Provides
     @ApplicationScope
-    Authenticator providesAuthenticator() {
-        return new FirebaseAuthenticator();
+    Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper) {
+        return new FirebaseAuthenticator(firebaseWrapper);
+    }
+
+    @Provides
+    @ApplicationScope
+    FirebaseAuthenticator providesFirebaseAuthenticator(FirebaseWrapper firebaseWrapper) {
+        return new FirebaseAuthenticator(firebaseWrapper);
     }
 
     @Provides
