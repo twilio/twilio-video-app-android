@@ -17,6 +17,7 @@
 package com.twilio.video.app.ui.login;
 
 import android.app.Activity;
+
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.ActivityKey;

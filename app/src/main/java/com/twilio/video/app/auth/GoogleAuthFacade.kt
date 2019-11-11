@@ -51,7 +51,7 @@ class GoogleAuthFacade {
     }
 
     fun getSignInResultFromIntent(data: Intent) = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-    
+
     fun signOut(googleSignInClient: GoogleSignInClient) {
         googleSignInClient.signOut()
     }
