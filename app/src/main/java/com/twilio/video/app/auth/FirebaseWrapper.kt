@@ -5,7 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.twilio.video.app.util.AuthHelper
 import com.twilio.video.app.util.AuthHelper.ERROR_AUTHENTICATION_FAILED
 
-class FirebaseFacade {
+class FirebaseWrapper {
 
     fun signInWithEmail(
             email: String,
@@ -27,5 +27,13 @@ class FirebaseFacade {
 
     fun signOut() {
         FirebaseAuth.getInstance().signOut()
+    }
+
+    fun addAuthStateListener(listener: FirebaseAuth.AuthStateListener ) {
+        FirebaseAuth.getInstance().addAuthStateListener(listener)
+    }
+
+    fun removeAuthStateListener(listener: FirebaseAuth.AuthStateListener) {
+        FirebaseAuth.getInstance().removeAuthStateListener(listener)
     }
 }

@@ -31,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.R;
-import com.twilio.video.app.auth.FirebaseFacade;
+import com.twilio.video.app.auth.FirebaseWrapper;
 import com.twilio.video.app.auth.GoogleAuthFacade;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
@@ -55,7 +55,8 @@ public class LoginActivity extends BaseActivity
 
     @Inject SharedPreferences sharedPreferences;
     @Inject GoogleAuthFacade googleAuthFacade;
-    @Inject FirebaseFacade firebaseFacade;
+    @Inject
+    FirebaseWrapper firebaseWrapper;
 
     private ProgressDialog progressDialog;
     private GoogleSignInClient googleSignInClient;
@@ -82,7 +83,7 @@ public class LoginActivity extends BaseActivity
             if (googleSignInClient == null) {
                 googleSignInClient = googleAuthFacade.buildGoogleAPIClient(this);
             }
-            firebaseFacade.signOut();
+            firebaseWrapper.signOut();
             googleAuthFacade.signOut(googleSignInClient);
         }
         super.onResume();
@@ -90,13 +91,13 @@ public class LoginActivity extends BaseActivity
 
     @Override
     protected void onStart() {
-        FirebaseAuth.getInstance().addAuthStateListener(fbAuthStateListener);
+        firebaseWrapper.addAuthStateListener(fbAuthStateListener);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        FirebaseAuth.getInstance().removeAuthStateListener(fbAuthStateListener);
+        firebaseWrapper.removeAuthStateListener(fbAuthStateListener);
         super.onStop();
     }
 
@@ -155,7 +156,7 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onExistingAccountCredentials(String email, String password) {
         showAuthenticatingDialog();
-        firebaseFacade.signInWithEmail(email, password, this, errorListener);
+        firebaseWrapper.signInWithEmail(email, password, this, errorListener);
     }
 
     private void startLobbyActivity() {
