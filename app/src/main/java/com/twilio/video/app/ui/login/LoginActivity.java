@@ -47,7 +47,6 @@ import timber.log.Timber;
 public class LoginActivity extends BaseActivity
         implements LoginLandingFragment.Listener, ExistingAccountLoginFragment.Listener {
 
-    public static final String EXTRA_SIGN_OUT = "SignOut";
     private static final int GOOGLE_SIGN_IN = 4615;
 
     @BindView(R.id.login_fragment_container)

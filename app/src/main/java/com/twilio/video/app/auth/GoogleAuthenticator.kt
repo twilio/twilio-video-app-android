@@ -3,10 +3,7 @@ package com.twilio.video.app.auth
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.twilio.video.app.R
@@ -59,5 +56,5 @@ class GoogleAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authen
                 .build()
     }
 
-    fun getSignInResultFromIntent(data: Intent) = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+    fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
 }
