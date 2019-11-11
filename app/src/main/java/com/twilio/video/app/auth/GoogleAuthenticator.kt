@@ -17,14 +17,17 @@ import com.twilio.video.app.util.AuthHelper.ERROR_UNAUTHORIZED_EMAIL
 class GoogleAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
 
     override fun loggedIn() = firebaseWrapper.instance.currentUser != null
+    private var googleSignInClient: GoogleSignInClient? = null
 
     override fun logout() {
-        TODO("Not Yet Implemented!")
+        googleSignInClient?.signOut()
     }
 
-    fun buildGoogleAPIClient(
-            activity: FragmentActivity): GoogleSignInClient {
-        return GoogleSignIn.getClient(activity, buildGoogleSignInOptions(activity))
+    // TODO Avoid exposing GoogleSignInClient. Clients shouldn't be concerned with it
+    fun googleSignInClient(
+            activity: FragmentActivity): GoogleSignInClient? {
+        googleSignInClient = GoogleSignIn.getClient(activity, buildGoogleSignInOptions(activity))
+        return googleSignInClient
     }
 
     fun signInWithGoogle(
@@ -57,8 +60,4 @@ class GoogleAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authen
     }
 
     fun getSignInResultFromIntent(data: Intent) = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-
-    fun signOut(googleSignInClient: GoogleSignInClient) {
-        googleSignInClient.signOut()
-    }
 }

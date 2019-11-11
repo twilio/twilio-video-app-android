@@ -18,6 +18,10 @@ package com.twilio.video.app.auth;
 
 import android.content.SharedPreferences;
 import com.twilio.video.app.ApplicationScope;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -33,5 +37,13 @@ public class CommunityAuthModule {
     @ApplicationScope
     CommunityAuthenticator providesCommunityAuthenticator(SharedPreferences preferences) {
         return new CommunityAuthenticator(preferences);
+    }
+
+    @Provides
+    @ApplicationScope
+    Authenticators providesAuthenticators(CommunityAuthenticator communityAuthenticator) {
+        List<Authenticator> authenticators = new ArrayList<>();
+        authenticators.add(communityAuthenticator);
+        return new Authenticators(authenticators);
     }
 }

@@ -76,19 +76,6 @@ public class LoginActivity extends BaseActivity
     }
 
     @Override
-    protected void onResume() {
-        Intent intent = getIntent();
-        if (intent.getBooleanExtra(EXTRA_SIGN_OUT, false)) {
-            if (googleSignInClient == null) {
-                googleSignInClient = googleAuthenticator.buildGoogleAPIClient(this);
-            }
-            firebaseAuthenticator.logout();
-            googleAuthenticator.signOut(googleSignInClient);
-        }
-        super.onResume();
-    }
-
-    @Override
     protected void onStart() {
         firebaseAuthenticator.addAuthStateListener(fbAuthStateListener);
         super.onStart();
@@ -134,7 +121,7 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onSignInWithGoogle() {
         if (googleSignInClient == null) {
-            googleSignInClient = googleAuthenticator.buildGoogleAPIClient(this);
+            googleSignInClient = googleAuthenticator.googleSignInClient(this);
         }
         Intent intent = googleSignInClient.getSignInIntent();
         showAuthenticatingDialog();

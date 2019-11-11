@@ -17,6 +17,10 @@
 package com.twilio.video.app.auth;
 
 import com.twilio.video.app.ApplicationScope;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -45,5 +49,14 @@ public class AuthModule {
     @ApplicationScope
     FirebaseWrapper providesEmailAuthenticator() {
         return new FirebaseWrapper();
+    }
+
+    @Provides
+    @ApplicationScope
+    Authenticators providesAuthenticators(FirebaseAuthenticator communityAuthenticator, GoogleAuthenticator googleAuthenticator) {
+        List<Authenticator> authenticators = new ArrayList<>();
+        authenticators.add(communityAuthenticator);
+        authenticators.add(googleAuthenticator);
+        return new Authenticators(authenticators);
     }
 }

@@ -18,7 +18,6 @@ package com.twilio.video.app.auth
 
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.twilio.video.app.ui.login.LoginActivity
 import com.twilio.video.app.util.AuthHelper
 
 class FirebaseAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
