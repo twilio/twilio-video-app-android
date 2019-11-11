@@ -17,27 +17,28 @@
 package com.twilio.video.app.ui.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
 import androidx.core.content.res.ResourcesCompat;
+
+import com.twilio.video.app.R;
+import com.twilio.video.app.auth.CommunityAuthenticator;
+import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.ui.room.RoomActivity;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import com.twilio.video.app.R;
-import com.twilio.video.app.auth.Authenticator;
-import com.twilio.video.app.auth.CommunityAuthenticator;
-import com.twilio.video.app.base.BaseActivity;
-import com.twilio.video.app.data.Preferences;
-import com.twilio.video.app.ui.room.RoomActivity;
-import javax.inject.Inject;
 
-// TODO Remove screen in future story
+// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 public class CommunityLoginActivity extends BaseActivity {
 
     @Inject
