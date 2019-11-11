@@ -1,6 +1,5 @@
 package com.twilio.video.app.ui
 
-import com.twilio.video.app.ScreenSelector
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.ui.login.CommunityLoginActivity
 
