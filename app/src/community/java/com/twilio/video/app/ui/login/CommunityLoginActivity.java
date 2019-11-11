@@ -37,6 +37,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.room.RoomActivity;
 import javax.inject.Inject;
 
+// TODO Remove screen in future story
 public class CommunityLoginActivity extends BaseActivity {
 
     @Inject

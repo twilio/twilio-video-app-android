@@ -14,7 +14,13 @@ import com.twilio.video.app.util.AuthHelper
 import com.twilio.video.app.util.AuthHelper.ERROR_AUTHENTICATION_FAILED
 import com.twilio.video.app.util.AuthHelper.ERROR_UNAUTHORIZED_EMAIL
 
-class GoogleAuthFacade {
+class GoogleAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
+
+    override fun loggedIn() = firebaseWrapper.instance.currentUser != null
+
+    override fun logout() {
+        TODO("Not Yet Implemented!")
+    }
 
     fun buildGoogleAPIClient(
             activity: FragmentActivity): GoogleSignInClient {

@@ -26,6 +26,7 @@ import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
 
+    // TODO Replace with FirebaseAuthenticator once Community sign in screen is removed
     @Inject lateinit var authenticator: Authenticator
     @Inject lateinit var screenSelector: ScreenSelector
 

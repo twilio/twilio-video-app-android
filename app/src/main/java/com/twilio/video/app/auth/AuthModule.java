@@ -37,8 +37,8 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    GoogleAuthFacade providesGoogleAuthenticator() {
-        return new GoogleAuthFacade();
+    GoogleAuthenticator providesGoogleAuthenticator(FirebaseWrapper firebaseWrapper) {
+        return new GoogleAuthenticator(firebaseWrapper);
     }
 
     @Provides
