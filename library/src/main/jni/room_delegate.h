@@ -20,7 +20,7 @@
 #include <jni.h>
 
 #include "twilio/video/video.h"
-#include "twilio/video/stats_observer.h"
+#include "twilio/media/stats_observer.h"
 #include "twilio/video/room.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
@@ -71,7 +71,7 @@ private:
     rtc::Event native_objects_released_;
     std::unique_ptr<twilio::video::Room> room_;
     std::shared_ptr<AndroidRoomObserver> android_room_observer_;
-    std::shared_ptr<twilio::video::StatsObserver> stats_observer_;
+    std::shared_ptr<twilio::media::StatsObserver> stats_observer_;
 };
 
 }

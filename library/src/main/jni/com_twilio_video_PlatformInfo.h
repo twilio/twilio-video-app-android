@@ -15,7 +15,7 @@
  */
 
 #include <jni.h>
-#include "twilio/video/platform_info.h"
+#include "twilio/platform_info.h"
 
 #ifndef VIDEO_ANDROID_COM_TWILIO_VIDEO_PLATFORMINFO_H_
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_PLATFORMINFO_H_
@@ -27,7 +27,7 @@ extern "C" {
 namespace twilio_video_jni {
 
 struct PlatformInfoContext {
-    twilio::video::PlatformInfo platform_info;
+    twilio::PlatformInfo platform_info;
 };
 
 JNIEXPORT jlong JNICALL Java_com_twilio_video_PlatformInfo_nativeCreate

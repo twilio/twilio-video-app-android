@@ -58,8 +58,8 @@ VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
           surface_texture_helper_(webrtc::jni::SurfaceTextureHelper::create(
                   jni, "Camera SurfaceTextureHelper", webrtc::JavaParamRef<jobject>(j_egl_context))),
           capturer_(nullptr) {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "VideoCapturerDelegate ctor");
     jobject j_frame_observer =
             jni->NewObject(j_observer_class_.obj(),
@@ -80,8 +80,8 @@ VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
 }
 
 VideoCapturerDelegate::~VideoCapturerDelegate() {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "~VideoCapturerDelegate");
     jni()->CallVoidMethod(
             j_video_capturer_.obj(),
@@ -103,8 +103,8 @@ void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
                                               "(Lcom/twilio/video/VideoPixelFormat;)V"),
                           j_video_pixel_format);
 
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "VideoCapturerDelegate start");
     RTC_DCHECK(thread_checker_.CalledOnValidThread());
     {
@@ -125,8 +125,8 @@ void VideoCapturerDelegate::Start(const cricket::VideoFormat& capture_format,
 }
 
 void VideoCapturerDelegate::Stop() {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "VideoCapturerDelegate stop");
     RTC_DCHECK(thread_checker_.CalledOnValidThread());
     {
@@ -144,8 +144,8 @@ void VideoCapturerDelegate::Stop() {
                                       "stopCapture", "()V");
     jni()->CallVoidMethod(j_video_capturer_.obj(), m);
     CHECK_EXCEPTION(jni()) << "error during VideoCapturer.stopCapture";
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "VideoCapturerDelegate stop done");
 }
 
@@ -156,8 +156,8 @@ void VideoCapturerDelegate::AsyncCapturerInvoke(
         typename Identity<Args>::type... args) {
     rtc::CritScope cs(&capturer_lock_);
     if (!invoker_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "%s() called from closed capturer", posted_from.function_name());
         return;
     }
@@ -227,8 +227,8 @@ std::vector<cricket::VideoFormat> VideoCapturerDelegate::GetSupportedFormats() {
 }
 
 void VideoCapturerDelegate::OnCapturerStarted(bool success) {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "VideoCapturerDelegate capture started: %s", (success ? "true" : "false"));
     AsyncCapturerInvoke(RTC_FROM_HERE, &AndroidVideoCapturer::OnCapturerStarted, success);
 }
@@ -240,8 +240,8 @@ void VideoCapturerDelegate::OnMemoryBufferFrame(void *video_frame, int length, i
                rotation == 270);
     rtc::CritScope cs(&capturer_lock_);
     if (!capturer_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "OnMemoryBufferFrame() called for closed capturer.");
         return;
     }
@@ -374,8 +374,8 @@ void VideoCapturerDelegate::OnTextureFrame(int width,
                rotation == 270);
     rtc::CritScope cs(&capturer_lock_);
     if (!capturer_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "OnTextureFrame() called for closed capturer.");
         surface_texture_helper_->ReturnTextureFrame();
         return;
@@ -435,8 +435,8 @@ void VideoCapturerDelegate::OnFrameCaptured(
         const webrtc::JavaRef<jobject>& j_video_frame_buffer) {
     rtc::CritScope cs(&capturer_lock_);
     if (!capturer_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "OnFrameCaptured() called for closed capturer.");
         return;
     }
@@ -487,8 +487,8 @@ Java_com_twilio_video_VideoCapturerDelegate_00024NativeObserver_nativeCapturerSt
                                                                                       jobject instance,
                                                                                       jlong j_capturer,
                                                                                       jboolean j_success) {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "NativeObserver_nativeCapturerStarted");
     reinterpret_cast<VideoCapturerDelegate*>(j_capturer)->OnCapturerStarted(
             j_success);

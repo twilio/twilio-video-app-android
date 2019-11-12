@@ -106,8 +106,8 @@ twilio::media::MediaOptions getMediaOptions(jobject j_media_options) {
         if (!IsNull(jni, j_audio_file_path)) {
             std::string audio_file_path = JavaToUTF8StdString(jni, j_audio_file_path);
 
-            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                              twilio::video::LogLevel::kDebug,
+            VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                              twilio::LogLevel::kDebug,
                               "Audio file path: %s", audio_file_path.c_str());
 
             struct stat file_info{};
@@ -203,8 +203,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     twilio::media::MediaConstraints* video_constraints = new twilio::media::MediaConstraints();
     JNIEnv* env = webrtc::jni::GetEnv();
 
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "Parsing video constraints");
 
     jclass video_constraints_class = env->GetObjectClass(j_video_constraints);
@@ -217,8 +217,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int max_fps =
             env->GetIntField(j_video_constraints, max_fps_field);
 
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "Video constraints minFps %d maxFps %d",
                       min_fps,
                       max_fps);
@@ -243,8 +243,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int min_height =
             env->GetIntField(j_min_video_dimensions, min_height_field);
 
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "Video constraints min width %d min height %d",
                       min_width,
                       min_height);
@@ -265,8 +265,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int denominator_aspect_ratio =
             env->GetIntField(j_aspect_ratio, denominator_field);
 
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "Video aspect ratio %d:%d",
                       numerator_aspect_ratio,
                       denominator_aspect_ratio);
@@ -283,8 +283,8 @@ twilio::media::MediaConstraints* convertVideoConstraints(jobject j_video_constra
     int max_height =
             env->GetIntField(j_max_video_dimensions, max_height_field);
 
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "Video constraints max width %d max height %d",
                       max_width,
                       max_height);
@@ -340,8 +340,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeCreate(JNIEnv *
                                                                         jobject j_egl_local_context,
                                                                         jobject j_egl_remote_context) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     if (!initialize(jni, context)) {
@@ -374,8 +374,8 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateAudioTr
                                                                                     jobject j_audio_options,
                                                                                     jstring j_name) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
@@ -405,8 +405,8 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateVideoTr
                                                                                     jstring j_name,
                                                                                     jobject j_egl_context) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
@@ -446,8 +446,8 @@ JNIEXPORT jobject JNICALL Java_com_twilio_video_MediaFactory_nativeCreateDataTra
                                                                                    jint j_max_retransmits,
                                                                                    jstring j_name) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     std::shared_ptr<twilio::media::MediaFactory> media_factory =
             getMediaFactory(media_factory_handle);
@@ -470,8 +470,8 @@ JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeRelease(JNIEnv *
                                                                         jobject j_media_factory,
                                                                         jlong media_factory_handle) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     if (media_factory_handle != 0) {
         MediaFactoryContext *media_factory_context =
@@ -489,8 +489,8 @@ JNIEXPORT jlong JNICALL Java_com_twilio_video_MediaFactory_nativeTestCreate(JNIE
                                                                             jobject context,
                                                                             jobject j_media_options) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     if (!initialize(jni, context)) {
         return 0;
@@ -511,8 +511,8 @@ JNIEXPORT void JNICALL Java_com_twilio_video_MediaFactory_nativeTestRelease(JNIE
                                                                             jobject j_media_factory,
                                                                             jlong media_factory_handle) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     Java_com_twilio_video_MediaFactory_nativeRelease(jni, j_media_factory, media_factory_handle);
 }

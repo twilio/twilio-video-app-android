@@ -33,8 +33,8 @@
 
 namespace twilio_video_jni {
 
-void log(twilio::video::LogModule module,
-         twilio::video::LogLevel level,
+void log(twilio::LogModule module,
+         twilio::LogLevel level,
          const char* file,
          const char* func,
          int line,

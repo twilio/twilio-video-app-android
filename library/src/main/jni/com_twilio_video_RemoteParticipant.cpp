@@ -335,14 +335,14 @@ Java_com_twilio_video_RemoteParticipant_nativeIsConnected(JNIEnv *env,
                                                           jobject instance,
                                                           jlong j_participant_context) {
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     RemoteParticipantContext *participant_context =
             reinterpret_cast<RemoteParticipantContext *>(j_participant_context);
     if (participant_context == nullptr || !participant_context->remote_participant) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "RemoteParticipant object no longer exist");
         return false;
     }

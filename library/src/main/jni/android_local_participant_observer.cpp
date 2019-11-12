@@ -98,22 +98,22 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                       j_twilio_exception_class_.obj(),
                                       "<init>",
                                       kTwilioExceptionConstructorSignature)){
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "AndroidLocalParticipantObserver");
 }
 
 AndroidLocalParticipantObserver::~AndroidLocalParticipantObserver() {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "~AndroidLocalParticipantObserver");
 }
 
 void AndroidLocalParticipantObserver::setObserverDeleted() {
     rtc::CritScope cs(&deletion_lock_);
     observer_deleted_ = true;
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "local participant observer deleted");
 }
 
@@ -121,8 +121,8 @@ void AndroidLocalParticipantObserver::onAudioTrackPublished(twilio::video::Local
                                                             std::shared_ptr<twilio::media::LocalAudioTrackPublication> local_audio_track_publication) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -152,8 +152,8 @@ void AndroidLocalParticipantObserver::onAudioTrackPublicationFailed(twilio::vide
                                                                     const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -182,8 +182,8 @@ void AndroidLocalParticipantObserver::onVideoTrackPublished(twilio::video::Local
                                                             std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     {
         rtc::CritScope cs(&deletion_lock_);
@@ -212,8 +212,8 @@ void AndroidLocalParticipantObserver::onVideoTrackPublicationFailed(twilio::vide
                                                                     const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -242,8 +242,8 @@ void AndroidLocalParticipantObserver::onDataTrackPublished(twilio::video::LocalP
                                                            std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     {
         rtc::CritScope cs(&deletion_lock_);
@@ -272,8 +272,8 @@ void AndroidLocalParticipantObserver::onDataTrackPublicationFailed(twilio::video
                                                                    const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -301,8 +301,8 @@ void AndroidLocalParticipantObserver::onDataTrackPublicationFailed(twilio::video
 void AndroidLocalParticipantObserver::onNetworkQualityLevelChanged(twilio::video::LocalParticipant *participant, twilio::video::NetworkQualityLevel level){
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
         {
@@ -362,15 +362,15 @@ void AndroidLocalParticipantObserver::onNetworkQualityLevelChanged(twilio::video
 
 bool AndroidLocalParticipantObserver::isObserverValid(const std::string &callback_name) {
     if (observer_deleted_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "local participant observer is marked for deletion, skipping %s callback",
                           callback_name.c_str());
         return false;
     };
     if (webrtc::IsNull(jni(), j_local_participant_observer_)) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "local participant observer reference has been destroyed, skipping %s callback",
                           callback_name.c_str());
         return false;

@@ -189,14 +189,14 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                                     j_twilio_exception_class_.obj(),
                                     "<init>",
                                     kTwilioExceptionConstructorSignature)) {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "AndroidRoomObserver");
 }
 
 AndroidRoomObserver::~AndroidRoomObserver()  {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "~AndroidRoomObserver");
 
     // Delete all remaining global references to Participants
@@ -209,16 +209,16 @@ AndroidRoomObserver::~AndroidRoomObserver()  {
 void AndroidRoomObserver::setObserverDeleted()  {
     rtc::CritScope cs(&deletion_lock_);
     observer_deleted_ = true;
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "room observer deleted");
 }
 
 void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -271,8 +271,8 @@ void AndroidRoomObserver::onReconnecting(const twilio::video::Room *room,
                                          const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -298,8 +298,8 @@ void AndroidRoomObserver::onReconnecting(const twilio::video::Room *room,
 void AndroidRoomObserver::onReconnected(const twilio::video::Room *room) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -320,8 +320,8 @@ void AndroidRoomObserver::onDisconnected(const twilio::video::Room *room,
                                          std::unique_ptr<twilio::video::Error> twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     {
         rtc::CritScope cs(&deletion_lock_);
@@ -345,8 +345,8 @@ void AndroidRoomObserver::onConnectFailure(const twilio::video::Room *room,
                                            const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     {
         rtc::CritScope cs(&deletion_lock_);
@@ -371,8 +371,8 @@ void AndroidRoomObserver::onParticipantConnected(twilio::video::Room *room,
                                                  std::shared_ptr<twilio::video::RemoteParticipant> participant) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -420,8 +420,8 @@ void AndroidRoomObserver::onDominantSpeakerChanged(const twilio::video::Room *ro
 
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -451,8 +451,8 @@ void AndroidRoomObserver::onParticipantDisconnected(twilio::video::Room *room,
                                                     std::shared_ptr<twilio::video::RemoteParticipant> participant)  {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -479,8 +479,8 @@ void AndroidRoomObserver::onParticipantDisconnected(twilio::video::Room *room,
 void AndroidRoomObserver::onRecordingStarted(twilio::video::Room *room) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -501,8 +501,8 @@ void AndroidRoomObserver::onRecordingStarted(twilio::video::Room *room) {
 void AndroidRoomObserver::onRecordingStopped(twilio::video::Room *room)  {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -526,15 +526,15 @@ JNIEnv* AndroidRoomObserver::jni()  {
 
 bool AndroidRoomObserver::isObserverValid(const std::string &callbackName) {
     if (observer_deleted_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "room observer is marked for deletion, skipping %s callback",
                           callbackName.c_str());
         return false;
     };
     if (webrtc::IsNull(jni(), j_room_observer_)) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "room observer reference has been destroyed, skipping %s callback",
                           callbackName.c_str());
         return false;
