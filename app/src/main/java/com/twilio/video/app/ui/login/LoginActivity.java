@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,7 +56,6 @@ public class LoginActivity extends BaseActivity
     @Inject FirebaseAuthenticator firebaseAuthenticator;
 
     private ProgressDialog progressDialog;
-    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +63,6 @@ public class LoginActivity extends BaseActivity
 
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -108,7 +105,7 @@ public class LoginActivity extends BaseActivity
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 if (account != null) {
-                    googleAuthenticator.signInWithGoogle(account, this, errorListener);
+                    googleAuthenticator.login(account, this, errorListener);
                 }
                 // TODO: failed to sign in with google
             }
@@ -119,10 +116,7 @@ public class LoginActivity extends BaseActivity
     // LoginLandingFragment
     @Override
     public void onSignInWithGoogle() {
-        if (googleSignInClient == null) {
-            googleSignInClient = googleAuthenticator.googleSignInClient(this);
-        }
-        Intent intent = googleSignInClient.getSignInIntent();
+        Intent intent = googleAuthenticator.getSignInIntent();
         showAuthenticatingDialog();
         startActivityForResult(intent, GOOGLE_SIGN_IN);
     }

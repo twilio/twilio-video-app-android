@@ -1,9 +1,12 @@
 package com.twilio.video.app.auth
 
+import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.*
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.twilio.video.app.R
@@ -11,23 +14,28 @@ import com.twilio.video.app.util.AuthHelper
 import com.twilio.video.app.util.AuthHelper.ERROR_AUTHENTICATION_FAILED
 import com.twilio.video.app.util.AuthHelper.ERROR_UNAUTHORIZED_EMAIL
 
-class GoogleAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
+// TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
+class GoogleAuthenticator (
+        private val firebaseWrapper: FirebaseWrapper,
+        context: Context,
+        private val googleAuthWrapper: GoogleAuthWrapper,
+        private val googleSignInWrapper: GoogleSignInWrapper,
+        private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper
+    ) : Authenticator {
+
+    private val googleSignInClient: GoogleSignInClient
+
+    init {
+        googleSignInClient = buildGoogleSignInClient(context)
+    }
 
     override fun loggedIn() = firebaseWrapper.instance.currentUser != null
-    private var googleSignInClient: GoogleSignInClient? = null
 
     override fun logout() {
-        googleSignInClient?.signOut()
+        googleSignInClient.signOut()
     }
 
-    // TODO Avoid exposing GoogleSignInClient. Clients shouldn't be concerned with it
-    fun googleSignInClient(
-            activity: FragmentActivity): GoogleSignInClient? {
-        googleSignInClient = GoogleSignIn.getClient(activity, buildGoogleSignInOptions(activity))
-        return googleSignInClient
-    }
-
-    fun signInWithGoogle(
+    fun login(
             account: GoogleSignInAccount,
             activity: FragmentActivity,
             errorListener: AuthHelper.ErrorListener) {
@@ -47,14 +55,19 @@ class GoogleAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authen
         }
     }
 
-    private fun buildGoogleSignInOptions(activity: FragmentActivity): GoogleSignInOptions {
-        val context = activity.baseContext
-        return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.default_web_client_id))
-                .requestEmail()
-                .setHostedDomain("twilio.com")
-                .build()
-    }
+    fun getSignInIntent() = googleSignInClient.signInIntent
 
-    fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+    fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = googleAuthWrapper.getSignInResultFromIntent(data)
+
+    private fun buildGoogleSignInClient(context: Context) =
+            googleSignInWrapper.getClient(context, buildGoogleSignInOptions(context))
+
+    private fun buildGoogleSignInOptions(context: Context): GoogleSignInOptions {
+        return googleSignInOptionsBuilderWrapper.run {
+            requestIdToken(context.getString(R.string.default_web_client_id))
+            requestEmail()
+            setHostedDomain("twilio.com")
+            build()
+        }
+    }
 }
