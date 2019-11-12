@@ -23,7 +23,7 @@ namespace twilio_video_jni {
 jobject createJavaTwilioException(JNIEnv *env,
                                   jclass j_twilio_exception_class,
                                   jmethodID j_twilio_exception_ctor_id,
-                                  const twilio::video::TwilioError &twilio_error) {
+                                  const twilio::video::Error &twilio_error) {
     jobject j_twilio_exception = env->NewObject(j_twilio_exception_class,
                                                 j_twilio_exception_ctor_id,
                                                 twilio_error.getCode(),

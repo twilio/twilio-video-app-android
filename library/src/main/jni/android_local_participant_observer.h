@@ -45,21 +45,21 @@ protected:
 
     virtual void onAudioTrackPublicationFailed(twilio::video::LocalParticipant *participant,
                                                std::shared_ptr<twilio::media::LocalAudioTrack> audio_track,
-                                               const twilio::video::TwilioError twilio_error);
+                                               const twilio::video::Error twilio_error);
 
     virtual void onVideoTrackPublished(twilio::video::LocalParticipant *local_participant,
                                        std::shared_ptr<twilio::media::LocalVideoTrackPublication> local_video_track_publication);
 
     virtual void onVideoTrackPublicationFailed(twilio::video::LocalParticipant *participant,
                                                std::shared_ptr<twilio::media::LocalVideoTrack> video_track,
-                                               const twilio::video::TwilioError twilio_error);
+                                               const twilio::video::Error twilio_error);
 
     virtual void onDataTrackPublished(twilio::video::LocalParticipant *local_participant,
                                       std::shared_ptr<twilio::media::LocalDataTrackPublication> local_data_track_publication);
 
     virtual void onDataTrackPublicationFailed(twilio::video::LocalParticipant *participant,
                                               std::shared_ptr<twilio::media::LocalDataTrack> data_track,
-                                              const twilio::video::TwilioError twilio_error);
+                                              const twilio::video::Error twilio_error);
 
     virtual void onNetworkQualityLevelChanged(twilio::video::LocalParticipant *participant, twilio::video::NetworkQualityLevel level);
 private:

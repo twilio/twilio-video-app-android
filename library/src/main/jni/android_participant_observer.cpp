@@ -538,7 +538,7 @@ void AndroidParticipantObserver::onAudioTrackSubscribed(twilio::video::RemotePar
 
 void AndroidParticipantObserver::onAudioTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
                                                                 std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
-                                                                const twilio::video::TwilioError twilio_error) {
+                                                                const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -635,7 +635,7 @@ void AndroidParticipantObserver::onVideoTrackSubscribed(twilio::video::RemotePar
 
 void AndroidParticipantObserver::onVideoTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
                                                                 std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
-                                                                const twilio::video::TwilioError twilio_error) {
+                                                                const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -730,7 +730,7 @@ void AndroidParticipantObserver::onDataTrackSubscribed(twilio::video::RemotePart
 
 void AndroidParticipantObserver::onDataTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
                                                                std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
-                                                               const twilio::video::TwilioError twilio_error) {
+                                                               const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,

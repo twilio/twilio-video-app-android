@@ -268,7 +268,7 @@ void AndroidRoomObserver::onConnected(twilio::video::Room *room) {
     }
 }
 void AndroidRoomObserver::onReconnecting(const twilio::video::Room *room,
-                                         const twilio::video::TwilioError twilio_error) {
+                                         const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -317,7 +317,7 @@ void AndroidRoomObserver::onReconnected(const twilio::video::Room *room) {
 }
 
 void AndroidRoomObserver::onDisconnected(const twilio::video::Room *room,
-                                         std::unique_ptr<twilio::video::TwilioError> twilio_error) {
+                                         std::unique_ptr<twilio::video::Error> twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
@@ -342,7 +342,7 @@ void AndroidRoomObserver::onDisconnected(const twilio::video::Room *room,
 }
 
 void AndroidRoomObserver::onConnectFailure(const twilio::video::Room *room,
-                                           const twilio::video::TwilioError twilio_error) {
+                                           const twilio::video::Error twilio_error) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
     VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
