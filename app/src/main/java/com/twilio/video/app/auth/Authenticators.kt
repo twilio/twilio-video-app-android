@@ -5,8 +5,6 @@ class Authenticators(private val authenticators: List<Authenticator>) : Authenti
 
     override fun loggedIn() = authenticators.all { it.loggedIn() }
 
-    override fun logout() {
-        authenticators.forEach{ it.logout() }
-    }
+    override fun logout() = authenticators.forEach{ it.logout() }
 
 }
