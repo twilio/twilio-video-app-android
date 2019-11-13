@@ -47,6 +47,19 @@ aliases:
       - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
 jobs:
+  test-app:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run:
+          name: Test app
+          command: ./gradlew -q app:testInternalDebugUnitTest
+      - save-cache: *save-cache-gradle
+
   build-app:
     <<: *build-defaults
     resource_class: large
@@ -87,6 +100,9 @@ workflows:
   build-test-publish:
     jobs:
       - build-app
+      - test-app:
+          requires:
+            - build-app
       - publish-to-appcenter:
           requires:
             - build-app
