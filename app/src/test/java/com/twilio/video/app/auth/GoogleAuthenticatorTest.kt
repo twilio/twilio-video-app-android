@@ -68,6 +68,7 @@ class GoogleAuthenticatorTest {
     @Ignore
     @Test
     fun `login should emit success when login is successful`() {
+        // TODO Try thenAnswer instead of ArgumentCaptor to invoke callback
 //        val account = mock<GoogleSignInAccount>{
 //            whenever(mock.email).thenReturn("test@twilio.com")
 //            whenever(mock.idToken).thenReturn("IdToken")

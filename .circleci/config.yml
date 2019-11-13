@@ -16,7 +16,7 @@ aliases:
     paths:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
-  - &setup-google-services
+  - &get-secrets
     name: Setup google services
     command: |
       # Internal debug google services
@@ -55,7 +55,7 @@ jobs:
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
-      - run: *setup-google-services
+      - run: *get-secrets
       - run:
           name: Build app
           command: ./gradlew -q app:assemble
