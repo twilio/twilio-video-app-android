@@ -125,9 +125,9 @@ integration-capturer-tests:
         - {model: athene , version: 23}
         - {model: athene_f, version: 23}
         - {model: blueline, version: 28}
-        - {model: blueline, version: Q-beta-3}
         - {model: cheryl, version: 25}
         - {model: crownqlteue, version: 27}
+        - {model: flame, version: 29}
         - {model: flo, version: 19}
         - {model: flo, version: 21}
         - {model: g3, version: 19}
