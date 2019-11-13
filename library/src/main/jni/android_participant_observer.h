@@ -20,6 +20,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "twilio/media/track.h"
+#include "twilio/media/data_track.h"
 #include "twilio/video/video.h"
 #include "twilio/video/remote_participant_observer.h"
 
