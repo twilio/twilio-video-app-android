@@ -23,11 +23,7 @@ class GoogleAuthenticator (
         private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper
     ) : Authenticator {
 
-    private val googleSignInClient: GoogleSignInClient
-
-    init {
-        googleSignInClient = buildGoogleSignInClient(context)
-    }
+    private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
 
     override fun loggedIn() = firebaseWrapper.instance.currentUser != null
 
