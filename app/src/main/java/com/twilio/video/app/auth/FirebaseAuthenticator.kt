@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.twilio.video.app.util.AuthHelper
 
+// TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class FirebaseAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
 
     override fun logout() {
