@@ -58,7 +58,7 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    FirebaseWrapper providesEmailAuthenticator() {
+    FirebaseWrapper providesFirebaseWrapperAuthenticator() {
         return new FirebaseWrapper();
     }
 
