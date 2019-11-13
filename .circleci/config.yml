@@ -73,6 +73,7 @@ jobs:
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
       - run:
           name: Unit Tests
           command: ./gradlew -q app:testInternalDebugUnitTest
