@@ -2,8 +2,12 @@
 
 This application demonstrates multi-party voice and video built with [Twilio’s Programmable Video Android SDK](https://www.twilio.com/docs/video).
 
+- [Features](#features)
+- [Architecture](#architecture)
 - [Getting Started](#getting-started)
-    - [Authentication](#authentication)
+- [Contributing](#contributing)
+- [Code of Conduct](#code-of-conduct)
+- [License](#license)
     
 # Features
 
