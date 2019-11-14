@@ -11,15 +11,12 @@ This application demonstrates multi-party voice and video built with [Twilio’s
     
 # Features
 
-- Real-time video
-    - Disable video 
-    - Network quality level indication
-    - Screen sharing
-    - Front and back camera control
-- Real-time audio
-    - Dominant speaker indication
-    - Mute audio
-    - Toggle speaker
+- [x] Video conferencing with real-time video and audio
+- [x] Enable/disable camera
+- [x] Switch between front and back camera
+- [x] Mute/unmute mic
+- [x] Dominant speaker indicator
+- [x] Network quality level indicator
     
 # Architecture
 // TODO [AHOYAPPS-90](https://issues.corp.twilio.com/browse/AHOYAPPS-90)
