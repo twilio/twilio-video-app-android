@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
 
-    // TODO Replace with FirebaseAuthenticator as part of // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
+    // TODO Replace with EmailAuthenticator as part of // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
     @Inject lateinit var authenticator: Authenticator
     @Inject lateinit var screenSelector: ScreenSelector
 

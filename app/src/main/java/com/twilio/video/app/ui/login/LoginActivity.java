@@ -30,7 +30,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.twilio.video.app.R;
-import com.twilio.video.app.auth.FirebaseAuthenticator;
+import com.twilio.video.app.auth.EmailAuthenticator;
 import com.twilio.video.app.auth.GoogleAuthenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
@@ -53,7 +53,8 @@ public class LoginActivity extends BaseActivity
 
     @Inject SharedPreferences sharedPreferences;
     @Inject GoogleAuthenticator googleAuthenticator;
-    @Inject FirebaseAuthenticator firebaseAuthenticator;
+    @Inject
+    EmailAuthenticator emailAuthenticator;
 
     private ProgressDialog progressDialog;
 
@@ -73,13 +74,13 @@ public class LoginActivity extends BaseActivity
 
     @Override
     protected void onStart() {
-        firebaseAuthenticator.addAuthStateListener(fbAuthStateListener);
+        emailAuthenticator.addAuthStateListener(fbAuthStateListener);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        firebaseAuthenticator.removeAuthStateListener(fbAuthStateListener);
+        emailAuthenticator.removeAuthStateListener(fbAuthStateListener);
         super.onStop();
     }
 
@@ -135,7 +136,7 @@ public class LoginActivity extends BaseActivity
     @Override
     public void onExistingAccountCredentials(String email, String password) {
         showAuthenticatingDialog();
-        firebaseAuthenticator.login(email, password, this, errorListener);
+        emailAuthenticator.login(email, password, this, errorListener);
     }
 
     private void startLobbyActivity() {

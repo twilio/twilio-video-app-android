@@ -36,13 +36,13 @@ public class AuthModule {
     @Provides
     @ApplicationScope
     Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper) {
-        return new FirebaseAuthenticator(firebaseWrapper);
+        return new EmailAuthenticator(firebaseWrapper);
     }
 
     @Provides
     @ApplicationScope
-    FirebaseAuthenticator providesFirebaseAuthenticator(FirebaseWrapper firebaseWrapper) {
-        return new FirebaseAuthenticator(firebaseWrapper);
+    EmailAuthenticator providesEmailAuthenticator(FirebaseWrapper firebaseWrapper) {
+        return new EmailAuthenticator(firebaseWrapper);
     }
 
     @Provides
@@ -64,7 +64,7 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    Authenticators providesAuthenticators(FirebaseAuthenticator communityAuthenticator, GoogleAuthenticator googleAuthenticator) {
+    Authenticators providesAuthenticators(EmailAuthenticator communityAuthenticator, GoogleAuthenticator googleAuthenticator) {
         List<Authenticator> authenticators = new ArrayList<>();
         authenticators.add(communityAuthenticator);
         authenticators.add(googleAuthenticator);
