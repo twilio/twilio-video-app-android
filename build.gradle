@@ -17,7 +17,7 @@ buildscript {
             'java': JavaVersion.VERSION_1_8,
 
             // Dependencies
-            'videoCpp': '5.0.0-rc7',
+            'videoCpp': '5.0.0-rc8',
             'junit': '4.12',
             'mockito': '1.10.19',
             'guava': '19.0',
