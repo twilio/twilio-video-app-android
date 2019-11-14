@@ -20,11 +20,6 @@ This application demonstrates multi-party voice and video built with [Twilio’s
     - Dominant speaker indication
     - Mute audio
     - Toggle speaker
-- Up to 50 participants
-- Authentication
-    - Firebase
-    - Google
-    - Email
     
 # Architecture
 // TODO [AHOYAPPS-90](https://issues.corp.twilio.com/browse/AHOYAPPS-90)
