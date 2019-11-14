@@ -72,7 +72,7 @@ TWILIO_ACCESS_TOKEN=abcdef0123456789
 
 # Contributing
 
-Check out [CONTRIBUTING.md] for information on how to help contribute to this app.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to help contribute to this app.
 
 ## Code of Conduct
 
@@ -80,4 +80,4 @@ This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDU
 
 # License
 
-Apache 2.0 license. See the [LICENSE.txt] file for details.
+Apache 2.0 license. See [LICENSE.txt](LICENSE.txt) for details.
