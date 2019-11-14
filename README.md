@@ -62,6 +62,14 @@ TWILIO_ACCESS_TOKEN=abcdef0123456789
 
 4. Run the application.
 
+### Start video conference
+
+For each device:
+
+1. Repeat steps to generate a Twilio access token and run. 
+1. Enter a room name.
+1. Tap `Join`.
+
 # Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to help contribute to this app.
