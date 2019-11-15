@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "twilio/video/video.h"
-#include "twilio/video/stats_observer.h"
+#include "twilio/media/stats_observer.h"
 #include "twilio/video/room.h"
 #include "android_room_observer.h"
 #include "android_stats_observer.h"

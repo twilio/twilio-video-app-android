@@ -19,8 +19,8 @@
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
-#include "twilio/video/stats_observer.h"
-#include "twilio/video/stats_report.h"
+#include "twilio/media/stats_observer.h"
+#include "twilio/media/stats_report.h"
 #include "class_reference_holder.h"
 #include "logging.h"
 #include "jni_utils.h"
@@ -31,7 +31,7 @@
 
 namespace twilio_video_jni {
 
-class AndroidStatsObserver : public twilio::video::StatsObserver {
+class AndroidStatsObserver : public twilio::media::StatsObserver {
 public:
     AndroidStatsObserver(JNIEnv *env, jobject j_stats_observer) :
             j_stats_observer_(env, webrtc::JavaParamRef<jobject>(j_stats_observer)),
@@ -144,26 +144,26 @@ public:
     }
 
     virtual ~AndroidStatsObserver() {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kDebug,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kDebug,
                           "~AndroidStatsObserver");
     }
 
     void setObserverDeleted() {
         rtc::CritScope cs(&deletion_lock_);
         observer_deleted_ = true;
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kDebug,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kDebug,
                           "android stats observer deleted");
     }
 
 protected:
     virtual void onStats(
-            const std::vector<twilio::video::StatsReport> &stats_reports) {
+            const std::vector<twilio::media::StatsReport> &stats_reports) {
         webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
         std::string func_name = std::string(__FUNCTION__);
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kDebug,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kDebug,
                           "%s", func_name.c_str());
 
         {
@@ -203,15 +203,15 @@ private:
 
     bool isObserverValid(const std::string &callbackName) {
         if (observer_deleted_) {
-            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                              twilio::video::LogLevel::kWarning,
+            VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                              twilio::LogLevel::kWarning,
                               "android stats observer is marked for deletion, skipping %s callback",
                               callbackName.c_str());
             return false;
         };
         if (IsNull(jni(), j_stats_observer_.obj())) {
-            VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                              twilio::video::LogLevel::kWarning,
+            VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                              twilio::LogLevel::kWarning,
                               "android stats observer reference has been destroyed, skipping %s callback",
                               callbackName.c_str());
             return false;
@@ -417,8 +417,8 @@ private:
                                                         "STATE_WAITING",
                                                         "Lcom/twilio/video/IceCandidatePairState;");
             } else {
-                VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                                  twilio::video::LogLevel::kError,
+                VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                                  twilio::LogLevel::kError,
                                   "invalid ice candidate pair state received");
                 continue;
             }

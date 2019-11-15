@@ -19,6 +19,7 @@
 
 #include <jni.h>
 #include "twilio/media/track.h"
+#include "twilio/media/data_track.h"
 #include "com_twilio_video_AudioTrack.h"
 
 #ifdef __cplusplus

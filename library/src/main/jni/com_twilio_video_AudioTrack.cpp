@@ -48,8 +48,8 @@ void AudioTrackContext::addSink(JNIEnv *env, jobject j_audio_sink) {
         return env->IsSameObject(it.first, j_audio_sink);
     });
     if(it != audio_sink_map_.end()){
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kInfo,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kInfo,
                           "Trying to add duplicate Audio Sink. Skipping.");
        return;
     }
@@ -74,8 +74,8 @@ void AudioTrackContext::removeSink(jobject j_audio_sink) {
     });
 
     if(it == audio_sink_map_.end()){
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kInfo,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kInfo,
                           "Removed audio sink that was not in collection");
         return;
     }

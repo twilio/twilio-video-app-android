@@ -36,8 +36,8 @@ cricket::CaptureState AndroidVideoCapturer::Start(const cricket::VideoFormat& ca
     RTC_CHECK(thread_checker_.CalledOnValidThread());
     RTC_CHECK(!running_);
     const int fps = cricket::VideoFormat::IntervalToFps(capture_format.interval);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "AndroidVideoCapturer::Start %dx%d@%d", capture_format.width,
                       capture_format.height, fps);
 
@@ -48,8 +48,8 @@ cricket::CaptureState AndroidVideoCapturer::Start(const cricket::VideoFormat& ca
 }
 
 void AndroidVideoCapturer::Stop() {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kInfo,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kInfo,
                       "AndroidVideoCapturer::Stop");
     RTC_CHECK(thread_checker_.CalledOnValidThread());
     RTC_CHECK(running_);

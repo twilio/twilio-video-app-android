@@ -47,8 +47,8 @@ RoomDelegate::RoomDelegate(JNIEnv *env,
 }
 
 RoomDelegate::~RoomDelegate() {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "~RoomDelegate");
     /*
      * The native objects have been scheduled for release, but may not have completed executing yet.
@@ -104,8 +104,8 @@ void RoomDelegate::release() {
 }
 
 void RoomDelegate::OnMessage(rtc::Message *msg) {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "onMessage");
     switch (msg->message_id) {
         case kMessageTypeConnect: {
@@ -141,8 +141,8 @@ void RoomDelegate::OnMessage(rtc::Message *msg) {
 void RoomDelegate::connectOnNotifier() {
     RTC_CHECK(notifier_thread_->IsCurrent()) << "connect not called on notifier "
             "thread";
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "connectOnNotifier");
     JNIEnv *env = webrtc::jni::AttachCurrentThreadIfNeeded();
 
@@ -202,8 +202,8 @@ void RoomDelegate::reportNetworkChangeOnNotifier(
 void RoomDelegate::disconnectOnNotifier() {
     RTC_CHECK(notifier_thread_->IsCurrent()) << "disconnect not called on "
             "notifier thread";
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "disconnectOnNotifier")
 
     if (room_) {
@@ -214,8 +214,8 @@ void RoomDelegate::disconnectOnNotifier() {
 void RoomDelegate::releaseOnNotifier() {
     RTC_CHECK(notifier_thread_->IsCurrent()) << "release not called on "
             "notifier thread";
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "release")
     room_.reset();
     stats_observer_.reset();

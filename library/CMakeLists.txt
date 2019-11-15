@@ -16,8 +16,8 @@ set(CORE_INCLUDE_DIR ${CORE_HOME_DIR}/include)
 set(CORE_STATIC_LIB_DIR ${CORE_HOME_DIR}/lib)
 
 # Set WebRTC paths
-set(WEBRTC_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc/include)
-set(THIRD_PARTY_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc/include/webrtc/third_party)
+set(WEBRTC_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party)
+set(THIRD_PARTY_INCLUDE_DIR ${CORE_INCLUDE_DIR}/third_party/webrtc/third_party)
 
 # Include headers
 include_directories(${CORE_INCLUDE_DIR})
