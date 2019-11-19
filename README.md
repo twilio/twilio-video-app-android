@@ -2,26 +2,13 @@
 
 This application demonstrates multi-party voice and video built with [Twilio’s Programmable Video Android SDK](https://www.twilio.com/docs/video).
 
-- [Features](#features)
-- [Architecture](#architecture)
+- [Languages](#languages)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
     
-# Features
-
-- [x] Video conferencing with real-time video and audio
-- [x] Enable/disable camera
-- [x] Switch between front and back camera
-- [x] Mute/unmute mic
-- [x] Dominant speaker indicator
-- [x] Network quality level indicator
-    
-# Architecture
-// TODO [AHOYAPPS-90](https://issues.corp.twilio.com/browse/AHOYAPPS-90)
-
-## Languages
+# Languages
 This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
  
 # Getting Started
@@ -37,9 +24,8 @@ Currently there are three product flavors for the application.
 
 ### Building the Community Flavor
 
-The community flavor of the application is meant for developers who would like to work with the
-Android SDK in the context of a full-fledged application without needing to bother with implementing
-authentication and managing a token server. **This variant uses a hard coded access tokens locally within
+The community flavor of the application is meant for developers who would like to work with the Video Android SDK in the context of a full-fledged application.
+**This variant uses a hard coded access tokens locally within
 the application. This practice is intended for local development and is not encouraged for your
 applications. Please follow the
 [User Identity and Access Tokens guide](https://www.twilio.com/docs/api/video/identity) for proper
