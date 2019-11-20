@@ -289,7 +289,7 @@ public class RoomActivity extends BaseActivity {
         participantController.setListener(participantClickListener());
 
         // Setup Activity
-        displayName = getDisplayName();
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
         updateUi(room);
@@ -620,19 +620,6 @@ public class RoomActivity extends BaseActivity {
         return sharedPreferences.getBoolean(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT);
-    }
-
-    private String getDisplayName() {
-        String displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-
-        /*
-         * Append serial number for internal or development flavor so the same account can be used
-         * across different devices.
-         */
-        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isCommunityFlavor()
-                ? displayName
-                        + String.format(Locale.getDefault(), " %d", System.currentTimeMillis())
-                : displayName;
     }
 
     private void obtainVideoConstraints() {
