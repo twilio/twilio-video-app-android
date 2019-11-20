@@ -17,13 +17,11 @@
 package com.twilio.video.app.auth;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,39 +33,22 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper) {
-        return new EmailAuthenticator(firebaseWrapper);
+    FirebaseFacade providesFirebaseFacade(FirebaseWrapper firebaseWrapper, Application application) {
+        Context context = application.getApplicationContext();
+        return new FirebaseFacade(firebaseWrapper,
+                new GoogleAuthenticator(
+                        new FirebaseWrapper(),
+                        context,
+                        new GoogleAuthWrapper(),
+                        new GoogleSignInWrapper(),
+                        new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
+                        new GoogleAuthProviderWrapper()),
+                new EmailAuthenticator(firebaseWrapper));
     }
 
     @Provides
     @ApplicationScope
-    EmailAuthenticator providesEmailAuthenticator(FirebaseWrapper firebaseWrapper) {
-        return new EmailAuthenticator(firebaseWrapper);
-    }
-
-    @Provides
-    @ApplicationScope
-    GoogleAuthenticator providesGoogleAuthenticator(FirebaseWrapper firebaseWrapper, Application application) {
-        return new GoogleAuthenticator(
-                firebaseWrapper,
-                application.getApplicationContext(),
-                new GoogleAuthWrapper(),
-                new GoogleSignInWrapper(),
-                new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN));
-    }
-
-    @Provides
-    @ApplicationScope
-    FirebaseWrapper providesFirebaseWrapperAuthenticator() {
+    FirebaseWrapper providesFirebaseWrapper() {
         return new FirebaseWrapper();
-    }
-
-    @Provides
-    @ApplicationScope
-    Authenticators providesAuthenticators(EmailAuthenticator communityAuthenticator, GoogleAuthenticator googleAuthenticator) {
-        List<Authenticator> authenticators = new ArrayList<>();
-        authenticators.add(communityAuthenticator);
-        authenticators.add(googleAuthenticator);
-        return new Authenticators(authenticators);
     }
 }

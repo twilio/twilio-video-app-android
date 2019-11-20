@@ -19,20 +19,19 @@ package com.twilio.video.app.ui.splash
 import android.content.Intent
 import android.os.Bundle
 import com.twilio.video.app.ui.ScreenSelector
-import com.twilio.video.app.auth.Authenticator
+import com.twilio.video.app.auth.FirebaseFacade
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.ui.room.RoomActivity
 import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
 
-    // TODO Replace with EmailAuthenticator as part of // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
-    @Inject lateinit var authenticator: Authenticator
+    @Inject lateinit var firebaseFacade: FirebaseFacade
     @Inject lateinit var screenSelector: ScreenSelector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val newIntent = if (authenticator.loggedIn())
+        val newIntent = if (firebaseFacade.loggedIn())
             Intent(this, RoomActivity::class.java)
         else
             Intent(this, screenSelector.loginScreen)

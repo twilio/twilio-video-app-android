@@ -16,9 +16,9 @@
 
 package com.twilio.video.app.auth
 
-import androidx.fragment.app.FragmentActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.twilio.video.app.util.AuthHelper
+import com.twilio.video.app.auth.Authenticator.MissingEmailError
+import com.twilio.video.app.auth.LoginEvent.EmailLogin
+import io.reactivex.Maybe
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class EmailAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authenticator {
@@ -27,33 +27,28 @@ class EmailAuthenticator(private val firebaseWrapper: FirebaseWrapper) : Authent
         firebaseWrapper.instance.signOut()
     }
 
-    fun login(
-            email: String,
-            password: String,
-            activity: FragmentActivity,
-            errorListener: AuthHelper.ErrorListener) {
-        require(!(email == null || email.length == 0)) { "Email can't be empty" }
-        require(!(password == null || password.length == 0)) { "Password can't be empty" }
-        val mAuth = firebaseWrapper.instance
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(
-                        activity
-                ) { task ->
-                    if (!task.isSuccessful) {
-                        errorListener.onError(AuthHelper.ERROR_AUTHENTICATION_FAILED)
-                    }
+    override fun login(emailLogin: LoginEvent): Maybe<Authenticator.LoginError> {
+        require(emailLogin is EmailLogin) { "Expecting ${EmailLogin::class.simpleName} as LoginEvent" }
+        return Maybe.create { maybe ->
+            emailLogin.run {
+                if (email.isBlank()) {
+                    maybe.onSuccess(MissingEmailError)
                 }
-    }
-
-    override fun loggedIn(): Boolean {
-        return firebaseWrapper.instance.currentUser != null
-    }
-
-    fun addAuthStateListener(listener: FirebaseAuth.AuthStateListener ) {
-        firebaseWrapper.instance.addAuthStateListener(listener)
-    }
-
-    fun removeAuthStateListener(listener: FirebaseAuth.AuthStateListener) {
-        firebaseWrapper.instance.removeAuthStateListener(listener)
+                if (password.isBlank()) {
+                    maybe.onSuccess(MissingPasswordError)
+                }
+                firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                maybe.onComplete()
+                            } else {
+                                maybe.onSuccess(FirebaseLoginError)
+                            }
+                        }
+            }
+        }
     }
 }
+
+object FirebaseLoginError : Authenticator.LoginError()
+object MissingPasswordError : Authenticator.LoginError()

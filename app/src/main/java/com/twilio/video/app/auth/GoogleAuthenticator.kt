@@ -2,58 +2,77 @@ package com.twilio.video.app.auth
 
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.twilio.video.app.R
-import com.twilio.video.app.util.AuthHelper
-import com.twilio.video.app.util.AuthHelper.ERROR_AUTHENTICATION_FAILED
-import com.twilio.video.app.util.AuthHelper.ERROR_UNAUTHORIZED_EMAIL
+import com.twilio.video.app.auth.Authenticator.MissingEmailError
+import com.twilio.video.app.auth.LoginEvent.GoogleLogin
+import io.reactivex.Maybe
+import io.reactivex.MaybeEmitter
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
-class GoogleAuthenticator (
+class GoogleAuthenticator(
         private val firebaseWrapper: FirebaseWrapper,
         context: Context,
         private val googleAuthWrapper: GoogleAuthWrapper,
         private val googleSignInWrapper: GoogleSignInWrapper,
-        private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper
-    ) : Authenticator {
+        private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
+        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
+) : Authenticator {
 
     private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
 
-    override fun loggedIn() = firebaseWrapper.instance.currentUser != null
+    override fun login(googleLogin: LoginEvent): Maybe<Authenticator.LoginError> {
+        require(googleLogin is GoogleLogin) { "Expecting ${GoogleLogin::class.simpleName} as LoginEvent" }
+        return Maybe.create { maybe ->
+            getSignInResultFromIntent(googleLogin.signInResultIntent)?.let { result ->
+                if (result.isSuccess) {
+                    result.signInAccount?.let { account ->
+                        loginWithAccount(account, maybe)
+                    } ?: maybe.onSuccess(NullGoogleSignInAccountError)
+                } else {
+                    maybe.onSuccess(LoginIntentError)
+                }
+                // TODO: failed to sign in with google
+            }
+        }
+    }
 
     override fun logout() {
         googleSignInClient.signOut()
     }
 
-    fun login(
-            account: GoogleSignInAccount,
-            activity: FragmentActivity,
-            errorListener: AuthHelper.ErrorListener) {
-        if (account.email!!.endsWith("@twilio.com")) {
-            val mAuth = FirebaseAuth.getInstance()
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            mAuth.signInWithCredential(credential)
-                    .addOnCompleteListener(
-                            activity
-                    ) { task ->
-                        if (!task.isSuccessful) {
-                            errorListener.onError(ERROR_AUTHENTICATION_FAILED)
-                        }
-                    }
-        } else {
-            errorListener.onError(ERROR_UNAUTHORIZED_EMAIL)
+    private fun loginWithAccount(account: GoogleSignInAccount, maybe: MaybeEmitter<Authenticator.LoginError>) {
+        val email = account.email
+        val idToken = account.idToken
+        if (email.isNullOrBlank()) {
+            maybe.onSuccess(MissingEmailError)
+            return
         }
+        if (email.endsWith("@twilio.com")) {
+            maybe.onSuccess(WrongEmailDomainError)
+            return
+        }
+        if (idToken.isNullOrBlank()) {
+            maybe.onSuccess(MissingIdTokenError)
+            return
+        }
+        val credential = googleAuthProviderWrapper.getCredential(idToken)
+        firebaseWrapper.instance.signInWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        maybe.onComplete()
+                    } else {
+                        maybe.onSuccess(GoogleAuthError)
+                    }
+                }
     }
 
     fun getSignInIntent() = googleSignInClient.signInIntent
 
-    fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = googleAuthWrapper.getSignInResultFromIntent(data)
+    private fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = googleAuthWrapper.getSignInResultFromIntent(data)
 
     private fun buildGoogleSignInClient(context: Context) =
             googleSignInWrapper.getClient(context, buildGoogleSignInOptions(context))
@@ -67,3 +86,9 @@ class GoogleAuthenticator (
         }
     }
 }
+
+object LoginIntentError : Authenticator.LoginError()
+object WrongEmailDomainError : Authenticator.LoginError()
+object GoogleAuthError : Authenticator.LoginError()
+object NullGoogleSignInAccountError : Authenticator.LoginError()
+object MissingIdTokenError : Authenticator.LoginError()

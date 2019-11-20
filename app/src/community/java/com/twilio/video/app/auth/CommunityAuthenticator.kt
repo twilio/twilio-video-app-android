@@ -20,17 +20,18 @@ import android.content.SharedPreferences
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.login.CommunityLoginActivity
 
-class CommunityAuthenticator(private val preferences: SharedPreferences) : Authenticator {
+// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
+class CommunityAuthenticator(private val preferences: SharedPreferences) {
 
     fun login(displayName: String) {
         preferences.edit().putString(Preferences.DISPLAY_NAME, displayName).apply()
     }
 
-    override fun loggedIn(): Boolean {
+    fun loggedIn(): Boolean {
         return !preferences.getString(Preferences.DISPLAY_NAME, null).isNullOrEmpty()
     }
 
-    override fun logout() {
+    fun logout() {
         preferences.edit().remove(Preferences.DISPLAY_NAME).apply()
     }
 }

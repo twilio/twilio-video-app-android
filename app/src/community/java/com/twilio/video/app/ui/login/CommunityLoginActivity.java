@@ -56,6 +56,7 @@ public class CommunityLoginActivity extends BaseActivity {
 
         setContentView(R.layout.development_activity_login);
         ButterKnife.bind(this);
+        if(authenticator.loggedIn()) startLobbyActivity();
     }
 
     @OnTextChanged(R.id.name_edittext)

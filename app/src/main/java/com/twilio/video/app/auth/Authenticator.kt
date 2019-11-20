@@ -16,9 +16,14 @@
 
 package com.twilio.video.app.auth
 
+import io.reactivex.Maybe
+
 interface Authenticator {
 
-    fun loggedIn() : Boolean
+    open class LoginError
+    object MissingEmailError : Authenticator.LoginError()
+
+    fun login(loginEvent: LoginEvent) : Maybe<LoginError>
 
     fun logout()
 }

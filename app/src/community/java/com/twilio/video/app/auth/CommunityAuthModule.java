@@ -16,34 +16,44 @@
 
 package com.twilio.video.app.auth;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
-import com.twilio.video.app.ApplicationScope;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.twilio.video.app.ApplicationScope;
 
 import dagger.Module;
 import dagger.Provides;
 
+// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 @Module
 public class CommunityAuthModule {
+
     @Provides
     @ApplicationScope
-    Authenticator providesAuthenticator(SharedPreferences preferences) {
-        return new CommunityAuthenticator(preferences);
+    FirebaseFacade providesFirebaseFacade(FirebaseWrapper firebaseWrapper, Application application) {
+        Context context = application.getApplicationContext();
+        return new FirebaseFacade(firebaseWrapper,
+                new GoogleAuthenticator(
+                        new FirebaseWrapper(),
+                        context,
+                        new GoogleAuthWrapper(),
+                        new GoogleSignInWrapper(),
+                        new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
+                        new GoogleAuthProviderWrapper()),
+                new EmailAuthenticator(firebaseWrapper));
+    }
+
+    @Provides
+    @ApplicationScope
+    FirebaseWrapper providesFirebaseWrapper() {
+        return new FirebaseWrapper();
     }
 
     @Provides
     @ApplicationScope
     CommunityAuthenticator providesCommunityAuthenticator(SharedPreferences preferences) {
         return new CommunityAuthenticator(preferences);
-    }
-
-    @Provides
-    @ApplicationScope
-    Authenticators providesAuthenticators(CommunityAuthenticator communityAuthenticator) {
-        List<Authenticator> authenticators = new ArrayList<>();
-        authenticators.add(communityAuthenticator);
-        return new Authenticators(authenticators);
     }
 }
