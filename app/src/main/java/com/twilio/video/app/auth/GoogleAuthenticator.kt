@@ -54,7 +54,7 @@ class GoogleAuthenticator(
             maybe.onSuccess(MissingEmailError)
             return
         }
-        if (email.endsWith("@twilio.com")) {
+        if (!email.endsWith("@twilio.com")) {
             maybe.onSuccess(WrongEmailDomainError)
             return
         }
