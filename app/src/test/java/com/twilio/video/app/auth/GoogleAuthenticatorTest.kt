@@ -1,14 +1,13 @@
 package com.twilio.video.app.auth
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -26,6 +25,8 @@ class GoogleAuthenticatorTest {
     private val googleSignInOptionsWrapper = mock<GoogleSignInOptionsBuilderWrapper>()
     private val googleSignInOptions = mock<GoogleSignInOptions>()
     private val googleSignInClient = mock<GoogleSignInClient>()
+    private val googleAuthProviderWrapper = mock<GoogleAuthProviderWrapper>()
+    private val sharedPreferences = mock<SharedPreferences>()
     private lateinit var googleAuthenticator: GoogleAuthenticator
 
     @Before
@@ -38,19 +39,9 @@ class GoogleAuthenticatorTest {
                 context,
                 googleAuthWrapper,
                 googleSignInWrapper,
-                googleSignInOptionsWrapper)
-    }
-
-    @Test
-    fun `loggedIn should return true when user is logged in`() {
-        whenever(firebaseAuth.currentUser).thenReturn(mock())
-
-        assertThat(googleAuthenticator.loggedIn(), equalTo(true))
-    }
-
-    @Test
-    fun `loggedIn should return false when user is not logged in`() {
-        assertThat(googleAuthenticator.loggedIn(), equalTo(false))
+                googleSignInOptionsWrapper,
+                googleAuthProviderWrapper,
+                sharedPreferences)
     }
 
     @Ignore
