@@ -36,6 +36,8 @@ import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val GOOGLE_SIGN_IN = 4615
+
 class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAccountLoginFragment.Listener {
 
     @Inject
