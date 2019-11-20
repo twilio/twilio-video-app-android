@@ -25,7 +25,7 @@
     <string name="settings_screen_vp8_simulcast">VP8 Simulcast</string>
     <string name="settings_screen_aspect_ratio">Aspect Ratio</string>
     <string name="settings_screen_fps">Frames per second</string>
-    <string name="settings_screen_identity">Identity</string>
+    <string name="settings_screen_identity">User Identity</string>
     <string name="settings_screen_version">Version</string>
     <string name="settings_screen_video_library_version">Video Library Version</string>
     <string name="settings_screen_logout">Log Out</string>
