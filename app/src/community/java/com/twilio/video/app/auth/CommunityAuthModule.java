@@ -32,7 +32,10 @@ public class CommunityAuthModule {
 
     @Provides
     @ApplicationScope
-    FirebaseFacade providesFirebaseFacade(FirebaseWrapper firebaseWrapper, Application application) {
+    FirebaseFacade providesFirebaseFacade(
+            FirebaseWrapper firebaseWrapper,
+            Application application,
+            SharedPreferences sharedPreferences) {
         Context context = application.getApplicationContext();
         return new FirebaseFacade(firebaseWrapper,
                 new GoogleAuthenticator(
@@ -41,8 +44,9 @@ public class CommunityAuthModule {
                         new GoogleAuthWrapper(),
                         new GoogleSignInWrapper(),
                         new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
-                        new GoogleAuthProviderWrapper()),
-                new EmailAuthenticator(firebaseWrapper));
+                        new GoogleAuthProviderWrapper(),
+                        sharedPreferences),
+                new EmailAuthenticator(firebaseWrapper, sharedPreferences));
     }
 
     @Provides

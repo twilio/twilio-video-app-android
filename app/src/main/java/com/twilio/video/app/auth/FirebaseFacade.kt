@@ -4,9 +4,7 @@ import android.content.Intent
 import com.twilio.video.app.auth.LoginEvent.EmailLogin
 import com.twilio.video.app.auth.LoginEvent.GoogleLogin
 import com.twilio.video.app.auth.LoginIntentEvent.GoogleSignInIntent
-import io.reactivex.Completable
 import io.reactivex.Maybe
-import java.lang.IllegalArgumentException
 
 class FirebaseFacade(
         private val firebaseWrapper: FirebaseWrapper,

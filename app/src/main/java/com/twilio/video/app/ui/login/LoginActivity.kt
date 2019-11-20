@@ -52,7 +52,6 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         setContentView(R.layout.activity_login)
         val user = firebaseFacade.getCurrentUser()
         if (user != null) {
-            saveIdentity(user)
             onSignInSuccess()
         }
         ButterKnife.bind(this)
@@ -62,7 +61,6 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
                     .add(R.id.login_fragment_container, LoginLandingFragment.newInstance())
                     .commit()
         }
-        if (firebaseFacade.loggedIn()) onSignInSuccess()
     }
 
 
@@ -125,28 +123,6 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         finish()
     }
 
-    private fun saveIdentity(user: FirebaseUser) {
-        val email = if (user.email != null) user.email else ""
-
-        sharedPreferences
-                .edit()
-                .putString(Preferences.EMAIL, email)
-                .putString(Preferences.DISPLAY_NAME, getDisplayName(user))
-                .apply()
-    }
-
-    private fun getDisplayName(user: FirebaseUser): String? {
-        var displayName: String? = ""
-
-        if (user.displayName != null) {
-            displayName = user.displayName
-        } else if (user.email != null) {
-            displayName = user.email!!.split("@".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-        }
-
-        return displayName
-    }
-
     // TODO Provide more detailed error handling as part of https://issues.corp.twilio.com/browse/AHOYAPPS-153
     private fun processError() {
         showUnauthorizedEmailDialog()
@@ -176,10 +152,5 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     private fun onSignInSuccess() {
         dismissAuthenticatingDialog()
         startLobbyActivity()
-    }
-
-    companion object {
-
-        private val GOOGLE_SIGN_IN = 4615
     }
 }

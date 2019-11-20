@@ -2,6 +2,7 @@ package com.twilio.video.app.auth
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -9,6 +10,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator.MissingEmailError
 import com.twilio.video.app.auth.LoginEvent.GoogleLogin
+import com.twilio.video.app.data.Preferences
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 
@@ -19,7 +21,8 @@ class GoogleAuthenticator(
         private val googleAuthWrapper: GoogleAuthWrapper,
         private val googleSignInWrapper: GoogleSignInWrapper,
         private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
-        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
+        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
+        private val sharedPreferences: SharedPreferences
 ) : Authenticator {
 
     private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
@@ -63,6 +66,7 @@ class GoogleAuthenticator(
         firebaseWrapper.instance.signInWithCredential(credential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        saveIdentity(account.displayName, email)
                         maybe.onComplete()
                     } else {
                         maybe.onSuccess(GoogleAuthError)
@@ -85,10 +89,19 @@ class GoogleAuthenticator(
             build()
         }
     }
-}
 
-object LoginIntentError : Authenticator.LoginError()
-object WrongEmailDomainError : Authenticator.LoginError()
-object GoogleAuthError : Authenticator.LoginError()
-object NullGoogleSignInAccountError : Authenticator.LoginError()
-object MissingIdTokenError : Authenticator.LoginError()
+    // TODO Create Facade for SharedPreferences for ease of use and testability
+    private fun saveIdentity(displayName: String?, email: String) {
+        sharedPreferences
+                .edit()
+                .putString(Preferences.EMAIL, email)
+                .putString(Preferences.DISPLAY_NAME, displayName ?: email)
+                .apply()
+    }
+
+    object LoginIntentError : Authenticator.LoginError()
+    object WrongEmailDomainError : Authenticator.LoginError()
+    object GoogleAuthError : Authenticator.LoginError()
+    object NullGoogleSignInAccountError : Authenticator.LoginError()
+    object MissingIdTokenError : Authenticator.LoginError()
+}
