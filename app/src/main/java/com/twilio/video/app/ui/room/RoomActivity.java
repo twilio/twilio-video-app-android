@@ -634,7 +634,7 @@ public class RoomActivity extends BaseActivity {
             builder.aspectRatio(aspectRatios[aspectRatioIndex]);
             Timber.d(
                     "Aspect ratio : %s",
-                    getResources().getStringArray(R.array.aspect_ratio_array)[aspectRatioIndex]);
+                    getResources().getStringArray(R.array.settings_screen_aspect_ratio_array)[aspectRatioIndex]);
         }
 
         // setup video dimensions
@@ -650,8 +650,8 @@ public class RoomActivity extends BaseActivity {
 
         Timber.d(
                 "Video dimensions: %s - %s",
-                getResources().getStringArray(R.array.video_dimensions_array)[minVideoDim],
-                getResources().getStringArray(R.array.video_dimensions_array)[maxVideoDim]);
+                getResources().getStringArray(R.array.settings_screen_video_dimensions_array)[minVideoDim],
+                getResources().getStringArray(R.array.settings_screen_video_dimensions_array)[maxVideoDim]);
 
         // setup fps
         int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);

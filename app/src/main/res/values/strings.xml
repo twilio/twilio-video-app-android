@@ -7,57 +7,58 @@
 
     <!--  Settings Screen  -->
     <string name="settings_screen_advanced">Advanced</string>
-    <string name="enable_stats">Enable Stats</string>
-    <string name="enable_network_quality_level">Enable Network Quality Level</string>
-    <string name="enable_insights">Enable Insights</string>
-    <string name="enable_automatic_track_subscription">Enable Automatic Track Subscription</string>
-    <string name="enable_dominant_speaker">Enable Dominant Speaker</string>
-    <string name="record_participants_on_connect">Record Participants on Connect</string>
-    <string name="enable_network_quality_level_description">Network Quality Level</string>
-    <string name="environment_string">Environment</string>
-    <string name="topology">Topology</string>
-    <string name="media">Media</string>
-    <string name="about">About</string>
-    <string name="video_codecs">Video Codec</string>
-    <string name="audio_codecs">Audio Codec</string>
-    <string name="max_video_bitrate">Video Bitrate (Kbps)</string>
-    <string name="max_audio_bitrate">Audio Bitrate (Kbps)</string>
-    <string name="vp8_simulcast">VP8 Simulcast</string>
-    <string name="aspect_ratio">Aspect Ratio</string>
-    <string name="fps">Frames per second</string>
-    <string name="identity">Identity</string>
-    <string name="version">Version</string>
-    <string name="video_library_version">Video Library Version</string>
-    <string name="logout">Log Out</string>
-    <string-array name="environment_array">
+    <string name="settings_screen_enable_stats">Enable Stats</string>
+    <string name="settings_screen_enable_network_quality_level">Enable Network Quality Level</string>
+    <string name="settings_screen_enable_insights">Enable Insights</string>
+    <string name="settings_screen_enable_automatic_track_subscription">Enable Automatic Track Subscription</string>
+    <string name="settings_screen_enable_dominant_speaker">Enable Dominant Speaker</string>
+    <string name="settings_screen_record_participants_on_connect">Record Participants on Connect</string>
+    <string name="settings_screen_enable_network_quality_level_description">Network Quality Level</string>
+    <string name="settings_screen_environment_string">Environment</string>
+    <string name="settings_screen_topology">Topology</string>
+    <string name="settings_screen_media">Media</string>
+    <string name="settings_screen_about">About</string>
+    <string name="settings_screen_video_codecs">Video Codec</string>
+    <string name="settings_screen_audio_codecs">Audio Codec</string>
+    <string name="settings_screen_max_video_bitrate">Video Bitrate (Kbps)</string>
+    <string name="settings_screen_max_audio_bitrate">Audio Bitrate (Kbps)</string>
+    <string name="settings_screen_vp8_simulcast">VP8 Simulcast</string>
+    <string name="settings_screen_aspect_ratio">Aspect Ratio</string>
+    <string name="settings_screen_fps">Frames per second</string>
+    <string name="settings_screen_identity">Identity</string>
+    <string name="settings_screen_version">Version</string>
+    <string name="settings_screen_video_library_version">Video Library Version</string>
+    <string name="settings_screen_logout">Log Out</string>
+    <string name="settings_screen_video_dimensions">Video dimensions</string>
+    <string-array name="settings_screen_environment_array">
         <item>Production</item>
         <item>Staging</item>
         <item>Development</item>
     </string-array>
 
-    <string-array name="environment_array_values">
+    <string-array name="settings_screen_environment_array_values">
         <item>production</item>
         <item>stage</item>
         <item>dev</item>
     </string-array>
 
-    <string-array name="topology_array">
+    <string-array name="settings_screen_topology_array">
         <item>peer-to-peer</item>
         <item>group</item>
         <item>group-small</item>
     </string-array>
-    <string-array name="aspect_ratio_array">
+    <string-array name="settings_screen_aspect_ratio_array">
         <item>4:3</item>
         <item>16:9</item>
         <item>11:9</item>
     </string-array>
 
-    <string-array name="aspect_ratio_array_values">
+    <string-array name="settings_screen_aspect_ratio_array_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
     </string-array>
-    <string-array name="video_dimensions_array">
+    <string-array name="settings_screen_video_dimensions_array">
         <item>352x288</item>
         <item>640x480</item>
         <item>800x480</item>
@@ -80,7 +81,6 @@
     <string name="registering">Registering</string>
     <string name="video_client_status">Video Client Status</string>
     <string name="room_status">Room Status</string>
-    <string name="video_dimensions">Video dimensions</string>
     <string name="video_constraints">Video Constraints</string>
     <string name="statistics">Statistics</string>
     <string name="local">Local Media</string>
