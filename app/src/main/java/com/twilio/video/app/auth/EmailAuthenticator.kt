@@ -21,6 +21,7 @@ import com.twilio.video.app.auth.Authenticator.MissingEmailError
 import com.twilio.video.app.auth.LoginEvent.EmailLogin
 import com.twilio.video.app.data.Preferences
 import io.reactivex.Maybe
+import io.reactivex.Single
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class EmailAuthenticator(
@@ -31,26 +32,35 @@ class EmailAuthenticator(
         firebaseWrapper.instance.signOut()
     }
 
-    override fun login(emailLogin: LoginEvent): Maybe<Authenticator.LoginError> {
-        require(emailLogin is EmailLogin) { "Expecting ${EmailLogin::class.simpleName} as LoginEvent" }
+    override fun loggedIn(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun login(emailLoginEvent: Single<LoginEvent>): Maybe<Authenticator.LoginError> {
         return Maybe.create { maybe ->
-            emailLogin.run {
-                if (email.isBlank()) {
-                    maybe.onSuccess(MissingEmailError)
-                }
-                if (password.isBlank()) {
-                    maybe.onSuccess(MissingPasswordError)
-                }
-                firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                saveIdentity(task.result?.user?.displayName, email)
-                                maybe.onComplete()
-                            } else {
-                                maybe.onSuccess(FirebaseLoginError)
+            emailLoginEvent.subscribe({ emailLogin ->
+                require(emailLogin is EmailLogin) { "Expecting ${EmailLogin::class.simpleName} as LoginEvent" }
+                emailLogin.run {
+                    if (email.isBlank()) {
+                        maybe.onSuccess(MissingEmailError)
+                    }
+                    if (password.isBlank()) {
+                        maybe.onSuccess(MissingPasswordError)
+                    }
+                    firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    saveIdentity(task.result?.user?.displayName, email)
+                                    maybe.onComplete()
+                                } else {
+                                    maybe.onSuccess(FirebaseLoginError)
+                                }
                             }
-                        }
-            }
+                }
+            }, {
+
+            })
+
         }
     }
 

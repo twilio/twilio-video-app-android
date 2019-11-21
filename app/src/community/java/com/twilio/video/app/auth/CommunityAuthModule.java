@@ -16,11 +16,8 @@
 
 package com.twilio.video.app.auth;
 
-import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationScope;
 
 import dagger.Module;
@@ -32,32 +29,7 @@ public class CommunityAuthModule {
 
     @Provides
     @ApplicationScope
-    FirebaseFacade providesFirebaseFacade(
-            FirebaseWrapper firebaseWrapper,
-            Application application,
-            SharedPreferences sharedPreferences) {
-        Context context = application.getApplicationContext();
-        return new FirebaseFacade(firebaseWrapper,
-                new GoogleAuthenticator(
-                        new FirebaseWrapper(),
-                        context,
-                        new GoogleAuthWrapper(),
-                        new GoogleSignInWrapper(),
-                        new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
-                        new GoogleAuthProviderWrapper(),
-                        sharedPreferences),
-                new EmailAuthenticator(firebaseWrapper, sharedPreferences));
-    }
-
-    @Provides
-    @ApplicationScope
-    FirebaseWrapper providesFirebaseWrapper() {
-        return new FirebaseWrapper();
-    }
-
-    @Provides
-    @ApplicationScope
-    CommunityAuthenticator providesCommunityAuthenticator(SharedPreferences preferences) {
+    Authenticator providesCommunityAuthenticator(SharedPreferences preferences) {
         return new CommunityAuthenticator(preferences);
     }
 }

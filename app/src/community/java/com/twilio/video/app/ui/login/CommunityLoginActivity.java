@@ -27,7 +27,8 @@ import android.widget.EditText;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.twilio.video.app.R;
-import com.twilio.video.app.auth.CommunityAuthenticator;
+import com.twilio.video.app.auth.Authenticator;
+import com.twilio.video.app.auth.LoginEvent;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.ui.room.RoomActivity;
 
@@ -37,18 +38,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import io.reactivex.subjects.SingleSubject;
 
 // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 public class CommunityLoginActivity extends BaseActivity {
 
     @Inject
-    CommunityAuthenticator authenticator;
+    Authenticator authenticator;
 
     @BindView(R.id.name_edittext)
     EditText nameEditText;
 
     @BindView(R.id.login_button)
     Button loginButton;
+
+    SingleSubject<LoginEvent> loginEventSubject = SingleSubject.create();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +85,8 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void saveIdentity(String displayName) {
-        authenticator.login(displayName);
+        authenticator.login(loginEventSubject);
+        loginEventSubject.onSuccess(new LoginEvent.TokenLogin(displayName));
     }
 
     private void startLobbyActivity() {

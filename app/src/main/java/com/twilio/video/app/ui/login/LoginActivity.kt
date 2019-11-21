@@ -22,17 +22,15 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import butterknife.ButterKnife
-import com.google.firebase.auth.FirebaseUser
 import com.twilio.video.app.R
-import com.twilio.video.app.auth.FirebaseFacade
-import com.twilio.video.app.auth.LoginEvent.EmailLogin
+import com.twilio.video.app.auth.Authenticator
+import com.twilio.video.app.auth.LoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLogin
-import com.twilio.video.app.auth.LoginIntentEvent.GoogleSignInIntent
 import com.twilio.video.app.base.BaseActivity
-import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.plus
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.SingleSubject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -43,17 +41,17 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
     @Inject
-    internal lateinit var firebaseFacade: FirebaseFacade
+    internal lateinit var authenticator: Authenticator
 
     private lateinit var progressDialog: ProgressDialog
     private val disposables = CompositeDisposable()
+    private val loginEvent: SingleSubject<LoginEvent> = SingleSubject.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_login)
-        val user = firebaseFacade.getCurrentUser()
-        if (user != null) {
+        if (authenticator.loggedIn()) {
             onSignInSuccess()
         }
         ButterKnife.bind(this)
@@ -65,24 +63,15 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         }
     }
 
-
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
         disposables.clear()
+        super.onStop()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN) {
             data?.let {
-                disposables + firebaseFacade.login(GoogleLogin(data))
-                        .subscribe({
-                            processError()
-                        }, {
-                            Timber.e(it)
-                        },
-                        {
-                            onSignInSuccess()
-                        })
+                loginEvent.onSuccess(GoogleLogin(data))
             } ?: processError()
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -90,13 +79,34 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // LoginLandingFragment
     override fun onSignInWithGoogle() {
-        val intent = firebaseFacade.getLoginIntent(GoogleSignInIntent)
+        disposables + authenticator
+                .login(loginEvent)
+                .subscribe(
+                        {
+                            processError()
+                        },
+                        {
+                            Timber.e(it)
+                        },
+                        {
+                            onSignInSuccess()
+                        })
         showAuthenticatingDialog()
         startActivityForResult(intent, GOOGLE_SIGN_IN)
     }
 
     // LoginLandingFragment
     override fun onSignInWithEmail() {
+        disposables + authenticator
+                .login(loginEvent)
+                .subscribe(
+                        {
+                            processError()
+                        },
+                        {
+                            Timber.e(it)
+                        },
+                        { onSignInSuccess() })
         supportFragmentManager
                 .beginTransaction()
                 .add(R.id.login_fragment_container, ExistingAccountLoginFragment.newInstance())
@@ -106,17 +116,8 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // ExistingAccountLoginFragment
     override fun onExistingAccountCredentials(email: String, password: String) {
+        loginEvent.onSuccess(LoginEvent.EmailLogin(email, password))
         showAuthenticatingDialog()
-        disposables + firebaseFacade.login(EmailLogin(email, password))
-                .subscribe({
-                    processError()
-                }, {
-                    Timber.e(it)
-                },
-                {
-                    onSignInSuccess()
-                })
-
     }
 
     private fun startLobbyActivity() {

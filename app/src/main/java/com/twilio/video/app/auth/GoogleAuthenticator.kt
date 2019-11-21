@@ -13,6 +13,7 @@ import com.twilio.video.app.auth.LoginEvent.GoogleLogin
 import com.twilio.video.app.data.Preferences
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
+import io.reactivex.Single
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class GoogleAuthenticator(
@@ -27,20 +28,29 @@ class GoogleAuthenticator(
 
     private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
 
-    override fun login(googleLogin: LoginEvent): Maybe<Authenticator.LoginError> {
-        require(googleLogin is GoogleLogin) { "Expecting ${GoogleLogin::class.simpleName} as LoginEvent" }
+    override fun login(googleLoginEvent: Single<LoginEvent>): Maybe<Authenticator.LoginError> {
         return Maybe.create { maybe ->
-            getSignInResultFromIntent(googleLogin.signInResultIntent)?.let { result ->
-                if (result.isSuccess) {
-                    result.signInAccount?.let { account ->
-                        loginWithAccount(account, maybe)
-                    } ?: maybe.onSuccess(NullGoogleSignInAccountError)
-                } else {
-                    maybe.onSuccess(LoginIntentError)
+            googleLoginEvent.subscribe({ googleLogin ->
+                require(googleLogin is GoogleLogin) { "Expecting ${LoginEvent.EmailLogin::class.simpleName} as LoginEvent" }
+                getSignInResultFromIntent(googleLogin.signInResultIntent)?.let { result ->
+                    if (result.isSuccess) {
+                        result.signInAccount?.let { account ->
+                            loginWithAccount(account, maybe)
+                        } ?: maybe.onSuccess(NullGoogleSignInAccountError)
+                    } else {
+                        maybe.onSuccess(LoginIntentError)
+                    }
+                    // TODO: failed to sign in with google
                 }
-                // TODO: failed to sign in with google
-            }
+            }, {
+
+            })
+
         }
+    }
+
+    override fun loggedIn(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun logout() {

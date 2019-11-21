@@ -39,6 +39,7 @@ import com.twilio.video.Vp8Codec;
 import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
+import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.FirebaseFacade;
 import com.twilio.video.app.ui.ScreenSelector;
 import com.twilio.video.app.base.BaseActivity;
@@ -59,7 +60,7 @@ public class SettingsActivity extends BaseActivity {
 
     @Inject SharedPreferences sharedPreferences;
     @Inject ScreenSelector screenSelector;
-    @Inject FirebaseFacade firebaseFacade;
+    @Inject Authenticator authenticator;
 
     private final Preference.OnPreferenceClickListener logoutClickListener =
             preference -> {
@@ -98,7 +99,7 @@ public class SettingsActivity extends BaseActivity {
 
         // Return to login activity
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        firebaseFacade.logout();
+        authenticator.logout();
         startActivity(loginIntent);
         finishAffinity();
     }

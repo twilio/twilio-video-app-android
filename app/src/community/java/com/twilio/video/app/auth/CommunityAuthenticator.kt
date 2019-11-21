@@ -18,20 +18,26 @@ package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.ui.login.CommunityLoginActivity
+import io.reactivex.Maybe
+import io.reactivex.subjects.SingleSubject
 
 // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
-class CommunityAuthenticator(private val preferences: SharedPreferences) {
+class CommunityAuthenticator(private val preferences: SharedPreferences) : Authenticator {
 
-    fun login(displayName: String) {
-        preferences.edit().putString(Preferences.DISPLAY_NAME, displayName).apply()
+    override fun login(loginEventSubject: SingleSubject<LoginEvent>): Maybe<Authenticator.LoginError> {
+        return Maybe.create {
+            loginEventSubject.subscribe { tokenLogin ->
+                require(tokenLogin is LoginEvent.TokenLogin) { "Expecting ${LoginEvent.TokenLogin::class.simpleName} as LoginEvent" }
+                preferences.edit().putString(Preferences.DISPLAY_NAME, tokenLogin.identity).apply()
+            }
+        }
     }
 
-    fun loggedIn(): Boolean {
+    override fun loggedIn(): Boolean {
         return !preferences.getString(Preferences.DISPLAY_NAME, null).isNullOrEmpty()
     }
 
-    fun logout() {
+    override fun logout() {
         preferences.edit().remove(Preferences.DISPLAY_NAME).apply()
     }
 }
