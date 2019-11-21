@@ -34,12 +34,12 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    FirebaseFacade providesFirebaseFacade(
+    Authenticator providesAuthenticator(
             FirebaseWrapper firebaseWrapper,
             Application application,
             SharedPreferences sharedPreferences) {
         Context context = application.getApplicationContext();
-        return new FirebaseFacade(firebaseWrapper,
+        return new FirebaseAuthenticator(firebaseWrapper,
                 new GoogleAuthenticator(
                         new FirebaseWrapper(),
                         context,

@@ -8,68 +8,75 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.twilio.video.app.R
-import com.twilio.video.app.auth.Authenticator.MissingEmailError
-import com.twilio.video.app.auth.LoginEvent.GoogleLogin
+import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
+import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
+import com.twilio.video.app.auth.LoginResult.GoogleLoginIntentResult
+import com.twilio.video.app.auth.LoginResult.GoogleLoginSuccessResult
 import com.twilio.video.app.data.Preferences
-import io.reactivex.Maybe
-import io.reactivex.MaybeEmitter
-import io.reactivex.Single
+import com.twilio.video.app.util.plus
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.disposables.CompositeDisposable
+import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
-class GoogleAuthenticator(
+class GoogleAuthenticator @JvmOverloads constructor(
         private val firebaseWrapper: FirebaseWrapper,
         context: Context,
         private val googleAuthWrapper: GoogleAuthWrapper,
         private val googleSignInWrapper: GoogleSignInWrapper,
         private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
         private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
-        private val sharedPreferences: SharedPreferences
-) : Authenticator {
+        private val sharedPreferences: SharedPreferences,
+        private val disposables: CompositeDisposable = CompositeDisposable()) : Authenticator {
 
     private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
 
-    override fun login(googleLoginEvent: Single<LoginEvent>): Maybe<Authenticator.LoginError> {
-        return Maybe.create { maybe ->
-            googleLoginEvent.subscribe({ googleLogin ->
-                require(googleLogin is GoogleLogin) { "Expecting ${LoginEvent.EmailLogin::class.simpleName} as LoginEvent" }
-                getSignInResultFromIntent(googleLogin.signInResultIntent)?.let { result ->
-                    if (result.isSuccess) {
-                        result.signInAccount?.let { account ->
-                            loginWithAccount(account, maybe)
-                        } ?: maybe.onSuccess(NullGoogleSignInAccountError)
-                    } else {
-                        maybe.onSuccess(LoginIntentError)
+    override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
+        return Observable.create<LoginResult> { observable ->
+            disposables + loginEventObservable.subscribe({ loginEvent ->
+                when (loginEvent) {
+                    GoogleLoginIntentRequestEvent -> {
+                        observable.onNext(GoogleLoginIntentResult(googleSignInClient.signInIntent))
                     }
-                    // TODO: failed to sign in with google
+                    is GoogleLoginEvent -> {
+                        getSignInResultFromIntent(loginEvent.signInResultIntent)?.let { result ->
+                            if (result.isSuccess) {
+                                result.signInAccount?.let { account ->
+                                    loginWithAccount(account, observable)
+                                } ?: onError(observable)
+                            } else {
+                                onError(observable)
+                            }
+                        }
+                    }
                 }
-            }, {
-
-            })
-
+            },
+                    {
+                        Timber.e(it)
+                    })
         }
     }
 
-    override fun loggedIn(): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun loggedIn() = firebaseWrapper.instance.currentUser != null
 
     override fun logout() {
         googleSignInClient.signOut()
     }
 
-    private fun loginWithAccount(account: GoogleSignInAccount, maybe: MaybeEmitter<Authenticator.LoginError>) {
+    private fun loginWithAccount(account: GoogleSignInAccount, observable: ObservableEmitter<LoginResult>) {
         val email = account.email
         val idToken = account.idToken
         if (email.isNullOrBlank()) {
-            maybe.onSuccess(MissingEmailError)
+            onError(observable)
             return
         }
         if (!email.endsWith("@twilio.com")) {
-            maybe.onSuccess(WrongEmailDomainError)
+            onError(observable)
             return
         }
         if (idToken.isNullOrBlank()) {
-            maybe.onSuccess(MissingIdTokenError)
+            onError(observable)
             return
         }
         val credential = googleAuthProviderWrapper.getCredential(idToken)
@@ -77,14 +84,19 @@ class GoogleAuthenticator(
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         saveIdentity(account.displayName, email)
-                        maybe.onComplete()
+                        observable.onNext(GoogleLoginSuccessResult)
+                        observable.onComplete()
+                        disposables.clear()
                     } else {
-                        maybe.onSuccess(GoogleAuthError)
+                        onError(observable)
                     }
                 }
     }
 
-    fun getSignInIntent() = googleSignInClient.signInIntent
+    private fun onError(observable: ObservableEmitter<LoginResult>) {
+        observable.onError(AuthenticationException())
+        disposables.clear()
+    }
 
     private fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = googleAuthWrapper.getSignInResultFromIntent(data)
 
@@ -108,10 +120,4 @@ class GoogleAuthenticator(
                 .putString(Preferences.DISPLAY_NAME, displayName ?: email)
                 .apply()
     }
-
-    object LoginIntentError : Authenticator.LoginError()
-    object WrongEmailDomainError : Authenticator.LoginError()
-    object GoogleAuthError : Authenticator.LoginError()
-    object NullGoogleSignInAccountError : Authenticator.LoginError()
-    object MissingIdTokenError : Authenticator.LoginError()
 }

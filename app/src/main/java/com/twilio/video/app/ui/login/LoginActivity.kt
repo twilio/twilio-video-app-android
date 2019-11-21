@@ -25,12 +25,14 @@ import butterknife.ButterKnife
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.auth.LoginEvent
-import com.twilio.video.app.auth.LoginEvent.GoogleLogin
+import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
+import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
+import com.twilio.video.app.auth.LoginResult.*
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.plus
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.SingleSubject
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -45,7 +47,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     private lateinit var progressDialog: ProgressDialog
     private val disposables = CompositeDisposable()
-    private val loginEvent: SingleSubject<LoginEvent> = SingleSubject.create()
+    private val loginEventSubject: PublishSubject<LoginEvent> = PublishSubject.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,15 +65,10 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         }
     }
 
-    override fun onStop() {
-        disposables.clear()
-        super.onStop()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN) {
             data?.let {
-                loginEvent.onSuccess(GoogleLogin(data))
+                loginEventSubject.onNext(GoogleLoginEvent(data))
             } ?: processError()
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -80,33 +77,37 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     // LoginLandingFragment
     override fun onSignInWithGoogle() {
         disposables + authenticator
-                .login(loginEvent)
+                .login(loginEventSubject.hide())
                 .subscribe(
                         {
-                            processError()
+                            when (it) {
+                                is GoogleLoginIntentResult -> {
+                                    startActivityForResult(it.intent, GOOGLE_SIGN_IN)
+                                }
+                                GoogleLoginSuccessResult -> {
+                                    onSignInSuccess()
+                                }
+                            }
                         },
                         {
                             Timber.e(it)
-                        },
-                        {
-                            onSignInSuccess()
+                            processError()
                         })
+        loginEventSubject.onNext(GoogleLoginIntentRequestEvent)
         showAuthenticatingDialog()
-        startActivityForResult(intent, GOOGLE_SIGN_IN)
     }
 
     // LoginLandingFragment
     override fun onSignInWithEmail() {
         disposables + authenticator
-                .login(loginEvent)
-                .subscribe(
-                        {
-                            processError()
-                        },
-                        {
-                            Timber.e(it)
-                        },
-                        { onSignInSuccess() })
+                .login(loginEventSubject.hide())
+                .subscribe({
+                    if(it is EmailLoginSuccessResult) onSignInSuccess()
+                },
+                {
+                    Timber.e(it)
+                    processError()
+                })
         supportFragmentManager
                 .beginTransaction()
                 .add(R.id.login_fragment_container, ExistingAccountLoginFragment.newInstance())
@@ -116,7 +117,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // ExistingAccountLoginFragment
     override fun onExistingAccountCredentials(email: String, password: String) {
-        loginEvent.onSuccess(LoginEvent.EmailLogin(email, password))
+        loginEventSubject.onNext(LoginEvent.EmailLoginEvent(email, password))
         showAuthenticatingDialog()
     }
 
@@ -153,6 +154,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     }
 
     private fun onSignInSuccess() {
+        disposables.clear()
         dismissAuthenticatingDialog()
         startLobbyActivity()
     }

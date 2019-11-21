@@ -17,50 +17,53 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
-import com.twilio.video.app.auth.Authenticator.MissingEmailError
-import com.twilio.video.app.auth.LoginEvent.EmailLogin
+import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
+import com.twilio.video.app.auth.LoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.data.Preferences
-import io.reactivex.Maybe
-import io.reactivex.Single
+import com.twilio.video.app.util.plus
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.disposables.CompositeDisposable
+import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
-class EmailAuthenticator(
+class EmailAuthenticator @JvmOverloads constructor(
         private val firebaseWrapper: FirebaseWrapper,
-        private val sharedPreferences: SharedPreferences) : Authenticator {
-
+        private val sharedPreferences: SharedPreferences,
+        private val disposables: CompositeDisposable = CompositeDisposable()) : Authenticator {
     override fun logout() {
         firebaseWrapper.instance.signOut()
     }
 
-    override fun loggedIn(): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun loggedIn() = firebaseWrapper.instance.currentUser != null
 
-    override fun login(emailLoginEvent: Single<LoginEvent>): Maybe<Authenticator.LoginError> {
-        return Maybe.create { maybe ->
-            emailLoginEvent.subscribe({ emailLogin ->
-                require(emailLogin is EmailLogin) { "Expecting ${EmailLogin::class.simpleName} as LoginEvent" }
-                emailLogin.run {
-                    if (email.isBlank()) {
-                        maybe.onSuccess(MissingEmailError)
-                    }
-                    if (password.isBlank()) {
-                        maybe.onSuccess(MissingPasswordError)
-                    }
-                    firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    saveIdentity(task.result?.user?.displayName, email)
-                                    maybe.onComplete()
-                                } else {
-                                    maybe.onSuccess(FirebaseLoginError)
+    override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
+        return Observable.create<LoginResult> { observable ->
+            disposables + loginEventObservable.subscribe({ loginEvent ->
+                if(loginEvent is EmailLoginEvent) {
+                    loginEvent.run {
+                        if (email.isBlank()) {
+                            onError(observable)
+                        }
+                        if (password.isBlank()) {
+                            onError(observable)
+                        }
+                        firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        saveIdentity(task.result?.user?.displayName, email)
+                                        observable.onNext(EmailLoginSuccessResult)
+                                        observable.onComplete()
+                                        disposables.clear()
+                                    } else {
+                                        onError(observable)
+                                    }
                                 }
-                            }
+                    }
                 }
             }, {
-
+                Timber.e(it)
             })
-
         }
     }
 
@@ -72,7 +75,9 @@ class EmailAuthenticator(
                 .putString(Preferences.DISPLAY_NAME, displayName ?: email)
                 .apply()
     }
-}
 
-object FirebaseLoginError : Authenticator.LoginError()
-object MissingPasswordError : Authenticator.LoginError()
+    private fun onError(observable: ObservableEmitter<LoginResult>) {
+        observable.onError(AuthenticationException())
+        disposables.clear()
+    }
+}

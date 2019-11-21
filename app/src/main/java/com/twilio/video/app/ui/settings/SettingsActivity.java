@@ -40,7 +40,6 @@ import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
-import com.twilio.video.app.auth.FirebaseFacade;
 import com.twilio.video.app.ui.ScreenSelector;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.NumberPreference;
