@@ -74,6 +74,10 @@ aliases:
     name: Install Cmake
     command:
       sdkmanager "cmake;3.6.4111459"
+  - &install-bbe
+    name: Install bbe
+    command:
+      sudo apt-get install bbe
   - &gcloud-auth
     name: Google Cloud Auth
     command: >
@@ -207,6 +211,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
 
       # Build app
       - run:
@@ -218,6 +223,37 @@ jobs:
           root: .
           paths:
             - app/build
+
+      # Save cache
+      - save-cache: *save-cache-android-ndk
+      - save-cache: *save-cache-gradle
+
+  build-compatibility:
+    <<: *build-defaults
+    resource_class: xlarge
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+      - run: *install-cmake
+      - run: *install-bbe
+
+      # Build compatibility
+      - run:
+          name: Build Compatibility
+          command: ./gradlew -q compatibility:assemble compatibility:assembleAndroidTest
+
+      # Save the builds to workspace
+      - persist_to_workspace:
+          root: .
+          paths:
+            - compatibility/build
 
       # Save cache
       - save-cache: *save-cache-android-ndk
@@ -237,6 +273,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
 
       # Build library and tests
       - run:
@@ -266,6 +303,7 @@ jobs:
       - restore-cache: *restore-cache-android-ndk
       - run: *install-android-ndk
       - run: *install-cmake
+      - run: *install-bbe
 
       # Check library size
       - run:
@@ -362,7 +400,7 @@ jobs:
           name: Integration Media Tests
           command: >
                     gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-media-tests 
+                    video-app-args.yaml:integration-media-tests
 
   integration-codec-tests:
     <<: *test-defaults
@@ -493,6 +531,40 @@ jobs:
                     gcloud firebase test android run --no-record-video --project video-app-79418
                     video-app-args.yaml:integration-capturer-tests
 
+  video-voice-side-by-side-test:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *install-secrets
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Video and Voice Side-By-Side Tests
+          command: >
+            gcloud firebase test android run --no-record-video --project video-app-79418
+            video-app-args.yaml:video-voice-side-by-side-tests
+
+  video-webrtc-side-by-side-test:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *install-secrets
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: Video and WebRTC Side-By-Side Tests
+          command: >
+            gcloud firebase test android run --no-record-video --project video-app-79418
+            video-app-args.yaml:video-webrtc-side-by-side-tests
+
   publish-library-snapshot:
     <<: *build-defaults
     resource_class: large
@@ -507,6 +579,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
 
       # Publish library snapshot
       - run:
@@ -531,6 +604,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
 
       # Publish app snapshot
       - run:
@@ -557,6 +631,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
       - run: *configure-git-user
 
       # Publish library rc
@@ -587,6 +662,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
 
       # Publish app RC
       - run:
@@ -614,6 +690,7 @@ jobs:
       - run: *install-android-ndk
       - run: *install-secrets
       - run: *install-cmake
+      - run: *install-bbe
       - run: *configure-git-user
 
       # Publish library
@@ -641,6 +718,9 @@ workflows:
       - setup-workspace
 
       # Build
+      - build-compatibility:
+          requires:
+            - setup-workspace
       - build-app:
           requires:
               - setup-workspace
@@ -687,6 +767,12 @@ workflows:
       - integration-recording-tests:
           requires:
               - build-library
+      - video-voice-side-by-side-test:
+          requires:
+            - build-compatibility
+      - video-webrtc-side-by-side-test:
+          requires:
+            - build-compatibility
 
 
       # Publish

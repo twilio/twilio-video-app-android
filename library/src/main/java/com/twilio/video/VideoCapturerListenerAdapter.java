@@ -19,10 +19,10 @@ package com.twilio.video;
 import android.support.annotation.NonNull;
 
 final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
-    private final org.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver;
+    private final tvi.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver;
 
     public VideoCapturerListenerAdapter(
-            org.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver) {
+            tvi.webrtc.VideoCapturer.CapturerObserver webRtcCapturerObserver) {
         this.webRtcCapturerObserver = webRtcCapturerObserver;
     }
 
@@ -34,7 +34,7 @@ final class VideoCapturerListenerAdapter implements VideoCapturer.Listener {
     @Override
     public void onFrameCaptured(@NonNull VideoFrame videoFrame) {
         /*
-         * Currently only Twilio capturers create VideoFrames that wrap org.webrtc.VideoFrame. All
+         * Currently only Twilio capturers create VideoFrames that wrap tvi.webrtc.VideoFrame. All
          * other customer capturers use onByteBufferFrameCaptured.
          */
         if (videoFrame.webRtcVideoFrame != null) {

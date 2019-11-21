@@ -32,8 +32,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.webrtc.RendererCommon;
-import org.webrtc.YuvConverter;
+import tvi.webrtc.RendererCommon;
+import tvi.webrtc.YuvConverter;
 
 public class BitmapVideoRenderer implements VideoRenderer {
     private final AtomicBoolean bitmapRequested = new AtomicBoolean(false);

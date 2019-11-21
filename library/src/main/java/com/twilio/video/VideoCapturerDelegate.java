@@ -18,10 +18,10 @@ package com.twilio.video;
 
 import android.content.Context;
 import java.util.List;
-import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.VideoFrame;
+import tvi.webrtc.SurfaceTextureHelper;
+import tvi.webrtc.VideoFrame;
 
-final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
+final class VideoCapturerDelegate implements tvi.webrtc.VideoCapturer {
     private final VideoCapturer videoCapturer;
     private VideoPixelFormat videoPixelFormat;
     private VideoCapturer.Listener listenerAdapter;
@@ -103,7 +103,7 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
     /*
      * An implementation of CapturerObserver that forwards all calls from Java to the C layer.
      */
-    static class NativeObserver implements org.webrtc.VideoCapturer.CapturerObserver {
+    static class NativeObserver implements tvi.webrtc.VideoCapturer.CapturerObserver {
         private final long nativeCapturer;
 
         public NativeObserver(long nativeCapturer) {
@@ -183,6 +183,6 @@ final class VideoCapturerDelegate implements org.webrtc.VideoCapturer {
                 int height,
                 long timeStamp,
                 int rotation,
-                org.webrtc.VideoFrame.Buffer webRtcVideoFrameBuffer);
+                tvi.webrtc.VideoFrame.Buffer webRtcVideoFrameBuffer);
     }
 }

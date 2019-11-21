@@ -29,11 +29,11 @@ import android.util.AttributeSet;
 import android.view.TextureView;
 import android.view.ViewGroup;
 import java.util.concurrent.CountDownLatch;
-import org.webrtc.EglBase;
-import org.webrtc.EglRenderer;
-import org.webrtc.GlRectDrawer;
-import org.webrtc.RendererCommon;
-import org.webrtc.ThreadUtils;
+import tvi.webrtc.EglBase;
+import tvi.webrtc.EglRenderer;
+import tvi.webrtc.GlRectDrawer;
+import tvi.webrtc.RendererCommon;
+import tvi.webrtc.ThreadUtils;
 
 public class VideoTextureView extends TextureView
         implements VideoRenderer, TextureView.SurfaceTextureListener {

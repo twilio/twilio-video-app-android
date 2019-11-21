@@ -28,7 +28,7 @@ static const char *const kLocalVideoTrackConstructorSignature = "("
         "Z"
         "Lcom/twilio/video/VideoCapturer;"
         "Lcom/twilio/video/VideoConstraints;"
-        "Lorg/webrtc/VideoTrack;"
+        "Ltvi/webrtc/VideoTrack;"
         "Ljava/lang/String;"
         "Ljava/lang/String;"
         "Landroid/content/Context;"
@@ -55,7 +55,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
     JNIEnv *jni = webrtc::jni::GetEnv();
     jclass j_video_track_class = twilio_video_jni::FindClass(jni,
                                                              "com/twilio/video/LocalVideoTrack");
-    jclass j_webrtc_video_track_class = webrtc::FindClass(jni, "org/webrtc/VideoTrack");
+    jclass j_webrtc_video_track_class = webrtc::FindClass(jni, "tvi/webrtc/VideoTrack");
     jmethodID j_webrtc_video_track_ctor_id = webrtc::GetMethodID(jni,
                                                                  j_webrtc_video_track_class,
                                                                  "<init>",
@@ -69,7 +69,7 @@ jobject createJavaLocalVideoTrack(std::shared_ptr<twilio::media::LocalVideoTrack
     jobject j_webrtc_video_track = jni->NewObject(j_webrtc_video_track_class,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc::NativeToJavaPointer(local_video_track->getWebRtcTrack()));
-    CHECK_EXCEPTION(jni) << "Error creating org.webrtc.VideoTrack";
+    CHECK_EXCEPTION(jni) << "Error creating tvi.webrtc.VideoTrack";
     jstring j_name = JavaUTF16StringFromStdString(jni, local_video_track->getName());
     jstring j_track_hash = JavaUTF16StringFromStdString(jni,
                                                         getLocalVideoTrackHash(local_video_track));

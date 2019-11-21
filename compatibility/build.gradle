@@ -1,0 +1,59 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion "${versions.buildTools}"
+
+
+    defaultConfig {
+        applicationId "com.twilio.video.compatibility"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    compileOptions {
+        sourceCompatibility versions.java
+        targetCompatibility versions.java
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "sideBySide"
+
+    productFlavors {
+        videoAndVoice {
+            dimension "sideBySide"
+        }
+        videoAndWebRtc {
+            dimension "sideBySide"
+        }
+    }
+}
+
+dependencies {
+    implementation "com.android.support:appcompat-v7:${versions.supportLibrary}"
+    implementation project(':library')
+
+    /*
+     * The Voice SDK is not side-by-side compatible prior to 3.2.0. Use a version prior to this
+     * release to validate side-by-side works as expected in the Video SDK.
+     */
+    videoAndVoiceImplementation 'com.twilio:voice-android:3.1.2'
+
+    videoAndWebRtcImplementation 'org.webrtc:google-webrtc:1.0.28262'
+
+    testImplementation "junit:junit:${versions.junit}"
+
+    androidTestImplementation "com.android.support.test:runner:${versions.testSupportLibrary}"
+    androidTestImplementation "com.android.support.test:rules:${versions.testSupportLibrary}"
+}

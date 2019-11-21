@@ -3,9 +3,11 @@ apply plugin: 'maven'
 apply plugin: 'jacoco'
 
 def currentToolchainVersion = "3.8"
-// TODO add back ability for local builds
 def coreHome = "${buildDir}/prebuilt/twilio-video"
+def videoAndroidLibrary = "twilio_video_android_so"
+def videoAndroidClasspathPrefix = "tvi"
 def compilerVersion = "clang-3.8"
+def libWebRtcJarHome = "${coreHome}/armeabi-v7a/${compilerVersion}/release/lib/libwebrtc.jar"
 
 configurations {
     preImplementation
@@ -43,7 +45,9 @@ android {
                 arguments '-DANDROID_TOOLCHAIN=clang',
                         '-DANDROID_PLATFORM=android-16',
                         '-DANDROID_STL=c++_static',
-                        "-DVIDEO_DEPS_PREFIX=${coreHome}".toString()
+                        "-DVIDEO_DEPS_PREFIX=${coreHome.toString()}",
+                        "-DVIDEO_ANDROID_LIBRARY=${videoAndroidLibrary.toString()}",
+                        "-DVIDEO_ANDROID_CLASSPATH_PREFIX=${videoAndroidClasspathPrefix.toString()}"
                 cppFlags "-DWEBRTC_POSIX",
                         /*
                          * Needed to extend cricket::VideoCapturer without causing unwarranted
@@ -60,6 +64,9 @@ android {
                         "-std=c++14",
                         "-fexceptions"
             }
+
+            buildConfigField("String", "TWILIO_VIDEO_ANDROID_LIBRARY",
+                    "\"${videoAndroidLibrary}\"")
         }
     }
 
@@ -150,8 +157,7 @@ dependencies {
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
     implementation "com.getkeepsafe.relinker:relinker:${versions.relinker}"
-    api files("${coreHome}/armeabi-v7a/${compilerVersion}/debug/lib/" +
-            "libwebrtc.jar")
+    api files(libWebRtcJarHome)
 }
 
 task jacocoTestReport(type: JacocoReport,
@@ -322,10 +328,32 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
     }
 }
 
+task renameWebRtcJarPackage(dependsOn: 'unpackPrebuilts') {
+    doLast {
+        // Write rules to a file in the build directory
+        def sideBySideRules = "rule org.webrtc.** ${videoAndroidClasspathPrefix}.webrtc.@1"
+        def sideBySideRulesFile = file("${buildDir}/side-by-side-rules.txt")
+        sideBySideRulesFile.write(sideBySideRules)
+
+        // Execute the jarjar links with the rules
+        exec {
+            commandLine "java",
+                    "-jar",
+                    // TODO: Research removing the jar from the project
+                    "${projectDir}/jarjar/dist/jarjar-main.jar",
+                    "process",
+                    sideBySideRulesFile.absolutePath,
+                    libWebRtcJarHome,
+                    libWebRtcJarHome
+        }
+    }
+}
+
 // Ensure that our pre build tasks are executed
 afterEvaluate {
     android.libraryVariants.all { variant ->
         variant.preBuildProvider.get().dependsOn(localizeWebRtcJniLoadUnLoad)
+        variant.preBuildProvider.get().dependsOn(renameWebRtcJarPackage)
     }
 }
 

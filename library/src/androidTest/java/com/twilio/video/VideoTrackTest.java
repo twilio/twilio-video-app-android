@@ -75,7 +75,7 @@ public class VideoTrackTest extends BaseVideoTest {
      * Concrete video track to test functionality in abstract class.
      */
     private static class InstrumentationTestVideoTrack extends VideoTrack {
-        InstrumentationTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack) {
+        InstrumentationTestVideoTrack(tvi.webrtc.VideoTrack webRtcVideoTrack) {
             super(webRtcVideoTrack, true, "");
         }
     }

@@ -1,5 +1,24 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.1.0
+
+* Programmable Video Android SDK 5.1.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.0/)
+
+Improvements
+
+- The SDK can now be compiled alongside another WebRTC based dependency. Please perform the
+following steps to properly upgrade to `5.1.0`
+    - Modify the classpath of any java files used from `org.webrtc.*` to `tvi.webrtc.*`. Calling
+    APIs to any class in `org.webrtc.*` will have no effect within the Video SDK.
+    - Perform the following modifications to your proguard file when compiling the Video SDK for a
+    release build with obfuscation.
+      - Change `-keep class org.webrtc.** { *; }` to `-keep class tvi.webrtc.** { *; }`
+      - Change `-dontwarn org.webrtc.**` to `-dontwarn tvi.webrtc.**`
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
 ### 5.0.1
 
 * Programmable Video Android SDK 5.0.1 [[bintray]](https://bintray.com/twilio/releases/video-android/5.0.1), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.0.1/)

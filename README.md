@@ -6,6 +6,7 @@
 - [Tests](#tests)
 - [Setup an Emulator](#setup-an-emulator)
 - [Library Size](#library-size)
+- [Side-By-Side Support](#side-by-side-support)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -27,6 +28,7 @@ To get started we recommend you use Android Studio for all your development.
 In order to use our project please perform the following steps:
 
 1.  Install the Android SDK using Android Studio.
+1.  Install [bbe](https://linux.die.net/man/1/bbe)
 1.  Download Android NDK r16b. The Android NDK is a set of tools that allow developers to implement
 parts of their application or libraries in native code using languages like C and C++. The Video
 Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. The two SDKs interact using the [Java Native Interface (JNI)](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/).
@@ -276,6 +278,24 @@ architectures in one APK.
 
 ### Calculate the Size Report of a Specific Version
 `./gradlew -PapkScaleVideoAndroidVersion=2.0.0 librarySizeReport`
+
+## Side-by-Side Support
+
+The Video SDK can be built alongside another WebRTC based dependency, such as the Voice Android SDK
+without Java or native conflicts at build or runtime. Side-by-side support is achieved with two
+steps: renaming the WebRTC jar classpath and the native symbols that reference the previous
+classpath.
+
+### Renaming the WebRTC Jar Classpath
+
+The Video SDK uses [jarjar links](./library/jarjar) to rename the WebRTC jar package classpath from
+`org.webrtc.*` to `tvi.webrtc.*` prior to assembling the SDK.
+
+### Renaming Native Symbols
+
+The Video SDK uses `bbe` to modify the native symbol references from `org_webrtc` to `tvi_webrtc`
+in accordance with the classpath rename. CMake performs this action as a post build step of the final
+.so file packaged into the aar.
 
 ## Code Formatting
 This project maintains Google AOSP formatted code. Before submitting a pull request, make sure to run `./gradlew spotlessApply`

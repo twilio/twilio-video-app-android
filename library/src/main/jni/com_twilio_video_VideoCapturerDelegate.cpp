@@ -69,8 +69,8 @@ VideoCapturerDelegate::VideoCapturerDelegate(JNIEnv* jni,
     jni->CallVoidMethod(
             j_video_capturer_.obj(),
             webrtc::GetMethodID(jni, j_video_capturer_class_.obj(), "initialize",
-                                "(Lorg/webrtc/SurfaceTextureHelper;Landroid/content/"
-                                        "Context;Lorg/webrtc/VideoCapturer$CapturerObserver;)V"),
+                                "(Ltvi/webrtc/SurfaceTextureHelper;Landroid/content/"
+                                        "Context;Ltvi/webrtc/VideoCapturer$CapturerObserver;)V"),
             surface_texture_helper_
             ? surface_texture_helper_->GetJavaSurfaceTextureHelper().obj()
             : nullptr,

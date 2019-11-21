@@ -6,7 +6,6 @@ sdk/.settings
 sdk/bin
 output
 
-dist/
 target/
 docs/
 

@@ -165,3 +165,25 @@ integration-capturer-tests:
         - {model: zeroflte, version: 23}
     test-targets:
         - "annotation com.twilio.video.testcategories.CapturerTest"
+
+video-voice-side-by-side-tests:
+    timeout: 5m
+    type: instrumentation
+    app: compatibility/build/outputs/apk/videoAndVoice/debug/compatibility-videoAndVoice-debug.apk
+    test: compatibility/build/outputs/apk/androidTest/videoAndVoice/debug/compatibility-videoAndVoice-debug-androidTest.apk
+    device:
+        - {model: m0, version: 18}
+        - {model: Nexus5, version: 19}
+        - {model: Pixel2_Q, version: Q}
+        - {model: flame, version: 29}
+
+video-webrtc-side-by-side-tests:
+    timeout: 5m
+    type: instrumentation
+    app: compatibility/build/outputs/apk/videoAndWebRtc/debug/compatibility-videoAndWebRtc-debug.apk
+    test: compatibility/build/outputs/apk/androidTest/videoAndWebRtc/debug/compatibility-videoAndWebRtc-debug-androidTest.apk
+    device:
+        - {model: m0, version: 18}
+        - {model: Nexus5, version: 19}
+        - {model: Pixel2_Q, version: Q}
+        - {model: flame, version: 29}

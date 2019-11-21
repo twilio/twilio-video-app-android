@@ -55,7 +55,7 @@ public class VideoFrame {
         }
     }
 
-    final org.webrtc.VideoFrame webRtcVideoFrame;
+    final tvi.webrtc.VideoFrame webRtcVideoFrame;
 
     /** The bytes of a frame. */
     public final byte[] imageBuffer;
@@ -76,10 +76,10 @@ public class VideoFrame {
 
     /*
      * This constructor is currently only used by Twilio capturers because they wrap
-     * WebRTC capturers which have access to org.webrtc.VideoFrame.
+     * WebRTC capturers which have access to tvi.webrtc.VideoFrame.
      */
     VideoFrame(
-            org.webrtc.VideoFrame webRtcVideoFrame,
+            tvi.webrtc.VideoFrame webRtcVideoFrame,
             @NonNull VideoDimensions dimensions,
             @NonNull RotationAngle orientation) {
         this(null, webRtcVideoFrame, dimensions, orientation, webRtcVideoFrame.getTimestampNs());
@@ -87,7 +87,7 @@ public class VideoFrame {
 
     private VideoFrame(
             @Nullable byte[] imageBuffer,
-            @Nullable org.webrtc.VideoFrame webRtcVideoFrame,
+            @Nullable tvi.webrtc.VideoFrame webRtcVideoFrame,
             @NonNull VideoDimensions dimensions,
             @NonNull RotationAngle orientation,
             long timestamp) {

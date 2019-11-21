@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-# Set the library name
-set(VIDEO_ANDROID_LIBRARY jingle_peerconnection_so)
+# Find bbe for JNI class reference renaming
+find_program(BBE bbe)
+if(NOT BBE)
+    message(FATAL_ERROR "bbe must be installed.")
+endif()
 
 # Set compiler name and version
 string(REGEX MATCH "^([0-9]+\\.[0-9]+)" COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION})
@@ -37,7 +40,7 @@ file(GLOB_RECURSE SOURCE_FILES
 set_source_files_properties(
     src/main/jni/com_twilio_video_ConnectOptions.cpp PROPERTIES COMPILE_FLAGS "-frtti")
 
-# Create the library
+# Create the library with name provided from build.gradle
 add_library(${VIDEO_ANDROID_LIBRARY} SHARED ${SOURCE_FILES})
 
 # Link framework libraries
@@ -74,3 +77,48 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-
         # applies this option to every library after the option is specified.
         "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc.a -Wl,--no-whole-archive"
         ${CORE_STATIC_LIB_DIR}/libjsoncpp.a)
+
+# Extract and rename all WebRTC JNI signature symbols to contain correct classpath prefix.
+#
+# This process must be done before the creation of the .so file in order to ensure
+# that the application can link WebRTC Java native method definitions to the appropriate
+# native counterparts at runtime.
+add_custom_command(
+        TARGET ${VIDEO_ANDROID_LIBRARY}
+        PRE_BUILD
+        COMMAND
+        # Extract all JNI symbols
+        ${CMAKE_NM} -g ${CORE_STATIC_LIB_DIR}/libwebrtc.a | grep 'Java_org_webrtc' |
+        # Output symbol rename definitions to the following multi-line format
+        # Java_org_webrtc_SymbolOne Java_tvi_webrtc_SymbolOne
+        # Java_org_webrtc_SymbolTwo Java_tvi_webrtc_SymbolTwo
+        cut -d \" \" -f3 |
+        sed 's/\\\(Java_\\\)org\\\(_.*\\\)/\\1org\\2 \\1${VIDEO_ANDROID_CLASSPATH_PREFIX}\\2/' >
+        ${CMAKE_BINARY_DIR}/webrtc-jni-symbols-definitions.txt &&
+        # Rename the JNI symbols
+        ${CMAKE_OBJCOPY}
+        --redefine-syms=${CMAKE_BINARY_DIR}/webrtc-jni-symbols-definitions.txt
+        ${CORE_STATIC_LIB_DIR}/libwebrtc.a
+)
+
+# Rename classpath reference symbols
+add_custom_command(
+        TARGET ${VIDEO_ANDROID_LIBRARY}
+        POST_BUILD
+        # There are two notable design decisions about this command:
+        #
+        # 1. Modifying the symbols in place corrupts the final .so file packaged into the aar. As
+        # a result, the process is split into two steps: renaming the symbols to a temporary file
+        # and moving the temporary file to the appropriate location.
+        #
+        # 2. Ninja fails when referencing target variables in multiple commands. The command is
+        # intentionally combined using the && operator to workaround this issue.
+        COMMAND
+        # Rename the symbols and output to a temporary file
+        bbe -e 's_org/webrtc_${VIDEO_ANDROID_CLASSPATH_PREFIX}/webrtc_'
+        $<TARGET_FILE:${VIDEO_ANDROID_LIBRARY}>
+        -o $<TARGET_FILE_DIR:${VIDEO_ANDROID_LIBRARY}>/${VIDEO_ANDROID_LIBRARY}-sbs.so &&
+        # Move the temporary file into the proper location
+        mv $<TARGET_FILE_DIR:${VIDEO_ANDROID_LIBRARY}>/${VIDEO_ANDROID_LIBRARY}-sbs.so
+        $<TARGET_FILE:${VIDEO_ANDROID_LIBRARY}>
+)

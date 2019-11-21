@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.webrtc.Camera2Enumerator;
-import org.webrtc.CameraEnumerationAndroid;
-import org.webrtc.CameraVideoCapturer;
-import org.webrtc.SurfaceTextureHelper;
+import tvi.webrtc.Camera2Enumerator;
+import tvi.webrtc.CameraEnumerationAndroid;
+import tvi.webrtc.CameraVideoCapturer;
+import tvi.webrtc.SurfaceTextureHelper;
 
 /**
  * The Camera2Capturer class is used to provide video frames for a {@link LocalVideoTrack} from the
@@ -65,7 +65,7 @@ public class Camera2Capturer implements VideoCapturer {
     private final Handler handler;
     private String cameraId;
     private VideoCapturer.Listener videoCapturerListener;
-    private org.webrtc.Camera2Capturer webrtcCamera2Capturer;
+    private tvi.webrtc.Camera2Capturer webrtcCamera2Capturer;
     private SurfaceTextureHelper surfaceTextureHelper;
     private String pendingCameraId;
 
@@ -100,8 +100,8 @@ public class Camera2Capturer implements VideoCapturer {
                 @Override
                 public void onCameraClosed() {}
             };
-    private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
-            new org.webrtc.VideoCapturer.CapturerObserver() {
+    private final tvi.webrtc.VideoCapturer.CapturerObserver observerAdapter =
+            new tvi.webrtc.VideoCapturer.CapturerObserver() {
                 @Override
                 public void onCapturerStarted(boolean success) {
                     videoCapturerListener.onCapturerStarted(success);
@@ -121,8 +121,8 @@ public class Camera2Capturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
-                    org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
+                public void onFrameCaptured(tvi.webrtc.VideoFrame videoFrame) {
+                    tvi.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
                     VideoDimensions dimensions =
                             new VideoDimensions(buffer.getWidth(), buffer.getHeight());
                     VideoFrame.RotationAngle orientation =
@@ -271,7 +271,7 @@ public class Camera2Capturer implements VideoCapturer {
             state = Camera2Capturer.State.STARTING;
         }
         this.webrtcCamera2Capturer =
-                (org.webrtc.Camera2Capturer)
+                (tvi.webrtc.Camera2Capturer)
                         camera2Enumerator.createCapturer(cameraId, cameraEventsHandler);
         this.videoCapturerListener = videoCapturerListener;
         this.webrtcCamera2Capturer.initialize(

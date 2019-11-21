@@ -23,7 +23,7 @@ public class RemoteVideoTrack extends VideoTrack {
     private final String sid;
 
     RemoteVideoTrack(
-            @NonNull org.webrtc.VideoTrack webRtcVideoTrack,
+            @NonNull tvi.webrtc.VideoTrack webRtcVideoTrack,
             @NonNull String sid,
             @NonNull String name,
             boolean enabled) {

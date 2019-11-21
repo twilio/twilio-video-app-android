@@ -36,8 +36,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.webrtc.MediaCodecVideoDecoder;
-import org.webrtc.MediaCodecVideoEncoder;
+import tvi.webrtc.MediaCodecVideoDecoder;
+import tvi.webrtc.MediaCodecVideoEncoder;
 
 @CodecTest
 @RunWith(AndroidJUnit4.class)
