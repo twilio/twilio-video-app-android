@@ -40,11 +40,12 @@ import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
+import com.twilio.video.app.ui.ScreenSelector;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.NumberPreference;
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat;
 import com.twilio.video.app.data.Preferences;
-import com.twilio.video.app.ui.login.LoginActivity;
+
 import javax.inject.Inject;
 
 public class SettingsActivity extends BaseActivity {
@@ -57,6 +58,7 @@ public class SettingsActivity extends BaseActivity {
             };
 
     @Inject SharedPreferences sharedPreferences;
+    @Inject ScreenSelector screenSelector;
     @Inject Authenticator authenticator;
 
     private final Preference.OnPreferenceClickListener logoutClickListener =
@@ -88,18 +90,15 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void logout() {
-        Intent loginIntent = new Intent(this, authenticator.getLoginActivity());
+        Intent loginIntent = new Intent(this, screenSelector.getLoginScreen());
 
         // Clear all preferences and set defaults
         sharedPreferences.edit().clear().apply();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
 
-        // Invoke authenticator logout
-        authenticator.logout();
-
         // Return to login activity
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        loginIntent.putExtra(LoginActivity.EXTRA_SIGN_OUT, true);
+        authenticator.logout();
         startActivity(loginIntent);
         finishAffinity();
     }

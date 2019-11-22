@@ -17,26 +17,37 @@
 package com.twilio.video.app.ui.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
 import androidx.core.content.res.ResourcesCompat;
+
+import com.twilio.video.app.R;
+import com.twilio.video.app.auth.Authenticator;
+import com.twilio.video.app.auth.LoginEvent;
+import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
+import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.ui.room.RoomActivity;
+import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import com.twilio.video.app.R;
-import com.twilio.video.app.base.BaseActivity;
-import com.twilio.video.app.data.Preferences;
-import com.twilio.video.app.ui.room.RoomActivity;
-import javax.inject.Inject;
+import io.reactivex.Single;
+import timber.log.Timber;
 
+// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 public class CommunityLoginActivity extends BaseActivity {
-    @Inject SharedPreferences sharedPreferences;
+
+    @Inject
+    Authenticator authenticator;
 
     @BindView(R.id.name_edittext)
     EditText nameEditText;
@@ -50,6 +61,7 @@ public class CommunityLoginActivity extends BaseActivity {
 
         setContentView(R.layout.development_activity_login);
         ButterKnife.bind(this);
+        if(authenticator.loggedIn()) startLobbyActivity();
     }
 
     @OnTextChanged(R.id.name_edittext)
@@ -69,12 +81,16 @@ public class CommunityLoginActivity extends BaseActivity {
         String name = nameEditText.getText().toString();
         if (name.length() > 0) {
             saveIdentity(name);
-            startLobbyActivity();
         }
     }
 
-    private void saveIdentity(String name) {
-        sharedPreferences.edit().putString(Preferences.DISPLAY_NAME, name).apply();
+    private void saveIdentity(String displayName) {
+        Single<LoginEvent> single = Single.create( emitter -> emitter.onSuccess(new CommunityLoginEvent(displayName)));
+        authenticator.login(single.toObservable())
+                .subscribe( loginResult -> {
+                    if(loginResult instanceof CommunityLoginSuccessResult) startLobbyActivity();
+                },
+                exception -> Timber.e(exception));
     }
 
     private void startLobbyActivity() {

@@ -16,7 +16,7 @@ aliases:
     paths:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
-  - &setup-google-services
+  - &get-secrets
     name: Setup google services
     command: |
       # Internal debug google services
@@ -55,7 +55,7 @@ jobs:
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
-      - run: *setup-google-services
+      - run: *get-secrets
       - run:
           name: Build app
           command: ./gradlew -q app:assemble
@@ -63,6 +63,20 @@ jobs:
           root: .
           paths:
             - app/build
+      - save-cache: *save-cache-gradle
+
+  unit-tests:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
+      - run:
+          name: Unit Tests
+          command: ./gradlew -q app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
 
   publish-to-appcenter:
@@ -87,6 +101,9 @@ workflows:
   build-test-publish:
     jobs:
       - build-app
+      - unit-tests:
+          requires:
+            - build-app
       - publish-to-appcenter:
           requires:
             - build-app

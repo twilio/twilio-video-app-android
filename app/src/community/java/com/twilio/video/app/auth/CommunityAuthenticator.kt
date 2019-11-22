@@ -17,14 +17,27 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
-import com.twilio.video.app.base.BaseActivity
+import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent
+import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.ui.login.CommunityLoginActivity
+import io.reactivex.Observable
+import io.reactivex.Single
+import timber.log.Timber
 
-class CommunityAuthenticator(private val preferences: SharedPreferences) : Authenticator {
+class CommunityAuthenticator @JvmOverloads constructor(
+        private val preferences: SharedPreferences) : Authenticator {
 
-    override fun getLoginActivity(): Class<out BaseActivity> {
-        return CommunityLoginActivity::class.java
+    override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
+        return Single.create<LoginResult> { observable ->
+            loginEventObservable.subscribe({ loginEvent ->
+                if(loginEvent is CommunityLoginEvent) {
+                    preferences.edit().putString(Preferences.DISPLAY_NAME, loginEvent.displayName).apply()
+                    observable.onSuccess(CommunityLoginSuccessResult)
+                }
+            }, {
+                Timber.e(it)
+            })
+        }.toObservable()
     }
 
     override fun loggedIn(): Boolean {
