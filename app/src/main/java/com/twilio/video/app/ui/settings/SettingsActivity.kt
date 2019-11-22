@@ -25,26 +25,15 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.twilio.video.AudioCodec
-import com.twilio.video.G722Codec
-import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
-import com.twilio.video.OpusCodec
-import com.twilio.video.PcmaCodec
-import com.twilio.video.PcmuCodec
-import com.twilio.video.Video
-import com.twilio.video.VideoCodec
-import com.twilio.video.Vp8Codec
-import com.twilio.video.Vp9Codec
+import com.twilio.video.*
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.R
-import com.twilio.video.app.auth.FirebaseFacade
-import com.twilio.video.app.ui.ScreenSelector
+import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.data.Preferences
-
+import com.twilio.video.app.ui.ScreenSelector
 import javax.inject.Inject
 
 class SettingsActivity : BaseActivity() {
@@ -54,7 +43,7 @@ class SettingsActivity : BaseActivity() {
     @Inject
     internal lateinit var screenSelector: ScreenSelector
     @Inject
-    internal lateinit var firebaseFacade: FirebaseFacade
+    internal lateinit var firebaseFacade: Authenticator
 
     private val logoutClickListener = Preference.OnPreferenceClickListener { preference ->
         logout()
