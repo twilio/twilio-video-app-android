@@ -6,4 +6,5 @@ sealed class LoginResult {
     data class GoogleLoginIntentResult(val intent: Intent) : LoginResult()
     object GoogleLoginSuccessResult : LoginResult()
     object EmailLoginSuccessResult : LoginResult()
+    object CommunityLoginSuccessResult : LoginResult()
 }

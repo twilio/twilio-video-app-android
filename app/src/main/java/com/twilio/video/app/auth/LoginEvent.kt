@@ -6,4 +6,5 @@ sealed class LoginEvent {
     object GoogleLoginIntentRequestEvent : LoginEvent()
     data class EmailLoginEvent(val email: String, val password: String) : LoginEvent()
     data class GoogleLoginEvent(val signInResultIntent: Intent) : LoginEvent()
+    data class CommunityLoginEvent(val displayName: String) : LoginEvent()
 }

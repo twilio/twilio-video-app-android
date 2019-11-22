@@ -29,8 +29,10 @@ import androidx.core.content.res.ResourcesCompat;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.LoginEvent;
+import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.ui.room.RoomActivity;
+import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
 
 import javax.inject.Inject;
 
@@ -38,7 +40,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import io.reactivex.subjects.SingleSubject;
+import io.reactivex.Single;
+import timber.log.Timber;
 
 // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 public class CommunityLoginActivity extends BaseActivity {
@@ -51,8 +54,6 @@ public class CommunityLoginActivity extends BaseActivity {
 
     @BindView(R.id.login_button)
     Button loginButton;
-
-    SingleSubject<LoginEvent> loginEventSubject = SingleSubject.create();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +81,16 @@ public class CommunityLoginActivity extends BaseActivity {
         String name = nameEditText.getText().toString();
         if (name.length() > 0) {
             saveIdentity(name);
-            startLobbyActivity();
         }
     }
 
     private void saveIdentity(String displayName) {
-        authenticator.login(loginEventSubject);
-        loginEventSubject.onSuccess(new LoginEvent.TokenLogin(displayName));
+        Single<LoginEvent> single = Single.create( emitter -> emitter.onSuccess(new CommunityLoginEvent(displayName)));
+        authenticator.login(single.toObservable())
+                .subscribe( loginResult -> {
+                    if(loginResult instanceof CommunityLoginSuccessResult) startLobbyActivity();
+                },
+                exception -> Timber.e(exception));
     }
 
     private void startLobbyActivity() {

@@ -17,20 +17,27 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
+import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent
+import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.Preferences
-import io.reactivex.Maybe
-import io.reactivex.subjects.SingleSubject
+import io.reactivex.Observable
+import io.reactivex.Single
+import timber.log.Timber
 
-// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
-class CommunityAuthenticator(private val preferences: SharedPreferences) : Authenticator {
+class CommunityAuthenticator @JvmOverloads constructor(
+        private val preferences: SharedPreferences) : Authenticator {
 
-    override fun login(loginEventSubject: SingleSubject<LoginEvent>): Maybe<Authenticator.LoginError> {
-        return Maybe.create {
-            loginEventSubject.subscribe { tokenLogin ->
-                require(tokenLogin is LoginEvent.TokenLogin) { "Expecting ${LoginEvent.TokenLogin::class.simpleName} as LoginEvent" }
-                preferences.edit().putString(Preferences.DISPLAY_NAME, tokenLogin.identity).apply()
-            }
-        }
+    override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
+        return Single.create<LoginResult> { observable ->
+            loginEventObservable.subscribe({ loginEvent ->
+                if(loginEvent is CommunityLoginEvent) {
+                    preferences.edit().putString(Preferences.DISPLAY_NAME, loginEvent.displayName).apply()
+                    observable.onSuccess(CommunityLoginSuccessResult)
+                }
+            }, {
+                Timber.e(it)
+            })
+        }.toObservable()
     }
 
     override fun loggedIn(): Boolean {

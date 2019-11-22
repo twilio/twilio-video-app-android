@@ -23,7 +23,6 @@ import com.twilio.video.app.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
 
-// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 @Module
 public class CommunityAuthModule {
 
