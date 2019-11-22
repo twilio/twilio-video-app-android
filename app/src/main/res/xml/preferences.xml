@@ -93,8 +93,8 @@
             app:startKey="pref_min_video_dim" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_advanced">
-        <Preference
-            android:key="pref_identity"
+        <EditTextPreference
+            android:key="pref_display_name"
             android:title="@string/settings_screen_identity"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">

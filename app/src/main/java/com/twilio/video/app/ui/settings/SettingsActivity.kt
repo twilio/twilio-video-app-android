@@ -21,10 +21,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.fragment.app.DialogFragment
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
+import androidx.preference.*
 import com.twilio.video.*
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.R
@@ -86,6 +83,7 @@ class SettingsActivity : BaseActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
 
         private lateinit var sharedPreferences: SharedPreferences
+        private lateinit var identityPreference: EditTextPreference
         private var logoutClickListener: Preference.OnPreferenceClickListener? = null
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -105,8 +103,13 @@ class SettingsActivity : BaseActivity() {
                     findPreference(Preferences.AUDIO_CODEC) as ListPreference?)
 
             // Fill out the rest of settings
-            val identity = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
-            findPreference(Preferences.IDENTITY).summary = identity
+            identityPreference = (findPreference(Preferences.DISPLAY_NAME) as EditTextPreference).apply {
+                summary = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
+                setOnPreferenceChangeListener { _, newValue ->
+                    summary = newValue as CharSequence?
+                    true
+                }
+            }
             findPreference(Preferences.VERSION).summary = BuildConfig.VERSION_NAME
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).summary = Video.getVersion()
             findPreference(Preferences.LOGOUT).onPreferenceClickListener = logoutClickListener

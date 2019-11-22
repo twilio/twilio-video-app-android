@@ -289,11 +289,19 @@ public class RoomActivity extends BaseActivity {
         participantController.setListener(participantClickListener());
 
         // Setup Activity
-        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
-        updateUi(room);
         requestPermissions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+        updateUi(room);
+        restoreCameraTrack();
+        initializeRoom();
+        updateStats();
     }
 
     @Override
@@ -339,14 +347,6 @@ public class RoomActivity extends BaseActivity {
                         .show();
             }
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        restoreCameraTrack();
-        initializeRoom();
-        updateStats();
     }
 
     @Override
