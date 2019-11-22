@@ -28,9 +28,10 @@ import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class EmailAuthenticator @JvmOverloads constructor(
-        private val firebaseWrapper: FirebaseWrapper,
-        private val sharedPreferences: SharedPreferences,
-        private val disposables: CompositeDisposable = CompositeDisposable()) : Authenticator {
+    private val firebaseWrapper: FirebaseWrapper,
+    private val sharedPreferences: SharedPreferences,
+    private val disposables: CompositeDisposable = CompositeDisposable()
+) : Authenticator {
     override fun logout() {
         firebaseWrapper.instance.signOut()
     }
@@ -40,7 +41,7 @@ class EmailAuthenticator @JvmOverloads constructor(
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
         return Observable.create<LoginResult> { observable ->
             disposables + loginEventObservable.subscribe({ loginEvent ->
-                if(loginEvent is EmailLoginEvent) {
+                if (loginEvent is EmailLoginEvent) {
                     loginEvent.run {
                         if (email.isBlank()) {
                             onError(observable)

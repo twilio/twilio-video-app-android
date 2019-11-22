@@ -40,12 +40,11 @@ import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.BuildConfig;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
-import com.twilio.video.app.ui.ScreenSelector;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.NumberPreference;
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat;
 import com.twilio.video.app.data.Preferences;
-
+import com.twilio.video.app.ui.ScreenSelector;
 import javax.inject.Inject;
 
 public class SettingsActivity extends BaseActivity {

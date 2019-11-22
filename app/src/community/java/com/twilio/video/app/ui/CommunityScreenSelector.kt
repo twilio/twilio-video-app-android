@@ -7,5 +7,4 @@ class CommunityScreenSelector : ScreenSelector {
 
     override val loginScreen: Class<out BaseActivity>
         get() = CommunityLoginActivity::class.java
-
 }

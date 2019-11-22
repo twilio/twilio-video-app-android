@@ -25,12 +25,13 @@ import io.reactivex.Single
 import timber.log.Timber
 
 class CommunityAuthenticator @JvmOverloads constructor(
-        private val preferences: SharedPreferences) : Authenticator {
+    private val preferences: SharedPreferences
+) : Authenticator {
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
         return Single.create<LoginResult> { observable ->
             loginEventObservable.subscribe({ loginEvent ->
-                if(loginEvent is CommunityLoginEvent) {
+                if (loginEvent is CommunityLoginEvent) {
                     preferences.edit().putString(Preferences.DISPLAY_NAME, loginEvent.displayName).apply()
                     observable.onSuccess(CommunityLoginSuccessResult)
                 }

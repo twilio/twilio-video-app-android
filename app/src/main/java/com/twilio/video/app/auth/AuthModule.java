@@ -19,17 +19,13 @@ package com.twilio.video.app.auth;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
-
 import dagger.Module;
 import dagger.Provides;
 
-@Module(
-        includes = ApplicationModule.class
-)
+@Module(includes = ApplicationModule.class)
 public class AuthModule {
 
     @Provides
@@ -39,7 +35,8 @@ public class AuthModule {
             Application application,
             SharedPreferences sharedPreferences) {
         Context context = application.getApplicationContext();
-        return new FirebaseAuthenticator(firebaseWrapper,
+        return new FirebaseAuthenticator(
+                firebaseWrapper,
                 new GoogleAuthenticator(
                         new FirebaseWrapper(),
                         context,

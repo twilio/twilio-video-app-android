@@ -3,9 +3,9 @@ package com.twilio.video.app.auth
 import io.reactivex.Observable
 
 class FirebaseAuthenticator(
-        private val firebaseWrapper: FirebaseWrapper,
-        private val googleAuthenticator: GoogleAuthenticator,
-        private val emailAuthenticator: EmailAuthenticator
+    private val firebaseWrapper: FirebaseWrapper,
+    private val googleAuthenticator: GoogleAuthenticator,
+    private val emailAuthenticator: EmailAuthenticator
 ) : Authenticator {
 
     override fun login(loginEventObservable: Observable<LoginEvent>) =
@@ -18,5 +18,4 @@ class FirebaseAuthenticator(
         googleAuthenticator.logout()
         emailAuthenticator.logout()
     }
-
 }

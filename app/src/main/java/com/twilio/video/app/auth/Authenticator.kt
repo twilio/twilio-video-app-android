@@ -20,7 +20,7 @@ import io.reactivex.Observable
 
 interface Authenticator {
 
-    fun login(loginEventObservable: Observable<LoginEvent>) : Observable<LoginResult>
+    fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult>
 
     fun loggedIn(): Boolean
 

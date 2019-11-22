@@ -7,5 +7,4 @@ class ProductionScreenSelector : ScreenSelector {
 
     override val loginScreen: Class<out BaseActivity>
         get() = LoginActivity::class.java
-
 }

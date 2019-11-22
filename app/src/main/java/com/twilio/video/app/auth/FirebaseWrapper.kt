@@ -4,6 +4,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 class FirebaseWrapper {
 
-    val instance : FirebaseAuth
+    val instance: FirebaseAuth
         get() = FirebaseAuth.getInstance()
 }

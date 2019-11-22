@@ -7,10 +7,10 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
-    
+
 # Languages
 This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
- 
+
 # Getting Started
 
 In order to run this application on an Android device or emulator, complete the following steps.
@@ -52,7 +52,7 @@ TWILIO_ACCESS_TOKEN=abcdef0123456789
 
 For each device:
 
-1. Repeat steps to generate a Twilio access token and run. 
+1. Repeat steps to generate a Twilio access token and run.
 1. Enter a room name.
 1. Tap `Join`.
 
