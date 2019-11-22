@@ -99,15 +99,6 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // LoginLandingFragment
     override fun onSignInWithEmail() {
-        disposables + authenticator
-                .login(loginEventSubject.hide())
-                .subscribe({
-                    if(it is EmailLoginSuccessResult) onSignInSuccess()
-                },
-                {
-                    Timber.e(it)
-                    processError()
-                })
         supportFragmentManager
                 .beginTransaction()
                 .add(R.id.login_fragment_container, ExistingAccountLoginFragment.newInstance())
@@ -117,6 +108,15 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // ExistingAccountLoginFragment
     override fun onExistingAccountCredentials(email: String, password: String) {
+        disposables + authenticator
+                .login(loginEventSubject.hide())
+                .subscribe({
+                    if (it is EmailLoginSuccessResult) onSignInSuccess()
+                },
+                {
+                    Timber.e(it)
+                    processError()
+                })
         loginEventSubject.onNext(LoginEvent.EmailLoginEvent(email, password))
         showAuthenticatingDialog()
     }
