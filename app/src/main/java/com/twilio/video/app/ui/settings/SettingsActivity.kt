@@ -40,7 +40,7 @@ class SettingsActivity : BaseActivity() {
     @Inject
     internal lateinit var screenSelector: ScreenSelector
     @Inject
-    internal lateinit var firebaseFacade: Authenticator
+    internal lateinit var authenticator: Authenticator
 
     private val logoutClickListener = Preference.OnPreferenceClickListener { preference ->
         logout()
@@ -75,7 +75,7 @@ class SettingsActivity : BaseActivity() {
 
         // Return to login activity
         loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        firebaseFacade.logout()
+        authenticator.logout()
         startActivity(loginIntent)
         finishAffinity()
     }
