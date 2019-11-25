@@ -29,7 +29,7 @@ class GoogleAuthenticator @JvmOverloads constructor(
     private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
     private val sharedPreferences: SharedPreferences,
     private val disposables: CompositeDisposable = CompositeDisposable()
-) : Authenticator {
+) : AuthenticationProvider {
 
     private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
 
@@ -58,8 +58,6 @@ class GoogleAuthenticator @JvmOverloads constructor(
                     })
         }
     }
-
-    override fun loggedIn() = firebaseWrapper.instance.currentUser != null
 
     override fun logout() {
         googleSignInClient.signOut()
