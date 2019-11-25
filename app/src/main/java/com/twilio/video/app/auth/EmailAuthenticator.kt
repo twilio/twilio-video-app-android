@@ -31,12 +31,10 @@ class EmailAuthenticator @JvmOverloads constructor(
     private val firebaseWrapper: FirebaseWrapper,
     private val sharedPreferences: SharedPreferences,
     private val disposables: CompositeDisposable = CompositeDisposable()
-) : Authenticator {
+) : AuthenticationProvider {
     override fun logout() {
         firebaseWrapper.instance.signOut()
     }
-
-    override fun loggedIn() = firebaseWrapper.instance.currentUser != null
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
         return Observable.create<LoginResult> { observable ->

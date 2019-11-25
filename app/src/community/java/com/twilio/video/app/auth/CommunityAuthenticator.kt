@@ -24,7 +24,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import timber.log.Timber
 
-class CommunityAuthenticator @JvmOverloads constructor(
+class CommunityAuthenticator constructor(
     private val preferences: SharedPreferences
 ) : Authenticator {
 
