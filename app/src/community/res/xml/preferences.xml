@@ -37,9 +37,6 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">
         <Preference
-            android:key="pref_identity"
-            android:title="@string/settings_screen_identity"/>
-        <Preference
             android:key="pref_version"
             android:title="@string/settings_screen_version"/>
         <Preference

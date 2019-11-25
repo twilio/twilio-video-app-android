@@ -31,10 +31,7 @@
             app:pinRadius="36dp"
             app:startKey="pref_min_video_dim" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/about">
-        <Preference
-            android:key="pref_identity"
-            android:title="@string/identity"/>
+    <PreferenceCategory android:title="@string/settings_screen_about">
         <Preference
             android:key="pref_version"
             android:title="@string/version"/>

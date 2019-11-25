@@ -83,7 +83,7 @@ class SettingsActivity : BaseActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
 
         private lateinit var sharedPreferences: SharedPreferences
-        private lateinit var identityPreference: EditTextPreference
+        private var identityPreference: EditTextPreference? = null
         private var logoutClickListener: Preference.OnPreferenceClickListener? = null
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -103,7 +103,7 @@ class SettingsActivity : BaseActivity() {
                     findPreference(Preferences.AUDIO_CODEC) as ListPreference?)
 
             // Fill out the rest of settings
-            identityPreference = (findPreference(Preferences.DISPLAY_NAME) as EditTextPreference).apply {
+            identityPreference = (findPreference(Preferences.DISPLAY_NAME) as EditTextPreference?)?.apply {
                 summary = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
                 setOnPreferenceChangeListener { _, newValue ->
                     summary = newValue as CharSequence?
