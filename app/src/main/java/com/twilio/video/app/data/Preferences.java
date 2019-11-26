@@ -21,7 +21,6 @@ import com.twilio.video.Vp8Codec;
 import com.twilio.video.app.BuildConfig;
 
 public class Preferences {
-    public static final String IDENTITY = "pref_identity";
     public static final String EMAIL = "pref_email";
     public static final String DISPLAY_NAME = "pref_display_name";
     public static final String ENVIRONMENT = "pref_environment";

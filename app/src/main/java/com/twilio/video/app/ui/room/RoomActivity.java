@@ -289,11 +289,19 @@ public class RoomActivity extends BaseActivity {
         participantController.setListener(participantClickListener());
 
         // Setup Activity
-        displayName = getDisplayName();
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
-        updateUi(room);
         requestPermissions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+        updateUi(room);
+        restoreCameraTrack();
+        initializeRoom();
+        updateStats();
     }
 
     @Override
@@ -339,14 +347,6 @@ public class RoomActivity extends BaseActivity {
                         .show();
             }
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        restoreCameraTrack();
-        initializeRoom();
-        updateStats();
     }
 
     @Override
@@ -622,19 +622,6 @@ public class RoomActivity extends BaseActivity {
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT);
     }
 
-    private String getDisplayName() {
-        String displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-
-        /*
-         * Append serial number for internal or development flavor so the same account can be used
-         * across different devices.
-         */
-        return BuildConfigUtils.isInternalFlavor() || BuildConfigUtils.isCommunityFlavor()
-                ? displayName
-                        + String.format(Locale.getDefault(), " %d", System.currentTimeMillis())
-                : displayName;
-    }
-
     private void obtainVideoConstraints() {
         Timber.d("Collecting video constraints...");
 
@@ -647,7 +634,7 @@ public class RoomActivity extends BaseActivity {
             builder.aspectRatio(aspectRatios[aspectRatioIndex]);
             Timber.d(
                     "Aspect ratio : %s",
-                    getResources().getStringArray(R.array.aspect_ratio_array)[aspectRatioIndex]);
+                    getResources().getStringArray(R.array.settings_screen_aspect_ratio_array)[aspectRatioIndex]);
         }
 
         // setup video dimensions
@@ -663,8 +650,8 @@ public class RoomActivity extends BaseActivity {
 
         Timber.d(
                 "Video dimensions: %s - %s",
-                getResources().getStringArray(R.array.video_dimensions_array)[minVideoDim],
-                getResources().getStringArray(R.array.video_dimensions_array)[maxVideoDim]);
+                getResources().getStringArray(R.array.settings_screen_video_dimensions_array)[minVideoDim],
+                getResources().getStringArray(R.array.settings_screen_video_dimensions_array)[maxVideoDim]);
 
         // setup fps
         int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
