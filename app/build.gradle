@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -34,6 +35,10 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     testOptions {
@@ -125,26 +130,24 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation "com.crashlytics.sdk.android:crashlytics:2.10.1"
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-
     implementation "com.google.dagger:dagger:$dagger"
     implementation "com.google.dagger:dagger-android:$dagger"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
-
     implementation "io.reactivex.rxjava2:rxjava:2.2.10"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
-
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofit"
-
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0"
+
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife"
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'androidx.test:core:1.2.0'
-
-
-    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife"
+    testImplementation 'androidx.test.ext:junit-ktx:1.1.1'
+    kaptTest "com.google.dagger:dagger-compiler:$dagger"
 }
 
 def getLocalProperty(key) {
