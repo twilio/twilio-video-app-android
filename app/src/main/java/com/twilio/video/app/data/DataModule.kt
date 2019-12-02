@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package com.twilio.video.app.ui.login;
+package com.twilio.video.app.data
 
-import dagger.Subcomponent;
-import dagger.android.AndroidInjector;
+import android.app.Application
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
+import com.twilio.video.app.ApplicationScope
+import dagger.Module
+import dagger.Provides
 
-@Subcomponent
-public interface LoginActivitySubcomponent extends AndroidInjector<LoginActivity> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<LoginActivity> {}
+@Module
+class DataModule {
+    @Provides
+    @ApplicationScope
+    internal fun provideSharedPreferences(app: Application): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(app)
+    }
 }

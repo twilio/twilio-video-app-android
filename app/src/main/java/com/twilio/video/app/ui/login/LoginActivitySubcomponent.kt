@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.twilio.video.app.ui.login;
+package com.twilio.video.app.ui.login
 
-import android.app.Activity;
-import dagger.Binds;
-import dagger.Module;
-import dagger.android.ActivityKey;
-import dagger.android.AndroidInjector;
-import dagger.multibindings.IntoMap;
+import dagger.Subcomponent
+import dagger.android.AndroidInjector
 
-@Module(subcomponents = LoginActivitySubcomponent.class)
-public abstract class LoginActivityModule {
-    @Binds
-    @IntoMap
-    @ActivityKey(LoginActivity.class)
-    abstract AndroidInjector.Factory<? extends Activity> bindYourActivityInjectorFactory(
-            LoginActivitySubcomponent.Builder builder);
+@Subcomponent
+interface LoginActivitySubcomponent : AndroidInjector<LoginActivity> {
+    @Subcomponent.Builder
+    abstract class Builder : AndroidInjector.Builder<LoginActivity>()
 }
