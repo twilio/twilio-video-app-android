@@ -14,7 +14,8 @@ import dagger.Component
     TestAuthModule::class,
     LoginActivityModule::class
 ])
-interface TestVideoApplicationComponent {
+interface IntegrationTestComponent {
     fun inject(testApp: TestApp)
     fun inject(loginActivity: LoginActivity)
+    fun inject(integrationTest: IntegrationTest)
 }

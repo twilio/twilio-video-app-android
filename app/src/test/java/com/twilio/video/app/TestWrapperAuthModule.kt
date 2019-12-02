@@ -12,36 +12,42 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class TestWrapperAuthModule {
+class TestWrapperAuthModule(
+        private val firebaseWrapper: FirebaseWrapper,
+        private val googleAuthWrapper: GoogleAuthWrapper,
+        private val googleSignInWrapper: GoogleSignInWrapper,
+        private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
+        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
+) {
 
     @Provides
     @ApplicationScope
-    internal fun providesFirebaseWrapper(): FirebaseWrapper {
-        return Mockito.mock(FirebaseWrapper::class.java)
+    fun providesFirebaseWrapper(): FirebaseWrapper {
+        return firebaseWrapper
     }
 
     @Provides
     @ApplicationScope
-    internal fun providesGoogleAuthWrapper(): GoogleAuthWrapper {
-        return Mockito.mock(GoogleAuthWrapper::class.java)
+    fun providesGoogleAuthWrapper(): GoogleAuthWrapper {
+        return googleAuthWrapper
     }
 
     @Provides
     @ApplicationScope
-    internal fun providesGoogleSignInWrapper(): GoogleSignInWrapper {
-        return Mockito.mock(GoogleSignInWrapper::class.java)
+    fun providesGoogleSignInWrapper(): GoogleSignInWrapper {
+        return googleSignInWrapper
     }
 
     @Provides
     @ApplicationScope
-    internal fun providesGoogleSignInOptionsBuilderWrapper(): GoogleSignInOptionsBuilderWrapper {
-        return Mockito.mock(GoogleSignInOptionsBuilderWrapper::class.java)
+    fun providesGoogleSignInOptionsBuilderWrapper(): GoogleSignInOptionsBuilderWrapper {
+        return googleSignInOptionsBuilderWrapper
     }
 
     @Provides
     @ApplicationScope
-    internal fun providesGoogleAuthProviderWrapper(): GoogleAuthProviderWrapper {
-        return Mockito.mock(GoogleAuthProviderWrapper::class.java)
+    fun providesGoogleAuthProviderWrapper(): GoogleAuthProviderWrapper {
+        return googleAuthProviderWrapper
     }
 
 }

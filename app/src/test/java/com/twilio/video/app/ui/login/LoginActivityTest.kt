@@ -1,12 +1,12 @@
 package com.twilio.video.app.ui.login
 
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.rules.activityScenarioRule
-import com.twilio.video.app.ApplicationModule
-import com.twilio.video.app.DaggerTestVideoApplicationComponent
-import com.twilio.video.app.TestApp
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.video.app.*
+import com.twilio.video.app.auth.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -14,12 +14,35 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApp::class)
-class LoginActivityTest {
+class LoginActivityTest : IntegrationTest {
 
-    @get:Rule var activityScenarioRule = activityScenarioRule<LoginActivity>()
+    private val firebaseWrapper: FirebaseWrapper = mock()
+    private val googleAuthWrapper: GoogleAuthWrapper = mock()
+    private val googleSignInWrapper: GoogleSignInWrapper = mock()
+    private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper = mock {
+        whenever(mock.build()).thenReturn(mock())
+    }
+    private val googleAuthProviderWrapper: GoogleAuthProviderWrapper = mock()
+
+    @Before
+    fun setUp() {
+        val testApp = ApplicationProvider.getApplicationContext<TestApp>()
+        val component = DaggerIntegrationTestComponent
+                .builder()
+                .applicationModule(ApplicationModule(testApp))
+                .testWrapperAuthModule(TestWrapperAuthModule(firebaseWrapper,
+                        googleAuthWrapper,
+                        googleSignInWrapper,
+                        googleSignInOptionsBuilderWrapper,
+                        googleAuthProviderWrapper)
+                )
+                .build()
+        component.inject(testApp)
+        ActivityScenario.launch(LoginActivity::class.java)
+
+    }
 
     @Test
     fun `it should successfully login with Google and navigate to the lobby screen`() {
-
     }
 }

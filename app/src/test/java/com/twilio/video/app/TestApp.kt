@@ -15,12 +15,6 @@ class TestApp: Application(), HasActivityInjector {
     override fun onCreate() {
         super.onCreate()
 
-        val component = DaggerTestVideoApplicationComponent
-                .builder()
-                .applicationModule(ApplicationModule(this))
-                .build()
-        component.inject(this)
-
         Timber.plant(Timber.DebugTree())
     }
 
