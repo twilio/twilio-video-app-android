@@ -2,6 +2,9 @@ package com.twilio.video.app.ui.login
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.FirebaseAuth
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.app.*
@@ -16,9 +19,16 @@ import org.robolectric.annotation.Config
 @Config(application = TestApp::class)
 class LoginActivityTest : IntegrationTest {
 
-    private val firebaseWrapper: FirebaseWrapper = mock()
+
+    private val firebaseAuth: FirebaseAuth= mock()
+    private val firebaseWrapper: FirebaseWrapper = mock {
+        whenever(mock.instance).thenReturn(firebaseAuth)
+    }
     private val googleAuthWrapper: GoogleAuthWrapper = mock()
-    private val googleSignInWrapper: GoogleSignInWrapper = mock()
+    private val googleSignInClient: GoogleSignInClient = mock()
+    private val googleSignInWrapper: GoogleSignInWrapper = mock {
+        whenever(mock.getClient(any(), any())).thenReturn(googleSignInClient)
+    }
     private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper = mock {
         whenever(mock.build()).thenReturn(mock())
     }
@@ -39,7 +49,6 @@ class LoginActivityTest : IntegrationTest {
                 .build()
         component.inject(testApp)
         ActivityScenario.launch(LoginActivity::class.java)
-
     }
 
     @Test
