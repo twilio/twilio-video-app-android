@@ -147,6 +147,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'androidx.test.ext:junit-ktx:1.1.1'
+    testImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     kaptTest "com.google.dagger:dagger-compiler:$dagger"
 }
 
