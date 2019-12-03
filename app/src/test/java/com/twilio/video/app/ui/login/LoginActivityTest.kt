@@ -30,7 +30,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApp::class)
-class LoginActivityTest : IntegrationTest {
+class LoginActivityTest {
 
 
     private lateinit var scenario: ActivityScenario<LoginActivity>

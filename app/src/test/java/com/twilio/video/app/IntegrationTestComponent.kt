@@ -17,5 +17,4 @@ import dagger.Component
 interface IntegrationTestComponent {
     fun inject(testApp: TestApp)
     fun inject(loginActivity: LoginActivity)
-    fun inject(integrationTest: IntegrationTest)
 }
