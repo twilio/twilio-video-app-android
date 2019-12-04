@@ -107,6 +107,7 @@ workflows:
       - publish-to-appcenter:
           requires:
             - build-app
+            - unit-tests
           filters:
             branches:
               only: master
