@@ -38,7 +38,7 @@ import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val GOOGLE_SIGN_IN = 4615
+internal const val GOOGLE_SIGN_IN = 4615
 
 class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAccountLoginFragment.Listener {
 
@@ -66,6 +66,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
                     .commit()
         }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN) {

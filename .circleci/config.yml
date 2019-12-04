@@ -76,7 +76,7 @@ jobs:
       - run: *get-secrets
       - run:
           name: Unit Tests
-          command: ./gradlew -q app:testInternalDebugUnitTest
+          command: ./gradlew app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
 
   publish-to-appcenter:

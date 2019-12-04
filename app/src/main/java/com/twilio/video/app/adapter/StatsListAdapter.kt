@@ -44,52 +44,52 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         @BindView(R.id.stats_track_name)
-        internal var trackNameText: TextView? = null
+        lateinit var trackNameText: TextView
 
         @BindView(R.id.stats_track_sid_value)
-        internal var trackSidValueText: TextView? = null
+        lateinit var trackSidValueText: TextView
 
         @BindView(R.id.stats_codec_value)
-        internal var codecValueText: TextView? = null
+        lateinit var codecValueText: TextView
 
         @BindView(R.id.stats_packets_value)
-        internal var packetsValueText: TextView? = null
+        lateinit var packetsValueText: TextView
 
         @BindView(R.id.stats_bytes_title)
-        internal var bytesTitleText: TextView? = null
+        lateinit var bytesTitleText: TextView
 
         @BindView(R.id.stats_bytes_value)
-        internal var bytesValueText: TextView? = null
+        lateinit var bytesValueText: TextView
 
         @BindView(R.id.stats_rtt_value)
-        internal var rttValueText: TextView? = null
+        lateinit var rttValueText: TextView
 
         @BindView(R.id.stats_jitter_value)
-        internal var jitterValueText: TextView? = null
+        lateinit var jitterValueText: TextView
 
         @BindView(R.id.stats_audio_level_value)
-        internal var audioLevelValueText: TextView? = null
+        lateinit var audioLevelValueText: TextView
 
         @BindView(R.id.stats_dimensions_value)
-        internal var dimensionsValueText: TextView? = null
+        lateinit var dimensionsValueText: TextView
 
         @BindView(R.id.stats_framerate_value)
-        internal var framerateValueText: TextView? = null
+        lateinit var framerateValueText: TextView
 
         @BindView(R.id.stats_rtt_row)
-        internal var rttTableRow: TableRow? = null
+        lateinit var rttTableRow: TableRow
 
         @BindView(R.id.stats_jitter_row)
-        internal var jitterTableRow: TableRow? = null
+        lateinit var jitterTableRow: TableRow
 
         @BindView(R.id.stats_audio_level_row)
-        internal var audioLevelTableRow: TableRow? = null
+        lateinit var audioLevelTableRow: TableRow
 
         @BindView(R.id.stats_dimensions_row)
-        internal var dimensionsTableRow: TableRow? = null
+        lateinit var dimensionsTableRow: TableRow
 
         @BindView(R.id.stats_framerate_row)
-        internal var framerateTableRow: TableRow? = null
+        lateinit var framerateTableRow: TableRow
 
         init {
             ButterKnife.bind(this, itemView)
@@ -104,33 +104,33 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = statsListItems[position]
-        holder.trackNameText!!.text = item.trackName
-        holder.trackSidValueText!!.text = item.trackSid
-        holder.codecValueText!!.text = item.codec
-        holder.packetsValueText!!.text = item.packetsLost.toString()
-        holder.bytesValueText!!.text = item.bytes.toString()
+        holder.trackNameText.text = item.trackName
+        holder.trackSidValueText.text = item.trackSid
+        holder.codecValueText.text = item.codec
+        holder.packetsValueText.text = item.packetsLost.toString()
+        holder.bytesValueText.text = item.bytes.toString()
         if (item.isLocalTrack) {
-            holder.bytesTitleText!!.text = context.getString(R.string.stats_bytes_sent)
-            holder.rttValueText!!.text = item.rtt.toString()
-            holder.rttTableRow!!.visibility = View.VISIBLE
+            holder.bytesTitleText.text = context.getString(R.string.stats_bytes_sent)
+            holder.rttValueText.text = item.rtt.toString()
+            holder.rttTableRow.visibility = View.VISIBLE
         } else {
-            holder.rttTableRow!!.visibility = View.GONE
-            holder.bytesTitleText!!.text = context.getString(R.string.stats_bytes_received)
+            holder.rttTableRow.visibility = View.GONE
+            holder.bytesTitleText.text = context.getString(R.string.stats_bytes_received)
         }
         if (item.isAudioTrack) {
-            holder.jitterValueText!!.text = item.jitter.toString()
-            holder.audioLevelValueText!!.text = item.audioLevel.toString()
-            holder.dimensionsTableRow!!.visibility = View.GONE
-            holder.framerateTableRow!!.visibility = View.GONE
-            holder.jitterTableRow!!.visibility = View.VISIBLE
-            holder.audioLevelTableRow!!.visibility = View.VISIBLE
+            holder.jitterValueText.text = item.jitter.toString()
+            holder.audioLevelValueText.text = item.audioLevel.toString()
+            holder.dimensionsTableRow.visibility = View.GONE
+            holder.framerateTableRow.visibility = View.GONE
+            holder.jitterTableRow.visibility = View.VISIBLE
+            holder.audioLevelTableRow.visibility = View.VISIBLE
         } else {
-            holder.dimensionsValueText!!.text = item.dimensions
-            holder.framerateValueText!!.text = item.framerate.toString()
-            holder.dimensionsTableRow!!.visibility = View.VISIBLE
-            holder.framerateTableRow!!.visibility = View.VISIBLE
-            holder.jitterTableRow!!.visibility = View.GONE
-            holder.audioLevelTableRow!!.visibility = View.GONE
+            holder.dimensionsValueText.text = item.dimensions
+            holder.framerateValueText.text = item.framerate.toString()
+            holder.dimensionsTableRow.visibility = View.VISIBLE
+            holder.framerateTableRow.visibility = View.VISIBLE
+            holder.jitterTableRow.visibility = View.GONE
+            holder.audioLevelTableRow.visibility = View.GONE
         }
     }
 
