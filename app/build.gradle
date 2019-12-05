@@ -31,7 +31,7 @@ android {
 
         multiDexEnabled true
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.twilio.video.app.InstrumentationRunner"
     }
 
     compileOptions {
@@ -118,6 +118,7 @@ android {
 dependencies {
     def butterknifeVersion = '10.2.0'
     def daggerVersion = '2.15'
+    def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
     def retrofitVersion = '2.1.0'
     def espressoVersion = '3.2.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
@@ -146,7 +147,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0"
 
-    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt daggerCompiler
     kapt "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     testImplementation testCore
@@ -155,7 +156,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3'
-    kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+    kaptTest daggerCompiler
 
     androidTestImplementation testCore
     androidTestImplementation espresso
@@ -163,7 +164,10 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
+    kaptAndroidTest daggerCompiler
 }
 
 def getLocalProperty(key) {

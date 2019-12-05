@@ -20,6 +20,9 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
+import com.twilio.video.app.idlingresource.FakeIdlingResource
+import com.twilio.video.app.idlingresource.ICountingIdlingResource
+import com.twilio.video.app.idlingresource.IdlingResourceModule
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
@@ -42,6 +45,7 @@ class VideoApplication : Application(), HasActivityInjector {
         // Create application component and inject application
         val applicationComponent = DaggerVideoApplicationComponent.builder()
                 .applicationModule(ApplicationModule(this))
+                .idlingResourceModule(IdlingResourceModule(FakeIdlingResource()))
                 .build()
         applicationComponent.inject(this)
 
