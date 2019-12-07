@@ -14,13 +14,19 @@ import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleAuthenticator
 import com.twilio.video.app.auth.GoogleSignInOptionsBuilderWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
+import com.twilio.video.app.idlingresource.ICountingIdlingResource
+import com.twilio.video.app.idlingresource.IdlingResourceModule
 
 import java.util.ArrayList
 
 import dagger.Module
 import dagger.Provides
 
-@Module(includes = [ApplicationModule::class, TestWrapperAuthModule::class])
+@Module(includes = [
+    ApplicationModule::class,
+    TestWrapperAuthModule::class,
+    IdlingResourceModule::class
+])
 class TestAuthModule {
 
     @Provides
@@ -32,7 +38,8 @@ class TestAuthModule {
             googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
             googleAuthProviderWrapper: GoogleAuthProviderWrapper,
             application: Application,
-            sharedPreferences: SharedPreferences): Authenticator {
+            sharedPreferences: SharedPreferences,
+            resource: ICountingIdlingResource): Authenticator {
         val authenticators = ArrayList<AuthenticationProvider>()
         authenticators.add(
                 GoogleAuthenticator(
@@ -44,7 +51,7 @@ class TestAuthModule {
                         googleAuthProviderWrapper,
                         sharedPreferences)
         )
-        authenticators.add(EmailAuthenticator(firebaseWrapper, sharedPreferences))
+        authenticators.add(EmailAuthenticator(firebaseWrapper, sharedPreferences, resource))
         return FirebaseAuthenticator(firebaseWrapper, authenticators)
     }
 }
