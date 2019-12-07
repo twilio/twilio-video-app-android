@@ -3,6 +3,7 @@ package com.twilio.video.app;
 import com.twilio.video.app.auth.AuthModule;
 import com.twilio.video.app.data.DataModule;
 import com.twilio.video.app.data.api.VideoAppServiceModule;
+import com.twilio.video.app.idlingresource.IdlingResourceModule;
 import com.twilio.video.app.ui.ScreenSelectorModule;
 import com.twilio.video.app.ui.login.LoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
@@ -22,7 +23,10 @@ import dagger.Component;
         SplashActivityModule.class,
         LoginActivityModule.class,
         RoomActivityModule.class,
-        SettingsActivityModule.class
+        SettingsActivityModule.class,
+        IdlingResourceModule.class
     }
 )
-public interface VideoApplicationComponent extends VideoApplicationGraph {}
+public interface VideoApplicationComponent {
+    void inject(VideoApplication application);
+}
