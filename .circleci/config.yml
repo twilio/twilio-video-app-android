@@ -153,11 +153,9 @@ workflows:
       - build-test-app:
           requires:
             - build-app
-            - unit-tests
       - ui-tests:
           requires:
             - build-app
-            - unit-tests
             - build-test-app
       - publish-to-appcenter:
           requires:
