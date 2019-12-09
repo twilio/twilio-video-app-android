@@ -56,8 +56,7 @@ aliases:
   - &gcloud-auth
     name: Google Cloud Auth
     command: >
-      gcloud auth activate-service-account ahoy-video-app@video-app-79418.iam.gserviceaccount.com
-      --key-file=$GCP_KEY_FILE
+      echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
 
 jobs:
   build-app:
