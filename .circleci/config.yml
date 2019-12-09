@@ -46,6 +46,19 @@ aliases:
     environment:
       - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
+  - &ui-test-defaults
+    working_directory: *workspace
+    docker:
+      - image: google/cloud-sdk:latest
+    environment:
+    resource_class: medium+
+
+  - &gcloud-auth
+    name: Google Cloud Auth
+    command: >
+      gcloud auth activate-service-account ahoy-video-app@video-app-79418.iam.gserviceaccount.com
+      --key-file=$GCP_KEY_FILE
+
 jobs:
   build-app:
     <<: *build-defaults
@@ -57,7 +70,7 @@ jobs:
       - restore-cache: *restore-cache-gradle
       - run: *get-secrets
       - run:
-          name: Build app
+          name: Build App
           command: ./gradlew -q app:assemble
       - persist_to_workspace:
           root: .
@@ -78,6 +91,40 @@ jobs:
           name: Unit Tests
           command: ./gradlew app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
+
+  build-test-app:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
+      - run:
+          name: Build Test App
+          command: ./gradlew -q app:assembleAndroidTest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/build
+      - save-cache: *save-cache-gradle
+
+  ui-tests:
+    <<: *ui-test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+
+      # Execute tests
+      - run:
+          name: UI Tests
+          command: >
+            gcloud firebase test android run --no-record-video --project video-app-79418
+            ui-test-args.yaml:ui-tests
 
   publish-to-appcenter:
     <<: *build-defaults
@@ -104,6 +151,15 @@ workflows:
       - unit-tests:
           requires:
             - build-app
+      - build-test-app:
+          requires:
+            - build-app
+            - unit-tests
+      - ui-tests:
+          requires:
+            - build-app
+            - unit-tests
+            - build-test-app
       - publish-to-appcenter:
           requires:
             - build-app
