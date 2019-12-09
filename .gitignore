@@ -69,3 +69,4 @@ secrets/
 
 # Test files
 captures/
+app/src/androidTest/assets/Credentials/TestCredentials.json

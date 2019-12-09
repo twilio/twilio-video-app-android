@@ -98,8 +98,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: *workspace
+      - run:
+          name: Read Test Credentials
+          command: echo $TEST_CREDENTIALS_JSON | base64 -di > app/src/androidTest/assets/Credentials/TestCredentials.json
       - run: *gcloud-auth
-
       # Execute tests
       - run:
           name: UI Tests
