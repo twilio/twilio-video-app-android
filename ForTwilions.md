@@ -15,8 +15,8 @@ After copying the above files the internal variant should build with no errors. 
 
 ### Credentials
 
-1. Make `Credentials` directory.
-1. Copy `Credentials/TestCredentials.json.example` to `Credentials/TestCredentials.json` and insert correct values for `email_sign_in_user`.
+1. Make `Credentials` directory within the ```app/src/androidTest/assets``` directory.
+1. Copy `TestCredentials.json.example` to `TestCredentials.json` within the ```Credentials``` directory and insert correct values for `email_sign_in_user`.
 
 ### Run
 
