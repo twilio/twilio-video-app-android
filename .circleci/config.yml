@@ -70,7 +70,7 @@ jobs:
       - run: *get-secrets
       - run:
           name: Build App
-          command: ./gradlew -q app:assemble
+          command: ./gradlew -q app:assemble app:assembleAndroidTest
       - persist_to_workspace:
           root: .
           paths:
@@ -89,24 +89,6 @@ jobs:
       - run:
           name: Unit Tests
           command: ./gradlew app:testInternalDebugUnitTest
-      - save-cache: *save-cache-gradle
-
-  build-test-app:
-    <<: *build-defaults
-    resource_class: large
-    steps:
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *get-secrets
-      - run:
-          name: Build Test App
-          command: ./gradlew -q app:assembleAndroidTest
-      - persist_to_workspace:
-          root: .
-          paths:
-            - app/build
       - save-cache: *save-cache-gradle
 
   ui-tests:
@@ -150,13 +132,9 @@ workflows:
       - unit-tests:
           requires:
             - build-app
-      - build-test-app:
-          requires:
-            - build-app
       - ui-tests:
           requires:
             - build-app
-            - build-test-app
       - publish-to-appcenter:
           requires:
             - build-app
