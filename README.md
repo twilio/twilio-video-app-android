@@ -4,6 +4,8 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 
 - [Languages](#languages)
 - [Getting Started](#getting-started)
+    - [Build](#build)
+    - [Unit Tests](#unit-tests)
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
@@ -21,6 +23,10 @@ Currently there are three product flavors for the application.
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
 1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
 1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
+
+### Twilions
+
+Twilio employees should follow [these instructions](Twilions.md) for building the Internal and Twilio product flavors.
 
 ### Building the Community Flavor
 
@@ -55,6 +61,11 @@ For each device:
 1. Repeat steps to generate a Twilio access token and run.
 1. Enter a room name.
 1. Tap `Join`.
+
+## Unit Tests
+
+* Android Studio - Right click and run unit tests on package ```app/src/main/java/com/twilio/video/app```
+* Terminal - ```./gradlew app:testInternalDebugUnitTest```
 
 # Contributing
 

@@ -46,7 +46,7 @@ class VideoApplication : Application(), HasActivityInjector {
         applicationComponent.inject(this)
 
         // Setup logging
-        Timber.plant(tree!!)
+        Timber.plant(tree)
     }
 
     override fun activityInjector(): DispatchingAndroidInjector<Activity>? {

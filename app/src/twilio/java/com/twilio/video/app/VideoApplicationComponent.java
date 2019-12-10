@@ -25,4 +25,6 @@ import dagger.Component;
         SettingsActivityModule.class
     }
 )
-public interface VideoApplicationComponent extends VideoApplicationGraph {}
+public interface VideoApplicationComponent {
+    void inject(VideoApplication application);
+}

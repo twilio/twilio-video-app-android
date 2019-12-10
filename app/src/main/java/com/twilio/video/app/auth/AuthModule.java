@@ -29,7 +29,9 @@ import java.util.List;
 import dagger.Module;
 import dagger.Provides;
 
-@Module(includes = ApplicationModule.class)
+@Module(includes = {
+        ApplicationModule.class
+})
 public class AuthModule {
 
     @Provides

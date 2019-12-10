@@ -24,6 +24,7 @@ import com.twilio.video.app.ui.login.LoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
 import com.twilio.video.app.ui.splash.SplashActivityModule;
+
 import dagger.Component;
 
 @ApplicationScope
@@ -41,4 +42,6 @@ import dagger.Component;
         SettingsActivityModule.class
     }
 )
-public interface VideoApplicationComponent extends VideoApplicationGraph {}
+public interface VideoApplicationComponent {
+    void inject(VideoApplication application);
+}

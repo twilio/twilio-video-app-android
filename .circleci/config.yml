@@ -46,6 +46,18 @@ aliases:
     environment:
       - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
+  - &ui-test-defaults
+    working_directory: *workspace
+    docker:
+      - image: google/cloud-sdk:latest
+    environment:
+    resource_class: medium+
+
+  - &gcloud-auth
+    name: Google Cloud Auth
+    command: >
+      echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
+
 jobs:
   build-app:
     <<: *build-defaults
@@ -57,8 +69,11 @@ jobs:
       - restore-cache: *restore-cache-gradle
       - run: *get-secrets
       - run:
-          name: Build app
-          command: ./gradlew -q app:assemble
+          name: Store Test Credentials
+          command: echo $TEST_CREDENTIALS_JSON | base64 -di > app/src/androidTest/assets/Credentials/TestCredentials.json
+      - run:
+          name: Build App
+          command: ./gradlew -q app:assemble app:assembleAndroidTest
       - persist_to_workspace:
           root: .
           paths:
@@ -78,6 +93,21 @@ jobs:
           name: Unit Tests
           command: ./gradlew app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
+
+  ui-tests:
+    <<: *ui-test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+      # Execute tests
+      - run:
+          name: UI Tests
+          command: >
+            gcloud firebase test android run --no-record-video --project video-app-79418
+            ui-test-args.yaml:ui-tests
 
   publish-to-appcenter:
     <<: *build-defaults
@@ -104,9 +134,14 @@ workflows:
       - unit-tests:
           requires:
             - build-app
+      - ui-tests:
+          requires:
+            - build-app
       - publish-to-appcenter:
           requires:
             - build-app
+            - unit-tests
+            - ui-tests
           filters:
             branches:
               only: master
