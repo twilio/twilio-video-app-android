@@ -141,6 +141,7 @@ workflows:
           requires:
             - build-app
             - unit-tests
+            - ui-tests
           filters:
             branches:
               only: master
