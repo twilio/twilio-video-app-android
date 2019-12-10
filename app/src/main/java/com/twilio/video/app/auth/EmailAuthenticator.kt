@@ -20,7 +20,6 @@ import android.content.SharedPreferences
 import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
 import com.twilio.video.app.auth.LoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.idlingresource.ICountingIdlingResource
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -31,7 +30,6 @@ import timber.log.Timber
 class EmailAuthenticator @JvmOverloads constructor(
     private val firebaseWrapper: FirebaseWrapper,
     private val sharedPreferences: SharedPreferences,
-    private val countingIdlingResource: ICountingIdlingResource,
     private val disposables: CompositeDisposable = CompositeDisposable()
 ) : AuthenticationProvider {
     override fun logout() {
@@ -49,10 +47,8 @@ class EmailAuthenticator @JvmOverloads constructor(
                         if (password.isBlank()) {
                             onError(observable)
                         }
-                        countingIdlingResource.increment()
                         firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
                                 .addOnCompleteListener { task ->
-                                    countingIdlingResource.decrement()
                                     if (task.isSuccessful) {
                                         saveIdentity(task.result?.user?.displayName, email)
                                         observable.onNext(EmailLoginSuccessResult)

@@ -18,7 +18,6 @@ package com.twilio.video.app;
 
 import com.twilio.video.app.auth.CommunityAuthModule;
 import com.twilio.video.app.data.CommunityDataModule;
-import com.twilio.video.app.idlingresource.IdlingResourceModule;
 import com.twilio.video.app.ui.CommunityScreenSelectorModule;
 import com.twilio.video.app.ui.login.CommunityLoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
@@ -37,8 +36,7 @@ import dagger.Component;
         SplashActivityModule.class,
         CommunityLoginActivityModule.class,
         RoomActivityModule.class,
-        SettingsActivityModule.class,
-        IdlingResourceModule.class,
+        SettingsActivityModule.class
     }
 )
 public interface VideoApplicationComponent {

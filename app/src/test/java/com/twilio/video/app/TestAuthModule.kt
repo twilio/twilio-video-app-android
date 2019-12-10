@@ -2,30 +2,14 @@ package com.twilio.video.app
 
 import android.app.Application
 import android.content.SharedPreferences
-
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.twilio.video.app.auth.AuthenticationProvider
-import com.twilio.video.app.auth.Authenticator
-import com.twilio.video.app.auth.EmailAuthenticator
-import com.twilio.video.app.auth.FirebaseAuthenticator
-import com.twilio.video.app.auth.FirebaseWrapper
-import com.twilio.video.app.auth.GoogleAuthProviderWrapper
-import com.twilio.video.app.auth.GoogleAuthWrapper
-import com.twilio.video.app.auth.GoogleAuthenticator
-import com.twilio.video.app.auth.GoogleSignInOptionsBuilderWrapper
-import com.twilio.video.app.auth.GoogleSignInWrapper
-import com.twilio.video.app.idlingresource.ICountingIdlingResource
-import com.twilio.video.app.idlingresource.IdlingResourceModule
-
-import java.util.ArrayList
-
+import com.twilio.video.app.auth.*
 import dagger.Module
 import dagger.Provides
+import java.util.*
 
 @Module(includes = [
     ApplicationModule::class,
-    TestWrapperAuthModule::class,
-    IdlingResourceModule::class
+    TestWrapperAuthModule::class
 ])
 class TestAuthModule {
 
@@ -38,8 +22,7 @@ class TestAuthModule {
             googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
             googleAuthProviderWrapper: GoogleAuthProviderWrapper,
             application: Application,
-            sharedPreferences: SharedPreferences,
-            resource: ICountingIdlingResource): Authenticator {
+            sharedPreferences: SharedPreferences): Authenticator {
         val authenticators = ArrayList<AuthenticationProvider>()
         authenticators.add(
                 GoogleAuthenticator(
@@ -51,7 +34,7 @@ class TestAuthModule {
                         googleAuthProviderWrapper,
                         sharedPreferences)
         )
-        authenticators.add(EmailAuthenticator(firebaseWrapper, sharedPreferences, resource))
+        authenticators.add(EmailAuthenticator(firebaseWrapper, sharedPreferences))
         return FirebaseAuthenticator(firebaseWrapper, authenticators)
     }
 }

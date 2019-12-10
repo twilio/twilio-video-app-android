@@ -17,8 +17,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.app.*
 import com.twilio.video.app.auth.*
-import com.twilio.video.app.idlingresource.FakeIdlingResource
-import com.twilio.video.app.idlingresource.IdlingResourceModule
 import com.twilio.video.app.screen.clickGoogleSignInButton
 import com.twilio.video.app.ui.room.RoomActivity
 import org.hamcrest.CoreMatchers.equalTo
@@ -65,7 +63,6 @@ class LoginActivityTest {
                         googleSignInOptionsBuilderWrapper,
                         googleAuthProviderWrapper)
                 )
-                .idlingResourceModule(IdlingResourceModule(FakeIdlingResource()))
                 .build()
         component.inject(testApp)
         scenario = ActivityScenario.launch(LoginActivity::class.java)

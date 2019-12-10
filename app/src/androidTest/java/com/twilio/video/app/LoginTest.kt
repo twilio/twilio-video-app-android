@@ -51,7 +51,7 @@ class LoginTest {
 
     private fun logout() {
         getInstrumentation().targetContext.run {
-            openActionBarOverflowOrOptionsMenu(this)
+            retryViewMatcher( { openActionBarOverflowOrOptionsMenu(this) } )
             onView(withText(getString(R.string.settings))).perform(click())
             onView(withId(androidx.preference.R.id.recycler_view))
                     .perform(actionOnItem<ViewHolder>(hasDescendant(withText(getString(R.string.settings_screen_logout))), click()))

@@ -22,8 +22,6 @@ import android.content.SharedPreferences;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
-import com.twilio.video.app.idlingresource.ICountingIdlingResource;
-import com.twilio.video.app.idlingresource.IdlingResourceModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +30,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(includes = {
-        ApplicationModule.class,
-        IdlingResourceModule.class
+        ApplicationModule.class
 })
 public class AuthModule {
 
@@ -42,8 +39,7 @@ public class AuthModule {
     Authenticator providesAuthenticator(
             FirebaseWrapper firebaseWrapper,
             Application application,
-            SharedPreferences sharedPreferences,
-            ICountingIdlingResource resource) {
+            SharedPreferences sharedPreferences) {
         Context context = application.getApplicationContext();
         List<AuthenticationProvider> authenticators = new ArrayList<>();
         authenticators.add(
@@ -56,7 +52,7 @@ public class AuthModule {
                         new GoogleAuthProviderWrapper(),
                         sharedPreferences)
         );
-        authenticators.add(new EmailAuthenticator(firebaseWrapper, sharedPreferences, resource));
+        authenticators.add(new EmailAuthenticator(firebaseWrapper, sharedPreferences));
         return new FirebaseAuthenticator(firebaseWrapper, authenticators);
     }
 
