@@ -4,5 +4,5 @@ ui-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: flo, version: 21}
-    - {model: walleye, version: 28}
+    - {model: flo, version: 19}
+    - {model: walleye, version: 29}
