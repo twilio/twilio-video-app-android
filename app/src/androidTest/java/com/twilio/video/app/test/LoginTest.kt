@@ -1,4 +1,4 @@
-package com.twilio.video.app
+package com.twilio.video.app.test
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
@@ -14,6 +14,10 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
+import com.twilio.video.app.EmailCredentials
+import com.twilio.video.app.R
+import com.twilio.video.app.TestCredentials
+import com.twilio.video.app.retryViewMatcher
 import com.twilio.video.app.ui.splash.SplashActivity
 import org.junit.Rule
 import org.junit.Test
@@ -51,7 +55,7 @@ class LoginTest {
 
     private fun logout() {
         getInstrumentation().targetContext.run {
-            retryViewMatcher( { openActionBarOverflowOrOptionsMenu(this) } )
+            retryViewMatcher({ openActionBarOverflowOrOptionsMenu(this) })
             onView(withText(getString(R.string.settings))).perform(click())
             onView(withId(androidx.preference.R.id.recycler_view))
                     .perform(actionOnItem<ViewHolder>(hasDescendant(withText(getString(R.string.settings_screen_logout))), click()))
