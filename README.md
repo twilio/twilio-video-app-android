@@ -24,9 +24,9 @@ Currently there are three product flavors for the application.
 1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
 1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
-### For Twilions
+### Twilions
 
-Twilio employees should follow [these instructions](ForTwilions.md) for building the Internal and Twilio product flavors.
+Twilio employees should follow [these instructions](Twilions.md) for building the Internal and Twilio product flavors.
 
 ### Building the Community Flavor
 

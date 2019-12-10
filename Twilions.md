@@ -1,4 +1,4 @@
-# For Twilions
+# Twilions
 
 Twilio employees should follow these instructions for building and testing the Twilio and Internal build variants.
 
