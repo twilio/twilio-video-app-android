@@ -123,7 +123,7 @@ jobs:
             sudo npm install webpack
             echo no | sudo npm install -g appcenter-cli
             appcenter login --token $APPCENTER_API_TOKEN
-            appcenter distribute release -f app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-App-Internal
+            appcenter distribute release -f app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-Internal
 
 workflows:
   version: 2
