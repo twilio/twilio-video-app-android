@@ -108,7 +108,6 @@ import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.settings.SettingsActivity;
-import com.twilio.video.app.util.BuildConfigUtils;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
@@ -123,7 +122,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
@@ -634,7 +632,9 @@ public class RoomActivity extends BaseActivity {
             builder.aspectRatio(aspectRatios[aspectRatioIndex]);
             Timber.d(
                     "Aspect ratio : %s",
-                    getResources().getStringArray(R.array.settings_screen_aspect_ratio_array)[aspectRatioIndex]);
+                    getResources()
+                            .getStringArray(R.array.settings_screen_aspect_ratio_array)[
+                            aspectRatioIndex]);
         }
 
         // setup video dimensions
@@ -650,8 +650,12 @@ public class RoomActivity extends BaseActivity {
 
         Timber.d(
                 "Video dimensions: %s - %s",
-                getResources().getStringArray(R.array.settings_screen_video_dimensions_array)[minVideoDim],
-                getResources().getStringArray(R.array.settings_screen_video_dimensions_array)[maxVideoDim]);
+                getResources()
+                        .getStringArray(R.array.settings_screen_video_dimensions_array)[
+                        minVideoDim],
+                getResources()
+                        .getStringArray(R.array.settings_screen_video_dimensions_array)[
+                        maxVideoDim]);
 
         // setup fps
         int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
