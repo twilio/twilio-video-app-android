@@ -22,7 +22,7 @@ import androidx.annotation.NonNull;
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.VideoCapturer;
-import org.webrtc.Camera2Enumerator;
+import tvi.webrtc.Camera2Enumerator;
 import timber.log.Timber;
 
 /*
