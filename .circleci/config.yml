@@ -67,13 +67,8 @@ jobs:
       - restore-cache: *restore-cache-gradle
       - run: *get-secrets
       - run:
-          name: Store Test Credentials
-          command: echo $TEST_CREDENTIALS_JSON | base64 -di > app/src/androidTest/assets/Credentials/TestCredentials.json
-
-      - run:
           name: Lint
           command: ./gradlew -q lint
-
       - store_artifacts:
           path: app/build/reports/lint-results.html
           prefix: app
