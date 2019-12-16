@@ -8,5 +8,3 @@ data class EmailCredentials(
     val email: String,
     val password: String
 )
-
-
