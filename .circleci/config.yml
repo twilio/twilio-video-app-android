@@ -59,6 +59,17 @@ aliases:
       echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
 
 jobs:
+  check-format:
+    <<: *build-defaults
+    resource_class: medium+
+    steps:
+      - checkout
+      - restore-cache: *restore-cache-gradle
+      - run:
+          name: Spotless Check
+          command: ./gradlew -q spotlessCheck
+      - save-cache: *save-cache-gradle
+
   build-app:
     <<: *build-defaults
     resource_class: large
@@ -131,15 +142,19 @@ workflows:
   build-test-publish:
     jobs:
       - build-app
+      - check-format
       - unit-tests:
           requires:
             - build-app
+            - check-format
       - ui-tests:
           requires:
             - build-app
+            - check-format
       - publish-to-appcenter:
           requires:
             - build-app
+            - check-format
             - unit-tests
             - ui-tests
           filters:
