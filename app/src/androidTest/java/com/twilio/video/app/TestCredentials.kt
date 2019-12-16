@@ -1,7 +1,7 @@
 package com.twilio.video.app
 
 data class TestCredentials(
-        val email_sign_in_user: EmailCredentials
+    val email_sign_in_user: EmailCredentials
 )
 
 data class EmailCredentials(

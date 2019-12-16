@@ -10,5 +10,4 @@ class InstrumentationRunner : AndroidJUnitRunner() {
         RxJavaPlugins.setInitIoSchedulerHandler(Rx2Idler.create("RxJava 2.x IO Scheduler"))
         super.onStart()
     }
-
 }

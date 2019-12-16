@@ -6,18 +6,16 @@ import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleSignInOptionsBuilderWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
 
-import org.mockito.Mockito
-
 import dagger.Module
 import dagger.Provides
 
 @Module
 class TestWrapperAuthModule(
-        private val firebaseWrapper: FirebaseWrapper,
-        private val googleAuthWrapper: GoogleAuthWrapper,
-        private val googleSignInWrapper: GoogleSignInWrapper,
-        private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
-        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
+    private val firebaseWrapper: FirebaseWrapper,
+    private val googleAuthWrapper: GoogleAuthWrapper,
+    private val googleSignInWrapper: GoogleSignInWrapper,
+    private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
+    private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
 ) {
 
     @Provides
@@ -49,5 +47,4 @@ class TestWrapperAuthModule(
     fun providesGoogleAuthProviderWrapper(): GoogleAuthProviderWrapper {
         return googleAuthProviderWrapper
     }
-
 }

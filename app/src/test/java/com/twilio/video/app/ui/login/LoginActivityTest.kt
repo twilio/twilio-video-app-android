@@ -39,7 +39,6 @@ import org.robolectric.annotation.Config
 @Config(application = TestApp::class)
 class LoginActivityTest {
 
-
     private lateinit var scenario: ActivityScenario<LoginActivity>
     private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
     private val googleSignInActivityRequest = Intent(testApp, TestActivity::class.java)

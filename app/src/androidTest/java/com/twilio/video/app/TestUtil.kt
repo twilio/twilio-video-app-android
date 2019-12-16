@@ -6,7 +6,7 @@ import java.util.concurrent.TimeoutException
 fun retryViewMatcher(espressoAction: () -> Unit, timeoutInSeconds: Long = 30000L) {
     val startTime = System.currentTimeMillis()
     var currentTime = 0L
-    while(currentTime <= timeoutInSeconds) {
+    while (currentTime <= timeoutInSeconds) {
         try {
             espressoAction()
             return
