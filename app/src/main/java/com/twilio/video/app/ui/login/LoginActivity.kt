@@ -67,7 +67,6 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN) {
             data?.let {

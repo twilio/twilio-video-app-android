@@ -9,7 +9,7 @@ class FirebaseAuthenticator(
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
         // TODO Figure out a better way to only subscribe to one authenticator at a time
-        val observables : MutableList<Observable<LoginResult>> = mutableListOf()
+        val observables: MutableList<Observable<LoginResult>> = mutableListOf()
         authenticationProviders.forEach {
             observables.add(it.login(loginEventObservable))
         }

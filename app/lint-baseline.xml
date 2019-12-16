@@ -3,9 +3,33 @@
 
     <issue
         id="ObsoleteLintCustomCheck"
-        message="Lint found one or more custom checks that could not be loaded. The most likely reason for this is that it is using an older, incompatible or unsupported API in lint. Make sure these lint checks are updated to the new APIs. The issue registry class is timber.lint.IssueRegistry. The class loading issue is com/android/tools/lint/detector/api/Detector$JavaScanner: ClassLoader.defineClass1(ClassLoader.java:-2)←ClassLoader.defineClass(ClassLoader.java:763)←ClassLoader.defineClass(ClassLoader.java:642)←UrlClassLoader._defineClass(UrlClassLoader.java:306)←UrlClassLoader.defineClass(UrlClassLoader.java:302)←UrlClassLoader._findClass(UrlClassLoader.java:271)←UrlClassLoader.findClass(UrlClassLoader.java:254)←ClassLoader.loadClass(ClassLoader.java:424)">
+        message="Lint found an issue registry (`butterknife.lint.LintRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 2 (3.2), current lint API level is 5 (3.5+)"
+        includedVariants="internalDebug"
+        excludedVariants="communityDebug,internalRelease,twilioRelease">
         <location
-            file="../../../../.gradle/caches/transforms-2/files-2.1/652aa7a6844fe44dcbec9e6d4d434f05/timber-4.1.0/jars/lint.jar"/>
+            file="../../../../../.gradle/caches/transforms-2/files-2.1/c7e74dea5b07108b2401d0743f373cab/butterknife-runtime-10.2.0/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`timber.lint.TimberIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 1 (3.1), current lint API level is 5 (3.5+)"
+        includedVariants="internalDebug"
+        excludedVariants="communityDebug,internalRelease,twilioRelease">
+        <location
+            file="../../../../../.gradle/caches/transforms-2/files-2.1/d0fd5c9689d0a1544b73d748b0dd5ecc/jetified-timber-4.7.1/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="CheckResult"
+        message="The result of `subscribe` is not used"
+        errorLine1="        authenticator"
+        errorLine2="        ^"
+        includedVariants="communityDebug"
+        excludedVariants="internalDebug,internalRelease,twilioRelease">
+        <location
+            file="src/community/java/com/twilio/video/app/ui/login/CommunityLoginActivity.java"
+            line="85"
+            column="9"/>
     </issue>
 
     <issue
@@ -15,8 +39,19 @@
         errorLine2="                                                                               ~~~~~~~~~~~">
         <location
             file="src/main/java/com/twilio/video/app/dialog/IceServersDialogFragment.java"
-            line="124"
+            line="127"
             column="80"/>
+    </issue>
+
+    <issue
+        id="OldTargetApi"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details."
+        errorLine1="        targetSdkVersion 28"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="41"
+            column="9"/>
     </issue>
 
     <issue
@@ -32,89 +67,12 @@
 
     <issue
         id="GradleDependency"
-        message="A newer version of com.android.support:design than 27.1.1 is available: 28.0.0"
-        errorLine1="    implementation &quot;com.android.support:design:${versions.designLibrary}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="A newer version of com.google.firebase:firebase-auth than 19.1.0 is available: 19.2.0"
+        errorLine1="    implementation &apos;com.google.firebase:firebase-auth:19.1.0&apos;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle"
-            line="126"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of com.android.support:preference-v14 than 27.1.1 is available: 28.0.0"
-        errorLine1="    implementation &quot;com.android.support:preference-v14:${versions.preferenceLibrary}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="127"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of com.android.support:support-v4 than 27.1.1 is available: 28.0.0"
-        errorLine1="    implementation &quot;com.android.support:support-v4:${versions.supportLibrary}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="134"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of com.google.firebase:firebase-core than 16.0.1 is available: 17.2.0"
-        errorLine1="    implementation &quot;com.google.firebase:firebase-core:${versions.firebase}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="136"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of com.google.firebase:firebase-auth than 16.0.2 is available: 19.1.0"
-        errorLine1="    implementation &quot;com.google.firebase:firebase-auth:${versions.firebaseAuth}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="137"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of com.crashlytics.sdk.android:crashlytics than 2.9.5 is available: 2.10.1"
-        errorLine1="    implementation &quot;com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="138"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of com.google.android.gms:play-services-auth than 15.0.1 is available: 17.0.0"
-        errorLine1="    implementation &quot;com.google.android.gms:play-services-auth:${versions.playServicesAuth}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="139"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="OutdatedLibrary"
-        message="This version is deprecated. Details:  Consider switching to recommended version 2.15."
-        errorLine1="    implementation &quot;com.google.dagger:dagger-android:${versions.dagger}&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="142"
+            line="154"
             column="5"/>
     </issue>
 
@@ -186,6 +144,17 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.ic_call_black_24dp` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_call_black_24dp.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.ic_call_white_24px` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -225,20 +194,6 @@
             file="src/main/res/mipmap-xxhdpi/ic_launcher_round.png"/>
         <location
             file="src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/internalDebug/res/mipmap-anydpi-v26/ic_launcher_round.xml"
-            line="2"
-            column="1"/>
-        <location
-            file="src/internalDebug/res/mipmap-hdpi/ic_launcher_round.png"/>
-        <location
-            file="src/internalDebug/res/mipmap-mdpi/ic_launcher_round.png"/>
-        <location
-            file="src/internalDebug/res/mipmap-xhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/internalDebug/res/mipmap-xxhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/internalDebug/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
     </issue>
 
     <issue
@@ -397,100 +352,12 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.client_name` appears to be unused"
-        errorLine1="    &lt;string name=&quot;client_name&quot;>Client Name&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.string.enable_ice` appears to be unused"
+        errorLine1="    &lt;string name=&quot;enable_ice&quot;>Enable ICE Options&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="5"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.username` appears to be unused"
-        errorLine1="    &lt;string name=&quot;username&quot;>Username&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="9"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.join_room` appears to be unused"
-        errorLine1="    &lt;string name=&quot;join_room&quot;>Join Room&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="10"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.registering` appears to be unused"
-        errorLine1="    &lt;string name=&quot;registering&quot;>Registering&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="11"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.video_client_status` appears to be unused"
-        errorLine1="    &lt;string name=&quot;video_client_status&quot;>Video Client Status&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="12"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.room_status` appears to be unused"
-        errorLine1="    &lt;string name=&quot;room_status&quot;>Room Status&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="13"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.video_constraints` appears to be unused"
-        errorLine1="    &lt;string name=&quot;video_constraints&quot;>Video Constraints&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="16"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.local` appears to be unused"
-        errorLine1="    &lt;string name=&quot;local&quot;>Local Media&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="20"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.remote` appears to be unused"
-        errorLine1="    &lt;string name=&quot;remote&quot;>Remote Media&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="21"
+            line="73"
             column="13"/>
     </issue>
 
@@ -501,7 +368,106 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="22"
+            line="74"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.client_name` appears to be unused"
+        errorLine1="    &lt;string name=&quot;client_name&quot;>Client Name&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="76"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.username` appears to be unused"
+        errorLine1="    &lt;string name=&quot;username&quot;>Username&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="79"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.join_room` appears to be unused"
+        errorLine1="    &lt;string name=&quot;join_room&quot;>Join Room&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="80"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.registering` appears to be unused"
+        errorLine1="    &lt;string name=&quot;registering&quot;>Registering&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="81"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.video_client_status` appears to be unused"
+        errorLine1="    &lt;string name=&quot;video_client_status&quot;>Video Client Status&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="82"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.room_status` appears to be unused"
+        errorLine1="    &lt;string name=&quot;room_status&quot;>Room Status&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="83"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.video_constraints` appears to be unused"
+        errorLine1="    &lt;string name=&quot;video_constraints&quot;>Video Constraints&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="84"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.local` appears to be unused"
+        errorLine1="    &lt;string name=&quot;local&quot;>Local Media&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="86"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.remote` appears to be unused"
+        errorLine1="    &lt;string name=&quot;remote&quot;>Remote Media&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="87"
             column="13"/>
     </issue>
 
@@ -512,7 +478,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="26"
+            line="89"
             column="13"/>
     </issue>
 
@@ -523,7 +489,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="27"
+            line="90"
             column="13"/>
     </issue>
 
@@ -534,18 +500,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="30"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.string.enable_ice` appears to be unused"
-        errorLine1="    &lt;string name=&quot;enable_ice&quot;>Enable ICE Options&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="31"
+            line="93"
             column="13"/>
     </issue>
 
@@ -556,7 +511,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="32"
+            line="94"
             column="13"/>
     </issue>
 
@@ -567,7 +522,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="34"
+            line="95"
             column="13"/>
     </issue>
 
@@ -578,7 +533,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="35"
+            line="96"
             column="13"/>
     </issue>
 
@@ -589,7 +544,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="36"
+            line="97"
             column="13"/>
     </issue>
 
@@ -600,7 +555,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="37"
+            line="98"
             column="13"/>
     </issue>
 
@@ -611,7 +566,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="38"
+            line="99"
             column="13"/>
     </issue>
 
@@ -622,7 +577,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="39"
+            line="100"
             column="13"/>
     </issue>
 
@@ -635,7 +590,7 @@
         excludedVariants="communityDebug">
         <location
             file="src/main/res/values/strings.xml"
-            line="88"
+            line="141"
             column="13"/>
     </issue>
 
@@ -646,7 +601,7 @@
         errorLine2="            ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="91"
+            line="142"
             column="13"/>
     </issue>
 
@@ -717,6 +672,13 @@
     </issue>
 
     <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-hdpi`: network_quality_level_0.png, network_quality_level_1.png, network_quality_level_2.png, network_quality_level_3.png, network_quality_level_4.png... (1 more)">
+        <location
+            file="src/main/res/drawable-hdpi"/>
+    </issue>
+
+    <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
         errorLine1="            &lt;EditText"
@@ -763,17 +725,6 @@
     </issue>
 
     <issue
-        id="ClickableViewAccessibility"
-        message="`onTouch` lambda should call `View#performClick` when a click is detected"
-        errorLine1="                (view, motionEvent) -> {"
-        errorLine2="                ^">
-        <location
-            file="src/main/java/com/twilio/video/app/ui/room/ClearableEditText.java"
-            line="97"
-            column="17"/>
-    </issue>
-
-    <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
         errorLine1="                &lt;ImageView"
@@ -791,7 +742,7 @@
         errorLine2="         ~~~~~~~~~">
         <location
             file="src/main/res/layout/participant_view.xml"
-            line="32"
+            line="35"
             column="10"/>
     </issue>
 
@@ -802,7 +753,7 @@
         errorLine2="             ~~~~~~~~~">
         <location
             file="src/main/res/layout/participant_view_primary.xml"
-            line="49"
+            line="56"
             column="14"/>
     </issue>
 
@@ -831,23 +782,12 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="            android:layout_gravity=&quot;bottom|left&quot;/>"
+        errorLine1="            android:layout_gravity=&quot;bottom|left&quot;"
         errorLine2="                                    ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/participant_view.xml"
-            line="38"
+            line="41"
             column="37"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="                android:layout_gravity=&quot;center|right&quot;"
-        errorLine2="                                        ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view_primary.xml"
-            line="44"
-            column="41"/>
     </issue>
 
     <issue
@@ -857,19 +797,8 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/participant_view_primary.xml"
-            line="45"
+            line="48"
             column="17"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="                android:layout_gravity=&quot;center|left&quot;"
-        errorLine2="                                        ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view_primary.xml"
-            line="53"
-            column="41"/>
     </issue>
 
     <issue
@@ -879,7 +808,7 @@
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/participant_view_primary.xml"
-            line="54"
+            line="60"
             column="17"/>
     </issue>
 

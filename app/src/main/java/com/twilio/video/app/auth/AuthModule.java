@@ -22,16 +22,12 @@ import android.content.SharedPreferences;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
-
+import dagger.Module;
+import dagger.Provides;
 import java.util.ArrayList;
 import java.util.List;
 
-import dagger.Module;
-import dagger.Provides;
-
-@Module(includes = {
-        ApplicationModule.class
-})
+@Module(includes = {ApplicationModule.class})
 public class AuthModule {
 
     @Provides
@@ -50,8 +46,7 @@ public class AuthModule {
                         new GoogleSignInWrapper(),
                         new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
                         new GoogleAuthProviderWrapper(),
-                        sharedPreferences)
-        );
+                        sharedPreferences));
         authenticators.add(new EmailAuthenticator(firebaseWrapper, sharedPreferences));
         return new FirebaseAuthenticator(firebaseWrapper, authenticators);
     }

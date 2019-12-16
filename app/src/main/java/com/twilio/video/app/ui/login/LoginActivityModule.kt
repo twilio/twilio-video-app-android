@@ -29,5 +29,6 @@ abstract class LoginActivityModule {
     @IntoMap
     @ActivityKey(LoginActivity::class)
     internal abstract fun bindYourActivityInjectorFactory(
-            builder: LoginActivitySubcomponent.Builder): AndroidInjector.Factory<out Activity>
+        builder: LoginActivitySubcomponent.Builder
+    ): AndroidInjector.Factory<out Activity>
 }
