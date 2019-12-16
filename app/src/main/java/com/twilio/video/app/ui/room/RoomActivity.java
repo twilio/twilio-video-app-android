@@ -25,8 +25,10 @@ import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
@@ -35,6 +37,7 @@ import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -100,6 +103,8 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.Vp8Codec;
 import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.R;
+import com.twilio.video.app.ScreenCapturerService;
+import com.twilio.video.app.ScreenCapturerService.LocalBinder;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
@@ -263,6 +268,9 @@ public class RoomActivity extends BaseActivity {
     /** Disposes {@link VideoAppService} requests when activity is destroyed. */
     private final CompositeDisposable rxDisposables = new CompositeDisposable();
 
+    ScreenCapturerService mService;
+    boolean mBound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -292,6 +300,21 @@ public class RoomActivity extends BaseActivity {
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
         requestPermissions();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+        Intent intent = new Intent(this, ScreenCapturerService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(connection);
+        mBound = false;
     }
 
     @Override
@@ -400,12 +423,21 @@ public class RoomActivity extends BaseActivity {
 
                 if (item.getTitle().equals(shareScreen)) {
                     if (screenCapturer == null) {
-                        requestScreenCapturePermission();
+                        if (mBound) {
+                            mService.startForeground();
+                            requestScreenCapturePermission();
+                        }
                     } else {
-                        startScreenCapture();
+                        if (mBound) {
+                            mService.startForeground();
+                            startScreenCapture();
+                        }
                     }
                 } else {
-                    stopScreenCapture();
+                    if (mBound) {
+                        mService.endForeground();
+                        stopScreenCapture();
+                    }
                 }
 
                 return true;
@@ -1917,4 +1949,23 @@ public class RoomActivity extends BaseActivity {
                                 this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PermissionChecker.PERMISSION_GRANTED;
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to ScreenCapturerService, cast the IBinder and get ScreenCapturerService instance
+            LocalBinder binder = (LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+
+    };
 }
