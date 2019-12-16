@@ -305,7 +305,7 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Bind to LocalService
+        // Bind to ScreenCapturerService
         Intent intent = new Intent(this, ScreenCapturerService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
