@@ -21,8 +21,22 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.fragment.app.DialogFragment
-import androidx.preference.*
-import com.twilio.video.*
+import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import com.twilio.video.AudioCodec
+import com.twilio.video.G722Codec
+import com.twilio.video.H264Codec
+import com.twilio.video.IsacCodec
+import com.twilio.video.OpusCodec
+import com.twilio.video.PcmaCodec
+import com.twilio.video.PcmuCodec
+import com.twilio.video.Video
+import com.twilio.video.VideoCodec
+import com.twilio.video.Vp8Codec
+import com.twilio.video.Vp9Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
@@ -129,14 +143,17 @@ class SettingsActivity : BaseActivity() {
                     dialogFragment.setTargetFragment(this, 0)
                     dialogFragment.show(requireFragmentManager(), PREFERENCE_FRAGMENT_TAG)
                 }
-
             } else {
                 super.onDisplayPreferenceDialog(preference)
             }
         }
 
         private fun setupCodecListPreference(
-                codecClass: Class<*>, key: String, defaultValue: String, preference: ListPreference?) {
+            codecClass: Class<*>,
+            key: String,
+            defaultValue: String,
+            preference: ListPreference?
+        ) {
             if (preference == null) {
                 return
             }
@@ -160,8 +177,9 @@ class SettingsActivity : BaseActivity() {
             private val PREFERENCE_FRAGMENT_TAG = "android.support.v7.preference.PreferenceFragment.DIALOG"
 
             internal fun newInstance(
-                    sharedPreferences: SharedPreferences,
-                    logoutClickListener: Preference.OnPreferenceClickListener): SettingsFragment {
+                sharedPreferences: SharedPreferences,
+                logoutClickListener: Preference.OnPreferenceClickListener
+            ): SettingsFragment {
                 val settingsFragment = SettingsFragment()
 
                 settingsFragment.logoutClickListener = logoutClickListener

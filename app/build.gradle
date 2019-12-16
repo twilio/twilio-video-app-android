@@ -21,7 +21,7 @@ def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
         "com.twilio:video-android:5.1.0")
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     lintOptions {
