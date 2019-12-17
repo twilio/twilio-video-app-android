@@ -1,5 +1,6 @@
 package com.twilio.video.app;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,14 +8,18 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
 
+@TargetApi(29)
 public class ScreenCapturerService extends Service {
+    private static final String CHANNEL_ID = "screen_capture_channel_01";
+    private static final String CHANNEL_NAME = "Screen Capture Notification Channel";
+
     // Binder given to clients
     private final IBinder binder = new LocalBinder();
+
     /**
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -37,19 +42,17 @@ public class ScreenCapturerService extends Service {
     }
 
     public void startForeground() {
-        if (Build.VERSION.SDK_INT >= 29) {
-            String CHANNEL_ID = "screen_capture_channel_01";
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Screen Capture Notification Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT);
 
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
 
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("")
-                    .setContentText("").build();
-            startForeground(1, notification);
-        }
+        final int notificationId = (int) System.currentTimeMillis();
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("")
+                .setContentText("").build();
+        startForeground(notificationId, notification);
     }
 
     public void endForeground() {
