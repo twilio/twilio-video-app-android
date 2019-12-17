@@ -16,12 +16,6 @@
 
 package com.twilio.video.app.ui.room;
 
-import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
-import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
-import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
-import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
-import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
-
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -51,6 +45,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -59,10 +54,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnTextChanged;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.twilio.androidenv.Env;
 import com.twilio.video.AspectRatio;
@@ -113,26 +105,38 @@ import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.settings.SettingsActivity;
-import com.twilio.video.app.util.BuildConfigUtils;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 import timber.log.Timber;
+
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
+import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
+import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
+import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
 public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -397,8 +401,10 @@ public class RoomActivity extends BaseActivity {
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
 
-        // Screen sharing only available on lollipop and up
-        screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+        if (mBound) {
+            // Screen sharing only available on lollipop and up
+            screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+        }
 
         return true;
     }
@@ -420,26 +426,17 @@ public class RoomActivity extends BaseActivity {
                 return true;
             case R.id.share_screen_menu_item:
                 String shareScreen = getString(R.string.share_screen);
-
                 if (item.getTitle().equals(shareScreen)) {
+                    mService.startForeground();
                     if (screenCapturer == null) {
-                        if (mBound) {
-                            mService.startForeground();
-                            requestScreenCapturePermission();
-                        }
+                        requestScreenCapturePermission();
                     } else {
-                        if (mBound) {
-                            mService.startForeground();
-                            startScreenCapture();
-                        }
+                        startScreenCapture();
                     }
                 } else {
-                    if (mBound) {
-                        mService.endForeground();
-                        stopScreenCapture();
-                    }
+                    mService.endForeground();
+                    stopScreenCapture();
                 }
-
                 return true;
             case R.id.pause_audio_menu_item:
                 toggleLocalAudioTrackState();
@@ -1960,6 +1957,10 @@ public class RoomActivity extends BaseActivity {
             LocalBinder binder = (LocalBinder) service;
             mService = binder.getService();
             mBound = true;
+            if (screenCaptureMenuItem != null) {
+                // Screen sharing only available on lollipop and up
+                screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+            }
         }
 
         @Override
