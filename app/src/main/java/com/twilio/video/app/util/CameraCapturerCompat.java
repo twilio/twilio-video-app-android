@@ -18,7 +18,6 @@ package com.twilio.video.app.util;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
@@ -154,11 +153,11 @@ public class CameraCapturerCompat {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private boolean isCameraIdSupported(String cameraId) {
         boolean isMonoChromeSupported = false;
-        boolean isPrivateImageFormatSupported;
+        boolean isPrivateImageFormatSupported = false;
         CameraCharacteristics cameraCharacteristics;
         try {
             cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -169,27 +168,27 @@ public class CameraCapturerCompat {
          */
         final StreamConfigurationMap streamMap =
                 cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        isPrivateImageFormatSupported = streamMap.isOutputSupportedFor(ImageFormat.PRIVATE);
+
+        if (streamMap != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            isPrivateImageFormatSupported = streamMap.isOutputSupportedFor(ImageFormat.PRIVATE);
+        }
 
         /*
          * Read the color filter arrangements of the camera to filter out the ones that support
          * SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO or SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR.
          * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
          */
-        final int colorFilterArrangement =
+        Integer colorFilterArrangement =
                 cameraCharacteristics.get(
                         CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT);
+        assert colorFilterArrangement != null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             isMonoChromeSupported =
-                    (colorFilterArrangement
-                                            == CameraMetadata
-                                                    .SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO
-                                    || colorFilterArrangement
-                                            == CameraMetadata
-                                                    .SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR)
-                            ? true
-                            : false;
+                    colorFilterArrangement
+                                    == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO
+                            || colorFilterArrangement
+                                    == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR;
         }
         return isPrivateImageFormatSupported && !isMonoChromeSupported;
     }
