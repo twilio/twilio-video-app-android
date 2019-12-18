@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/stats_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView
+        android:id="@+id/stats_track_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Stats.TextTrack"
+        android:layout_marginTop="10dp"/>
+    <View
+        android:id="@+id/stats_item_line"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="@color/colorFadedRed"
+        android:layout_below="@+id/stats_track_name"
+        android:paddingTop="8dp"
+        android:layout_marginTop="5dp"/>
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/stats_item_line">
+
+        <TableRow android:id="@+id/stats_track_sid_row">
+            <TextView
+                android:id="@+id/stats_track_sid_title"
+                android:text="@string/stats_track_sid"
+                android:gravity="start"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_track_sid_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_codec_row">
+            <TextView
+                android:id="@+id/stats_codec_title"
+                android:text="@string/stats_codec"
+                android:gravity="start"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_codec_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_packets_row">
+            <TextView
+                android:id="@+id/stats_packets_title"
+                android:text="@string/stats_packets"
+                android:gravity="start"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_packets_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_bytes_row">
+            <TextView
+                android:id="@+id/stats_bytes_title"
+                android:text="@string/stats_bytes_sent"
+                android:gravity="start"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_bytes_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_rtt_row">
+            <TextView
+                android:id="@+id/stats_rtt_title"
+                android:gravity="start"
+                android:text="@string/stats_rtt"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_rtt_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_jitter_row">
+            <TextView
+                android:id="@+id/stats_jitter_title"
+                android:gravity="start"
+                android:text="@string/stats_jitter"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_jitter_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_audio_level_row">
+            <TextView
+                android:id="@+id/stats_audio_level_title"
+                android:gravity="start"
+                android:text="@string/stats_audio_level"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_audio_level_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_dimensions_row">
+            <TextView
+                android:id="@+id/stats_dimensions_title"
+                android:gravity="start"
+                android:text="@string/stats_dimensions"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_dimensions_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+
+        <TableRow android:id="@+id/stats_framerate_row">
+            <TextView
+                android:id="@+id/stats_framerate_title"
+                android:gravity="start"
+                android:text="@string/stats_framerate"
+                style="@style/Stats.TextTitle"/>
+            <TextView
+                android:id="@+id/stats_framerate_value"
+                android:gravity="start"
+                style="@style/Stats.TextValue"/>
+        </TableRow>
+    </TableLayout>
+</RelativeLayout>

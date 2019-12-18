@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/participant_background"
+    android:layout_width="96dp"
+    android:layout_height="148dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp">
+
+    <!-- RemoteParticipant layout with video track -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/participant_video_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.twilio.video.VideoTextureView
+            android:id="@+id/participant_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:overlaySurface="true"/>
+
+        <TextView
+            android:id="@+id/participant_video_identity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/participantBackground"
+            android:padding="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/dominant_speaker_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_dominant_speaker_img"
+            android:visibility="gone"
+            android:layout_gravity="bottom|left"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/participant_stroke"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- RemoteParticipant layout without video track -->
+
+    <RelativeLayout
+        android:id="@+id/participant_selected_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/participant_selected_background">
+
+        <ImageView
+            android:id="@+id/participant_stub_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/profile_picture"
+            app:srcCompat="@drawable/ic_account_circle_white_24dp" />
+
+        <TextView
+            android:id="@+id/participant_selected_identity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/participant_stub_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
+    <!-- RemoteParticipant audio toggle -->
+
+    <ImageView
+        android:id="@+id/participant_no_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:contentDescription="@string/audio_toggle"
+        app:srcCompat="@drawable/ic_thumbnail_no_audio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/network_quality_level_img"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="6dp"
+        app:srcCompat="@drawable/network_quality_level_5"
+        android:contentDescription="@string/settings_screen_enable_network_quality_level_description"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
