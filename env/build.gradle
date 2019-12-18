@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "${versions.buildTools}"
+    buildToolsVersion versions.buildTools
 
     lintOptions {
         warningsAsErrors true

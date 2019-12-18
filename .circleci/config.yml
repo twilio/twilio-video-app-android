@@ -51,18 +51,16 @@ aliases:
     name: Install secrets
     command: |
       # Internal debug google services
-      mkdir -p app/src/internal/debug || true
-      cp secrets/internal-debug-google-services.json app/src/internal/debug/google-services.json
+      mkdir -p videoapp/app/src/internal/debug || true
+      cp secrets/internal-debug-google-services.json videoapp/app/src/internal/debug/google-services.json
       # Internal release google services
-      mkdir -p app/src/internal/release || true
-      cp secrets/internal-release-google-services.json app/src/internal/release/google-services.json
+      mkdir -p videoapp/app/src/internal/release || true
+      cp secrets/internal-release-google-services.json videoapp/app/src/internal/release/google-services.json
       # Twilio release google services
-      mkdir -p app/src/twilio/release || true
-      cp secrets/twilio-release-google-services.json app/src/twilio/release/google-services.json
+      mkdir -p videoapp/app/src/twilio/release || true
+      cp secrets/twilio-release-google-services.json videoapp/app/src/twilio/release/google-services.json
       # Video Android Twilio Credentials
       echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > library/twilio-video.json
-      # Video App Development Variant Credentials
-      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > app/twilio-video-app.json
       # Android Keystore
       mkdir -p ~/.gradle
       echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
@@ -212,21 +210,59 @@ jobs:
       - run: *install-secrets
       - run: *install-cmake
       - run: *install-bbe
+      - run:
+          name: Store Test Credentials
+          command: echo $TEST_CREDENTIALS_JSON | base64 -di > videoapp/app/src/androidTest/assets/Credentials/TestCredentials.json
 
       # Build app
       - run:
           name: Build App
-          command: ./gradlew -q app:assemble
+          command: ./gradlew -q app:assemble app:assembleAndroidTest
 
       # Save the builds to workspace
       - persist_to_workspace:
           root: .
           paths:
-            - app/build
+            - videoapp/app/build
 
       # Save cache
       - save-cache: *save-cache-android-ndk
       - save-cache: *save-cache-gradle
+
+  app-unit-tests:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *create-android-ndk-directory
+      - restore-cache: *restore-cache-android-ndk
+      - run: *install-android-ndk
+      - run: *install-secrets
+      - run: *install-cmake
+      - run: *install-bbe
+      - run:
+          name: Unit Tests
+          command: ./gradlew app:testInternalDebugUnitTest
+      - save-cache: *save-cache-gradle
+
+  app-ui-tests:
+    <<: *test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+      # Execute tests
+      - run:
+          name: UI Tests
+          command: |
+            pushd videoapp
+            gcloud firebase test android run --no-record-video --project video-app-79418 ui-test-args.yaml:ui-tests
+            popd
 
   build-compatibility:
     <<: *build-defaults
@@ -337,7 +373,7 @@ jobs:
           path: apkscale/build/reports/lint-results.html
           prefix: apkscale
       - store_artifacts:
-          path: app/build/reports/lint-results.html
+          path: videoapp/app/build/reports/lint-results.html
           prefix: app
       - store_artifacts:
           path: env/build/reports/lint-results.html
@@ -590,33 +626,6 @@ jobs:
       - save-cache: *save-cache-android-ndk
       - save-cache: *save-cache-gradle
 
-  publish-app-snapshot:
-    <<: *build-defaults
-    resource_class: large
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-
-      # Publish app snapshot
-      - run:
-          name: Publish App Snapshot
-          command: >
-                    ./gradlew -q
-                    -Psnapshot=true
-                    app:uploadInternalReleaseToHockeyApp
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
   publish-library-rc:
     <<: *build-defaults
     resource_class: xlarge
@@ -667,10 +676,15 @@ jobs:
       # Publish app RC
       - run:
           name: Publish App RC
-          command: >
-                    ./gradlew -q
-                    -PreleaseCandidate=true
-                    app:uploadInternalReleaseToHockeyApp
+          command: |
+            # TODO Ticket to improve build time here https://issues.corp.twilio.com/browse/AHOYAPPS-67
+            # TODO Ticket to add latest changelog update https://issues.corp.twilio.com/browse/AHOYAPPS-94
+            ./gradlew -q -PreleaseCandidate=true app:assembleInternalRelease
+            sudo npm install webpack
+            echo no | sudo npm install -g appcenter-cli
+            appcenter login --token $APPCENTER_API_TOKEN
+            # TODO Define a better version schema rather than using the SDK version
+            appcenter distribute release -f videoapp/app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-Internal -b $CIRCLE_TAG
 
       # Save cache
       - save-cache: *save-cache-android-ndk
@@ -740,6 +754,12 @@ workflows:
             - setup-workspace
 
       # Test
+      - app-unit-tests:
+          requires:
+            - build-app
+      - app-ui-tests:
+          requires:
+            - build-app
       - unit-test:
           requires:
               - build-library
@@ -777,9 +797,6 @@ workflows:
 
       # Publish
       - publish-library-snapshot:
-          <<: *snapshot-defaults
-
-      - publish-app-snapshot:
           <<: *snapshot-defaults
 
   release-candidate:

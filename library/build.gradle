@@ -16,7 +16,7 @@ configurations {
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "${versions.buildTools}"
+    buildToolsVersion versions.buildTools
 
     packagingOptions {
         exclude 'META-INF/LICENSE'

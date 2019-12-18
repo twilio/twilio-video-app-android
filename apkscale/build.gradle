@@ -8,7 +8,7 @@ println("Video Android SDK Dep -> ${videoAndroidSdkDep}")
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "${versions.buildTools}"
+    buildToolsVersion versions.buildTools
 
     lintOptions {
         warningsAsErrors true
