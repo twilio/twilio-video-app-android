@@ -5,4 +5,5 @@ ui-tests:
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
     - {model: flo, version: 21}
+    - {model: Nexus9, version: 24}
     - {model: blueline, version: 29}
