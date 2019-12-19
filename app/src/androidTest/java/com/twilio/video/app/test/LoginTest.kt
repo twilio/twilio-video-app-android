@@ -14,7 +14,10 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.twilio.video.app.*
+import com.twilio.video.app.EmailCredentials
+import com.twilio.video.app.R
+import com.twilio.video.app.TestCredentials
+import com.twilio.video.app.retryViewMatcher
 import com.twilio.video.app.screen.assertGoogleSignInButtonIsVisible
 import com.twilio.video.app.screen.assertSignInErrorIsVisible
 import com.twilio.video.app.screen.loginWithEmail
@@ -45,7 +48,7 @@ class LoginTest {
     fun `it_should_not_login_successfully_with_email`() {
         retrieveEmailCredentials()
         loginWithWrongEmailCreds(emailCredentials)
-        retryViewMatcher{ assertSignInErrorIsVisible() }
+        retryViewMatcher { assertSignInErrorIsVisible() }
     }
 
     private fun retrieveEmailCredentials() {
