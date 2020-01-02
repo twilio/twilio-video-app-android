@@ -6,4 +6,4 @@ ui-tests:
   device:
     - {model: hammerhead, version: 21}
     - {model: Nexus9, version: 24}
-    - {model: blueline, version: 29}
+    - {model: flame, version: 29}
