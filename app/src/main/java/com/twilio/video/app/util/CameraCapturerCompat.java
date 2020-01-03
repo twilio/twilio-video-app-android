@@ -181,9 +181,8 @@ public class CameraCapturerCompat {
         Integer colorFilterArrangement =
                 cameraCharacteristics.get(
                         CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT);
-        assert colorFilterArrangement != null;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && colorFilterArrangement != null) {
             isMonoChromeSupported =
                     colorFilterArrangement
                                     == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO
