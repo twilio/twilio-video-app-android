@@ -521,7 +521,7 @@ public class RoomActivity extends BaseActivity {
     void toggleLocalAudio() {
         int icon;
         if (localAudioTrack == null) {
-            localAudioTrack = LocalAudioTrack.create(this, true);
+            localAudioTrack = LocalAudioTrack.create(this, true, "microphone");
             if (localParticipant != null && localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
             }
@@ -552,7 +552,7 @@ public class RoomActivity extends BaseActivity {
             // add local camera track
             cameraVideoTrack =
                     LocalVideoTrack.create(
-                            this, true, cameraCapturer.getVideoCapturer(), videoConstraints);
+                            this, true, cameraCapturer.getVideoCapturer(), videoConstraints, "camera");
             if (localParticipant != null && cameraVideoTrack != null) {
                 localParticipant.publishTrack(cameraVideoTrack);
 
@@ -752,7 +752,7 @@ public class RoomActivity extends BaseActivity {
 
     /** Initialize local media and provide stub participant for primary view. */
     private void setupLocalMedia() {
-        localAudioTrack = LocalAudioTrack.create(this, true);
+        localAudioTrack = LocalAudioTrack.create(this, true, "microphone");
         setupLocalVideoTrack();
         renderLocalParticipantStub();
     }
@@ -768,7 +768,7 @@ public class RoomActivity extends BaseActivity {
 
         cameraVideoTrack =
                 LocalVideoTrack.create(
-                        this, true, cameraCapturer.getVideoCapturer(), videoConstraints);
+                        this, true, cameraCapturer.getVideoCapturer(), videoConstraints, "camera");
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(
                     cameraVideoTrack.getName(), getString(R.string.camera_video_track));
@@ -968,7 +968,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void startScreenCapture() {
-        screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer);
+        screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer, "screen");
 
         if (screenVideoTrack != null) {
             screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
