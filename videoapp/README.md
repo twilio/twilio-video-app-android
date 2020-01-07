@@ -67,10 +67,6 @@ For each device:
 * Android Studio - Right click and run unit tests on package ```app/src/main/java/com/twilio/video/app```
 * Terminal - ```./gradlew app:testInternalDebugUnitTest```
 
-# Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for information on how to help contribute to this app.
-
 ## Code of Conduct
 
 This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project administrators.

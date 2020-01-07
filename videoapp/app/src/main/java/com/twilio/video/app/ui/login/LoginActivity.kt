@@ -131,6 +131,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // TODO Provide more detailed error handling as part of https://issues.corp.twilio.com/browse/AHOYAPPS-153
     private fun processError() {
+        progressDialog.dismiss()
         showUnauthorizedEmailDialog()
     }
 
@@ -140,10 +141,6 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
                 .setMessage(getString(R.string.login_screen_auth_error_desc))
                 .setPositiveButton("OK", null)
                 .show()
-    }
-
-    private fun dismissAuthenticatingDialog() {
-        progressDialog.dismiss()
     }
 
     internal fun showAuthenticatingDialog() {
@@ -157,7 +154,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     private fun onSignInSuccess() {
         disposables.clear()
-        dismissAuthenticatingDialog()
+        progressDialog.dismiss()
         startLobbyActivity()
     }
 }

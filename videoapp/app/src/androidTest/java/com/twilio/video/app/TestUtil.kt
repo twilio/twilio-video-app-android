@@ -3,7 +3,7 @@ package com.twilio.video.app
 import androidx.test.espresso.NoMatchingViewException
 import java.util.concurrent.TimeoutException
 
-fun retryViewMatcher(espressoAction: () -> Unit, timeoutInSeconds: Long = 30000L) {
+fun retryViewMatcher(timeoutInSeconds: Long = 60000L, espressoAction: () -> Unit) {
     val startTime = System.currentTimeMillis()
     var currentTime = 0L
     while (currentTime <= timeoutInSeconds) {
