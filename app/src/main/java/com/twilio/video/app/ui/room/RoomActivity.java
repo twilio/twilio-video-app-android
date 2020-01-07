@@ -552,7 +552,11 @@ public class RoomActivity extends BaseActivity {
             // add local camera track
             cameraVideoTrack =
                     LocalVideoTrack.create(
-                            this, true, cameraCapturer.getVideoCapturer(), videoConstraints, "camera");
+                            this,
+                            true,
+                            cameraCapturer.getVideoCapturer(),
+                            videoConstraints,
+                            "camera");
             if (localParticipant != null && cameraVideoTrack != null) {
                 localParticipant.publishTrack(cameraVideoTrack);
 
