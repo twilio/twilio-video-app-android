@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/ice_options_layout"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/ice_policy_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ice_transp_policy"
+        android:textSize="15sp"
+        android:layout_margin="@dimen/activity_horizontal_margin" />
+    <Spinner
+        android:id="@+id/ice_trans_policy_spinner"
+        android:layout_below="@id/ice_policy_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_gravity="center_horizontal" />
+    <TextView
+        android:id="@+id/ice_servers_list_text"
+        android:layout_below="@id/ice_trans_policy_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ice_servers_list_desc"
+        android:textSize="15sp"
+        android:layout_margin="@dimen/activity_horizontal_margin" />
+    <ListView
+        android:id="@+id/ice_servers_list_view"
+        android:layout_below="@id/ice_servers_list_text"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:choiceMode="multipleChoice"/>
+</RelativeLayout>
