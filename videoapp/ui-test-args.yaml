@@ -1,8 +1,0 @@
-ui-tests:
-  timeout: 30m
-  type: instrumentation
-  app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
-  test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
-  device:
-    - {model: flo, version: 21}
-    - {model: blueline, version: 29}
