@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RangeBarPreference">
+        <attr name="entries" format="reference" />
+        <attr name="startKey" format="string" />
+        <attr name="endKey" format="string" />
+        <attr name="startTick" format="integer" />
+        <attr name="endTick" format="integer" />
+        <attr name="pinRadius" format="dimension" />
+        <attr name="height" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="ClearableEditText">
+        <attr name="clearIcon" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="ParticipantView">
+        <attr name="state" format="enum">
+            <enum name="video" value="0"/>
+            <enum name="no_video" value="1"/>
+            <enum name="selected" value="2"/>
+        </attr>
+        <attr name="identity" format="reference"/>
+        <attr name="mirror" format="boolean" />
+        <attr name="type" format="enum">
+            <enum name="fit" value="0"/>
+            <enum name="fill" value="1"/>
+            <enum name="balanced" value="2"/>
+        </attr>
+        <attr name="overlaySurface" format="boolean" />
+    </declare-styleable>
+</resources>

@@ -1,21 +1,9 @@
-version: 2.0
+version: 2.17.3
 
 aliases:
   # Workspace
   - &workspace
-    ~/twilio-video-android
-
-  # Cache
-  - &android-ndk-cache-key
-    key: android-ndk-r16b-{{ checksum "scripts/install-android-ndk.sh" }}
-  - &restore-cache-android-ndk
-    <<: *android-ndk-cache-key
-    name: Restore Android NDK
-  - &save-cache-android-ndk
-    <<: *android-ndk-cache-key
-    name: Save Android NDK Cache
-    paths:
-      - /opt/android-ndk
+      ~/twilio-video-app-android
 
   - &gradle-cache-key
     key: jars-{{ checksum "build.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
@@ -28,208 +16,76 @@ aliases:
     paths:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
-
-  # Dependencies
-  - &create-android-ndk-directory
-    name: Create Android NDK Directory
-    command: |
-      if [[ ! -e /opt/android-ndk ]]; then
-        sudo mkdir /opt/android-ndk
-      fi
-      sudo chown ${USER:=$(/usr/bin/id -run)}:$USER /opt/android-ndk
-  - &install-android-ndk
-    name: Install Android NDK
-    command: scripts/install-android-ndk.sh
-
-  - &decrypt-secrets
-    name: Decrypt secrets
-    command: |
-      # Untar secrets
-      openssl aes-256-cbc -K $encrypted_7f5144414b5d_key -iv $encrypted_7f5144414b5d_iv -in secrets.tar.enc -out secrets.tar -d
-      tar -xf secrets.tar
-  - &install-secrets
-    name: Install secrets
+  - &get-secrets
+    name: Setup google services
     command: |
       # Internal debug google services
-      mkdir -p videoapp/app/src/internal/debug || true
-      cp secrets/internal-debug-google-services.json videoapp/app/src/internal/debug/google-services.json
+      mkdir -p app/src/internal/debug || true
+      echo $GOOGLE_SERVICES_INTERNAL_DEBUG_JSON | base64 -di > app/src/internal/debug/google-services.json
       # Internal release google services
-      mkdir -p videoapp/app/src/internal/release || true
-      cp secrets/internal-release-google-services.json videoapp/app/src/internal/release/google-services.json
+      mkdir -p app/src/internal/release || true
+      echo $GOOGLE_SERVICES_INTERNAL_RELEASE_JSON | base64 -di > app/src/internal/release/google-services.json
       # Twilio release google services
-      mkdir -p videoapp/app/src/twilio/release || true
-      cp secrets/twilio-release-google-services.json videoapp/app/src/twilio/release/google-services.json
-      # Video Android Twilio Credentials
-      echo $TWILIO_VIDEO_ANDROID_FTL_CREDENTIALS | base64 -di > library/twilio-video.json
-      # Android Keystore
+      mkdir -p app/src/twilio/release || true
+      echo $GOOGLE_SERVICES_TWILIO_RELEASE_JSON | base64 -di > app/src/twilio/release/google-services.json
+      # Gradle Properties
       mkdir -p ~/.gradle
+      mkdir -p $PWD/secrets
+      echo $VIDEO_APP_KEYSTORE | base64 -d > $PWD/secrets/android.keystore
       echo "androidKeystore=$PWD/secrets/android.keystore" >> ~/.gradle/gradle.properties
-      echo "androidKeystorePassword=$ANDROID_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
-      echo "androidReleaseKeyAlias=$ANDROID_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
-      echo "androidReleaseKeyPassword=$ANDROID_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "androidKeystorePassword=$VIDEO_APP_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyAlias=$VIDEO_APP_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
+      echo "androidReleaseKeyPassword=$VIDEO_APP_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
       echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
-  - &install-cmake
-    name: Install Cmake
-    command:
-      sdkmanager "cmake;3.6.4111459"
-  - &install-bbe
-    name: Install bbe
-    command:
-      sudo apt-get install bbe
-  - &gcloud-auth
-    name: Google Cloud Auth
-    command: >
-              gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com
-              --key-file=secrets/video-app-46437ca14fdd.json
-
-  # Trigger QE tests
-  - &trigger-qe-tests
-    name: Trigger QE tests
-    command: |
-      curl --silent --output /dev/null -u "$CIRCLECI_API_AUTH_TOKEN": -X POST \
-      --header "Content-Type: application/json" \
-      -d '{"branch":"'V${CIRCLE_TAG:0:1}'","parameters":{"rc-version":"'$CIRCLE_TAG'","rc-testing":true}}' \
-      $SDKS_QE_CIRCLECI_VIDEO_ANDROID_TESTS_ENDPOINT
-
-  # Configure git user
-  - &configure-git-user
-    name: Configure git user
-    command: |
-      git config --global user.email "twilio-sdk-build@twilio.com"
-      git config --global user.name "twilio-sdk-build"
-
-  # Filters
-  - &filter-snapshot
-    branches:
-      only:
-        - "master"
 
   # Containers
   - &build-defaults
     working_directory: *workspace
     docker:
-      - image: circleci/android:api-28-node@sha256:a8d15723766a8f32f1a4ead42c5441bb0ded2e832329291cb4bbd9f1d1557721
+      - image: circleci/android:api-28-node
     environment:
       - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
-  - &test-defaults
+  - &ui-test-defaults
     working_directory: *workspace
     docker:
       - image: google/cloud-sdk:latest
     environment:
     resource_class: medium+
 
-  - &snapshot-defaults
-    filters: *filter-snapshot
-    requires:
-        - check-format
-        - check-library-size
-        - unit-test
-        - integration-media-tests
-        - integration-codec-tests
-        - integration-track-tests
-        - integration-participant-tests
-        - integration-stats-tests
-        - integration-room-tests
-        - integration-recording-tests
-        - integration-network-tests
-
-  - &rc-defaults
-    filters:
-      tags:
-        only:
-          - /^\d+\.\d+\.\d+-rc\d+$/
-          - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
-          - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
-      branches:
-        ignore: /.*/
-
-  - &release-defaults
-    filters:
-      tags:
-        only:
-          - /^\d+\.\d+\.\d+$/
-          - /^\d+\.\d+\.\d+-preview\d+$/
-          - /^\d+\.\d+\.\d+-beta\d+$/
-      branches:
-        ignore: /.*/
+  - &gcloud-auth
+    name: Google Cloud Auth
+    command: >
+      echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
 
 jobs:
-  setup-workspace:
+  lint:
     <<: *build-defaults
-    resource_class: medium+
+    resource_class: large
     steps:
-      # Setup code and workspace for downstream jobs
       - checkout
       - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *decrypt-secrets
-      - persist_to_workspace:
-          root: .
-          paths:
-            - secrets
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
+      - run: *get-secrets
+      - run:
+          name: Lint
+          command: ./gradlew -q lint
+      - store_artifacts:
+          path: app/build/reports/lint-results.html
+          prefix: app
       - save-cache: *save-cache-gradle
 
   check-format:
     <<: *build-defaults
     resource_class: medium+
     steps:
-      # Setup
       - checkout
       - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-
-      # Run spotless check
       - run:
           name: Spotless Check
           command: ./gradlew -q spotlessCheck
-
-      # Save cache
       - save-cache: *save-cache-gradle
-      - save-cache: *save-cache-android-ndk
 
   build-app:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-      - run:
-          name: Store Test Credentials
-          command: echo $TEST_CREDENTIALS_JSON | base64 -di > videoapp/app/src/androidTest/assets/Credentials/TestCredentials.json
-
-      # Build app
-      - run:
-          name: Build App
-          command: ./gradlew -q app:assemble app:assembleAndroidTest
-
-      # Save the builds to workspace
-      - persist_to_workspace:
-          root: .
-          paths:
-            - videoapp/app/build
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  app-unit-tests:
     <<: *build-defaults
     resource_class: large
     steps:
@@ -237,19 +93,35 @@ jobs:
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
+      - run: *get-secrets
+      - run:
+          name: Store Test Credentials
+          command: echo $TEST_CREDENTIALS_JSON | base64 -di > app/src/androidTest/assets/Credentials/TestCredentials.json
+      - run:
+          name: Build App
+          command: ./gradlew -q app:assemble app:assembleAndroidTest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/build
+      - save-cache: *save-cache-gradle
+
+  unit-tests:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
       - run:
           name: Unit Tests
           command: ./gradlew app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
 
-  app-ui-tests:
-    <<: *test-defaults
+  ui-tests:
+    <<: *ui-test-defaults
     steps:
       # Setup
       - checkout
@@ -259,578 +131,51 @@ jobs:
       # Execute tests
       - run:
           name: UI Tests
-          command: |
-            pushd videoapp
-            gcloud firebase test android run --no-record-video --project video-app-79418 ui-test-args.yaml:ui-tests
-            popd
+          command: >
+            gcloud firebase test android run --no-record-video --project video-app-79418
+            ui-test-args.yaml:ui-tests
 
-  build-compatibility:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-
-      # Build compatibility
-      - run:
-          name: Build Compatibility
-          command: ./gradlew -q compatibility:assemble compatibility:assembleAndroidTest
-
-      # Save the builds to workspace
-      - persist_to_workspace:
-          root: .
-          paths:
-            - compatibility/build
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  build-library:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-
-      # Build library and tests
-      - run:
-          name: Build Library and Tests
-          command: ./gradlew -q library:assemble library:assembleAndroidTest
-
-      # Save the builds to workspace
-      - persist_to_workspace:
-          root: .
-          paths:
-            - library/build
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  check-library-size:
-    <<: *build-defaults
-    resource_class: large
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-cmake
-      - run: *install-bbe
-
-      # Check library size
-      - run:
-          name: Check Library Size
-          command: ./gradlew -q librarySizeReport
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  lint:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-
-      - run:
-          name: Lint
-          command: ./gradlew -q lint
-
-      - store_artifacts:
-          path: apkscale/build/reports/lint-results.html
-          prefix: apkscale
-      - store_artifacts:
-          path: videoapp/app/build/reports/lint-results.html
-          prefix: app
-      - store_artifacts:
-          path: env/build/reports/lint-results.html
-          prefix: env
-      - store_artifacts:
-          path: library/build/reports/lint-results.html
-          prefix: library
-      - store_artifacts:
-          path: token/build/reports/lint-results.html
-          prefix: token
-      - store_artifacts:
-          path: twilioapi/build/reports/lint-results.html
-          prefix: twilioapi
-
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  unit-test:
+  publish-to-appcenter:
     <<: *build-defaults
     resource_class: medium+
+    name: Publish to AppCenter
     steps:
-      # Setup
-      - checkout
       - attach_workspace:
           at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-
-      # Run unit tests
       - run:
-          name: Unit Tests
-          command: ./gradlew library:testDebugUnitTest
-
-      # Save cache
-      - save-cache: *save-cache-gradle
-
-  trigger-qe-tests:
-    <<: *build-defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *trigger-qe-tests
-
-  integration-media-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Media Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-media-tests
-
-  integration-codec-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Media Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-codec-tests 
-
-  integration-participant-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Participant Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-participant-tests 
-
-  integration-network-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Network Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-network-tests 
-  
-  integration-stats-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Stats Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-stats-tests
-
-  integration-track-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Track Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-track-tests
-
-  integration-room-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Room Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-room-tests
-
-  integration-recording-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Integration Room Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-recording-tests
-
-
-  integration-capturer-tests:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Instrumentation Camera Tests
-          command: >
-                    gcloud firebase test android run --no-record-video --project video-app-79418
-                    video-app-args.yaml:integration-capturer-tests
-
-  video-voice-side-by-side-test:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *install-secrets
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Video and Voice Side-By-Side Tests
-          command: >
-            gcloud firebase test android run --no-record-video --project video-app-79418
-            video-app-args.yaml:video-voice-side-by-side-tests
-
-  video-webrtc-side-by-side-test:
-    <<: *test-defaults
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - run: *install-secrets
-      - run: *gcloud-auth
-
-      # Execute tests
-      - run:
-          name: Video and WebRTC Side-By-Side Tests
-          command: >
-            gcloud firebase test android run --no-record-video --project video-app-79418
-            video-app-args.yaml:video-webrtc-side-by-side-tests
-
-  publish-library-snapshot:
-    <<: *build-defaults
-    resource_class: large
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-
-      # Publish library snapshot
-      - run:
-          name: Publish Library Snapshot
-          command: ./gradlew -q -Psnapshot=true bintrayLibrarySnapshotUpload
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  publish-library-rc:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-      - run: *configure-git-user
-
-      # Publish library rc
-      - run:
-          name: Publish Library RC
-          command: ./gradlew bintrayLibraryReleaseCandidateUpload librarySizeReport incrementRc
-
-      # Send webhook if successful
-      - run:
-          command: ./scripts/send-circleci-webhook.sh
-          when: on_success
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  publish-app-rc:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-
-      # Publish app RC
-      - run:
-          name: Publish App RC
+          # TODO Ticket to improve build time here https://issues.corp.twilio.com/browse/AHOYAPPS-67
+          # TODO Ticket to add latest changelog update https://issues.corp.twilio.com/browse/AHOYAPPS-94
           command: |
-            # TODO Ticket to improve build time here https://issues.corp.twilio.com/browse/AHOYAPPS-67
-            # TODO Ticket to add latest changelog update https://issues.corp.twilio.com/browse/AHOYAPPS-94
-            ./gradlew -q -PreleaseCandidate=true app:assembleInternalRelease
             sudo npm install webpack
             echo no | sudo npm install -g appcenter-cli
             appcenter login --token $APPCENTER_API_TOKEN
-            # TODO Define a better version schema rather than using the SDK version
-            appcenter distribute release -f videoapp/app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-Internal -b $CIRCLE_TAG
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
-
-  publish-library:
-    <<: *build-defaults
-    resource_class: xlarge
-    steps:
-      # Setup
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *create-android-ndk-directory
-      - restore-cache: *restore-cache-android-ndk
-      - run: *install-android-ndk
-      - run: *install-secrets
-      - run: *install-cmake
-      - run: *install-bbe
-      - run: *configure-git-user
-
-      # Publish library
-      - run:
-          name: Publish Library
-          command: >
-                    ./gradlew bintrayLibraryReleaseUpload librarySizeReport publishLibraryJavadocs
-                    incrementVersion
-
-      # Send webhook if successful
-      - run:
-          command: ./scripts/send-circleci-webhook.sh
-          when: on_success
-
-      # Save cache
-      - save-cache: *save-cache-android-ndk
-      - save-cache: *save-cache-gradle
+            appcenter distribute release -f app/build/outputs/apk/internal/release/app-internal-release.apk -g Collaborators --app nico-hokeyapp-dzyz/Video-App-Internal
 
 workflows:
   version: 2
 
   build-test-publish:
     jobs:
-      # Setup
-      - setup-workspace
-
-      # Build
-      - build-compatibility:
-          requires:
-            - setup-workspace
-      - build-app:
-          requires:
-              - setup-workspace
-      - build-library:
-          requires:
-              - setup-workspace
-      - check-library-size:
-          requires:
-              - setup-workspace
-
-      # Hygiene
-      - lint:
-          requires:
-            - setup-workspace
-      - check-format:
-          requires:
-            - setup-workspace
-
-      # Test
-      - app-unit-tests:
+      - build-app
+      - lint
+      - check-format
+      - unit-tests:
           requires:
             - build-app
-      - app-ui-tests:
+            - lint
+            - check-format
+      - ui-tests:
           requires:
             - build-app
-      - unit-test:
+            - lint
+            - check-format
+      - publish-to-appcenter:
           requires:
-              - build-library
-      - integration-media-tests:
-          requires:
-              - build-library
-      - integration-codec-tests:
-          requires:
-              - build-library
-      - integration-network-tests:
-          requires:
-              - build-library
-      - integration-participant-tests:
-          requires:
-              - build-library
-      - integration-track-tests:
-          requires:
-              - build-library
-      - integration-stats-tests:
-          requires:
-              - build-library
-      - integration-room-tests:
-          requires:
-              - build-library
-      - integration-recording-tests:
-          requires:
-              - build-library
-      - video-voice-side-by-side-test:
-          requires:
-            - build-compatibility
-      - video-webrtc-side-by-side-test:
-          requires:
-            - build-compatibility
-
-
-      # Publish
-      - publish-library-snapshot:
-          <<: *snapshot-defaults
-
-  release-candidate:
-    jobs:
-      # Setup
-      - setup-workspace:
-          <<: *rc-defaults
-
-      # Publish
-      - publish-library-rc:
-          <<: *rc-defaults
-          context: sdks
-          requires:
-              - setup-workspace
-
-      - trigger-qe-tests:
-          <<: *rc-defaults
-          requires:
-            - publish-library-rc
-
-      - publish-app-rc:
-          <<: *rc-defaults
-          requires:
-              - setup-workspace
-  release:
-    jobs:
-      # Setup
-      - setup-workspace:
-          <<: *release-defaults
-
-      # Publish
-      # TODO: Add publishing app to Play Store VIDEOAPP-15
-      - publish-library:
-          <<: *release-defaults
-          context: sdks
-          requires:
-              - setup-workspace
+            - build-app
+            - lint
+            - check-format
+            - unit-tests
+            - ui-tests
+          filters:
+            branches:
+              only: master
