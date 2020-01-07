@@ -131,6 +131,9 @@ public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int STATS_DELAY = 1000; // milliseconds
+    private static final String MICROPHONE_TRACK_NAME = "microphone";
+    private static final String CAMERA_TRACK_NAME = "camera";
+    private static final String SCREEN_TRACK_NAME = "screen";
 
     // This will be used instead of real local participant sid,
     // because that information is unknown until room connection is fully established
@@ -521,7 +524,7 @@ public class RoomActivity extends BaseActivity {
     void toggleLocalAudio() {
         int icon;
         if (localAudioTrack == null) {
-            localAudioTrack = LocalAudioTrack.create(this, true, "microphone");
+            localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
             if (localParticipant != null && localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
             }
@@ -556,7 +559,7 @@ public class RoomActivity extends BaseActivity {
                             true,
                             cameraCapturer.getVideoCapturer(),
                             videoConstraints,
-                            "camera");
+                            CAMERA_TRACK_NAME);
             if (localParticipant != null && cameraVideoTrack != null) {
                 localParticipant.publishTrack(cameraVideoTrack);
 
@@ -756,7 +759,7 @@ public class RoomActivity extends BaseActivity {
 
     /** Initialize local media and provide stub participant for primary view. */
     private void setupLocalMedia() {
-        localAudioTrack = LocalAudioTrack.create(this, true, "microphone");
+        localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
         setupLocalVideoTrack();
         renderLocalParticipantStub();
     }
@@ -772,7 +775,11 @@ public class RoomActivity extends BaseActivity {
 
         cameraVideoTrack =
                 LocalVideoTrack.create(
-                        this, true, cameraCapturer.getVideoCapturer(), videoConstraints, "camera");
+                        this,
+                        true,
+                        cameraCapturer.getVideoCapturer(),
+                        videoConstraints,
+                        CAMERA_TRACK_NAME);
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(
                     cameraVideoTrack.getName(), getString(R.string.camera_video_track));
@@ -972,7 +979,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void startScreenCapture() {
-        screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer, "screen");
+        screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer, SCREEN_TRACK_NAME);
 
         if (screenVideoTrack != null) {
             screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
