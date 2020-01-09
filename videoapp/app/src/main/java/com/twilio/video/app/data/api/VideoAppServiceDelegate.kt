@@ -17,7 +17,6 @@
 package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
-import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.model.RoomProperties
 import io.reactivex.Single
@@ -34,22 +33,14 @@ class VideoAppServiceDelegate(
         val env = sharedPreferences.getString(
                 Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
 
-        val appEnv = resolveAppEnvironment(BuildConfig.FLAVOR)
         val videoAppService = resolveVideoAppService(env!!)
-        Timber.d("app environment = $appEnv, app service env = $videoAppService")
+        Timber.d("app service env = $videoAppService")
         return videoAppService.getToken(
                 identity,
                 roomProperties.name,
-                appEnv,
+                "production",
                 roomProperties.topology.string,
                 roomProperties.isRecordParticipantsOnConnect)
-    }
-
-    private fun resolveAppEnvironment(appFlavor: String): String {
-        // Video App Service only accepts internal and production for app environment
-        return if (TWILIO_API_DEV_ENV == appFlavor) {
-            "internal"
-        } else "production"
     }
 
     private fun resolveVideoAppService(env: String): VideoAppService {
