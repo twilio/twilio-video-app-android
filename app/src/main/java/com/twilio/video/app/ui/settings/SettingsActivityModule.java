@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.ui.settings;
 
-import android.app.Activity;
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.AndroidInjector;
@@ -28,6 +27,6 @@ public abstract class SettingsActivityModule {
     @Binds
     @IntoMap
     @ClassKey(SettingsActivity.class)
-    abstract AndroidInjector.Factory<? extends Activity> bindYourActivityInjectorFactory(
-            SettingsActivitySubcomponent.Builder builder);
+    abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
+            SettingsActivitySubcomponent.Factory builder);
 }

@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.ui.splash;
 
-import android.app.Activity;
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.AndroidInjector;
@@ -28,6 +27,6 @@ public abstract class SplashActivityModule {
     @Binds
     @IntoMap
     @ClassKey(SplashActivity.class)
-    abstract AndroidInjector.Factory<? extends Activity> bindYourActivityInjectorFactory(
-            SplashActivitySubcomponent.Builder builder);
+    abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
+            SplashActivitySubcomponent.Factory factory);
 }

@@ -16,18 +16,20 @@
 
 package com.twilio.video.app
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import javax.inject.Inject
+import dagger.android.HasAndroidInjector
 import timber.log.Timber
+import javax.inject.Inject
 
-class VideoApplication : Application(), HasActivityInjector {
+
+class VideoApplication : Application(), HasAndroidInjector {
     @Inject
-    lateinit var dispatchingActivityInjector: DispatchingAndroidInjector<Activity>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
     @Inject
     lateinit var tree: Timber.Tree
 
@@ -40,16 +42,13 @@ class VideoApplication : Application(), HasActivityInjector {
         super.onCreate()
 
         // Create application component and inject application
-        val applicationComponent = DaggerVideoApplicationComponent.builder()
-                .applicationModule(ApplicationModule(this))
-                .build()
-        applicationComponent.inject(this)
+//        val applicationComponent = DaggerVideoApplicationComponent.create().inject(this)
 
         // Setup logging
         Timber.plant(tree)
     }
 
-    override fun activityInjector(): DispatchingAndroidInjector<Activity>? {
-        return dispatchingActivityInjector
+    override fun androidInjector(): AndroidInjector<Any> {
+        return dispatchingAndroidInjector
     }
 }
