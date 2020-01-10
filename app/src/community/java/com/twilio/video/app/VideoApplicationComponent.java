@@ -24,10 +24,12 @@ import com.twilio.video.app.ui.room.RoomActivityModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
 import com.twilio.video.app.ui.splash.SplashActivityModule;
 import dagger.Component;
+import dagger.android.AndroidInjectionModule;
 
 @ApplicationScope
 @Component(
     modules = {
+        AndroidInjectionModule.class,
         ApplicationModule.class,
         CommunityTreeModule.class,
         CommunityDataModule.class,
