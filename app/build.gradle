@@ -186,8 +186,6 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
-    kaptAndroidTest daggerAndroidProcessor
-    kaptAndroidTest daggerCompiler
 }
 
 def getLocalProperty(key) {
