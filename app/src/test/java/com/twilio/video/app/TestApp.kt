@@ -20,5 +20,4 @@ class TestApp : Application(), HasAndroidInjector {
     override fun androidInjector(): AndroidInjector<Any> {
         return dispatchingAndroidInjector
     }
-
 }

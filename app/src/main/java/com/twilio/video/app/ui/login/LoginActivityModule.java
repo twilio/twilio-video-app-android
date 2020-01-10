@@ -14,4 +14,3 @@ public abstract class LoginActivityModule {
     abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
             LoginActivitySubcomponent.Factory factory);
 }
-
