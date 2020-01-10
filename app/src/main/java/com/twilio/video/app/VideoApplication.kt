@@ -20,7 +20,6 @@ import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
 import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import timber.log.Timber
@@ -42,7 +41,11 @@ class VideoApplication : Application(), HasAndroidInjector {
         super.onCreate()
 
         // Create application component and inject application
-//        val applicationComponent = DaggerVideoApplicationComponent.create().inject(this)
+        DaggerVideoApplicationComponent
+                .builder()
+                .applicationModule(ApplicationModule(this))
+                .build()
+                .inject(this)
 
         // Setup logging
         Timber.plant(tree)
