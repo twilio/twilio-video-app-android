@@ -24,7 +24,8 @@ import dagger.android.AndroidInjectionModule;
         SplashActivityModule.class,
         LoginActivityModule.class,
         RoomActivityModule.class,
-        SettingsActivityModule.class
+        SettingsActivityModule.class,
+        SettingsFragmentModule.class
     }
 )
 public interface VideoApplicationComponent {
