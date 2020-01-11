@@ -1,7 +1,6 @@
 package com.twilio.video.app.ui.settings;
 
 import com.twilio.video.app.ui.settings.SettingsActivity.SettingsFragment;
-
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.AndroidInjector;
