@@ -28,5 +28,5 @@ public abstract class SettingsActivityModule {
     @IntoMap
     @ClassKey(SettingsActivity.class)
     abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
-            SettingsActivitySubcomponent.Factory builder);
+            SettingsActivitySubcomponent.Factory factory);
 }
