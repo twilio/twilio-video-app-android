@@ -1,4 +1,4 @@
-package com.twilio.video.app.test
+package com.twilio.video.app.e2eTest
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
