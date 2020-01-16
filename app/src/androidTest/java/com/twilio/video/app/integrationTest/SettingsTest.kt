@@ -18,7 +18,6 @@ class SettingsTest {
     @get:Rule
     var scenario = activityScenarioRule<SettingsActivity>()
 
-
     @Test
     fun configuration_change_should_not_crash_app() {
         UiDevice.getInstance(getInstrumentation()).run {
