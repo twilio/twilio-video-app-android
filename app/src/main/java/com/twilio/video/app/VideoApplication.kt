@@ -39,15 +39,15 @@ class VideoApplication : Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
 
-        // Create application component and inject application
         DaggerVideoApplicationComponent
                 .builder()
                 .applicationModule(ApplicationModule(this))
                 .build()
                 .inject(this)
 
-        // Setup logging
         Timber.plant(tree)
+
+        startAppcenter(this)
     }
 
     override fun androidInjector(): AndroidInjector<Any> {
