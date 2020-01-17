@@ -19,8 +19,6 @@ package com.twilio.video.app
 import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.distribute.Distribute
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -41,19 +39,15 @@ class VideoApplication : Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
 
-        // Create application component and inject application
         DaggerVideoApplicationComponent
                 .builder()
                 .applicationModule(ApplicationModule(this))
                 .build()
                 .inject(this)
 
-        // Setup logging
         Timber.plant(tree)
 
-        if (BuildConfig.FLAVOR == "internal" && !BuildConfig.DEBUG) {
-            AppCenter.start(this, BuildConfig.APPCENTER_APP_KEY, Distribute::class.java)
-        }
+        startAppcenter(this)
     }
 
     override fun androidInjector(): AndroidInjector<Any> {
