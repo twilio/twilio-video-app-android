@@ -17,7 +17,7 @@ aliases:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
   - &get-secrets
-    name: Setup google services
+    name: Setup secrets
     command: |
       # Internal debug google services
       mkdir -p app/src/internal/debug || true
@@ -37,6 +37,7 @@ aliases:
       echo "androidReleaseKeyAlias=$VIDEO_APP_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
       echo "androidReleaseKeyPassword=$VIDEO_APP_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
       echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
+      echo "APPCENTER_APP_KEY=$APPCENTER_APP_KEY" >> ./local.properties
 
   # Containers
   - &build-defaults
