@@ -92,6 +92,16 @@ jobs:
           command: ./gradlew -q spotlessCheck
       - save-cache: *save-cache-gradle
 
+  increment-version-code:
+    <<: *build-defaults
+    resource_class: medium+
+    steps:
+      - checkout
+      - run: *configure-git-user
+      - run:
+          name: Increment Version Code
+          command: ./gradlew incrementVersionCode
+
   build-app:
     <<: *build-defaults
     resource_class: large
@@ -163,9 +173,18 @@ workflows:
 
   build-test-publish:
     jobs:
-      - build-app
       - lint
       - check-format
+      - increment-version-code:
+          requires:
+            - lint
+            - check-format
+          filters:
+            branches:
+              only: master
+      - build-app:
+          requires:
+            - increment-version-code
       - unit-tests:
           requires:
             - build-app
