@@ -116,7 +116,7 @@ jobs:
           command: echo $TEST_CREDENTIALS_JSON | base64 -di > app/src/androidTest/assets/Credentials/TestCredentials.json
       - run:
           name: Build App
-          command: ./gradlew -q app:assemble app:assembleAndroidTest
+          command: ./gradlew -q app:assemble app:assembleInternalDebugAndroidTest
       - persist_to_workspace:
           root: .
           paths:
