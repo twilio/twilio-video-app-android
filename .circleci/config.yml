@@ -65,6 +65,11 @@ aliases:
     command: >
       echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
 
+  - &filter-on-master
+    filters:
+      branches:
+        only:
+          - master
 jobs:
   lint:
     <<: *build-defaults
@@ -92,16 +97,6 @@ jobs:
           command: ./gradlew -q spotlessCheck
       - save-cache: *save-cache-gradle
 
-  increment-version-code:
-    <<: *build-defaults
-    resource_class: medium+
-    steps:
-      - checkout
-      - run: *configure-git-user
-      - run:
-          name: Increment Version Code
-          command: ./gradlew incrementVersionCode
-
   build-app:
     <<: *build-defaults
     resource_class: large
@@ -115,7 +110,7 @@ jobs:
           name: Store Test Credentials
           command: echo $TEST_CREDENTIALS_JSON | base64 -di > app/src/androidTest/assets/Credentials/TestCredentials.json
       - run:
-          name: Build App
+          name: Build All APKs
           command: ./gradlew -q app:assemble app:assembleInternalDebugAndroidTest
       - persist_to_workspace:
           root: .
@@ -152,6 +147,33 @@ jobs:
             gcloud firebase test android run --no-record-video --project video-app-79418
             ui-test-args.yaml:ui-tests
 
+  increment-version-code:
+    <<: *build-defaults
+    resource_class: medium+
+    steps:
+      - checkout
+      - run: *configure-git-user
+      - run:
+          name: Increment Version Code
+          command: ./gradlew incrementVersionCode
+
+  build-release-app:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run:
+          name: Build Release APK
+          command: ./gradlew -q app:assembleInternalRelease
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/build
+      - save-cache: *save-cache-gradle
+
   publish-to-appcenter:
     <<: *build-defaults
     resource_class: medium+
@@ -171,20 +193,11 @@ jobs:
 workflows:
   version: 2
 
-  build-test-publish:
+  build-test-deploy:
     jobs:
       - lint
       - check-format
-      - increment-version-code:
-          requires:
-            - lint
-            - check-format
-          filters:
-            branches:
-              only: master
-      - build-app:
-          requires:
-            - increment-version-code
+      - build-app
       - unit-tests:
           requires:
             - build-app
@@ -195,13 +208,20 @@ workflows:
             - build-app
             - lint
             - check-format
-      - publish-to-appcenter:
+      - increment-version-code:
+#          *filter-on-master
           requires:
-            - build-app
-            - lint
-            - check-format
             - unit-tests
             - ui-tests
-          filters:
-            branches:
-              only: master
+      - build-release-app:
+#          *filter-on-master
+          requires:
+            - unit-tests
+            - ui-tests
+            - increment-version-code
+      - publish-to-appcenter:
+#          *filter-on-master
+          requires:
+            - unit-tests
+            - ui-tests
+            - build-release-app
