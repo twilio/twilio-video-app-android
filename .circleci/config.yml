@@ -39,6 +39,12 @@ aliases:
       echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
       echo "APPCENTER_APP_KEY=$APPCENTER_APP_KEY" >> ./local.properties
 
+  - &configure-git-user
+    name: Configure git user
+    command: |
+      git config --global user.email "twilio-sdk-build@twilio.com"
+      git config --global user.name "twilio-sdk-build"
+
   # Containers
   - &build-defaults
     working_directory: *workspace
