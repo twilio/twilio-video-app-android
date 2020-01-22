@@ -209,18 +209,18 @@ workflows:
             - lint
             - check-format
       - increment-version-code:
-#          *filter-on-master
+#          <<: *filter-on-master
           requires:
             - unit-tests
             - ui-tests
       - build-release-app:
-#          *filter-on-master
+#          <<: *filter-on-master
           requires:
             - unit-tests
             - ui-tests
             - increment-version-code
       - publish-to-appcenter:
-#          *filter-on-master
+#          <<: *filter-on-master
           requires:
             - unit-tests
             - ui-tests
