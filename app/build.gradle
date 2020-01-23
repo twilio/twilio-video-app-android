@@ -19,6 +19,7 @@ def videoAndroidSdkDepProp = "videoAppSdkDependency"
 def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
         project("${project.property(videoAndroidSdkDepProp)}") :
         "com.twilio:video-android:5.1.0")
+def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
     compileSdkVersion 29
@@ -41,7 +42,7 @@ android {
         targetSdkVersion 28
 
         versionName "0.1.0"
-        versionCode 1
+        versionCode versionCodeProperty
 
         vectorDrawables.useSupportLibrary = true
 

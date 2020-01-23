@@ -33,7 +33,8 @@ public class Preferences {
     public static final String MIN_VIDEO_DIMENSIONS = "pref_min_video_dim";
     public static final String MAX_VIDEO_DIMENSIONS = "pref_max_video_dim";
     public static final String ASPECT_RATIO = "pref_aspect_ratio";
-    public static final String VERSION = "pref_version";
+    public static final String VERSION_NAME = "pref_version_name";
+    public static final String VERSION_CODE = "pref_version_code";
     public static final String VIDEO_LIBRARY_VERSION = "pref_video_library_version";
     public static final String LOGOUT = "pref_logout";
     public static final String ENABLE_STATS = "pref_enable_stats";

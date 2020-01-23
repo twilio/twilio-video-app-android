@@ -27,6 +27,7 @@
     <string name="settings_screen_fps">Frames per second</string>
     <string name="settings_screen_identity">User Identity</string>
     <string name="settings_screen_version">Version</string>
+    <string name="settings_screen_version_code">Version Code</string>
     <string name="settings_screen_video_library_version">Video Library Version</string>
     <string name="settings_screen_logout">Log Out</string>
     <string name="settings_screen_video_dimensions">Video dimensions</string>

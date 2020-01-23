@@ -108,6 +108,67 @@ spotless {
     }
 }
 
+task incrementVersionCode {
+    description = 'Increment the version code'
+    group = 'Git'
+
+    doLast {
+        def githubToken = System.getenv("GITHUB_TOKEN")
+        def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
+        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
+        def remote = "upstream"
+        def pushNullFile = new FileOutputStream("/dev/null")
+        def versionCode = project.property("versionCode")
+        def newVersionCode = (versionCode as Integer) + 1
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
+            // Ignore exit value because remote may have been added in previous task
+            ignoreExitValue true
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "fetch", "${remote}"
+        }
+
+        def propertiesFile = new FileOutputStream("${rootDir}/gradle.properties")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "versionCode=${newVersionCode}"
+            standardOutput propertiesFile
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "echo", "New version code:"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "cat", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "add", "gradle.properties"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "commit", "gradle.properties", "-m", "Bump version code [skip ci]"
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "--quiet", "${remote}", "${System.env.CIRCLE_BRANCH}"
+            standardOutput pushNullFile
+        }
+    }
+}
+
 allprojects {
     repositories {
         google()
