@@ -37,7 +37,15 @@
         <activity
             android:name=".ui.room.RoomActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.Lobby"/>
+            android:theme="@style/AppTheme.Lobby">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="twilio-video-react.appspot.com" />
+            </intent-filter>
+
+            </activity>
         <activity android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.room.RoomActivity"
             android:label="@string/settings"
