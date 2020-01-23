@@ -65,11 +65,6 @@ aliases:
     command: >
       echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
 
-  - &filter-on-master
-    filters:
-      branches:
-        only:
-          - master
 jobs:
   lint:
     <<: *build-defaults
@@ -188,7 +183,11 @@ jobs:
 workflows:
   version: 2
 
-  build-test-deploy:
+  build-test:
+    filters:
+      branches:
+        ignore:
+          - master
     jobs:
       - lint
       - check-format
@@ -203,14 +202,14 @@ workflows:
             - build-app
             - lint
             - check-format
-      - build-release-app:
-#          <<: *filter-on-master
-          requires:
-            - unit-tests
-            - ui-tests
+
+  publish-to-appcenter:
+    filters:
+      branches:
+        only:
+          - master
+    jobs:
+      - build-release-app
       - publish-to-appcenter:
-#          <<: *filter-on-master
           requires:
-            - unit-tests
-            - ui-tests
             - build-release-app
