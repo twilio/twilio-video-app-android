@@ -165,6 +165,7 @@ jobs:
       - attach_workspace:
           at: *workspace
       - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
       - run:
           name: Build Release APK
           command: ./gradlew -q app:assembleInternalRelease
