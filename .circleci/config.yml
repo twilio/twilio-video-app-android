@@ -45,6 +45,18 @@ aliases:
       git config --global user.email "twilio-sdk-build@twilio.com"
       git config --global user.name "twilio-sdk-build"
 
+  - &build-test-filter
+    filters:
+      branches:
+        ignore:
+          - master
+
+  - &publish-to-appcenter-filter
+    filters:
+      branches:
+        only:
+          - master
+
   # Containers
   - &build-defaults
     working_directory: *workspace
@@ -184,32 +196,31 @@ workflows:
   version: 2
 
   build-test:
-    filters:
-      branches:
-        ignore:
-          - master
     jobs:
-      - lint
-      - check-format
-      - build-app
+      - lint:
+          <<: *build-test-filter
+      - check-format:
+          <<: *build-test-filter
+      - build-app:
+          <<: *build-test-filter
       - unit-tests:
+          <<: *build-test-filter
           requires:
             - build-app
             - lint
             - check-format
       - ui-tests:
+          <<: *build-test-filter
           requires:
             - build-app
             - lint
             - check-format
 
   publish-to-appcenter:
-    filters:
-      branches:
-        only:
-          - master
     jobs:
-      - build-release-app
+      - build-release-app:
+          <<: *publish-to-appcenter-filter
       - publish-to-appcenter:
+          <<: *publish-to-appcenter-filter
           requires:
             - build-release-app
