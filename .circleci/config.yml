@@ -147,16 +147,6 @@ jobs:
             gcloud firebase test android run --no-record-video --project video-app-79418
             ui-test-args.yaml:ui-tests
 
-  increment-version-code:
-    <<: *build-defaults
-    resource_class: medium+
-    steps:
-      - checkout
-      - run: *configure-git-user
-      - run:
-          name: Increment Version Code
-          command: ./gradlew incrementVersionCode
-
   build-release-app:
     <<: *build-defaults
     resource_class: large
@@ -166,6 +156,10 @@ jobs:
           at: *workspace
       - restore-cache: *restore-cache-gradle
       - run: *get-secrets
+      - run: *configure-git-user
+      - run:
+          name: Increment Version Code
+          command: ./gradlew incrementVersionCode
       - run:
           name: Build Release APK
           command: ./gradlew -q app:assembleInternalRelease
@@ -209,17 +203,11 @@ workflows:
             - build-app
             - lint
             - check-format
-      - increment-version-code:
-#          <<: *filter-on-master
-          requires:
-            - unit-tests
-            - ui-tests
       - build-release-app:
 #          <<: *filter-on-master
           requires:
             - unit-tests
             - ui-tests
-            - increment-version-code
       - publish-to-appcenter:
 #          <<: *filter-on-master
           requires:
