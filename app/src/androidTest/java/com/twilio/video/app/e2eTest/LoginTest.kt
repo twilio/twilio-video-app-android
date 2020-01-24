@@ -4,7 +4,12 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.twilio.video.app.retryViewMatcher
-import com.twilio.video.app.screen.*
+import com.twilio.video.app.screen.assertSignInErrorIsVisible
+import com.twilio.video.app.screen.loginWithWrongEmailCreds
+import com.twilio.video.app.screen.assertGoogleSignInButtonIsVisible
+import com.twilio.video.app.screen.clickSettingsMenuItem
+import com.twilio.video.app.screen.loginWithEmail
+import com.twilio.video.app.screen.logout
 import com.twilio.video.app.ui.splash.SplashActivity
 import org.junit.Rule
 import org.junit.Test
