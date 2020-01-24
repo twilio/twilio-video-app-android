@@ -3,8 +3,6 @@ package com.twilio.video.app.e2eTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.twilio.video.app.EmailCredentials
-import com.twilio.video.app.retrieveEmailCredentials
 import com.twilio.video.app.retryViewMatcher
 import com.twilio.video.app.screen.*
 import com.twilio.video.app.ui.splash.SplashActivity
@@ -18,12 +16,10 @@ class LoginTest {
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()
-    private lateinit var emailCredentials: EmailCredentials
 
     @Test
     fun `it_should_login_successfully_with_email_and_then_logout`() {
-        emailCredentials = retrieveEmailCredentials()
-        loginWithEmail(emailCredentials)
+        loginWithEmail()
         retryViewMatcher { clickSettingsMenuItem() }
         logout()
         assertGoogleSignInButtonIsVisible()
@@ -31,8 +27,7 @@ class LoginTest {
 
     @Test
     fun `it_should_not_login_successfully_with_email`() {
-        emailCredentials = retrieveEmailCredentials()
-        loginWithWrongEmailCreds(emailCredentials)
+        loginWithWrongEmailCreds()
         retryViewMatcher { assertSignInErrorIsVisible() }
     }
 }
