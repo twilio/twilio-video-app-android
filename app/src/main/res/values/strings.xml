@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- General -->
+    <string name="web_app_domain">twilio-video-react.appspot.com</string>
+
     <!--  Login Screen  -->
     <string name="login_screen_auth_error_title">Login Error</string>
     <string name="login_screen_auth_error_desc">There was an issue logging in.</string>

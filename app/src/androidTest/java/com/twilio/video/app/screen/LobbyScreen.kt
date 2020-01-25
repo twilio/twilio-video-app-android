@@ -11,3 +11,7 @@ fun clickSettingsMenuItem() {
     Espresso.openActionBarOverflowOrOptionsMenu(getTargetContext())
     Espresso.onView(ViewMatchers.withText(getString(R.string.settings))).perform(ViewActions.click())
 }
+
+fun assertScreenIsDisplayed() {
+
+}

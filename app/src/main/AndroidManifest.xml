@@ -43,7 +43,7 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="twilio-video-react.appspot.com" />
+                <data android:scheme="https" android:host="@string/web_app_domain" />
             </intent-filter>
 
             </activity>
