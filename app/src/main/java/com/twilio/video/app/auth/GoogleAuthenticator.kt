@@ -17,14 +17,14 @@ import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class GoogleAuthenticator @JvmOverloads constructor(
-        private val firebaseWrapper: FirebaseWrapper,
-        context: Context,
-        private val googleAuthWrapper: GoogleAuthWrapper,
-        googleSignInWrapper: GoogleSignInWrapper,
-        googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
-        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
-        private val acceptedDomain: String? = null,
-        private val disposables: CompositeDisposable = CompositeDisposable()
+    private val firebaseWrapper: FirebaseWrapper,
+    context: Context,
+    private val googleAuthWrapper: GoogleAuthWrapper,
+    googleSignInWrapper: GoogleSignInWrapper,
+    googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
+    private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
+    private val acceptedDomain: String? = null,
+    private val disposables: CompositeDisposable = CompositeDisposable()
 ) : AuthenticationProvider {
 
     private val googleSignInClient: GoogleSignInClient =

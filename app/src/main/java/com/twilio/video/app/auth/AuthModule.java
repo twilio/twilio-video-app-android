@@ -23,10 +23,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
 import com.twilio.video.app.R;
-
 import dagger.Module;
 import dagger.Provides;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,10 +41,10 @@ public class AuthModule {
         List<AuthenticationProvider> authenticators = new ArrayList<>();
         GoogleSignInOptions googleSignInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(context.getString(R.string.default_web_client_id))
-        .requestEmail()
-        .setHostedDomain("twilio.com")
-        .build();
+                        .requestIdToken(context.getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .setHostedDomain("twilio.com")
+                        .build();
 
         authenticators.add(
                 new GoogleAuthenticator(

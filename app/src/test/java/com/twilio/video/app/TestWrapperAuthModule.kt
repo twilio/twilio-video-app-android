@@ -1,17 +1,21 @@
 package com.twilio.video.app
 
-import com.twilio.video.app.auth.*
-
 import dagger.Module
 import dagger.Provides
 
+import com.twilio.video.app.auth.FirebaseWrapper
+import com.twilio.video.app.auth.GoogleAuthWrapper
+import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
+import com.twilio.video.app.auth.GoogleSignInWrapper
+import com.twilio.video.app.auth.GoogleAuthProviderWrapper
+
 @Module
 class TestWrapperAuthModule(
-        private val firebaseWrapper: FirebaseWrapper,
-        private val googleAuthWrapper: GoogleAuthWrapper,
-        private val googleSignInWrapper: GoogleSignInWrapper,
-        private val googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
-        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
+    private val firebaseWrapper: FirebaseWrapper,
+    private val googleAuthWrapper: GoogleAuthWrapper,
+    private val googleSignInWrapper: GoogleSignInWrapper,
+    private val googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
+    private val googleAuthProviderWrapper: GoogleAuthProviderWrapper
 ) {
 
     @Provides
