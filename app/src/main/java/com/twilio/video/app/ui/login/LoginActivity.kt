@@ -31,6 +31,7 @@ import com.twilio.video.app.auth.LoginResult.GoogleLoginIntentResult
 import com.twilio.video.app.auth.LoginResult.GoogleLoginSuccessResult
 import com.twilio.video.app.auth.LoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.base.BaseActivity
+import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.plus
 import io.reactivex.disposables.CompositeDisposable
@@ -86,7 +87,8 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
                                 is GoogleLoginIntentResult -> {
                                     startActivityForResult(it.intent, GOOGLE_SIGN_IN)
                                 }
-                                GoogleLoginSuccessResult -> {
+                                is GoogleLoginSuccessResult -> {
+                                    saveIdentity(it.googleSignInAccount.displayName, it.googleSignInAccount.email!!)
                                     onSignInSuccess()
                                 }
                             }
@@ -156,5 +158,13 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         disposables.clear()
         progressDialog.dismiss()
         startLobbyActivity()
+    }
+
+    private fun saveIdentity(displayName: String?, email: String) {
+        sharedPreferences
+                .edit()
+                .putString(Preferences.EMAIL, email)
+                .putString(Preferences.DISPLAY_NAME, displayName ?: email)
+                .apply()
     }
 }

@@ -2,17 +2,14 @@ package com.twilio.video.app.auth
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.auth.LoginResult.GoogleLoginIntentResult
 import com.twilio.video.app.auth.LoginResult.GoogleLoginSuccessResult
-import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -27,8 +24,8 @@ class GoogleAuthenticator @JvmOverloads constructor(
     private val googleSignInWrapper: GoogleSignInWrapper,
     private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
     private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
-    private val sharedPreferences: SharedPreferences,
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    private val disposables: CompositeDisposable = CompositeDisposable(),
+    private val acceptedDomain: String? = null
 ) : AuthenticationProvider {
 
     private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
@@ -70,9 +67,11 @@ class GoogleAuthenticator @JvmOverloads constructor(
             onError(observable)
             return
         }
-        if (!email.endsWith("@twilio.com")) {
-            onError(observable)
-            return
+        acceptedDomain?.let {
+            if (!email.endsWith(it)) {
+                onError(observable)
+                return
+            }
         }
         if (idToken.isNullOrBlank()) {
             onError(observable)
@@ -82,8 +81,7 @@ class GoogleAuthenticator @JvmOverloads constructor(
         firebaseWrapper.instance.signInWithCredential(credential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        saveIdentity(account.displayName, email)
-                        observable.onNext(GoogleLoginSuccessResult)
+                        observable.onNext(GoogleLoginSuccessResult(account))
                         observable.onComplete()
                         disposables.clear()
                     } else {
@@ -102,21 +100,12 @@ class GoogleAuthenticator @JvmOverloads constructor(
     private fun buildGoogleSignInClient(context: Context) =
             googleSignInWrapper.getClient(context, buildGoogleSignInOptions(context))
 
-    private fun buildGoogleSignInOptions(context: Context): GoogleSignInOptions {
+    private fun buildGoogleSignInOptions(context: Context): GoogleSignInOptionsWrapper {
         return googleSignInOptionsBuilderWrapper.run {
             requestIdToken(context.getString(R.string.default_web_client_id))
             requestEmail()
-            setHostedDomain("twilio.com")
+            acceptedDomain?.let{setHostedDomain(it)}
             build()
         }
-    }
-
-    // TODO Create Facade for SharedPreferences for ease of use and testability
-    private fun saveIdentity(displayName: String?, email: String) {
-        sharedPreferences
-                .edit()
-                .putString(Preferences.EMAIL, email)
-                .putString(Preferences.DISPLAY_NAME, displayName ?: email)
-                .apply()
     }
 }

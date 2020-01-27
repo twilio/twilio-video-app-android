@@ -6,6 +6,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 class GoogleSignInWrapper {
 
-    fun getClient(context: Context, googleSignInOptions: GoogleSignInOptions) =
-            GoogleSignIn.getClient(context, googleSignInOptions)
+    fun getClient(context: Context, googleSignInOptions: GoogleSignInOptionsWrapper) =
+            GoogleSignIn.getClient(context, googleSignInOptions.googleSignInOptions)
 }

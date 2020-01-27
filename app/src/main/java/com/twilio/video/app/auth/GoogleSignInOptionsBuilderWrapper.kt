@@ -18,5 +18,5 @@ class GoogleSignInOptionsBuilderWrapper(defaultSignIn: GoogleSignInOptions) {
         builder.setHostedDomain(hostedDomain)
     }
 
-    fun build() = builder.build()
+    fun build() = GoogleSignInOptionsWrapper(builder.build())
 }

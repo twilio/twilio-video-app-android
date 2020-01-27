@@ -45,8 +45,7 @@ public class AuthModule {
                         new GoogleAuthWrapper(),
                         new GoogleSignInWrapper(),
                         new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
-                        new GoogleAuthProviderWrapper(),
-                        sharedPreferences));
+                        new GoogleAuthProviderWrapper()));
         authenticators.add(new EmailAuthenticator(firebaseWrapper, sharedPreferences));
         return new FirebaseAuthenticator(firebaseWrapper, authenticators);
     }

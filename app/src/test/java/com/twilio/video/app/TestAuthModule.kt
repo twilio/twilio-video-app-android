@@ -40,8 +40,7 @@ class TestAuthModule {
                         googleAuthWrapper,
                         googleSignInWrapper,
                         googleSignInOptionsBuilderWrapper,
-                        googleAuthProviderWrapper,
-                        sharedPreferences)
+                        googleAuthProviderWrapper)
         )
         authenticators.add(EmailAuthenticator(firebaseWrapper, sharedPreferences))
         return FirebaseAuthenticator(firebaseWrapper, authenticators)
