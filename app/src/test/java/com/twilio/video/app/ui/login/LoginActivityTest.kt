@@ -19,11 +19,7 @@ import com.twilio.video.app.ApplicationModule
 import com.twilio.video.app.TestApp
 import com.twilio.video.app.DaggerIntegrationTestComponent
 import com.twilio.video.app.TestWrapperAuthModule
-import com.twilio.video.app.auth.FirebaseWrapper
-import com.twilio.video.app.auth.GoogleAuthProviderWrapper
-import com.twilio.video.app.auth.GoogleAuthWrapper
-import com.twilio.video.app.auth.GoogleSignInOptionsBuilderWrapper
-import com.twilio.video.app.auth.GoogleSignInWrapper
+import com.twilio.video.app.auth.*
 import com.twilio.video.app.screen.clickGoogleSignInButton
 import com.twilio.video.app.ui.room.RoomActivity
 import org.hamcrest.CoreMatchers.equalTo
@@ -54,9 +50,7 @@ class LoginActivityTest {
     private val googleSignInWrapper: GoogleSignInWrapper = mock {
         whenever(mock.getClient(any(), any())).thenReturn(googleSignInClient)
     }
-    private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper = mock {
-        whenever(mock.build()).thenReturn(mock())
-    }
+    private val googleSignInOptionsWrapper: GoogleSignInOptionsWrapper = mock()
 
     @Before
     fun setUp() {
@@ -66,7 +60,7 @@ class LoginActivityTest {
                 .testWrapperAuthModule(TestWrapperAuthModule(firebaseWrapper,
                         googleAuthWrapper,
                         googleSignInWrapper,
-                        googleSignInOptionsBuilderWrapper,
+                        googleSignInOptionsWrapper,
                         googleAuthProviderWrapper)
                 )
                 .build()

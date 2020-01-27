@@ -24,9 +24,7 @@ class GoogleAuthenticatorTest {
     private val context: Context = mock {
         whenever(mock.getString(any())).thenReturn("")
     }
-    private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper = mock {
-        whenever(mock.build()).thenReturn(mock())
-    }
+    private val googleSignInOptionsWrapper: GoogleSignInOptionsWrapper = mock()
     private val googleSignInWrapper: GoogleSignInWrapper = mock {
         whenever(mock.getClient(any(), any())).thenReturn(mock())
     }
@@ -68,10 +66,10 @@ class GoogleAuthenticatorTest {
                 context,
                 googleAuthWrapper,
                 googleSignInWrapper,
-                googleSignInOptionsBuilderWrapper,
+                googleSignInOptionsWrapper,
                 googleAuthProviderWrapper,
-                disposables,
-                "test.com"
+                "test.com",
+                disposables
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
         testObservable.assertValue(GoogleLoginSuccessResult(googleSignInAccount))
@@ -86,9 +84,9 @@ class GoogleAuthenticatorTest {
                 context,
                 googleAuthWrapper,
                 googleSignInWrapper,
-                googleSignInOptionsBuilderWrapper,
+                googleSignInOptionsWrapper,
                 googleAuthProviderWrapper,
-                disposables
+                disposables = disposables
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
         testObservable.assertValue(GoogleLoginSuccessResult(googleSignInAccount))
@@ -105,23 +103,13 @@ class GoogleAuthenticatorTest {
                 context,
                 googleAuthWrapper,
                 googleSignInWrapper,
-                googleSignInOptionsBuilderWrapper,
+                googleSignInOptionsWrapper,
                 mock(),
-                disposables,
-                "test.com"
+                "test.com",
+                disposables
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
         assertThat(testObservable.errorCount(), equalTo(1))
         verify(disposables).clear()
-    }
-
-    @Test
-    fun `buildGoogleSignInOptions should set hosted domain if accepted domain is not null`() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    @Test
-    fun `buildGoogleSignInOptions should set not hosted domain if accepted domain is null`() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

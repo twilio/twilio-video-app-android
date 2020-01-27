@@ -5,7 +5,6 @@ import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
-import com.twilio.video.app.R
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.auth.LoginResult.GoogleLoginIntentResult
@@ -18,17 +17,18 @@ import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class GoogleAuthenticator @JvmOverloads constructor(
-    private val firebaseWrapper: FirebaseWrapper,
-    context: Context,
-    private val googleAuthWrapper: GoogleAuthWrapper,
-    private val googleSignInWrapper: GoogleSignInWrapper,
-    private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper,
-    private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
-    private val disposables: CompositeDisposable = CompositeDisposable(),
-    private val acceptedDomain: String? = null
+        private val firebaseWrapper: FirebaseWrapper,
+        context: Context,
+        private val googleAuthWrapper: GoogleAuthWrapper,
+        googleSignInWrapper: GoogleSignInWrapper,
+        googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
+        private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
+        private val acceptedDomain: String? = null,
+        private val disposables: CompositeDisposable = CompositeDisposable()
 ) : AuthenticationProvider {
 
-    private val googleSignInClient: GoogleSignInClient = buildGoogleSignInClient(context)
+    private val googleSignInClient: GoogleSignInClient =
+            googleSignInWrapper.getClient(context, googleSignInOptionsWrapper)
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
         return Observable.create<LoginResult> { observable ->
@@ -96,16 +96,4 @@ class GoogleAuthenticator @JvmOverloads constructor(
     }
 
     private fun getSignInResultFromIntent(data: Intent): GoogleSignInResult? = googleAuthWrapper.getSignInResultFromIntent(data)
-
-    private fun buildGoogleSignInClient(context: Context) =
-            googleSignInWrapper.getClient(context, buildGoogleSignInOptions(context))
-
-    private fun buildGoogleSignInOptions(context: Context): GoogleSignInOptionsWrapper {
-        return googleSignInOptionsBuilderWrapper.run {
-            requestIdToken(context.getString(R.string.default_web_client_id))
-            requestEmail()
-            acceptedDomain?.let { setHostedDomain(it) }
-            build()
-        }
-    }
 }
