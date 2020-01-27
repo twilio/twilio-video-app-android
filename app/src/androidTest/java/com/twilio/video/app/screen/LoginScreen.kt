@@ -11,7 +11,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.R
-import com.twilio.video.app.retrieveEmailCredentials
 
 // TODO Move to common module as part of https://issues.corp.twilio.com/browse/AHOYAPPS-197
 
