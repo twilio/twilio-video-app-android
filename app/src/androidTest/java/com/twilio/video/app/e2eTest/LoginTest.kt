@@ -3,6 +3,7 @@ package com.twilio.video.app.e2eTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.twilio.video.app.retrieveEmailCredentials
 import com.twilio.video.app.retryViewMatcher
 import com.twilio.video.app.screen.assertSignInErrorIsVisible
 import com.twilio.video.app.screen.loginWithWrongEmailCreds
@@ -24,7 +25,8 @@ class LoginTest {
 
     @Test
     fun `it_should_login_successfully_with_email_and_then_logout`() {
-        loginWithEmail()
+        val emailCredentials = retrieveEmailCredentials()
+        loginWithEmail(emailCredentials)
         retryViewMatcher { clickSettingsMenuItem() }
         logout()
         assertGoogleSignInButtonIsVisible()
@@ -32,7 +34,8 @@ class LoginTest {
 
     @Test
     fun `it_should_not_login_successfully_with_email`() {
-        loginWithWrongEmailCreds()
+        val emailCredentials = retrieveEmailCredentials()
+        loginWithWrongEmailCreds(emailCredentials)
         retryViewMatcher { assertSignInErrorIsVisible() }
     }
 }

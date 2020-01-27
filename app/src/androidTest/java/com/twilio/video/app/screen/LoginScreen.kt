@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.R
 import com.twilio.video.app.retrieveEmailCredentials
 
@@ -23,13 +24,11 @@ fun assertSignInErrorIsVisible() {
     onView(withText(errorTitle)).check(matches(isDisplayed()))
 }
 
-fun loginWithEmail() {
-    val emailCredentials = retrieveEmailCredentials()
+fun loginWithEmail(emailCredentials: EmailCredentials) {
     loginWithEmail(emailCredentials.email, emailCredentials.password)
 }
 
-fun loginWithWrongEmailCreds() {
-    val emailCredentials = retrieveEmailCredentials()
+fun loginWithWrongEmailCreds(emailCredentials: EmailCredentials) {
     loginWithEmail(emailCredentials.email, "foo")
 }
 
