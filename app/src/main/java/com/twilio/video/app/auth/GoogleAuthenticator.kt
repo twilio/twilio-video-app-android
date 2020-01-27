@@ -104,7 +104,7 @@ class GoogleAuthenticator @JvmOverloads constructor(
         return googleSignInOptionsBuilderWrapper.run {
             requestIdToken(context.getString(R.string.default_web_client_id))
             requestEmail()
-            acceptedDomain?.let{setHostedDomain(it)}
+            acceptedDomain?.let { setHostedDomain(it) }
             build()
         }
     }

@@ -13,5 +13,4 @@ fun clickSettingsMenuItem() {
 }
 
 fun assertScreenIsDisplayed() {
-
 }

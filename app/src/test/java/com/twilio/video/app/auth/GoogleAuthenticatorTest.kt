@@ -111,7 +111,7 @@ class GoogleAuthenticatorTest {
                 "test.com"
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
-        assertThat(testObservable.errorCount(),  equalTo(1))
+        assertThat(testObservable.errorCount(), equalTo(1))
         verify(disposables).clear()
     }
 
