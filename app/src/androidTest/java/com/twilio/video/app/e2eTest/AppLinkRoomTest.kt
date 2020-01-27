@@ -7,6 +7,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.twilio.video.app.R
 import com.twilio.video.app.getString
+import com.twilio.video.app.retrieveEmailCredentials
+import com.twilio.video.app.screen.assertRoomNameIsDisplayed
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.ui.room.RoomActivity
 import org.junit.Test
@@ -17,19 +19,21 @@ import org.junit.runner.RunWith
 class AppLinkRoomTest {
 
     @Test
-    fun `room_app_link_should_navigate_to_room_screen_with_room_name_populated_if_user_is_already_logged_in`() {
+    fun `room_app_link_should_navigate_to_room_screen_with_room_name_populated`() {
+        val roomName = "test"
         val scenario = ActivityScenario.launch<RoomActivity>(
                 Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://${getString(R.string.web_app_domain)}/room/test")
+                        Uri.parse("https://${getString(R.string.web_app_domain)}/room/$roomName")
                 )
         )
-        loginWithEmail()
+        val emailCredentials = retrieveEmailCredentials()
+
+        loginWithEmail(emailCredentials)
+
+        assertRoomNameIsDisplayed(roomName)
 
         scenario.recreate()
-    }
 
-    @Test
-    fun `room_app_link_should_authenticate_user_and_then_navigate_to_room_screen_with_room_name_populated_if_user_is_logged_out`() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        assertRoomNameIsDisplayed(roomName)
     }
 }
