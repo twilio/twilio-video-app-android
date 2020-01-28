@@ -42,10 +42,6 @@ class AppLinkRoomTest {
         restartActivity(intent)
 
         retryViewMatcher { assertRoomNameIsDisplayed(roomName) }
-        clickJoinRoomButton()
-
-        retryViewMatcher { assertJoiningRoomIsDisplayed() }
-        retryViewMatcher { clickDisconnectButton() }
 
         retryViewMatcher { clickSettingsMenuItem() }
         logout()

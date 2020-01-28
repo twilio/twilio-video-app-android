@@ -23,7 +23,7 @@ fun clickJoinRoomButton() {
 }
 
 fun assertJoiningRoomIsDisplayed() {
-    onView(withText("Joining...")).check(matches(isDisplayed()))
+    onView(withText(getString(R.string.you))).check(matches(isDisplayed()))
 }
 
 fun clickDisconnectButton() {
