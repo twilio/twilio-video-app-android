@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.ui.room;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
@@ -307,22 +306,27 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        checkAuth();
+        boolean isAppLinkProvided = checkAuth();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        updateUi(room);
+        updateUi(room, isAppLinkProvided);
         restoreCameraTrack();
         initializeRoom();
         updateStats();
     }
 
-    private void checkAuth() {
+    private boolean checkAuth() {
+        boolean isAppLinkProvided = false;
         if (!authenticator.loggedIn()) {
             startActivityForResult(new Intent(this, screenSelector.getLoginScreen()), LOGIN_REQUEST);
         } else {
             Uri uri = getIntent().getData();
             String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
-            roomEditText.setText(roomName);
+            if(roomName != null) {
+                roomEditText.setText(roomName);
+                isAppLinkProvided = true;
+            }
         }
+        return isAppLinkProvided;
     }
 
     @Override
@@ -838,13 +842,17 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void updateUi(Room room) {
+        updateUi(room, false);
+    }
+
+    private void updateUi(Room room, boolean isAppLinkProvided) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
 
         boolean settingsMenuItemState = true;
 
-        boolean connectButtonEnabled = false;
+        boolean connectButtonEnabled = isAppLinkProvided;
 
         String roomName = displayName;
         String toolbarTitle = displayName;
