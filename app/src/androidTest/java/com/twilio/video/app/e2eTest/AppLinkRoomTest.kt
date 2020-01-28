@@ -8,6 +8,7 @@ import androidx.test.rule.ActivityTestRule
 import com.twilio.video.app.R
 import com.twilio.video.app.getString
 import com.twilio.video.app.retrieveEmailCredentials
+import com.twilio.video.app.retryViewMatcher
 import com.twilio.video.app.screen.assertRoomNameIsDisplayed
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.ui.room.RoomActivity
@@ -37,11 +38,11 @@ class AppLinkRoomTest {
 
         loginWithEmail(emailCredentials)
 
-        assertRoomNameIsDisplayed(roomName)
+        retryViewMatcher { assertRoomNameIsDisplayed(roomName) }
 
         restartActivity(intent)
 
-        assertRoomNameIsDisplayed(roomName)
+        retryViewMatcher { assertRoomNameIsDisplayed(roomName) }
     }
 
     private fun restartActivity(intent: Intent) {
