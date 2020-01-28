@@ -18,24 +18,14 @@ package com.twilio.video.app.ui.splash
 
 import android.content.Intent
 import android.os.Bundle
-import com.twilio.video.app.auth.Authenticator
-import com.twilio.video.app.ui.ScreenSelector
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.ui.room.RoomActivity
-import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
 
-    @Inject lateinit var authenticator: Authenticator
-    @Inject lateinit var screenSelector: ScreenSelector
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val newIntent = if (authenticator.loggedIn())
-            Intent(this, RoomActivity::class.java)
-        else
-            Intent(this, screenSelector.loginScreen)
-        startActivity(newIntent)
+        startActivity(Intent(this, RoomActivity::class.java))
         finish()
     }
 }

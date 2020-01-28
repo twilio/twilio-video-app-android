@@ -109,6 +109,7 @@ import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.ui.ScreenSelector;
 import com.twilio.video.app.ui.login.LoginActivity;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
@@ -263,6 +264,8 @@ public class RoomActivity extends BaseActivity {
 
     @Inject Authenticator authenticator;
 
+    @Inject ScreenSelector screenSelector;
+
     /** Coordinates participant thumbs and primary participant rendering. */
     private ParticipantController participantController;
 
@@ -313,7 +316,7 @@ public class RoomActivity extends BaseActivity {
 
     private void checkAuth() {
         if(!authenticator.loggedIn()) {
-            startActivity(new Intent(this, LoginActivity.class));
+            startActivity(new Intent(this, screenSelector.getLoginScreen()));
         } else {
             Uri uri = getIntent().getData();
             String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();

@@ -80,10 +80,8 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void saveIdentity(String displayName) {
-        Single<LoginEvent> single =
-                Single.create(emitter -> emitter.onSuccess(new CommunityLoginEvent(displayName)));
         authenticator
-                .login(single.toObservable())
+                .login(new CommunityLoginEvent(displayName))
                 .subscribe(
                         loginResult -> {
                             if (loginResult instanceof CommunityLoginSuccessResult)
