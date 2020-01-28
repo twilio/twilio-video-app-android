@@ -3,7 +3,9 @@ package com.twilio.video.app.ui.room
 import android.net.Uri
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -49,7 +51,6 @@ class UriRoomParserTest {
 
         assertThat(actualRoom, `is`(nullValue()))
     }
-
 
     @Test
     fun `parseRoom should return null if the path segments are null`() {

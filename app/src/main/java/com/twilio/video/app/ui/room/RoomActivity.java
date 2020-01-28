@@ -16,6 +16,7 @@
 
 package com.twilio.video.app.ui.room;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
@@ -110,7 +111,6 @@ import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.ScreenSelector;
-import com.twilio.video.app.ui.login.LoginActivity;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -134,6 +134,7 @@ import timber.log.Timber;
 public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
+    private static final int LOGIN_REQUEST = 102;
     private static final int STATS_DELAY = 1000; // milliseconds
     private static final String MICROPHONE_TRACK_NAME = "microphone";
     private static final String CAMERA_TRACK_NAME = "camera";
@@ -315,8 +316,8 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void checkAuth() {
-        if(!authenticator.loggedIn()) {
-            startActivity(new Intent(this, screenSelector.getLoginScreen()));
+        if (!authenticator.loggedIn()) {
+            startActivityForResult(new Intent(this, screenSelector.getLoginScreen()), LOGIN_REQUEST);
         } else {
             Uri uri = getIntent().getData();
             String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
@@ -448,6 +449,9 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == LOGIN_REQUEST && resultCode == RESULT_CANCELED) {
+            finish();
+        }
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 Snackbar.make(
