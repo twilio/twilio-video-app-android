@@ -33,6 +33,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -101,12 +102,14 @@ import com.twilio.video.Vp8Codec;
 import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
+import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.ui.login.LoginActivity;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -258,6 +261,8 @@ public class RoomActivity extends BaseActivity {
 
     @Inject SharedPreferences sharedPreferences;
 
+    @Inject Authenticator authenticator;
+
     /** Coordinates participant thumbs and primary participant rendering. */
     private ParticipantController participantController;
 
@@ -298,11 +303,22 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkAuth();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         updateUi(room);
         restoreCameraTrack();
         initializeRoom();
         updateStats();
+    }
+
+    private void checkAuth() {
+        if(!authenticator.loggedIn()) {
+            startActivity(new Intent(this, LoginActivity.class));
+        } else {
+            Uri uri = getIntent().getData();
+            String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
+            roomEditText.setText(roomName);
+        }
     }
 
     @Override
