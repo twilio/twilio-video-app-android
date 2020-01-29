@@ -1,6 +1,6 @@
 package com.twilio.video.app.ui.login
 
-import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ActivityScenario
@@ -25,7 +25,6 @@ import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
 import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.screen.clickGoogleSignInButton
-import com.twilio.video.app.ui.room.RoomActivity
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -73,7 +72,7 @@ class LoginActivityTest {
     }
 
     @Test
-    fun `it should navigate to the lobby screen when google login is successful`() {
+    fun `it should finish the login flow when google login is successful`() {
         val googleSignInActivityResult = Intent()
         val signInAccount: GoogleSignInAccount = mock {
             whenever(mock.idToken).thenReturn("123456")
@@ -99,15 +98,16 @@ class LoginActivityTest {
         assertThat(actualActivityRequest, equalTo(googleSignInActivityRequest))
 
         scenario.onActivity {
+            // Trigger onActivityResult
             shadowOf(it).receiveResult(
                     actualActivityRequest,
-                    Activity.RESULT_OK,
+                    RESULT_OK,
                     googleSignInActivityResult
             )
-        }
 
-        val roomActivityRequest = shadowOf(testApp).nextStartedActivity
-        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
+            assertThat(shadowOf(it).resultCode, equalTo(RESULT_OK))
+            it.isFinishing
+        }
     }
 
     class TestActivity : AppCompatActivity()
