@@ -9,7 +9,10 @@ import com.twilio.video.app.R
 import com.twilio.video.app.getString
 import com.twilio.video.app.retrieveEmailCredentials
 import com.twilio.video.app.retryViewMatcher
-import com.twilio.video.app.screen.*
+import com.twilio.video.app.screen.assertRoomNameIsDisplayed
+import com.twilio.video.app.screen.clickSettingsMenuItem
+import com.twilio.video.app.screen.loginWithEmail
+import com.twilio.video.app.screen.logout
 import com.twilio.video.app.ui.room.RoomActivity
 import org.junit.Rule
 import org.junit.Test

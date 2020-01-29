@@ -16,7 +16,8 @@
 
 package com.twilio.video.app.ui.login;
 
-import android.app.Activity;
+import static android.app.Activity.RESULT_OK;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -35,8 +36,6 @@ import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
 import com.twilio.video.app.base.BaseActivity;
 import javax.inject.Inject;
 import timber.log.Timber;
-
-import static android.app.Activity.RESULT_OK;
 
 // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
 public class CommunityLoginActivity extends BaseActivity {

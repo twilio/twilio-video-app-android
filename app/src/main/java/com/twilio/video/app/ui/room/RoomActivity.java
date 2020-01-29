@@ -317,11 +317,12 @@ public class RoomActivity extends BaseActivity {
     private boolean checkAuth() {
         boolean isAppLinkProvided = false;
         if (!authenticator.loggedIn()) {
-            startActivityForResult(new Intent(this, screenSelector.getLoginScreen()), LOGIN_REQUEST);
+            startActivityForResult(
+                    new Intent(this, screenSelector.getLoginScreen()), LOGIN_REQUEST);
         } else {
             Uri uri = getIntent().getData();
             String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
-            if(roomName != null) {
+            if (roomName != null) {
                 roomEditText.setText(roomName);
                 isAppLinkProvided = true;
             }
@@ -453,7 +454,7 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == LOGIN_REQUEST && resultCode == RESULT_CANCELED) {
+        if (requestCode == LOGIN_REQUEST && resultCode == RESULT_CANCELED) {
             finish();
         }
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
