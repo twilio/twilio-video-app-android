@@ -25,7 +25,7 @@ class SplashActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startActivity(Intent(this, RoomActivity::class.java))
+        startActivity(Intent(this, RoomActivity::class.java).apply { data = intent.data })
         finish()
     }
 }

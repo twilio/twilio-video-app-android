@@ -29,6 +29,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter android:autoVerify="true"
+                tools:targetApi="m">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                    android:pathPrefix="/room"
+                    android:host="@string/web_app_domain"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.login.LoginActivity"
@@ -38,17 +47,7 @@
             android:name=".ui.room.RoomActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.Lobby">
-            <intent-filter android:autoVerify="true"
-                tools:targetApi="m">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https"
-                    android:pathPrefix="/room"
-                    android:host="@string/web_app_domain" />
-            </intent-filter>
-
-            </activity>
+        </activity>
         <activity android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.room.RoomActivity"
             android:label="@string/settings"
