@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
+import com.twilio.video.app.R;
 import dagger.Module;
 import dagger.Provides;
 import java.util.ArrayList;
@@ -38,15 +39,22 @@ public class AuthModule {
             SharedPreferences sharedPreferences) {
         Context context = application.getApplicationContext();
         List<AuthenticationProvider> authenticators = new ArrayList<>();
+        GoogleSignInOptions googleSignInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(context.getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .setHostedDomain("twilio.com")
+                        .build();
+
         authenticators.add(
                 new GoogleAuthenticator(
                         new FirebaseWrapper(),
                         context,
                         new GoogleAuthWrapper(),
                         new GoogleSignInWrapper(),
-                        new GoogleSignInOptionsBuilderWrapper(GoogleSignInOptions.DEFAULT_SIGN_IN),
+                        new GoogleSignInOptionsWrapper(googleSignInOptions),
                         new GoogleAuthProviderWrapper(),
-                        sharedPreferences));
+                        "twilio.com"));
         authenticators.add(new EmailAuthenticator(firebaseWrapper, sharedPreferences));
         return new FirebaseAuthenticator(firebaseWrapper, authenticators);
     }
