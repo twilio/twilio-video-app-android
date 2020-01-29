@@ -13,7 +13,7 @@ import com.twilio.video.app.screen.assertRoomNameIsDisplayed
 import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.screen.logout
-import com.twilio.video.app.ui.room.RoomActivity
+import com.twilio.video.app.ui.splash.SplashActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,8 +23,8 @@ import org.junit.runner.RunWith
 class AppLinkRoomTest {
 
     @get:Rule
-    var rule: ActivityTestRule<RoomActivity> =
-            ActivityTestRule(RoomActivity::class.java,
+    var rule: ActivityTestRule<SplashActivity> =
+            ActivityTestRule(SplashActivity::class.java,
             true,
             false)
 

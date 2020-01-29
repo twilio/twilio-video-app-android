@@ -102,14 +102,12 @@ import com.twilio.video.Vp8Codec;
 import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
-import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
-import com.twilio.video.app.ui.ScreenSelector;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -133,7 +131,6 @@ import timber.log.Timber;
 public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
-    private static final int LOGIN_REQUEST = 102;
     private static final int STATS_DELAY = 1000; // milliseconds
     private static final String MICROPHONE_TRACK_NAME = "microphone";
     private static final String CAMERA_TRACK_NAME = "camera";
@@ -262,10 +259,6 @@ public class RoomActivity extends BaseActivity {
 
     @Inject SharedPreferences sharedPreferences;
 
-    @Inject Authenticator authenticator;
-
-    @Inject ScreenSelector screenSelector;
-
     /** Coordinates participant thumbs and primary participant rendering. */
     private ParticipantController participantController;
 
@@ -306,7 +299,7 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean isAppLinkProvided = checkAuth();
+        boolean isAppLinkProvided = checkIntentURI();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         updateUi(room, isAppLinkProvided);
         restoreCameraTrack();
@@ -314,18 +307,13 @@ public class RoomActivity extends BaseActivity {
         updateStats();
     }
 
-    private boolean checkAuth() {
+    private boolean checkIntentURI() {
         boolean isAppLinkProvided = false;
-        if (!authenticator.loggedIn()) {
-            startActivityForResult(
-                    new Intent(this, screenSelector.getLoginScreen()), LOGIN_REQUEST);
-        } else {
-            Uri uri = getIntent().getData();
-            String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
-            if (roomName != null) {
-                roomEditText.setText(roomName);
-                isAppLinkProvided = true;
-            }
+        Uri uri = getIntent().getData();
+        String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
+        if (roomName != null) {
+            roomEditText.setText(roomName);
+            isAppLinkProvided = true;
         }
         return isAppLinkProvided;
     }
@@ -454,9 +442,6 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOGIN_REQUEST && resultCode == RESULT_CANCELED) {
-            finish();
-        }
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 Snackbar.make(

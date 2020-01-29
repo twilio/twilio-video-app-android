@@ -17,6 +17,7 @@
 package com.twilio.video.app.ui.settings
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
@@ -44,6 +45,7 @@ import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.ui.ScreenSelector
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -75,6 +77,8 @@ class SettingsActivity : BaseActivity() {
 
         @Inject
         internal lateinit var sharedPreferences: SharedPreferences
+        @Inject
+        internal lateinit var screenSelector: ScreenSelector
         @Inject
         internal lateinit var authenticator: Authenticator
         private var identityPreference: EditTextPreference? = null
@@ -162,13 +166,17 @@ class SettingsActivity : BaseActivity() {
 
         private fun logout() {
             requireActivity().let { activity ->
+                val loginIntent = Intent(activity, screenSelector.loginScreen)
+
                 // Clear all preferences and set defaults
                 sharedPreferences.edit().clear().apply()
                 PreferenceManager.setDefaultValues(activity, R.xml.preferences, true)
 
                 // Return to login activity
+                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 authenticator.logout()
-                activity.finish()
+                startActivity(loginIntent)
+                activity.finishAffinity()
             }
         }
 
