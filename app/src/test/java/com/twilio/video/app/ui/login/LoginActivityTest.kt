@@ -25,6 +25,7 @@ import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
 import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.screen.clickGoogleSignInButton
+import com.twilio.video.app.ui.room.RoomActivity
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -104,10 +105,10 @@ class LoginActivityTest {
                     RESULT_OK,
                     googleSignInActivityResult
             )
-
-            assertThat(shadowOf(it).resultCode, equalTo(RESULT_OK))
-            it.isFinishing
         }
+
+        val roomActivityRequest = shadowOf(testApp).nextStartedActivity
+        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
     }
 
     class TestActivity : AppCompatActivity()
