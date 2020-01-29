@@ -173,10 +173,9 @@ class SettingsActivity : BaseActivity() {
                 PreferenceManager.setDefaultValues(activity, R.xml.preferences, true)
 
                 // Return to login activity
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 authenticator.logout()
                 startActivity(loginIntent)
-                activity.finishAffinity()
+                activity.finish()
             }
         }
 
