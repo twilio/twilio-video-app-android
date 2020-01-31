@@ -28,7 +28,7 @@ integration-network-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 21}
-        - {model: Pixel2_Q, version: Q}
+        - {model: Pixel2, version: 29}
     test-targets:
         - "annotation com.twilio.video.testcategories.NetworkTest"
 
@@ -39,7 +39,7 @@ integration-participant-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 21}
-        - {model: Pixel2_Q, version: Q}
+        - {model: Pixel2, version: 29}
     test-targets:
         - "annotation com.twilio.video.testcategories.ParticipantTest"
 
@@ -50,7 +50,7 @@ integration-room-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 21}
-        - {model: Pixel2_Q, version: Q}
+        - {model: Pixel2, version: 29}
     test-targets:
         - "annotation com.twilio.video.testcategories.RoomTest"
 
@@ -61,7 +61,7 @@ integration-recording-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 21}
-        - {model: Pixel2_Q, version: Q}
+        - {model: Pixel2, version: 29}
     test-targets:
         - "annotation com.twilio.video.testcategories.RecordingTest"
 
@@ -72,7 +72,7 @@ integration-stats-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 21}
-        - {model: Pixel2_Q, version: Q}
+        - {model: Pixel2, version: 29}
     test-targets:
         - "annotation com.twilio.video.testcategories.StatsTest"
 
@@ -102,7 +102,7 @@ integration-codec-tests:
     test: library/build/outputs/apk/androidTest/debug/library-debug-androidTest.apk
     device:
         - {model: Nexus5, version: 21}
-        - {model: Pixel2_Q, version: Q}
+        - {model: Pixel2, version: 29}
     test-targets:
         - "annotation com.twilio.video.testcategories.CodecTest"
 
