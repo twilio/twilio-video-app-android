@@ -530,6 +530,8 @@ public class RoomActivity extends BaseActivity {
         if (room != null) {
             Timber.i("Exiting room");
             room.disconnect();
+
+            stopScreenCapture();
         }
     }
 
