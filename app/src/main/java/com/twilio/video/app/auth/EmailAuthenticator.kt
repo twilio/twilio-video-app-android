@@ -16,10 +16,8 @@
 
 package com.twilio.video.app.auth
 
-import android.content.SharedPreferences
 import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
 import com.twilio.video.app.auth.LoginResult.EmailLoginSuccessResult
-import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -29,7 +27,6 @@ import timber.log.Timber
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class EmailAuthenticator @JvmOverloads constructor(
     private val firebaseWrapper: FirebaseWrapper,
-    private val sharedPreferences: SharedPreferences,
     private val disposables: CompositeDisposable = CompositeDisposable()
 ) : AuthenticationProvider {
     override fun logout() {
@@ -50,8 +47,7 @@ class EmailAuthenticator @JvmOverloads constructor(
                         firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
-                                        saveIdentity(task.result?.user?.displayName, email)
-                                        observable.onNext(EmailLoginSuccessResult)
+                                        observable.onNext(EmailLoginSuccessResult(email))
                                         observable.onComplete()
                                         disposables.clear()
                                     } else {
@@ -64,15 +60,6 @@ class EmailAuthenticator @JvmOverloads constructor(
                 Timber.e(it)
             })
         }
-    }
-
-    // TODO Create Facade for SharedPreferences for ease of use and testability
-    private fun saveIdentity(displayName: String?, email: String) {
-        sharedPreferences
-                .edit()
-                .putString(Preferences.EMAIL, email)
-                .putString(Preferences.DISPLAY_NAME, displayName ?: email)
-                .apply()
     }
 
     private fun onError(observable: ObservableEmitter<LoginResult>) {
