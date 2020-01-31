@@ -34,25 +34,20 @@ public class AuthModule {
     @ApplicationScope
     Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper, Application application) {
         Context context = application.getApplicationContext();
-        List<AuthenticationProvider> authenticators = new ArrayList<>();
+        List<AuthenticationProvider> authProviders = new ArrayList<>();
+        String acceptedDomain = "twilio.com";
         GoogleSignInOptions googleSignInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(context.getString(R.string.default_web_client_id))
                         .requestEmail()
-                        .setHostedDomain("twilio.com")
+                        .setHostedDomain(acceptedDomain)
                         .build();
 
-        authenticators.add(
-                new GoogleAuthenticator(
-                        new FirebaseWrapper(),
-                        context,
-                        new GoogleAuthWrapper(),
-                        new GoogleSignInWrapper(),
-                        new GoogleSignInOptionsWrapper(googleSignInOptions),
-                        new GoogleAuthProviderWrapper(),
-                        "twilio.com"));
-        authenticators.add(new EmailAuthenticator(firebaseWrapper));
-        return new FirebaseAuthenticator(firebaseWrapper, authenticators);
+        authProviders.add(
+                GoogleAuthProvider.Companion.newInstance(
+                        context, googleSignInOptions, acceptedDomain));
+        authProviders.add(new EmailAuthProvider(firebaseWrapper));
+        return new FirebaseAuthenticator(firebaseWrapper, authProviders);
     }
 
     @Provides

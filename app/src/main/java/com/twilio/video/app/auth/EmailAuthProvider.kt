@@ -25,7 +25,7 @@ import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
-class EmailAuthenticator @JvmOverloads constructor(
+class EmailAuthProvider @JvmOverloads constructor(
     private val firebaseWrapper: FirebaseWrapper,
     private val disposables: CompositeDisposable = CompositeDisposable()
 ) : AuthenticationProvider {
