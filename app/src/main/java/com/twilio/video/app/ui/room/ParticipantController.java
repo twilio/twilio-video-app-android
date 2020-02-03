@@ -20,6 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import com.twilio.video.VideoTrack;
+import com.twilio.video.app.ui.room.ParticipantPrimaryView;
+import com.twilio.video.app.ui.room.ParticipantThumbView;
+import com.twilio.video.app.ui.room.ParticipantView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

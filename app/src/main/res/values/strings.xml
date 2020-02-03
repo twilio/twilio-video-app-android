@@ -8,6 +8,10 @@
     <string name="login_screen_auth_error_title">Login Error</string>
     <string name="login_screen_auth_error_desc">There was an issue logging in.</string>
 
+    <!--  Room Screen  -->
+    <string name="room_activity_joining">Joining…</string>
+    <string name="room_activity_failed_to_connect_to_room">Failed to connect to room</string>
+
     <!--  Settings Screen  -->
     <string name="settings_screen_advanced">Advanced</string>
     <string name="settings_screen_enable_stats">Enable Stats</string>
