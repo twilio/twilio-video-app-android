@@ -239,7 +239,7 @@ class RoomManager(
         videoConstraints = builder.build()
     }
 
-    private fun roomListener(): Room.Listener? {
+    private fun roomListener(): Room.Listener {
         return object : Room.Listener {
             override fun onConnected(room: Room) {
                 viewEvent { it.copy(isConnected = true, isDisconnected = false, room = room) }
@@ -341,8 +341,6 @@ class RoomManager(
 
     private fun connect(activity: Activity, token: String, roomName: String): Single<Room>? {
         return Single.fromCallable {
-            val env = sharedPreferences.getString(
-                    Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
             val enableInsights = sharedPreferences.getBoolean(
                     Preferences.ENABLE_INSIGHTS,
                     Preferences.ENABLE_INSIGHTS_DEFAULT)
@@ -367,17 +365,17 @@ class RoomManager(
                     Preferences.MAX_AUDIO_BITRATE,
                     Preferences.MAX_AUDIO_BITRATE_DEFAULT)
             val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
-            if (localAudioTrack != null) {
-                connectOptionsBuilder.audioTracks(listOf(localAudioTrack))
+            localAudioTrack?.let {
+                connectOptionsBuilder.audioTracks(listOf(it))
             }
             val localVideoTracks: MutableList<LocalVideoTrack> = ArrayList()
-            if (cameraVideoTrack != null) {
-                localVideoTracks.add(cameraVideoTrack)
+            cameraVideoTrack?.let {
+                localVideoTracks.add(it)
             }
-            if (screenVideoTrack != null) {
-                localVideoTracks.add(screenVideoTrack!!)
+            screenVideoTrack?.let {
+                localVideoTracks.add(it)
             }
-            if (!localVideoTracks.isEmpty()) {
+            if (localVideoTracks.isNotEmpty()) {
                 connectOptionsBuilder.videoTracks(localVideoTracks)
             }
             connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
@@ -386,7 +384,7 @@ class RoomManager(
             room = Video.connect(
                     activity,
                     connectOptionsBuilder.build(),
-                    roomListener()!!)
+                    roomListener())
             room
         }
     }

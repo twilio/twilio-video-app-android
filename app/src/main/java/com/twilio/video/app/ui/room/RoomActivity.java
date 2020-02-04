@@ -387,7 +387,7 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.local_audio_image_button)
     void toggleLocalAudio() {
-        roomManager.toggleLocalAudio();
+        roomManager.toggleLocalAudio(this);
     }
 
     @OnClick(R.id.local_video_image_button)
