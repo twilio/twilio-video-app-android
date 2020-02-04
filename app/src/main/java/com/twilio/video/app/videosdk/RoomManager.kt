@@ -2,13 +2,13 @@ package com.twilio.video.app.videosdk
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.twilio.androidenv.Env
 import com.twilio.video.*
-import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.model.RoomProperties
@@ -17,7 +17,6 @@ import com.twilio.video.app.ui.room.ParticipantPrimaryView
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
-import com.twilio.video.app.videosdk.RoomEvent.Connected
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -63,16 +62,16 @@ class RoomManager(
     private var room: Room? = null
     private var videoConstraints: VideoConstraints? = null
     private var localAudioTrack: LocalAudioTrack? = null
-    private val cameraVideoTrack: LocalVideoTrack? = null
+    private var cameraVideoTrack: LocalVideoTrack? = null
     private val restoreLocalVideoCameraTrack = false
     private var screenVideoTrack: LocalVideoTrack? = null
     private val cameraCapturer: CameraCapturerCompat? = null
-    private val screenCapturer: ScreenCapturer? = null
+    var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
             Timber.e("Screen capturer error: %s", errorDescription)
             stopScreenCapture()
-            mutableRoomEvents.value = RoomEvent.ScreenShareError
+            viewEffect(RoomViewEffect(isScreenShareError = true))
         }
 
         override fun onFirstFrameAvailable() {
@@ -81,12 +80,13 @@ class RoomManager(
     }
 
     private val rxDisposables = CompositeDisposable()
-    private val localVideoTrackNames: Map<String, String> = HashMap()
-    private val mutableRoomEvents: MutableLiveData<RoomEvent> = MutableLiveData()
-    val roomEvents: LiveData<RoomEvent> = mutableRoomEvents
+    private val localVideoTrackNames: MutableMap<String, String> = HashMap()
+    private val mutableViewEvents: MutableLiveData<RoomViewState> = MutableLiveData()
+    val viewEvents: LiveData<RoomViewState> = mutableViewEvents
+    private val mutableViewEffects: MutableLiveData<RoomViewEffect> = MutableLiveData()
+    val viewEffects: LiveData<RoomViewEffect> = mutableViewEffects
 
-    fun init(displayName: String?, context: Activity) {
-        this.displayName = displayName
+    fun init(context: Activity) {
         // Setup Audio
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.isSpeakerphoneOn = true
@@ -124,39 +124,91 @@ class RoomManager(
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError {
-                    mutableRoomEvents.value = RoomEvent.ConnectFailure
+                    viewEvent { it.copy(isConnectFailure = true) }
                 }
                 .subscribe()
     }
 
     fun toggleLocalAudio(context: Context) {
-        localAudioTrack?.let { localAudioTrack ->
+        if(localAudioTrack == null) {
             localParticipant?.let { localParticipant ->
-                this.localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
-                localParticipant.publishTrack(localAudioTrack)
+                localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
+                localAudioTrack?.let { localParticipant.publishTrack(it) }
+                viewEvent { it.copy(isLocalAudioMuted = false) }
             }
-        } ?: run {
-            localParticipant?.unpublishTrack(localAudioTrack!!)
-            localAudioTrack!!.release()
+        } else {
+            localAudioTrack?.let { localParticipant?.unpublishTrack(it) }
+            localAudioTrack?.release()
             localAudioTrack = null
+            viewEvent { it.copy(isLocalAudioMuted = true) }
         }
 
+    }
+
+    fun toggleSpeakerPhone() {
+        if (audioManager.isSpeakerphoneOn) {
+            audioManager.isSpeakerphoneOn = false
+            viewEvent { it.copy(isSpeakerPhoneMuted = true) }
+        } else {
+            audioManager.isSpeakerphoneOn = true
+            viewEvent { it.copy(isSpeakerPhoneMuted = false) }
+        }
+    }
+
+    @JvmOverloads
+    fun setupScreenCapture(context: Context, data: Intent, resultCode: Int = Activity.RESULT_OK) {
+        screenCapturer = ScreenCapturer(context, resultCode, data, screenCapturerListener)
+    }
+
+    fun startScreenCapture(context: Context, screenVideoTrackName: String) {
+        screenCapturer?.let {
+            screenVideoTrack = LocalVideoTrack.create(context, true, screenCapturer!!, SCREEN_TRACK_NAME)
+
+            if (screenVideoTrack != null && screenCapturer != null) {
+                localVideoTrackNames[screenVideoTrack!!.name] = screenVideoTrackName
+                localParticipant?.publishTrack(screenVideoTrack!!)
+            } else {
+                Timber.e("Failed to add screen video track")
+            }
+
+        } ?: run {
+            viewEffect(RoomViewEffect(requestScreenSharePermission = true))
+        }
+    }
+
+    fun stopScreenCapture() {
+        screenVideoTrack?.let { screenVideoTrack ->
+            localParticipant?.unpublishTrack(screenVideoTrack)
+            screenVideoTrack.release()
+            localVideoTrackNames.remove(screenVideoTrack.name)
+            this.screenVideoTrack = null
+            viewEvent { it.copy(isScreenShared = false) }
+        }
     }
 
     fun disconnect() {
         room?.disconnect()
         stopScreenCapture()
-    }
 
-    private fun stopScreenCapture() {
-        if (screenVideoTrack != null) {
-            localParticipant?.unpublishTrack(screenVideoTrack)
-            screenVideoTrack.release()
-            localVideoTrackNames.remove(screenVideoTrack.getName())
-            screenVideoTrack = null
-            screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp)
-            screenCaptureMenuItem.setTitle(R.string.share_screen)
+        // Reset the speakerphone
+        audioManager.isSpeakerphoneOn = false
+
+        // Teardown tracks
+        localAudioTrack?.let {
+            it.release()
+            localAudioTrack = null
         }
+        cameraVideoTrack?.let {
+            it.release()
+            cameraVideoTrack = null
+        }
+        screenVideoTrack?.let {
+            it.release()
+            screenVideoTrack = null
+        }
+
+        // dispose any token requests if needed
+        rxDisposables.clear()
     }
 
     private fun obtainVideoConstraints() {
@@ -190,7 +242,7 @@ class RoomManager(
     private fun roomListener(): Room.Listener? {
         return object : Room.Listener {
             override fun onConnected(room: Room) {
-                mutableRoomEvents.value = Connected(room)
+                viewEvent { it.copy(isConnected = true, isDisconnected = false, room = room) }
             }
 
             override fun onConnectFailure(
@@ -221,6 +273,7 @@ class RoomManager(
                 Timber.i(
                         "Disconnected from room -> sid: %s, state: %s",
                         room.sid, room.state)
+                viewEvent { it.copy(isConnected = false, isDisconnected = true, room = null) }
                 removeAllParticipants()
                 this@RoomActivity.room = null
                 this@RoomActivity.localParticipant = null
@@ -393,5 +446,20 @@ class RoomManager(
         return sharedPreferences.getBoolean(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT)
+    }
+
+    private fun viewEvent(action: (oldState: RoomViewState) -> RoomViewState) {
+        val oldState = mutableViewEvents.value
+        oldState?.let {
+            mutableViewEvents.value = action(oldState)
+        }
+    }
+
+    /*
+     * TODO Figure out how to not persist view effects on config changes
+     * See https://github.com/AdamSHurwitz/Coinverse/blob/master/app/src/main/java/app/coinverse/content/ContentViewModel.kt
+     */
+    private fun viewEffect(roomViewEffect: RoomViewEffect) {
+            mutableViewEffects.value = roomViewEffect
     }
 }

@@ -83,12 +83,8 @@ import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
-import com.twilio.video.app.videosdk.RoomEvent;
-import com.twilio.video.app.videosdk.RoomEvent.Connecting;
-import com.twilio.video.app.videosdk.RoomEvent.Disconnected;
-import com.twilio.video.app.videosdk.RoomEvent.MuteLocalAudio;
-import com.twilio.video.app.videosdk.RoomEvent.ScreenShareError;
-import com.twilio.video.app.videosdk.RoomEvent.UnmuteLocalAudio;
+import com.twilio.video.app.videosdk.RoomViewEffect;
+import com.twilio.video.app.videosdk.RoomViewState;
 import com.twilio.video.app.videosdk.RoomManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -195,12 +191,14 @@ public class RoomActivity extends BaseActivity {
         // Grab views
         setContentView(R.layout.activity_room);
         ButterKnife.bind(this);
-        roomManager.getRoomEvents().observe(this, this::bindRoomEvents);
+        roomManager.getViewEvents().observe(this, this::bindViewEvents);
+        roomManager.getViewEffects().observe(this, this::bindViewEffects);
 
         // Setup toolbar
         setSupportActionBar(toolbar);
 
-        roomManager.init(sharedPreferences.getString(Preferences.DISPLAY_NAME, null), this);
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+        roomManager.init(this);
 
         // setup participant controller
         participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
@@ -221,8 +219,23 @@ public class RoomActivity extends BaseActivity {
         updateStats();
     }
 
-    private void bindRoomEvents(@Nullable RoomEvent roomEvent) {
-        updateUi(roomEvent);
+    private void bindViewEvents(@Nullable RoomViewState viewState) {
+        updateUi(viewState);
+    }
+
+    private void bindViewEffects(@Nullable RoomViewEffect viewEffect) {
+        if(viewEffect != null) {
+            if(viewEffect.isScreenShareError()) {
+                Snackbar.make(
+                        primaryVideoView,
+                        R.string.screen_capture_error,
+                        Snackbar.LENGTH_LONG)
+                        .show();
+            }
+            if(viewEffect.getRequestScreenSharePermission()) {
+                requestScreenCapturePermission();
+            }
+        }
     }
 
     private boolean checkIntentURI() {
@@ -234,28 +247,6 @@ public class RoomActivity extends BaseActivity {
             isAppLinkProvided = true;
         }
         return isAppLinkProvided;
-    }
-
-    @Override
-    protected void onDestroy() {
-        // Reset the speakerphone
-        audioManager.setSpeakerphoneOn(false);
-        // Teardown tracks
-        if (localAudioTrack != null) {
-            localAudioTrack.release();
-            localAudioTrack = null;
-        }
-        if (cameraVideoTrack != null) {
-            cameraVideoTrack.release();
-            cameraVideoTrack = null;
-        }
-        if (screenVideoTrack != null) {
-            screenVideoTrack.release();
-            screenVideoTrack = null;
-        }
-        // dispose any token requests if needed
-        rxDisposables.clear();
-        super.onDestroy();
     }
 
     @Override
@@ -319,25 +310,15 @@ public class RoomActivity extends BaseActivity {
                 switchCamera();
                 return true;
             case R.id.speaker_menu_item:
-                if (audioManager.isSpeakerphoneOn()) {
-                    audioManager.setSpeakerphoneOn(false);
-                    item.setIcon(ic_phonelink_ring_white_24dp);
-                } else {
-                    audioManager.setSpeakerphoneOn(true);
-                    item.setIcon(ic_volume_up_white_24dp);
-                }
+                roomManager.toggleSpeakerPhone();
                 return true;
             case R.id.share_screen_menu_item:
                 String shareScreen = getString(R.string.share_screen);
 
                 if (item.getTitle().equals(shareScreen)) {
-                    if (screenCapturer == null) {
-                        requestScreenCapturePermission();
-                    } else {
-                        startScreenCapture();
-                    }
+                    roomManager.startScreenCapture(this, getString(R.string.screen_video_track));
                 } else {
-                    stopScreenCapture();
+                    roomManager.stopScreenCapture();
                 }
 
                 return true;
@@ -369,8 +350,8 @@ public class RoomActivity extends BaseActivity {
                         .show();
                 return;
             }
-            screenCapturer = new ScreenCapturer(this, resultCode, data, screenCapturerListener);
-            startScreenCapture();
+            roomManager.setupScreenCapture(this, data);
+            roomManager.startScreenCapture(this, getString(R.string.screen_video_track));
         }
     }
 
@@ -572,15 +553,15 @@ public class RoomActivity extends BaseActivity {
         primaryVideoView.showIdentityBadge(false);
     }
 
-    private void updateUi(RoomEvent roomEvent) {
-        updateUi(roomEvent, false);
+    private void updateUi(RoomViewState viewState) {
+        updateUi(viewState, false);
     }
 
     private void updateUi(boolean isAppLinkProvided) {
         updateUi(null, isAppLinkProvided);
     }
 
-    private void updateUi(@Nullable RoomEvent roomEvent, boolean isAppLinkProvided) {
+    private void updateUi(@Nullable RoomViewState viewState, boolean isAppLinkProvided) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
@@ -594,15 +575,8 @@ public class RoomActivity extends BaseActivity {
         String joinStatus = "";
         int recordingWarningVisibility = View.GONE;
 
-        if (roomEvent != null) {
-            if(roomEvent instanceof ScreenShareError) {
-                Snackbar.make(
-                        primaryVideoView,
-                        R.string.screen_capture_error,
-                        Snackbar.LENGTH_LONG)
-                        .show();
-            }
-            else if(roomEvent instanceof Connecting) {
+        if(viewState != null) {
+            if (viewState.isConnecting()) {
                 InputUtils.hideKeyboard(RoomActivity.this);
                 disconnectButtonState = View.VISIBLE;
                 joinRoomLayoutState = View.GONE;
@@ -612,29 +586,41 @@ public class RoomActivity extends BaseActivity {
 
                 connectButtonEnabled = false;
 
-                roomName = ((Connecting) roomEvent).getRoom().getName();
+                roomName = viewState.getRoom().getName();
                 joinStatus = "Joining...";
             }
-            else if(roomEvent instanceof Disconnected) {
+            if (viewState.isDisconnected()) {
                 connectButtonEnabled = true;
                 Snackbar.make(
                         primaryVideoView,
                         getString(R.string.room_activity_failed_to_connect_to_room),
                         Snackbar.LENGTH_LONG)
-                            .show();
+                        .show();
             }
-            else if(roomEvent instanceof MuteLocalAudio) {
+            if (viewState.isLocalAudioMuted()) {
                 int icon = R.drawable.ic_mic_off_gray_24px;
-                    pauseAudioMenuItem.setVisible(false);
+                pauseAudioMenuItem.setVisible(false);
                 pauseAudioMenuItem.setTitle(R.string.resume_audio);
                 localAudioImageButton.setImageResource(icon);
-            }
-            else if(roomEvent instanceof UnmuteLocalAudio) {
+            } else {
                 int icon = R.drawable.ic_mic_white_24px;
                 pauseAudioMenuItem.setVisible(true);
                 pauseAudioMenuItem.setTitle(R.string.pause_audio);
                 localAudioImageButton.setImageResource(icon);
             }
+            if (viewState.isSpeakerPhoneMuted()) {
+                ((MenuItem) findViewById(R.id.speaker_menu_item)).setIcon(ic_volume_up_white_24dp);
+            } else {
+                ((MenuItem) findViewById(R.id.speaker_menu_item)).setIcon(ic_phonelink_ring_white_24dp);
+            }
+            int icon = R.drawable.ic_screen_share_white_24dp;
+            int title = R.string.share_screen;
+            if (viewState.isScreenShared()) {
+                icon = R.drawable.ic_stop_screen_share_white_24dp;
+                title = R.string.stop_screen_share;
+            }
+            screenCaptureMenuItem.setIcon(icon);
+            screenCaptureMenuItem.setTitle(title);
         }
 
         statsListAdapter = new StatsListAdapter(this);
@@ -751,28 +737,6 @@ public class RoomActivity extends BaseActivity {
         // This initiates a prompt dialog for the user to confirm screen projection.
         startActivityForResult(
                 mediaProjectionManager.createScreenCaptureIntent(), MEDIA_PROJECTION_REQUEST_CODE);
-    }
-
-    private void startScreenCapture() {
-        screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer, SCREEN_TRACK_NAME);
-
-        if (screenVideoTrack != null) {
-            screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp);
-            screenCaptureMenuItem.setTitle(R.string.stop_screen_share);
-            localVideoTrackNames.put(
-                    screenVideoTrack.getName(), getString(R.string.screen_video_track));
-
-            if (localParticipant != null) {
-                localParticipant.publishTrack(screenVideoTrack);
-            }
-        } else {
-            Snackbar.make(
-                            primaryVideoView,
-                            R.string.failed_to_add_screen_video_track,
-                            Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .show();
-        }
     }
 
     private void toggleLocalAudioTrackState() {
