@@ -22,6 +22,8 @@ import com.twilio.video.app.ui.room.ParticipantView
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
+import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission
+import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -76,7 +78,7 @@ class RoomManager(
         override fun onScreenCaptureError(errorDescription: String) {
             Timber.e("Screen capturer error: %s", errorDescription)
             stopScreenCapture()
-            viewEffect(RoomViewEffect(isScreenShareError = true))
+            viewEffect(ScreenShareError)
         }
 
         override fun onFirstFrameAvailable() {
@@ -86,8 +88,8 @@ class RoomManager(
 
     private val rxDisposables = CompositeDisposable()
     private val localVideoTrackNames: MutableMap<String, String> = HashMap()
-    private val mutableViewEvents: MutableLiveData<RoomViewState> = MutableLiveData()
-    val viewEvents: LiveData<RoomViewState> = mutableViewEvents
+    private val mutableViewState: MutableLiveData<RoomViewState> = MutableLiveData()
+    val viewState: LiveData<RoomViewState> = mutableViewState
     private val mutableViewEffects: MutableLiveData<RoomViewEffect> = MutableLiveData()
     val viewEffects: LiveData<RoomViewEffect> = mutableViewEffects
     private var participantController: ParticipantController? = null
@@ -139,7 +141,7 @@ class RoomManager(
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError {
-                    viewEvent { it.copy(isConnectFailure = true) }
+                    updateState { it.copy(isConnectFailure = true) }
                 }
                 .subscribe()
     }
@@ -149,13 +151,13 @@ class RoomManager(
             localParticipant?.let { localParticipant ->
                 localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
                 localAudioTrack?.let { localParticipant.publishTrack(it) }
-                viewEvent { it.copy(isLocalAudioMuted = false) }
+                updateState { it.copy(isLocalAudioMuted = false) }
             }
         } else {
             localAudioTrack?.let { localParticipant?.unpublishTrack(it) }
             localAudioTrack?.release()
             localAudioTrack = null
-            viewEvent { it.copy(isLocalAudioMuted = true) }
+            updateState { it.copy(isLocalAudioMuted = true) }
         }
 
     }
@@ -163,10 +165,10 @@ class RoomManager(
     fun toggleSpeakerPhone() {
         if (audioManager.isSpeakerphoneOn) {
             audioManager.isSpeakerphoneOn = false
-            viewEvent { it.copy(isSpeakerPhoneMuted = true) }
+            updateState { it.copy(isSpeakerPhoneMuted = true) }
         } else {
             audioManager.isSpeakerphoneOn = true
-            viewEvent { it.copy(isSpeakerPhoneMuted = false) }
+            updateState { it.copy(isSpeakerPhoneMuted = false) }
         }
     }
 
@@ -187,7 +189,7 @@ class RoomManager(
             }
 
         } ?: run {
-            viewEffect(RoomViewEffect(requestScreenSharePermission = true))
+            viewEffect(RequestScreenSharePermission)
         }
     }
 
@@ -197,7 +199,7 @@ class RoomManager(
             screenVideoTrack.release()
             localVideoTrackNames.remove(screenVideoTrack.name)
             this.screenVideoTrack = null
-            viewEvent { it.copy(isScreenShared = false) }
+            updateState { it.copy(isScreenShared = false) }
         }
     }
 
@@ -297,7 +299,7 @@ class RoomManager(
     private fun roomListener(): Room.Listener {
         return object : Room.Listener {
             override fun onConnected(room: Room) {
-                viewEvent { it.copy(isConnected = true, isDisconnected = false, room = room) }
+                updateState { it.copy(isConnected = true, isDisconnected = false, room = room) }
             }
 
             override fun onConnectFailure(
@@ -328,7 +330,7 @@ class RoomManager(
                 Timber.i(
                         "Disconnected from room -> sid: %s, state: %s",
                         room.sid, room.state)
-                viewEvent { it.copy(isConnected = false, isDisconnected = true, room = null) }
+                updateState { it.copy(isConnected = false, isDisconnected = true, room = null) }
                 removeAllParticipants()
                 this@RoomActivity.room = null
                 this@RoomActivity.localParticipant = null
@@ -543,10 +545,10 @@ class RoomManager(
         }
     }
 
-    private fun viewEvent(action: (oldState: RoomViewState) -> RoomViewState) {
-        val oldState = mutableViewEvents.value
+    private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
+        val oldState = mutableViewState.value
         oldState?.let {
-            mutableViewEvents.value = action(oldState)
+            mutableViewState.value = action(oldState)
         }
     }
 

@@ -84,6 +84,8 @@ import com.twilio.video.app.util.StatsScheduler;
 import com.twilio.video.app.videosdk.ParticipantController;
 import com.twilio.video.app.videosdk.RoomManager;
 import com.twilio.video.app.videosdk.RoomViewEffect;
+import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission;
+import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError;
 import com.twilio.video.app.videosdk.RoomViewState;
 
 import org.jetbrains.annotations.NotNull;
@@ -187,7 +189,7 @@ public class RoomActivity extends BaseActivity {
         // Grab views
         setContentView(R.layout.activity_room);
         ButterKnife.bind(this);
-        roomManager.getViewEvents().observe(this, this::bindViewEvents);
+        roomManager.getViewState().observe(this, this::bindViewState);
         roomManager.getViewEffects().observe(this, this::bindViewEffects);
 
         // Setup toolbar
@@ -210,20 +212,20 @@ public class RoomActivity extends BaseActivity {
         updateStats();
     }
 
-    private void bindViewEvents(@Nullable RoomViewState viewState) {
+    private void bindViewState(@Nullable RoomViewState viewState) {
         updateUi(viewState);
     }
 
     private void bindViewEffects(@Nullable RoomViewEffect viewEffect) {
         if(viewEffect != null) {
-            if(viewEffect.isScreenShareError()) {
+            if(viewEffect instanceof ScreenShareError) {
                 Snackbar.make(
                         primaryVideoView,
                         R.string.screen_capture_error,
                         Snackbar.LENGTH_LONG)
                         .show();
             }
-            if(viewEffect.getRequestScreenSharePermission()) {
+            if(viewEffect instanceof RequestScreenSharePermission) {
                 requestScreenCapturePermission();
             }
         }
