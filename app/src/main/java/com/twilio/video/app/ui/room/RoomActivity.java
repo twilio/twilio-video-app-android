@@ -81,7 +81,6 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
-import com.twilio.video.app.videosdk.ParticipantController;
 import com.twilio.video.app.videosdk.RoomManager;
 import com.twilio.video.app.videosdk.RoomViewEffect;
 import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission;
@@ -180,6 +179,8 @@ public class RoomActivity extends BaseActivity {
 
     private String displayName;
 
+    private ParticipantController participantController;
+
     @Inject SharedPreferences sharedPreferences;
 
     @Inject
@@ -203,7 +204,9 @@ public class RoomActivity extends BaseActivity {
         // Setup toolbar
         setSupportActionBar(toolbar);
 
-        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
+        // setup participant controller
+        participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
+        participantController.setListener(participantClickListener());
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
@@ -487,10 +490,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void setupLocalMedia() {
-        ParticipantController participantController =
-                new ParticipantController(thumbnailLinearLayout, primaryVideoView);
-        roomManager.processViewEvent(new SetupLocalMedia(this,
-                participantController);
+        roomManager.processViewEvent(new SetupLocalMedia(this));
     }
 
     private boolean permissionsGranted() {
@@ -763,6 +763,55 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
+    /**
+     * Sets new item to render as primary view and moves existing primary view item to thumbs view.
+     *
+     * @param item New item to be rendered in primary view
+     */
+    private void renderItemAsPrimary(ParticipantController.Item item) {
+        // nothing to click while not in room
+        if (room == null) return;
+
+        // no need to renderer if same item clicked
+        ParticipantController.Item old = participantController.getPrimaryItem();
+        if (old != null && item.sid.equals(old.sid) && item.videoTrack == old.videoTrack) return;
+
+        // add back old participant to thumbs
+        if (old != null) {
+
+            if (old.sid.equals(localParticipantSid)) {
+
+                // toggle local participant state
+                int state =
+                        old.videoTrack == null
+                                ? ParticipantView.State.NO_VIDEO
+                                : ParticipantView.State.VIDEO;
+                participantController.updateThumb(old.sid, old.videoTrack, state);
+                participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
+
+            } else {
+
+                // add thumb for remote participant
+                participantController.addThumb(old);
+            }
+        }
+
+        // handle new primary participant click
+        participantController.renderAsPrimary(item);
+
+        if (item.sid.equals(localParticipantSid)) {
+
+            // toggle local participant state and hide his badge
+            participantController.updateThumb(
+                    item.sid, item.videoTrack, ParticipantView.State.SELECTED);
+            participantController.getPrimaryView().showIdentityBadge(false);
+        } else {
+
+            // remove remote participant thumb
+            participantController.removeThumb(item);
+        }
+    }
+
     /** Removes all participant thumbs and push local camera as primary with empty sid. */
     private void removeAllParticipants() {
         if (room != null) {
@@ -862,6 +911,17 @@ public class RoomActivity extends BaseActivity {
                         statsReports, room.getRemoteParticipants(), localVideoTrackNames);
             }
         };
+    }
+
+    /**
+     * Provides participant thumb click listener. On thumb click appropriate video track is being
+     * send to primary view. If local camera track becomes primary, it should just change it state
+     * to SELECTED state, if remote particpant track is going to be primary - thumb is removed.
+     *
+     * @return participant click listener.
+     */
+    private ParticipantController.ItemClickListener participantClickListener() {
+        return this::renderItemAsPrimary;
     }
 
     private void initializeRoom() {

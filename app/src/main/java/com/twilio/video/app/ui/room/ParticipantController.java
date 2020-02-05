@@ -20,16 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import com.twilio.video.VideoTrack;
-import com.twilio.video.app.ui.room.ParticipantPrimaryView;
-import com.twilio.video.app.ui.room.ParticipantThumbView;
-import com.twilio.video.app.ui.room.ParticipantView;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /** ParticipantController is main controlling party for rendering participants. */
-public class ParticipantController {
+class ParticipantController {
 
     /**
      * Data container about primary participant - sid, identity, video track, audio state and
@@ -314,7 +310,7 @@ public class ParticipantController {
      * @param muted participant audio state.
      * @param mirror enable/disable mirroring for video track.
      */
-    public void renderAsPrimary(
+    void renderAsPrimary(
             String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
 
         Item old = primaryItem;
@@ -438,7 +434,7 @@ public class ParticipantController {
     }
 
     /** RemoteParticipant information data holder. */
-    public static class Item {
+    static class Item {
 
         /** RemoteParticipant unique identifier. */
         String sid;

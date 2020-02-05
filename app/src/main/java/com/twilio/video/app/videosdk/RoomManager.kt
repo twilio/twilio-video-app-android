@@ -93,14 +93,11 @@ class RoomManager(
     val viewState: LiveData<RoomViewState> = mutableViewState
     private val mutableViewEffects: MutableLiveData<RoomViewEffect> = MutableLiveData()
     val viewEffects: LiveData<RoomViewEffect> = mutableViewEffects
-    private var participantController: ParticipantController? = null
 
     fun processViewEvent(viewEvent: RoomViewEvent) {
         Timber.d("Processing ViewEvent: $viewEvent")
         when(viewEvent) {
-            is SetupLocalMedia -> { setupLocalMedia(viewEvent.activity,
-                    viewEvent.participantController)
-            }
+            is SetupLocalMedia -> { setupLocalMedia(viewEvent.activity) }
             is ConnectToRoom -> { connectToRoom(viewEvent.roomName, viewEvent.tokenIdentity) }
             ToggleLocalAudio -> { toggleLocalAudio() }
             ToggleSpeakerPhone -> { toggleSpeakerPhone() }
@@ -112,17 +109,15 @@ class RoomManager(
     }
 
     // TODO Remove activity dependency
-    private fun setupLocalMedia(activity: Activity,
-                        participantController: ParticipantController) {
+    private fun setupLocalMedia(activity: Activity) {
         // Setup Audio
         audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.isSpeakerphoneOn = true
         savedVolumeControlStream = activity.volumeControlStream
         obtainVideoConstraints()
-        localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME)
+        localAudioTrack = LocalAudioTrack.create(activity, true, MICROPHONE_TRACK_NAME)
 
         // Setup Video
-        participantController.setListener(participantClickListener())
         setupLocalVideoTrack(context.getString(R.string.video_track))
         renderLocalParticipantStub(context.getString(R.string.you))
     }
@@ -515,48 +510,6 @@ class RoomManager(
         return sharedPreferences.getBoolean(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT)
-    }
-
-    /**
-     * Provides participant thumb click listener. On thumb click appropriate video track is being
-     * send to primary view. If local camera track becomes primary, it should just change it state
-     * to SELECTED state, if remote particpant track is going to be primary - thumb is removed.
-     *
-     * @return participant click listener.
-     */
-    private fun participantClickListener(): ItemClickListener? {
-        return ItemClickListener { item: ParticipantController.Item? -> this.renderItemAsPrimary(item) }
-    }
-
-    /**
-     * Sets new item to render as primary view and moves existing primary view item to thumbs view.
-     *
-     * @param item New item to be rendered in primary view
-     */
-    private fun renderItemAsPrimary(item: ParticipantController.Item) { // nothing to click while not in room
-        if (room == null) return
-        // no need to renderer if same item clicked
-        val old = participantController!!.getPrimaryItem()
-        if (old != null && item.sid == old.sid && item.videoTrack === old.videoTrack) return
-        // add back old participant to thumbs
-        if (old != null) {
-            if (old.sid == localParticipantSid) { // toggle local participant state
-                val state = if (old.videoTrack == null) ParticipantView.State.NO_VIDEO else ParticipantView.State.VIDEO
-                participantController!!.updateThumb(old.sid, old.videoTrack, state)
-                participantController!!.updateThumb(old.sid, old.videoTrack, old.mirror)
-            } else { // add thumb for remote participant
-                participantController!!.addThumb(old)
-            }
-        }
-        // handle new primary participant click
-        participantController!!.renderAsPrimary(item)
-        if (item.sid == localParticipantSid) { // toggle local participant state and hide his badge
-            participantController!!.updateThumb(
-                    item.sid, item.videoTrack, ParticipantView.State.SELECTED)
-            participantController!!.getPrimaryView().showIdentityBadge(false)
-        } else { // remove remote participant thumb
-            participantController!!.removeThumb(item)
-        }
     }
 
     private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
