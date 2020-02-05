@@ -86,6 +86,14 @@ import com.twilio.video.app.videosdk.RoomManager;
 import com.twilio.video.app.videosdk.RoomViewEffect;
 import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission;
 import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError;
+import com.twilio.video.app.videosdk.RoomViewEvent;
+import com.twilio.video.app.videosdk.RoomViewEvent.ConnectToRoom;
+import com.twilio.video.app.videosdk.RoomViewEvent.DisconnectFromRoom;
+import com.twilio.video.app.videosdk.RoomViewEvent.SetupLocalMedia;
+import com.twilio.video.app.videosdk.RoomViewEvent.StartScreenCapture;
+import com.twilio.video.app.videosdk.RoomViewEvent.StopScreenCapture;
+import com.twilio.video.app.videosdk.RoomViewEvent.ToggleLocalAudio;
+import com.twilio.video.app.videosdk.RoomViewEvent.ToggleSpeakerPhone;
 import com.twilio.video.app.videosdk.RoomViewState;
 
 import org.jetbrains.annotations.NotNull;
@@ -303,15 +311,15 @@ public class RoomActivity extends BaseActivity {
                 switchCamera();
                 return true;
             case R.id.speaker_menu_item:
-                roomManager.toggleSpeakerPhone();
+                roomManager.processViewEvent(ToggleSpeakerPhone.INSTANCE);
                 return true;
             case R.id.share_screen_menu_item:
                 String shareScreen = getString(R.string.share_screen);
 
                 if (item.getTitle().equals(shareScreen)) {
-                    roomManager.startScreenCapture(this, getString(R.string.screen_video_track));
+                    roomManager.processViewEvent(StartScreenCapture.INSTANCE);
                 } else {
-                    roomManager.stopScreenCapture();
+                    roomManager.processViewEvent(StopScreenCapture.INSTANCE);
                 }
 
                 return true;
@@ -343,8 +351,8 @@ public class RoomActivity extends BaseActivity {
                         .show();
                 return;
             }
-            roomManager.setupScreenCapture(this, data);
-            roomManager.startScreenCapture(this, getString(R.string.screen_video_track));
+            roomManager.processViewEvent(new RoomViewEvent.SetupScreenCapture(data));
+            roomManager.processViewEvent(StartScreenCapture.INSTANCE);
         }
     }
 
@@ -369,18 +377,18 @@ public class RoomActivity extends BaseActivity {
         Editable text = roomEditText.getText();
         if (text != null) {
             final String roomName = text.toString();
-            roomManager.connectToRoom(this, roomName, displayName);
+            roomManager.processViewEvent(new ConnectToRoom(roomName, displayName));
         }
     }
 
     @OnClick(R.id.disconnect)
     void disconnectButtonClick() {
-        roomManager.disconnect();
+        roomManager.processViewEvent(DisconnectFromRoom.INSTANCE);
     }
 
     @OnClick(R.id.local_audio_image_button)
     void toggleLocalAudio() {
-        roomManager.toggleLocalAudio(this);
+        roomManager.processViewEvent(ToggleLocalAudio.INSTANCE);
     }
 
     @OnClick(R.id.local_video_image_button)
@@ -481,10 +489,7 @@ public class RoomActivity extends BaseActivity {
     private void setupLocalMedia() {
         ParticipantController participantController =
                 new ParticipantController(thumbnailLinearLayout, primaryVideoView);
-        roomManager.setupLocalMedia(
-                this,
-                getString(R.string.local_video_track),
-                getString(R.string.you),
+        roomManager.processViewEvent(new SetupLocalMedia(this,
                 participantController);
     }
 

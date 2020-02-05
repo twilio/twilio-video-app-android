@@ -18,12 +18,12 @@ import com.twilio.video.app.data.api.model.Topology
 import com.twilio.video.app.ui.room.ParticipantController
 import com.twilio.video.app.ui.room.ParticipantController.ItemClickListener
 import com.twilio.video.app.ui.room.ParticipantPrimaryView
-import com.twilio.video.app.ui.room.ParticipantView
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
 import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission
 import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError
+import com.twilio.video.app.videosdk.RoomViewEvent.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -33,7 +33,8 @@ import java.util.*
 
 class RoomManager(
         private val sharedPreferences: SharedPreferences,
-        private val tokenService: TokenService
+        private val tokenService: TokenService,
+        private val context: Context
 ) {
     private val STATS_DELAY = 1000 // milliseconds
 
@@ -94,10 +95,24 @@ class RoomManager(
     val viewEffects: LiveData<RoomViewEffect> = mutableViewEffects
     private var participantController: ParticipantController? = null
 
-    /** Initialize local media and provide stub participant for primary view.  */
-    fun setupLocalMedia(activity: Activity,
-                        videoTrackName: String,
-                        localParticipantName: String,
+    fun processViewEvent(viewEvent: RoomViewEvent) {
+        Timber.d("Processing ViewEvent: $viewEvent")
+        when(viewEvent) {
+            is SetupLocalMedia -> { setupLocalMedia(viewEvent.activity,
+                    viewEvent.participantController)
+            }
+            is ConnectToRoom -> { connectToRoom(viewEvent.roomName, viewEvent.tokenIdentity) }
+            ToggleLocalAudio -> { toggleLocalAudio() }
+            ToggleSpeakerPhone -> { toggleSpeakerPhone() }
+            is SetupScreenCapture -> { setupScreenCapture(viewEvent.data) }
+            StartScreenCapture -> { startScreenCapture() }
+            StopScreenCapture -> { stopScreenCapture() }
+            DisconnectFromRoom -> { disconnectFromRoom() }
+        }
+    }
+
+    // TODO Remove activity dependency
+    private fun setupLocalMedia(activity: Activity,
                         participantController: ParticipantController) {
         // Setup Audio
         audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -112,7 +127,7 @@ class RoomManager(
         renderLocalParticipantStub(localParticipantName)
     }
 
-    fun connectToRoom(activity: Activity, roomName: String, tokenIdentity: String) {
+    private fun connectToRoom(roomName: String, tokenIdentity: String) {
         // obtain latest environment preferences
         val roomProperties =
                 RoomProperties.Builder()
@@ -128,13 +143,13 @@ class RoomManager(
                                         Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
                         .createRoomProperties()
 
-        rxDisposables + updateEnv(activity)
+        rxDisposables + updateEnv()
                 .andThen(tokenService.getToken(tokenIdentity, roomProperties))
                 .onErrorResumeNext { e ->
                     Timber.e(e, "Fetch access token failed")
                     Single.error(e)
                 }
-                .flatMap { token -> connect(activity, token, roomName }
+                .flatMap { token -> connect(token, roomName }
                 .onErrorResumeNext { e ->
                     Timber.e(e, "Connection to room failed")
                     Single.error(e)
@@ -146,7 +161,7 @@ class RoomManager(
                 .subscribe()
     }
 
-    fun toggleLocalAudio(context: Context) {
+    private fun toggleLocalAudio() {
         if(localAudioTrack == null) {
             localParticipant?.let { localParticipant ->
                 localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
@@ -162,7 +177,7 @@ class RoomManager(
 
     }
 
-    fun toggleSpeakerPhone() {
+    private fun toggleSpeakerPhone() {
         if (audioManager.isSpeakerphoneOn) {
             audioManager.isSpeakerphoneOn = false
             updateState { it.copy(isSpeakerPhoneMuted = true) }
@@ -172,12 +187,11 @@ class RoomManager(
         }
     }
 
-    @JvmOverloads
-    fun setupScreenCapture(context: Context, data: Intent, resultCode: Int = Activity.RESULT_OK) {
+    private fun setupScreenCapture(data: Intent, resultCode: Int = Activity.RESULT_OK) {
         screenCapturer = ScreenCapturer(context, resultCode, data, screenCapturerListener)
     }
 
-    fun startScreenCapture(context: Context, screenVideoTrackName: String) {
+    private fun startScreenCapture() {
         screenCapturer?.let {
             screenVideoTrack = LocalVideoTrack.create(context, true, screenCapturer!!, SCREEN_TRACK_NAME)
 
@@ -193,7 +207,7 @@ class RoomManager(
         }
     }
 
-    fun stopScreenCapture() {
+    private fun stopScreenCapture() {
         screenVideoTrack?.let { screenVideoTrack ->
             localParticipant?.unpublishTrack(screenVideoTrack)
             screenVideoTrack.release()
@@ -203,7 +217,7 @@ class RoomManager(
         }
     }
 
-    fun disconnect() {
+    private fun disconnectFromRoom() {
         room?.disconnect()
         stopScreenCapture()
 
@@ -396,7 +410,7 @@ class RoomManager(
         }
     }
 
-    private fun connect(activity: Activity, token: String, roomName: String): Single<Room>? {
+    private fun connect(token: String, roomName: String): Single<Room>? {
         return Single.fromCallable {
             val enableInsights = sharedPreferences.getBoolean(
                     Preferences.ENABLE_INSIGHTS,
@@ -439,20 +453,20 @@ class RoomManager(
             connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
             connectOptionsBuilder.encodingParameters(encodingParameters)
             room = Video.connect(
-                    activity,
+                    context,
                     connectOptionsBuilder.build(),
                     roomListener())
             room
         }
     }
 
-    private fun updateEnv(activity: Activity): Completable {
+    private fun updateEnv(): Completable {
         return Completable.fromAction {
             val env = sharedPreferences.getString(
                     Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
             val nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env)
             Env.set(
-                    activity,
+                    context,
                     EnvUtil.TWILIO_ENV_KEY,
                     nativeEnvironmentVariableValue,
                     true)
@@ -552,10 +566,6 @@ class RoomManager(
         }
     }
 
-    /*
-     * TODO Figure out how to not persist view effects on config changes
-     * See https://github.com/AdamSHurwitz/Coinverse/blob/master/app/src/main/java/app/coinverse/content/ContentViewModel.kt
-     */
     private fun viewEffect(roomViewEffect: RoomViewEffect) {
         mutableViewEffects.value = roomViewEffect
     }
