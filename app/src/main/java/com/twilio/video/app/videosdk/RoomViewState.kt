@@ -1,5 +1,6 @@
 package com.twilio.video.app.videosdk
 
+import com.twilio.video.Participant
 import com.twilio.video.Room
 
 data class RoomViewState(
@@ -10,5 +11,15 @@ data class RoomViewState(
         val isLocalAudioMuted: Boolean = false,
         val isSpeakerPhoneMuted: Boolean = false,
         val isScreenShared: Boolean = false,
-        val room: Room? = null
+        val room: Room? = null,
+        val primaryParticipant: ParticipantViewState? = null,
+        val remoteParticipants: List<ParticipantViewState>? = null
+)
+
+data class ParticipantViewState(
+    val participant: Participant,
+    val isMuted: Boolean = false,
+    val isMirrored: Boolean = true,
+    val showNetworkQualityLevel: Boolean = true,
+    val isDominantSpeaker: Boolean = false
 )
