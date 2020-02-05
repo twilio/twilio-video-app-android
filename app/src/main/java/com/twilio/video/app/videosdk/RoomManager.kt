@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.media.AudioManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.snackbar.Snackbar
 import com.twilio.androidenv.Env
 import com.twilio.video.*
 import com.twilio.video.app.R
@@ -15,8 +14,6 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.model.RoomProperties
 import com.twilio.video.app.data.api.model.Topology
-import com.twilio.video.app.ui.room.ParticipantController
-import com.twilio.video.app.ui.room.ParticipantController.ItemClickListener
 import com.twilio.video.app.ui.room.ParticipantPrimaryView
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
@@ -256,24 +253,22 @@ class RoomManager(
 
     private fun setupLocalVideoTrack(videoTrackName: String) {
         if (cameraCapturer == null) {
-            cameraCapturer = CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA)
+            cameraCapturer = CameraCapturerCompat(context, CameraCapturer.CameraSource.FRONT_CAMERA)
         }
-        cameraVideoTrack = LocalVideoTrack.create(
-                this,
-                true,
-                cameraCapturer.getVideoCapturer(),
-                videoConstraints,
-                CAMERA_TRACK_NAME)
-        if (cameraVideoTrack != null) {
-            localVideoTrackNames[cameraVideoTrack!!.name] = videoTrackName
+        cameraCapturer?.let { cameraCapturer ->
+            cameraVideoTrack = LocalVideoTrack.create(
+                    context,
+                    true,
+                    cameraCapturer.videoCapturer,
+                    videoConstraints,
+                    CAMERA_TRACK_NAME)
+        }
+        cameraVideoTrack?.let { cameraVideoTrack ->
+            localVideoTrackNames[cameraVideoTrack.name] = videoTrackName
             // Share camera video track if we are connected to room
-            localParticipant?.publishTrack(cameraVideoTrack!!)
-        } else {
-            Snackbar.make(
-                    primaryVideoView,
-                    R.string.failed_to_add_camera_video_track,
-                    Snackbar.LENGTH_LONG)
-                    .show()
+            localParticipant?.publishTrack(cameraVideoTrack)
+        } ?: run {
+            Timber.e("Failed to add camera video track")
         }
     }
 
