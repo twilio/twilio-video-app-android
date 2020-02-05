@@ -71,7 +71,6 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.Room;
-import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.TwilioException;
 import com.twilio.video.VideoTrack;
@@ -80,12 +79,12 @@ import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.settings.SettingsActivity;
-import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
+import com.twilio.video.app.videosdk.ParticipantController;
+import com.twilio.video.app.videosdk.RoomManager;
 import com.twilio.video.app.videosdk.RoomViewEffect;
 import com.twilio.video.app.videosdk.RoomViewState;
-import com.twilio.video.app.videosdk.RoomManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -171,9 +170,6 @@ public class RoomActivity extends BaseActivity {
 
     private String displayName;
 
-    /** Coordinates participant thumbs and primary participant rendering.  */
-    private ParticipantController participantController;
-
     @Inject SharedPreferences sharedPreferences;
 
     @Inject
@@ -198,11 +194,6 @@ public class RoomActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        roomManager.init(this);
-
-        // setup participant controller
-        participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
-        participantController.setListener(participantClickListener());
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
@@ -485,6 +476,16 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
+    private void setupLocalMedia() {
+        ParticipantController participantController =
+                new ParticipantController(thumbnailLinearLayout, primaryVideoView);
+        roomManager.setupLocalMedia(
+                this,
+                getString(R.string.local_video_track),
+                getString(R.string.you),
+                participantController);
+    }
+
     private boolean permissionsGranted() {
         int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
@@ -494,63 +495,6 @@ public class RoomActivity extends BaseActivity {
         return ((resultCamera == PackageManager.PERMISSION_GRANTED)
                 && (resultMic == PackageManager.PERMISSION_GRANTED)
                 && (resultStorage == PackageManager.PERMISSION_GRANTED));
-    }
-
-    /** Initialize local media and provide stub participant for primary view. */
-    private void setupLocalMedia() {
-        localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
-        setupLocalVideoTrack();
-        renderLocalParticipantStub();
-    }
-
-    /** Create local video track */
-    private void setupLocalVideoTrack() {
-
-        // initialize capturer only once if needed
-        if (cameraCapturer == null) {
-            cameraCapturer =
-                    new CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA);
-        }
-
-        cameraVideoTrack =
-                LocalVideoTrack.create(
-                        this,
-                        true,
-                        cameraCapturer.getVideoCapturer(),
-                        videoConstraints,
-                        CAMERA_TRACK_NAME);
-        if (cameraVideoTrack != null) {
-            localVideoTrackNames.put(
-                    cameraVideoTrack.getName(), getString(R.string.camera_video_track));
-
-            // Share camera video track if we are connected to room
-            if (localParticipant != null) {
-                localParticipant.publishTrack(cameraVideoTrack);
-            }
-        } else {
-            Snackbar.make(
-                            primaryVideoView,
-                            R.string.failed_to_add_camera_video_track,
-                            Snackbar.LENGTH_LONG)
-                    .show();
-        }
-    }
-
-    /**
-     * Render local video track.
-     *
-     * <p>NOTE: Stub participant is created in controller. Make sure to remove it when connected to
-     * room.
-     */
-    private void renderLocalParticipantStub() {
-        participantController.renderAsPrimary(
-                localParticipantSid,
-                getString(R.string.you),
-                cameraVideoTrack,
-                localAudioTrack == null,
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
-
-        primaryVideoView.showIdentityBadge(false);
     }
 
     private void updateUi(RoomViewState viewState) {
@@ -812,55 +756,6 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Sets new item to render as primary view and moves existing primary view item to thumbs view.
-     *
-     * @param item New item to be rendered in primary view
-     */
-    private void renderItemAsPrimary(ParticipantController.Item item) {
-        // nothing to click while not in room
-        if (room == null) return;
-
-        // no need to renderer if same item clicked
-        ParticipantController.Item old = participantController.getPrimaryItem();
-        if (old != null && item.sid.equals(old.sid) && item.videoTrack == old.videoTrack) return;
-
-        // add back old participant to thumbs
-        if (old != null) {
-
-            if (old.sid.equals(localParticipantSid)) {
-
-                // toggle local participant state
-                int state =
-                        old.videoTrack == null
-                                ? ParticipantView.State.NO_VIDEO
-                                : ParticipantView.State.VIDEO;
-                participantController.updateThumb(old.sid, old.videoTrack, state);
-                participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
-
-            } else {
-
-                // add thumb for remote participant
-                participantController.addThumb(old);
-            }
-        }
-
-        // handle new primary participant click
-        participantController.renderAsPrimary(item);
-
-        if (item.sid.equals(localParticipantSid)) {
-
-            // toggle local participant state and hide his badge
-            participantController.updateThumb(
-                    item.sid, item.videoTrack, ParticipantView.State.SELECTED);
-            participantController.getPrimaryView().showIdentityBadge(false);
-        } else {
-
-            // remove remote participant thumb
-            participantController.removeThumb(item);
-        }
-    }
-
     /** Removes all participant thumbs and push local camera as primary with empty sid. */
     private void removeAllParticipants() {
         if (room != null) {
@@ -960,17 +855,6 @@ public class RoomActivity extends BaseActivity {
                         statsReports, room.getRemoteParticipants(), localVideoTrackNames);
             }
         };
-    }
-
-    /**
-     * Provides participant thumb click listener. On thumb click appropriate video track is being
-     * send to primary view. If local camera track becomes primary, it should just change it state
-     * to SELECTED state, if remote particpant track is going to be primary - thumb is removed.
-     *
-     * @return participant click listener.
-     */
-    private ParticipantController.ItemClickListener participantClickListener() {
-        return this::renderItemAsPrimary;
     }
 
     private void initializeRoom() {

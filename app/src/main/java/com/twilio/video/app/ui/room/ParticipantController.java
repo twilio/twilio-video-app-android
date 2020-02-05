@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** ParticipantController is main controlling party for rendering participants. */
-class ParticipantController {
+public class ParticipantController {
 
     /**
      * Data container about primary participant - sid, identity, video track, audio state and
@@ -314,7 +314,7 @@ class ParticipantController {
      * @param muted participant audio state.
      * @param mirror enable/disable mirroring for video track.
      */
-    void renderAsPrimary(
+    public void renderAsPrimary(
             String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
 
         Item old = primaryItem;
@@ -438,7 +438,7 @@ class ParticipantController {
     }
 
     /** RemoteParticipant information data holder. */
-    static class Item {
+    public static class Item {
 
         /** RemoteParticipant unique identifier. */
         String sid;

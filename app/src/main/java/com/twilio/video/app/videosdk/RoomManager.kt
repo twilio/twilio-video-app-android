@@ -7,13 +7,18 @@ import android.content.SharedPreferences
 import android.media.AudioManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.snackbar.Snackbar
 import com.twilio.androidenv.Env
 import com.twilio.video.*
+import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.model.RoomProperties
 import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.ui.room.ParticipantController
+import com.twilio.video.app.ui.room.ParticipantController.ItemClickListener
 import com.twilio.video.app.ui.room.ParticipantPrimaryView
+import com.twilio.video.app.ui.room.ParticipantView
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
@@ -65,7 +70,7 @@ class RoomManager(
     private var cameraVideoTrack: LocalVideoTrack? = null
     private val restoreLocalVideoCameraTrack = false
     private var screenVideoTrack: LocalVideoTrack? = null
-    private val cameraCapturer: CameraCapturerCompat? = null
+    private var cameraCapturer: CameraCapturerCompat? = null
     var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
@@ -85,15 +90,25 @@ class RoomManager(
     val viewEvents: LiveData<RoomViewState> = mutableViewEvents
     private val mutableViewEffects: MutableLiveData<RoomViewEffect> = MutableLiveData()
     val viewEffects: LiveData<RoomViewEffect> = mutableViewEffects
+    private var participantController: ParticipantController? = null
 
-    fun init(context: Activity) {
+    /** Initialize local media and provide stub participant for primary view.  */
+    fun setupLocalMedia(activity: Activity,
+                        videoTrackName: String,
+                        localParticipantName: String,
+                        participantController: ParticipantController) {
         // Setup Audio
-        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.isSpeakerphoneOn = true
-        savedVolumeControlStream = context.volumeControlStream
+        savedVolumeControlStream = activity.volumeControlStream
         obtainVideoConstraints()
-    }
+        localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME)
 
+        // Setup Video
+        participantController.setListener(participantClickListener())
+        setupLocalVideoTrack(videoTrackName)
+        renderLocalParticipantStub(localParticipantName)
+    }
 
     fun connectToRoom(activity: Activity, roomName: String, tokenIdentity: String) {
         // obtain latest environment preferences
@@ -209,6 +224,46 @@ class RoomManager(
 
         // dispose any token requests if needed
         rxDisposables.clear()
+    }
+
+    /**
+     * Render local video track.
+     *
+     *
+     * NOTE: Stub participant is created in controller. Make sure to remove it when connected to
+     * room.
+     */
+    private fun renderLocalParticipantStub(localParticipantName: String) {
+        participantController.renderAsPrimary(
+                localParticipantSid,
+                localParticipantName,
+                cameraVideoTrack,
+                localAudioTrack == null,
+                cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA)
+        primaryVideoView.showIdentityBadge(false)
+    }
+
+    private fun setupLocalVideoTrack(videoTrackName: String) {
+        if (cameraCapturer == null) {
+            cameraCapturer = CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA)
+        }
+        cameraVideoTrack = LocalVideoTrack.create(
+                this,
+                true,
+                cameraCapturer.getVideoCapturer(),
+                videoConstraints,
+                CAMERA_TRACK_NAME)
+        if (cameraVideoTrack != null) {
+            localVideoTrackNames[cameraVideoTrack!!.name] = videoTrackName
+            // Share camera video track if we are connected to room
+            localParticipant?.publishTrack(cameraVideoTrack!!)
+        } else {
+            Snackbar.make(
+                    primaryVideoView,
+                    R.string.failed_to_add_camera_video_track,
+                    Snackbar.LENGTH_LONG)
+                    .show()
+        }
     }
 
     private fun obtainVideoConstraints() {
@@ -446,6 +501,48 @@ class RoomManager(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT)
     }
 
+    /**
+     * Provides participant thumb click listener. On thumb click appropriate video track is being
+     * send to primary view. If local camera track becomes primary, it should just change it state
+     * to SELECTED state, if remote particpant track is going to be primary - thumb is removed.
+     *
+     * @return participant click listener.
+     */
+    private fun participantClickListener(): ItemClickListener? {
+        return ItemClickListener { item: ParticipantController.Item? -> this.renderItemAsPrimary(item) }
+    }
+
+    /**
+     * Sets new item to render as primary view and moves existing primary view item to thumbs view.
+     *
+     * @param item New item to be rendered in primary view
+     */
+    private fun renderItemAsPrimary(item: ParticipantController.Item) { // nothing to click while not in room
+        if (room == null) return
+        // no need to renderer if same item clicked
+        val old = participantController!!.getPrimaryItem()
+        if (old != null && item.sid == old.sid && item.videoTrack === old.videoTrack) return
+        // add back old participant to thumbs
+        if (old != null) {
+            if (old.sid == localParticipantSid) { // toggle local participant state
+                val state = if (old.videoTrack == null) ParticipantView.State.NO_VIDEO else ParticipantView.State.VIDEO
+                participantController!!.updateThumb(old.sid, old.videoTrack, state)
+                participantController!!.updateThumb(old.sid, old.videoTrack, old.mirror)
+            } else { // add thumb for remote participant
+                participantController!!.addThumb(old)
+            }
+        }
+        // handle new primary participant click
+        participantController!!.renderAsPrimary(item)
+        if (item.sid == localParticipantSid) { // toggle local participant state and hide his badge
+            participantController!!.updateThumb(
+                    item.sid, item.videoTrack, ParticipantView.State.SELECTED)
+            participantController!!.getPrimaryView().showIdentityBadge(false)
+        } else { // remove remote participant thumb
+            participantController!!.removeThumb(item)
+        }
+    }
+
     private fun viewEvent(action: (oldState: RoomViewState) -> RoomViewState) {
         val oldState = mutableViewEvents.value
         oldState?.let {
@@ -458,6 +555,6 @@ class RoomManager(
      * See https://github.com/AdamSHurwitz/Coinverse/blob/master/app/src/main/java/app/coinverse/content/ContentViewModel.kt
      */
     private fun viewEffect(roomViewEffect: RoomViewEffect) {
-            mutableViewEffects.value = roomViewEffect
+        mutableViewEffects.value = roomViewEffect
     }
 }
