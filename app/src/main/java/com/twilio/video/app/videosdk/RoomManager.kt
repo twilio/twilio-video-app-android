@@ -123,8 +123,8 @@ class RoomManager(
 
         // Setup Video
         participantController.setListener(participantClickListener())
-        setupLocalVideoTrack(videoTrackName)
-        renderLocalParticipantStub(localParticipantName)
+        setupLocalVideoTrack(context.getString(R.string.video_track))
+        renderLocalParticipantStub(context.getString(R.string.you))
     }
 
     private fun connectToRoom(roomName: String, tokenIdentity: String) {
@@ -149,7 +149,7 @@ class RoomManager(
                     Timber.e(e, "Fetch access token failed")
                     Single.error(e)
                 }
-                .flatMap { token -> connect(token, roomName }
+                .flatMap { token -> connect(token, roomName) }
                 .onErrorResumeNext { e ->
                     Timber.e(e, "Connection to room failed")
                     Single.error(e)
@@ -196,7 +196,7 @@ class RoomManager(
             screenVideoTrack = LocalVideoTrack.create(context, true, screenCapturer!!, SCREEN_TRACK_NAME)
 
             if (screenVideoTrack != null && screenCapturer != null) {
-                localVideoTrackNames[screenVideoTrack!!.name] = screenVideoTrackName
+                localVideoTrackNames[screenVideoTrack!!.name] = context.getString(R.string.screen_video_track)
                 localParticipant?.publishTrack(screenVideoTrack!!)
             } else {
                 Timber.e("Failed to add screen video track")
