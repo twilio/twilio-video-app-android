@@ -532,7 +532,7 @@ public class RoomActivity extends BaseActivity {
             //                        .show();
             //            }
             //            if (viewState.isLocalAudioMuted()) {
-            //                int icon = R.drawable.ic_mic_off_gray_24px;
+            int icon = R.drawable.ic_mic_off_gray_24px;
             //                pauseAudioMenuItem.setVisible(false);
             //                pauseAudioMenuItem.setTitle(R.string.resume_audio);
             //                localAudioImageButton.setImageResource(icon);
@@ -552,7 +552,7 @@ public class RoomActivity extends BaseActivity {
             //            int icon = R.drawable.ic_screen_share_white_24dp;
             //            int title = R.string.share_screen;
             //            if (viewState.isScreenShared()) {
-            //                icon = R.drawable.ic_stop_screen_share_white_24dp;
+            icon = R.drawable.ic_stop_screen_share_white_24dp;
             //                title = R.string.stop_screen_share;
             //            }
             //            screenCaptureMenuItem.setIcon(icon);
