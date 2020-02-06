@@ -18,6 +18,7 @@ package com.twilio.video.app.ui.login;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -34,6 +35,8 @@ import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.ui.room.RoomActivity;
+
 import javax.inject.Inject;
 import timber.log.Timber;
 
@@ -89,7 +92,8 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void startLobbyActivity() {
-        setResult(RESULT_OK);
+        Intent intent = new Intent(this, RoomActivity.class);
+        startActivity(intent);
         finish();
     }
 }
