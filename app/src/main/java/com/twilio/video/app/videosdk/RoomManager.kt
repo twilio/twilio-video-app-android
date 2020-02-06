@@ -8,30 +8,59 @@ import android.media.AudioManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.twilio.androidenv.Env
-import com.twilio.video.*
+import com.twilio.video.AspectRatio
+import com.twilio.video.AudioCodec
+import com.twilio.video.CameraCapturer
+import com.twilio.video.ConnectOptions
+import com.twilio.video.EncodingParameters
+import com.twilio.video.G722Codec
+import com.twilio.video.H264Codec
+import com.twilio.video.IsacCodec
+import com.twilio.video.LocalAudioTrack
+import com.twilio.video.LocalParticipant
+import com.twilio.video.LocalVideoTrack
+import com.twilio.video.OpusCodec
+import com.twilio.video.PcmaCodec
+import com.twilio.video.PcmuCodec
+import com.twilio.video.RemoteParticipant
+import com.twilio.video.Room
+import com.twilio.video.ScreenCapturer
+import com.twilio.video.TwilioException
+import com.twilio.video.Video
+import com.twilio.video.VideoCodec
+import com.twilio.video.VideoConstraints
+import com.twilio.video.VideoDimensions
+import com.twilio.video.VideoTrack
+import com.twilio.video.Vp8Codec
+import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.model.RoomProperties
 import com.twilio.video.app.data.api.model.Topology
-import com.twilio.video.app.ui.room.ParticipantPrimaryView
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
 import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission
 import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError
-import com.twilio.video.app.videosdk.RoomViewEvent.*
+import com.twilio.video.app.videosdk.RoomViewEvent.SetupLocalMedia
+import com.twilio.video.app.videosdk.RoomViewEvent.DisconnectFromRoom
+import com.twilio.video.app.videosdk.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.videosdk.RoomViewEvent.ToggleSpeakerPhone
+import com.twilio.video.app.videosdk.RoomViewEvent.ToggleLocalAudio
+import com.twilio.video.app.videosdk.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.videosdk.RoomViewEvent.SetupScreenCapture
+import com.twilio.video.app.videosdk.RoomViewEvent.ConnectToRoom
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
-import java.util.*
 
 class RoomManager(
-        private val sharedPreferences: SharedPreferences,
-        private val tokenService: TokenService,
-        private val context: Context
+    private val sharedPreferences: SharedPreferences,
+    private val tokenService: TokenService,
+    private val context: Context
 ) {
     private val STATS_DELAY = 1000 // milliseconds
 
@@ -83,17 +112,18 @@ class RoomManager(
             Timber.d("First frame from screen capturer available")
         }
     }
-
     private val rxDisposables = CompositeDisposable()
     private val localVideoTrackNames: MutableMap<String, String> = HashMap()
-    private val mutableViewState: MutableLiveData<RoomViewState> = MutableLiveData()
-    val viewState: LiveData<RoomViewState> = mutableViewState
+
+    private val mutableViewState: MutableLiveData<RoomViewState> = MutableLiveData<RoomViewState>().apply { value = RoomViewState() }
     private val mutableViewEffects: MutableLiveData<RoomViewEffect> = MutableLiveData()
+
+    val viewState: LiveData<RoomViewState> = mutableViewState
     val viewEffects: LiveData<RoomViewEffect> = mutableViewEffects
 
     fun processViewEvent(viewEvent: RoomViewEvent) {
         Timber.d("Processing ViewEvent: $viewEvent")
-        when(viewEvent) {
+        when (viewEvent) {
             is SetupLocalMedia -> { setupLocalMedia(viewEvent.activity) }
             is ConnectToRoom -> { connectToRoom(viewEvent.roomName, viewEvent.tokenIdentity) }
             ToggleLocalAudio -> { toggleLocalAudio() }
@@ -154,7 +184,7 @@ class RoomManager(
     }
 
     private fun toggleLocalAudio() {
-        if(localAudioTrack == null) {
+        if (localAudioTrack == null) {
             localParticipant?.let { localParticipant ->
                 localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
                 localAudioTrack?.let { localParticipant.publishTrack(it) }
@@ -166,7 +196,6 @@ class RoomManager(
             localAudioTrack = null
             updateState { it.copy(isLocalAudioMuted = true) }
         }
-
     }
 
     private fun toggleSpeakerPhone() {
@@ -193,7 +222,6 @@ class RoomManager(
             } else {
                 Timber.e("Failed to add screen video track")
             }
-
         } ?: run {
             viewEffect(RequestScreenSharePermission)
         }
@@ -242,13 +270,19 @@ class RoomManager(
      * room.
      */
     private fun renderLocalParticipantStub(localParticipantName: String) {
-        participantController.renderAsPrimary(
-                localParticipantSid,
-                localParticipantName,
-                cameraVideoTrack,
-                localAudioTrack == null,
-                cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA)
-        primaryVideoView.showIdentityBadge(false)
+        cameraVideoTrack?.let { cameraVideoTrack ->
+            val participantStub = ParticipantViewState(
+                    localParticipantSid,
+                    localParticipantName,
+                    cameraVideoTrack,
+                    null,
+                    localAudioTrack == null,
+                    cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
+            )
+            updateState { it.copy(primaryParticipant = participantStub) }
+        } ?: run {
+            Timber.e("Unable to create PrimaryParticipantViewState")
+        }
     }
 
     private fun setupLocalVideoTrack(videoTrackName: String) {
@@ -284,7 +318,7 @@ class RoomManager(
         // setup video dimensions
         val minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0)
         val maxVideoDim = sharedPreferences.getInt(
-                Preferences.MAX_VIDEO_DIMENSIONS, videoDimensions.length - 1)
+                Preferences.MAX_VIDEO_DIMENSIONS, videoDimensions.size - 1)
         if (maxVideoDim != -1 && minVideoDim != -1) {
             builder.minVideoDimensions(videoDimensions[minVideoDim])
             builder.maxVideoDimensions(videoDimensions[maxVideoDim])
@@ -307,21 +341,25 @@ class RoomManager(
             }
 
             override fun onConnectFailure(
-                    room: Room, twilioException: TwilioException) {
-                Timber.e(
-                        "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
-                        room.sid,
-                        room.state,
-                        twilioException.code,
-                        twilioException.message)
-                removeAllParticipants()
-                this@RoomActivity.room = null
-                updateUi(room)
-                setAudioFocus(false)
+                room: Room,
+                twilioException: TwilioException
+            ) {
+//                Timber.e(
+//                        "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
+//                        room.sid,
+//                        room.state,
+//                        twilioException.code,
+//                        twilioException.message)
+//                removeAllParticipants()
+//                this@RoomActivity.room = null
+//                updateUi(room)
+//                setAudioFocus(false)
             }
 
             override fun onReconnecting(
-                    room: Room, twilioException: TwilioException) {
+                room: Room,
+                twilioException: TwilioException
+            ) {
                 Timber.i("onReconnecting: %s", room.name)
             }
 
@@ -330,63 +368,71 @@ class RoomManager(
             }
 
             override fun onDisconnected(
-                    room: Room, twilioException: TwilioException?) {
+                room: Room,
+                twilioException: TwilioException?
+            ) {
                 Timber.i(
                         "Disconnected from room -> sid: %s, state: %s",
                         room.sid, room.state)
                 updateState { it.copy(isConnected = false, isDisconnected = true, room = null) }
-                removeAllParticipants()
-                this@RoomActivity.room = null
-                this@RoomActivity.localParticipant = null
-                this@RoomActivity.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
-                updateUi(room)
-                updateStats()
-                setAudioFocus(false)
+//                removeAllParticipants()
+//                this@RoomActivity.room = null
+//                this@RoomActivity.localParticipant = null
+//                this@RoomActivity.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
+//                updateUi(room)
+//                updateStats()
+//                setAudioFocus(false)
             }
 
             override fun onParticipantConnected(
-                    room: Room, remoteParticipant: RemoteParticipant) {
+                room: Room,
+                remoteParticipant: RemoteParticipant
+            ) {
                 Timber.i(
                         "RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
                         room.sid, remoteParticipant.sid)
                 val renderAsPrimary = room.remoteParticipants.size == 1
-                addParticipant(remoteParticipant, renderAsPrimary)
-                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false))
+//                addParticipant(remoteParticipant, renderAsPrimary)
+//                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false))
             }
 
             override fun onParticipantDisconnected(
-                    room: Room, remoteParticipant: RemoteParticipant) {
+                room: Room,
+                remoteParticipant: RemoteParticipant
+            ) {
                 Timber.i(
                         "RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                         room.sid, remoteParticipant.sid)
-                removeParticipant(remoteParticipant)
-                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false))
+//                removeParticipant(remoteParticipant)
+//                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false))
             }
 
             override fun onDominantSpeakerChanged(
-                    room: Room, remoteParticipant: RemoteParticipant?) {
+                room: Room,
+                remoteParticipant: RemoteParticipant?
+            ) {
                 if (remoteParticipant == null) {
-                    participantController.setDominantSpeaker(null)
+//                    participantController.setDominantSpeaker(null)
                     return
                 }
                 val videoTrack: VideoTrack? = if (remoteParticipant.remoteVideoTracks.size > 0) remoteParticipant
                         .remoteVideoTracks[0]
                         .remoteVideoTrack else null
                 if (videoTrack != null) {
-                    val participantView: ParticipantView = participantController.getThumb(remoteParticipant.sid, videoTrack)
-                    if (participantView != null) {
-                        participantController.setDominantSpeaker(participantView)
-                    } else {
-                        remoteParticipant.identity
-                        val primaryParticipantView: ParticipantPrimaryView = participantController.getPrimaryView()
-                        if (primaryParticipantView.identity ==
-                                remoteParticipant.identity) {
-                            participantController.setDominantSpeaker(
-                                    participantController.getPrimaryView())
-                        } else {
-                            participantController.setDominantSpeaker(null)
-                        }
-                    }
+//                    val participantView: ParticipantView = participantController.getThumb(remoteParticipant.sid, videoTrack)
+//                    if (participantView != null) {
+//                        participantController.setDominantSpeaker(participantView)
+//                    } else {
+//                        remoteParticipant.identity
+//                        val primaryParticipantView: ParticipantPrimaryView = participantController.getPrimaryView()
+//                        if (primaryParticipantView.identity ==
+//                                remoteParticipant.identity) {
+//                            participantController.setDominantSpeaker(
+//                                    participantController.getPrimaryView())
+//                        } else {
+//                            participantController.setDominantSpeaker(null)
+//                        }
+//                    }
                 }
             }
 
