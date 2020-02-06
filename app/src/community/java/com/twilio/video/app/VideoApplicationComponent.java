@@ -25,7 +25,6 @@ import com.twilio.video.app.ui.settings.SettingsActivityModule;
 import com.twilio.video.app.ui.settings.SettingsFragmentModule;
 import com.twilio.video.app.ui.splash.SplashActivityModule;
 import com.twilio.video.app.videosdk.RoomManagerModule;
-
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
 
