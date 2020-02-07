@@ -197,8 +197,6 @@ workflows:
 
   build-test:
     jobs:
-      - lint:
-          <<: *build-test-filter
       - check-format:
           <<: *build-test-filter
       - build-app:
@@ -207,13 +205,11 @@ workflows:
           <<: *build-test-filter
           requires:
             - build-app
-            - lint
             - check-format
       - ui-tests:
           <<: *build-test-filter
           requires:
             - build-app
-            - lint
             - check-format
 
   publish-to-appcenter:
