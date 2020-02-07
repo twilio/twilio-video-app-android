@@ -42,7 +42,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -65,12 +64,15 @@ import com.twilio.video.RemoteDataTrackPublication;
 import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
+import com.twilio.video.Room;
 import com.twilio.video.StatsListener;
 import com.twilio.video.TwilioException;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.ui.settings.SettingsActivity;
+import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import com.twilio.video.app.videosdk.ParticipantViewState;
 import com.twilio.video.app.videosdk.RoomManager;
@@ -83,6 +85,7 @@ import com.twilio.video.app.videosdk.RoomViewEvent.DisconnectFromRoom;
 import com.twilio.video.app.videosdk.RoomViewEvent.SetupLocalMedia;
 import com.twilio.video.app.videosdk.RoomViewEvent.StartScreenCapture;
 import com.twilio.video.app.videosdk.RoomViewEvent.StopScreenCapture;
+import com.twilio.video.app.videosdk.RoomViewEvent.TearDownLocalMedia;
 import com.twilio.video.app.videosdk.RoomViewEvent.ToggleLocalAudio;
 import com.twilio.video.app.videosdk.RoomViewEvent.ToggleSpeakerPhone;
 import com.twilio.video.app.videosdk.RoomViewState;
@@ -188,6 +191,8 @@ public class RoomActivity extends BaseActivity {
         participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
         participantController.setListener(participantClickListener());
 
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, "");
+
         // Setup Activity
         statsScheduler = new StatsScheduler();
         requestPermissions();
@@ -196,11 +201,17 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean isAppLinkProvided = checkIntentURI();
-        updateUi(isAppLinkProvided);
+        //        boolean isAppLinkProvided = checkIntentURI();
+        //        updateUi(isAppLinkProvided);
         restoreCameraTrack();
         initializeRoom();
         updateStats();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        roomManager.processViewEvent(TearDownLocalMedia.INSTANCE);
     }
 
     private void bindViewState(@Nullable RoomViewState viewState) {
@@ -346,19 +357,13 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
-        if (!didAcceptPermissions()) {
-            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
-                    .show();
-            return;
-        }
-        connect.setEnabled(false);
-        // obtain room name
-
+        InputUtils.hideKeyboard(RoomActivity.this);
         Editable text = roomEditText.getText();
+        String roomName = "";
         if (text != null) {
-            final String roomName = text.toString();
-            roomManager.processViewEvent(new ConnectToRoom(roomName, displayName));
+            roomName = text.toString();
         }
+        roomManager.processViewEvent(new ConnectToRoom(roomName, displayName));
     }
 
     @OnClick(R.id.disconnect)
@@ -510,27 +515,45 @@ public class RoomActivity extends BaseActivity {
             if (participantViewState != null) {
                 renderPrimaryParticipant(participantViewState, false);
             }
-            //            if (viewState.isConnecting()) {
-            //                InputUtils.hideKeyboard(RoomActivity.this);
-            //                disconnectButtonState = View.VISIBLE;
-            //                joinRoomLayoutState = View.GONE;
-            //                joinStatusLayoutState = View.VISIBLE;
-            //                recordingWarningVisibility = View.VISIBLE;
-            //                settingsMenuItemState = false;
-            //
-            //                connectButtonEnabled = false;
-            //
-            //                roomName = viewState.getRoom().getName();
-            //                joinStatus = "Joining...";
-            //            }
-            //            if (viewState.isDisconnected()) {
-            //                connectButtonEnabled = true;
-            //                Snackbar.make(
-            //                        primaryVideoView,
-            //                        getString(R.string.room_activity_failed_to_connect_to_room),
-            //                        Snackbar.LENGTH_LONG)
-            //                        .show();
-            //            }
+            if (viewState.isConnecting()) {
+                disconnectButtonState = View.VISIBLE;
+                joinRoomLayoutState = View.GONE;
+                joinStatusLayoutState = View.VISIBLE;
+                recordingWarningVisibility = View.VISIBLE;
+                settingsMenuItemState = false;
+                connectButtonEnabled = false;
+                joinStatus = "Joining...";
+            }
+            if (viewState.isConnected()) {
+                Room room = viewState.getRoom();
+                if (room != null) {
+                    roomName = room.getName();
+                }
+                disconnectButtonState = View.VISIBLE;
+                joinRoomLayoutState = View.GONE;
+                joinStatusLayoutState = View.GONE;
+                recordingWarningVisibility = View.GONE;
+                settingsMenuItemState = false;
+                connectButtonEnabled = false;
+                toolbarTitle = roomName;
+                joinStatus = "";
+            }
+            if (viewState.isDisconnected()) {
+                connectButtonEnabled = true;
+                removeAllParticipants();
+                //                room = null
+                //                localParticipant = null
+                //                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
+                //                updateStats()
+                //                setAudioFocus(false)
+            }
+            if (viewState.isConnectFailure()) {
+                Snackbar.make(
+                                primaryVideoView,
+                                getString(R.string.room_activity_failed_to_connect_to_room),
+                                Snackbar.LENGTH_LONG)
+                        .show();
+            }
             //            if (viewState.isLocalAudioMuted()) {
             int icon = R.drawable.ic_mic_off_gray_24px;
             //                pauseAudioMenuItem.setVisible(false);
@@ -1381,15 +1404,5 @@ public class RoomActivity extends BaseActivity {
 
             // TODO: need design
         }
-    }
-
-    private boolean didAcceptPermissions() {
-        return PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                        == PermissionChecker.PERMISSION_GRANTED
-                && PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA)
-                        == PermissionChecker.PERMISSION_GRANTED
-                && PermissionChecker.checkSelfPermission(
-                                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PermissionChecker.PERMISSION_GRANTED;
     }
 }

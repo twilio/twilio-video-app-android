@@ -43,14 +43,15 @@ import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
 import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission
 import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError
-import com.twilio.video.app.videosdk.RoomViewEvent.SetupLocalMedia
-import com.twilio.video.app.videosdk.RoomViewEvent.DisconnectFromRoom
-import com.twilio.video.app.videosdk.RoomViewEvent.StartScreenCapture
-import com.twilio.video.app.videosdk.RoomViewEvent.ToggleSpeakerPhone
-import com.twilio.video.app.videosdk.RoomViewEvent.ToggleLocalAudio
-import com.twilio.video.app.videosdk.RoomViewEvent.StopScreenCapture
-import com.twilio.video.app.videosdk.RoomViewEvent.SetupScreenCapture
 import com.twilio.video.app.videosdk.RoomViewEvent.ConnectToRoom
+import com.twilio.video.app.videosdk.RoomViewEvent.DisconnectFromRoom
+import com.twilio.video.app.videosdk.RoomViewEvent.SetupLocalMedia
+import com.twilio.video.app.videosdk.RoomViewEvent.SetupScreenCapture
+import com.twilio.video.app.videosdk.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.videosdk.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.videosdk.RoomViewEvent.TearDownLocalMedia
+import com.twilio.video.app.videosdk.RoomViewEvent.ToggleLocalAudio
+import com.twilio.video.app.videosdk.RoomViewEvent.ToggleSpeakerPhone
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -125,14 +126,38 @@ class RoomManager(
         Timber.d("Processing ViewEvent: $viewEvent")
         when (viewEvent) {
             is SetupLocalMedia -> { setupLocalMedia(viewEvent.activity) }
+            TearDownLocalMedia -> { tearDownLocalMedia() }
             is ConnectToRoom -> { connectToRoom(viewEvent.roomName, viewEvent.tokenIdentity) }
+            DisconnectFromRoom -> { disconnectFromRoom() }
             ToggleLocalAudio -> { toggleLocalAudio() }
             ToggleSpeakerPhone -> { toggleSpeakerPhone() }
             is SetupScreenCapture -> { setupScreenCapture(viewEvent.data) }
             StartScreenCapture -> { startScreenCapture() }
             StopScreenCapture -> { stopScreenCapture() }
-            DisconnectFromRoom -> { disconnectFromRoom() }
         }
+    }
+
+    private fun tearDownLocalMedia() {
+        // Reset the speakerphone
+        audioManager.isSpeakerphoneOn = false
+        // Teardown tracks
+        localAudioTrack?.let { localAudioTrack ->
+            localAudioTrack.release()
+            localParticipant?.unpublishTrack(localAudioTrack)
+            this.localAudioTrack = null
+        }
+        cameraVideoTrack?.let { cameraVideoTrack ->
+            cameraVideoTrack.release()
+            localParticipant?.unpublishTrack(cameraVideoTrack)
+            this.cameraVideoTrack = null
+        }
+        screenVideoTrack?.let { screenVideoTrack ->
+            screenVideoTrack.release()
+            localParticipant?.unpublishTrack(screenVideoTrack)
+            this.screenVideoTrack = null
+        }
+        // dispose any token requests if needed
+        rxDisposables.clear()
     }
 
     // TODO Remove activity dependency
@@ -151,36 +176,39 @@ class RoomManager(
 
     private fun connectToRoom(roomName: String, tokenIdentity: String) {
         // obtain latest environment preferences
-        val roomProperties =
-                RoomProperties.Builder()
-                        .setName(roomName)
-                        .setTopology(
-                                Topology.fromString(
-                                        sharedPreferences.getString(
-                                                Preferences.TOPOLOGY,
-                                                Preferences.TOPOLOGY_DEFAULT)))
-                        .setRecordOnParticipantsConnect(
-                                sharedPreferences.getBoolean(
-                                        Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
-                                        Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
-                        .createRoomProperties()
+        if (roomName.isNotBlank()) {
+            updateState { it.copy(isConnecting = true) }
+            val roomProperties =
+                    RoomProperties.Builder()
+                            .setName(roomName)
+                            .setTopology(
+                                    Topology.fromString(
+                                            sharedPreferences.getString(
+                                                    Preferences.TOPOLOGY,
+                                                    Preferences.TOPOLOGY_DEFAULT)))
+                            .setRecordOnParticipantsConnect(
+                                    sharedPreferences.getBoolean(
+                                            Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
+                                            Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
+                            .createRoomProperties()
 
-        rxDisposables + updateEnv()
-                .andThen(tokenService.getToken(tokenIdentity, roomProperties))
-                .onErrorResumeNext { e ->
-                    Timber.e(e, "Fetch access token failed")
-                    Single.error(e)
-                }
-                .flatMap { token -> connect(token, roomName) }
-                .onErrorResumeNext { e ->
-                    Timber.e(e, "Connection to room failed")
-                    Single.error(e)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError {
-                    updateState { it.copy(isConnectFailure = true) }
-                }
-                .subscribe()
+            rxDisposables + updateEnv()
+                    .andThen(tokenService.getToken(tokenIdentity, roomProperties))
+                    .onErrorResumeNext { e ->
+                        Timber.e(e, "Fetch access token failed")
+                        Single.error(e)
+                    }
+                    .flatMap { token -> connect(token, roomName) }
+                    .onErrorResumeNext { e ->
+                        Timber.e(e, "Connection to room failed")
+                        Single.error(e)
+                    }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError {
+                        updateState { it.copy(isConnectFailure = true) }
+                    }
+                    .subscribe()
+        }
     }
 
     private fun toggleLocalAudio() {
@@ -248,10 +276,6 @@ class RoomManager(
         localAudioTrack?.let {
             it.release()
             localAudioTrack = null
-        }
-        cameraVideoTrack?.let {
-            it.release()
-            cameraVideoTrack = null
         }
         screenVideoTrack?.let {
             it.release()
@@ -337,23 +361,24 @@ class RoomManager(
     private fun roomListener(): Room.Listener {
         return object : Room.Listener {
             override fun onConnected(room: Room) {
-                updateState { it.copy(isConnected = true, isDisconnected = false, room = room) }
+                updateState { it.copy(isConnected = true,
+                        isConnecting = false,
+                        isDisconnected = false,
+                        isConnectFailure = false,
+                        room = room)
+                }
             }
 
             override fun onConnectFailure(
                 room: Room,
                 twilioException: TwilioException
             ) {
-//                Timber.e(
-//                        "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
-//                        room.sid,
-//                        room.state,
-//                        twilioException.code,
-//                        twilioException.message)
-//                removeAllParticipants()
-//                this@RoomActivity.room = null
-//                updateUi(room)
-//                setAudioFocus(false)
+                updateState { it.copy(isConnected = false,
+                        isConnecting = false,
+                        isDisconnected = false,
+                        isConnectFailure = true,
+                        room = room)
+                }
             }
 
             override fun onReconnecting(
@@ -374,14 +399,12 @@ class RoomManager(
                 Timber.i(
                         "Disconnected from room -> sid: %s, state: %s",
                         room.sid, room.state)
-                updateState { it.copy(isConnected = false, isDisconnected = true, room = null) }
-//                removeAllParticipants()
-//                this@RoomActivity.room = null
-//                this@RoomActivity.localParticipant = null
-//                this@RoomActivity.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
-//                updateUi(room)
-//                updateStats()
-//                setAudioFocus(false)
+                updateState { it.copy(isConnected = false,
+                        isConnecting = false,
+                        isDisconnected = true,
+                        isConnectFailure = false,
+                        room = room)
+                }
             }
 
             override fun onParticipantConnected(
@@ -556,11 +579,14 @@ class RoomManager(
     private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
         val oldState = mutableViewState.value
         oldState?.let {
-            mutableViewState.value = action(oldState)
+            val newState = action(oldState)
+            Timber.d("ViewState: $newState")
+            mutableViewState.value = newState
         }
     }
 
     private fun viewEffect(roomViewEffect: RoomViewEffect) {
+        Timber.d("ViewEffect: $roomViewEffect")
         mutableViewEffects.value = roomViewEffect
     }
 }
