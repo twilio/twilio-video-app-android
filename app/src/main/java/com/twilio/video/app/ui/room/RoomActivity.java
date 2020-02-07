@@ -275,8 +275,6 @@ public class RoomActivity extends BaseActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Grab menu items for updating later
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
-        pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
-        pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
 
         // Screen sharing only available on lollipop and up
@@ -303,12 +301,6 @@ public class RoomActivity extends BaseActivity {
                     roomManager.processViewEvent(StopScreenCapture.INSTANCE);
                 }
 
-                return true;
-            case R.id.pause_audio_menu_item:
-                //                toggleLocalAudioTrackState();
-                return true;
-            case R.id.pause_video_menu_item:
-                //                toggleLocalVideoTrackState();
                 return true;
             case R.id.settings_menu_item:
                 removeCameraTrack();
@@ -487,11 +479,10 @@ public class RoomActivity extends BaseActivity {
         updateUi(null, isAppLinkProvided);
     }
 
-    private void updateUi(@Nullable RoomViewState viewState, boolean isAppLinkProvided) {
+    private void updateUi(RoomViewState viewState, boolean isAppLinkProvided) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
-        int audioIconButton = R.drawable.ic_mic_white_24px;
 
         boolean settingsMenuItemState = true;
 
@@ -502,83 +493,70 @@ public class RoomActivity extends BaseActivity {
         String joinStatus = "";
         int recordingWarningVisibility = View.GONE;
 
-        boolean isPauseAudioMenuItem = true;
-        int pauseAudioMenuItemTitle = R.string.pause_audio;
-        if (viewState != null) {
-            ParticipantViewState participantViewState = viewState.getPrimaryParticipant();
-            if (participantViewState != null) {
-                renderPrimaryParticipant(participantViewState, false);
-            }
-            if (viewState.isConnecting()) {
-                disconnectButtonState = View.VISIBLE;
-                joinRoomLayoutState = View.GONE;
-                joinStatusLayoutState = View.VISIBLE;
-                recordingWarningVisibility = View.VISIBLE;
-                settingsMenuItemState = false;
-                connectButtonEnabled = false;
-                joinStatus = "Joining...";
-            }
-            if (viewState.isConnected()) {
-                Room room = viewState.getRoom();
-                if (room != null) {
-                    roomName = room.getName();
-                }
-                disconnectButtonState = View.VISIBLE;
-                joinRoomLayoutState = View.GONE;
-                joinStatusLayoutState = View.GONE;
-                recordingWarningVisibility = View.GONE;
-                settingsMenuItemState = false;
-                connectButtonEnabled = false;
-                toolbarTitle = roomName;
-                joinStatus = "";
-            }
-            if (viewState.isDisconnected()) {
-                connectButtonEnabled = true;
-                removeAllParticipants();
-                //                room = null
-                //                localParticipant = null
-                //                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
-                //                updateStats()
-                //                setAudioFocus(false)
-            }
-            if (viewState.isConnectFailure()) {
-                Snackbar.make(
-                                primaryVideoView,
-                                getString(R.string.room_activity_failed_to_connect_to_room),
-                                Snackbar.LENGTH_LONG)
-                        .show();
-            }
-            if (viewState.isLocalAudioMuted()) {
-                audioIconButton = R.drawable.ic_mic_off_gray_24px;
-                isPauseAudioMenuItem = false;
-                pauseAudioMenuItemTitle = R.string.resume_audio;
-            } else {
-                audioIconButton = R.drawable.ic_mic_white_24px;
-                isPauseAudioMenuItem = true;
-                pauseAudioMenuItemTitle = R.string.pause_audio;
-            }
-            //            if (viewState.isSpeakerPhoneMuted()) {
-            //                ((MenuItem)
-            // findViewById(R.id.speaker_menu_item)).setIcon(ic_volume_up_white_24dp);
-            //            } else {
-            //                ((MenuItem)
-            // findViewById(R.id.speaker_menu_item)).setIcon(ic_phonelink_ring_white_24dp);
-            //            }
-            //            int icon = R.drawable.ic_screen_share_white_24dp;
-            //            int title = R.string.share_screen;
-            //            if (viewState.isScreenShared()) {
-            //                icon = R.drawable.ic_stop_screen_share_white_24dp;
-            //                title = R.string.stop_screen_share;
-            //            }
-            //            screenCaptureMenuItem.setIcon(icon);
-            //            screenCaptureMenuItem.setTitle(title);
+        ParticipantViewState participantViewState = viewState.getPrimaryParticipant();
+        if (participantViewState != null) {
+            renderPrimaryParticipant(participantViewState, false);
         }
+        if (viewState.isConnecting()) {
+            disconnectButtonState = View.VISIBLE;
+            joinRoomLayoutState = View.GONE;
+            joinStatusLayoutState = View.VISIBLE;
+            recordingWarningVisibility = View.VISIBLE;
+            settingsMenuItemState = false;
+            connectButtonEnabled = false;
+            joinStatus = "Joining...";
+        }
+        if (viewState.isConnected()) {
+            Room room = viewState.getRoom();
+            if (room != null) {
+                roomName = room.getName();
+            }
+            disconnectButtonState = View.VISIBLE;
+            joinRoomLayoutState = View.GONE;
+            joinStatusLayoutState = View.GONE;
+            recordingWarningVisibility = View.GONE;
+            settingsMenuItemState = false;
+            connectButtonEnabled = false;
+            toolbarTitle = roomName;
+            joinStatus = "";
+        }
+        if (viewState.isDisconnected()) {
+            connectButtonEnabled = true;
+            removeAllParticipants();
+            //                room = null
+            //                localParticipant = null
+            //                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
+            //                updateStats()
+            //                setAudioFocus(false)
+        }
+        if (viewState.isConnectFailure()) {
+            Snackbar.make(
+                            primaryVideoView,
+                            getString(R.string.room_activity_failed_to_connect_to_room),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+        }
+        if (viewState.isLocalAudioMuted()) {
+            localAudioImageButton.setImageResource(R.drawable.ic_mic_off_gray_24px);
+        } else {
+            localAudioImageButton.setImageResource(R.drawable.ic_mic_white_24px);
+        }
+        //            if (viewState.isSpeakerPhoneMuted()) {
+        //                ((MenuItem)
+        // findViewById(R.id.speaker_menu_item)).setIcon(ic_volume_up_white_24dp);
+        //            } else {
+        //                ((MenuItem)
+        // findViewById(R.id.speaker_menu_item)).setIcon(ic_phonelink_ring_white_24dp);
+        //            }
+        //            int icon = R.drawable.ic_screen_share_white_24dp;
+        //            int title = R.string.share_screen;
+        //            if (viewState.isScreenShared()) {
+        //                icon = R.drawable.ic_stop_screen_share_white_24dp;
+        //                title = R.string.stop_screen_share;
+        //            }
+        //            screenCaptureMenuItem.setIcon(icon);
+        //            screenCaptureMenuItem.setTitle(title);
 
-        if (pauseAudioMenuItem != null) {
-            pauseAudioMenuItem.setVisible(isPauseAudioMenuItem);
-            pauseAudioMenuItem.setTitle(pauseAudioMenuItemTitle);
-        }
-        localAudioImageButton.setImageResource(audioIconButton);
         statsListAdapter = new StatsListAdapter(this);
         statsRecyclerView.setAdapter(statsListAdapter);
         statsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
