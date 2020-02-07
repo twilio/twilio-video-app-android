@@ -12,6 +12,8 @@ data class RoomViewState(
     val isLocalAudioMuted: Boolean = false,
     val isSpeakerPhoneMuted: Boolean = false,
     val isScreenShared: Boolean = false,
+    val volumeControl: Boolean = false,
+    val volumeControlStream: Int = 0,
     val room: Room? = null,
     val primaryParticipant: ParticipantViewState? = null,
     val remoteParticipants: List<ParticipantViewState>? = null

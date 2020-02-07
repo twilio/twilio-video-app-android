@@ -4,7 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.twilio.androidenv.Env
@@ -87,10 +90,10 @@ class RoomManager(
     )
 
     private lateinit var audioManager: AudioManager
-    private val savedAudioMode = AudioManager.MODE_INVALID
+    private var savedAudioMode = AudioManager.MODE_INVALID
     private var savedVolumeControlStream = 0
-    private val savedIsMicrophoneMute = false
-    private val savedIsSpeakerPhoneOn = false
+    private var savedIsMicrophoneMute = false
+    private var savedIsSpeakerPhoneOn = false
 
     private var localParticipant: LocalParticipant? = null
     private var localParticipantSid: String? = LOCAL_PARTICIPANT_STUB_SID
@@ -126,7 +129,7 @@ class RoomManager(
         Timber.d("Processing ViewEvent: $viewEvent")
         when (viewEvent) {
             is SetupLocalMedia -> {
-                setupLocalMedia(viewEvent.activity)
+                setupLocalMedia(viewEvent.volumeControlStream)
             }
             TearDownLocalMedia -> {
                 tearDownLocalMedia()
@@ -178,14 +181,13 @@ class RoomManager(
         rxDisposables.clear()
     }
 
-    // TODO Remove activity dependency
-    private fun setupLocalMedia(activity: Activity) {
+    private fun setupLocalMedia(volumeControlStream: Int) {
         // Setup Audio
-        audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.isSpeakerphoneOn = true
-        savedVolumeControlStream = activity.volumeControlStream
+        savedVolumeControlStream = volumeControlStream
         obtainVideoConstraints()
-        localAudioTrack = LocalAudioTrack.create(activity, true, MICROPHONE_TRACK_NAME)
+        localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
 
         // Setup Video
         setupLocalVideoTrack(context.getString(R.string.video_track))
@@ -288,6 +290,8 @@ class RoomManager(
     private fun disconnectFromRoom() {
         room?.disconnect()
         stopScreenCapture()
+
+        setAudioFocus(false)
 
         // Reset the speakerphone
         audioManager.isSpeakerphoneOn = false
@@ -610,7 +614,7 @@ class RoomManager(
             this.localParticipant = room.localParticipant
             localParticipantSid = localParticipant?.sid
 
-//            setAudioFocus(true);
+            setAudioFocus(true)
 //            updateStats();
 
             // remove primary view
@@ -657,6 +661,105 @@ class RoomManager(
 //            }
 //        }
         }
+    }
+
+    private fun setAudioFocus(setFocus: Boolean) {
+        if (setFocus) {
+            savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn
+            savedIsMicrophoneMute = audioManager.isMicrophoneMute
+            unMuteMicrophone()
+            savedAudioMode = audioManager.mode
+            // Request audio focus before making any device switch.
+            requestAudioFocus()
+            /*
+             * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+             * required to be in this mode when playout and/or recording starts for
+             * best possible VoIP performance.
+             * Some devices have difficulties with speaker mode if this is not set.
+             */
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+            updateState { it.copy(
+                    volumeControl = true)
+            }
+        } else {
+            audioManager.mode = savedAudioMode
+            audioManager.abandonAudioFocus(null)
+            audioManager.isMicrophoneMute = savedIsMicrophoneMute
+            audioManager.isSpeakerphoneOn = savedIsSpeakerPhoneOn
+            updateState { it.copy(
+                    volumeControl = false,
+                    volumeControlStream = savedVolumeControlStream)
+            }
+        }
+    }
+
+    private fun requestAudioFocus() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val playbackAttributes =
+                    AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build()
+            val focusRequest =
+                    AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                            .setAudioAttributes(playbackAttributes)
+                            .setAcceptsDelayedFocusGain(true)
+                            .setOnAudioFocusChangeListener {}
+                            .build()
+            audioManager.requestAudioFocus(focusRequest)
+        } else {
+            audioManager.requestAudioFocus(
+                    null, AudioManager.STREAM_VOICE_CALL,
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+        }
+    }
+
+    //    private void switchCamera() {
+//        if (cameraCapturer != null) {
+//
+//            boolean mirror =
+//                    cameraCapturer.getCameraSource() ==
+// CameraCapturer.CameraSource.BACK_CAMERA;
+//
+//            cameraCapturer.switchCamera();
+//
+//            if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
+//                participantController.updatePrimaryThumb(mirror);
+//            } else {
+//                participantController.updateThumb(localParticipantSid, cameraVideoTrack,
+// mirror);
+//            }
+//        }
+//    }
+//
+//    private void requestAudioFocus() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            AudioAttributes playbackAttributes =
+//                    new AudioAttributes.Builder()
+//                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+//                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+//                            .build();
+//            AudioFocusRequest focusRequest =
+//                    new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+//                            .setAudioAttributes(playbackAttributes)
+//                            .setAcceptsDelayedFocusGain(true)
+//                            .setOnAudioFocusChangeListener(i -> {})
+//                            .build();
+//            audioManager.requestAudioFocus(focusRequest);
+//        } else {
+//            audioManager.requestAudioFocus(
+//                    null, AudioManager.STREAM_VOICE_CALL,
+// AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+//        }
+//    }
+//
+
+    private fun unMuteMicrophone() {
+        val wasMuted = audioManager.isMicrophoneMute
+        if (!wasMuted) {
+            return
+        }
+        audioManager.isMicrophoneMute = false
     }
 
 //    private class LocalParticipantListener internal constructor(primaryView: ParticipantView) : LocalParticipant.Listener {

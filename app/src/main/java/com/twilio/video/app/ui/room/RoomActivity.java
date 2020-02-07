@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -457,7 +458,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void setupLocalMedia() {
-        roomManager.processViewEvent(new SetupLocalMedia(this));
+        roomManager.processViewEvent(new SetupLocalMedia(getVolumeControlStream()));
     }
 
     private boolean permissionsGranted() {
@@ -519,6 +520,7 @@ public class RoomActivity extends BaseActivity {
             connectButtonEnabled = false;
             toolbarTitle = roomName;
             joinStatus = "";
+            setVolumeControl(viewState.getVolumeControl(), viewState.getVolumeControlStream());
         }
         if (viewState.isDisconnected()) {
             connectButtonEnabled = true;
@@ -614,71 +616,8 @@ public class RoomActivity extends BaseActivity {
     //        }
     //    }
     //
-    //    private void setAudioFocus(boolean setFocus) {
-    //        if (setFocus) {
-    //            savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
-    //            savedIsMicrophoneMute = audioManager.isMicrophoneMute();
-    //            setMicrophoneMute();
-    //            savedAudioMode = audioManager.getMode();
-    //            // Request audio focus before making any device switch.
-    //            requestAudioFocus();
-    //            /*
-    //             * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-    //             * required to be in this mode when playout and/or recording starts for
-    //             * best possible VoIP performance.
-    //             * Some devices have difficulties with speaker mode if this is not set.
-    //             */
-    //            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-    //            setVolumeControl(true);
-    //        } else {
-    //            audioManager.setMode(savedAudioMode);
-    //            audioManager.abandonAudioFocus(null);
-    //            audioManager.setMicrophoneMute(savedIsMicrophoneMute);
-    //            audioManager.setSpeakerphoneOn(savedIsSpeakerPhoneOn);
-    //            setVolumeControl(false);
-    //        }
-    //    }
     //
-    //    private void requestAudioFocus() {
-    //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-    //            AudioAttributes playbackAttributes =
-    //                    new AudioAttributes.Builder()
-    //                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-    //                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-    //                            .build();
-    //            AudioFocusRequest focusRequest =
-    //                    new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-    //                            .setAudioAttributes(playbackAttributes)
-    //                            .setAcceptsDelayedFocusGain(true)
-    //                            .setOnAudioFocusChangeListener(i -> {})
-    //                            .build();
-    //            audioManager.requestAudioFocus(focusRequest);
-    //        } else {
-    //            audioManager.requestAudioFocus(
-    //                    null, AudioManager.STREAM_VOICE_CALL,
-    // AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-    //        }
-    //    }
     //
-    //    /** Sets the microphone mute state. */
-    //    private void setMicrophoneMute() {
-    //        boolean wasMuted = audioManager.isMicrophoneMute();
-    //        if (!wasMuted) {
-    //            return;
-    //        }
-    //        audioManager.setMicrophoneMute(false);
-    //    }
-    //
-    //    private void setVolumeControl(boolean setVolumeControl) {
-    //        if (setVolumeControl) {
-    //            /*
-    //             * Enable changing the volume using the up/down keys during a conversation
-    //             */
-    //            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-    //        } else {
-    //            setVolumeControlStream(savedVolumeControlStream);
-    //        }
-    //    }
     //
     //    @TargetApi(21)
     //    private void requestScreenCapturePermission() {
@@ -711,6 +650,17 @@ public class RoomActivity extends BaseActivity {
     // R.string.resume_video);
     //        }
     //    }
+
+    private void setVolumeControl(boolean setVolumeControl, int volumeControlStream) {
+        if (setVolumeControl) {
+            /*
+             * Enable changing the volume using the up/down keys during a conversation
+             */
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        } else {
+            setVolumeControlStream(volumeControlStream);
+        }
+    }
 
     /**
      * Provides remoteParticipant a listener for media events and add thumb.
