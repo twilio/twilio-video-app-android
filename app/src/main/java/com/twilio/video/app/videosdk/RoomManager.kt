@@ -92,8 +92,8 @@ class RoomManager(
     private val savedIsMicrophoneMute = false
     private val savedIsSpeakerPhoneOn = false
 
-    private val localParticipant: LocalParticipant? = null
-    private val localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
+    private var localParticipant: LocalParticipant? = null
+    private var localParticipantSid: String? = LOCAL_PARTICIPANT_STUB_SID
     private var room: Room? = null
     private var videoConstraints: VideoConstraints? = null
     private var localAudioTrack: LocalAudioTrack? = null
@@ -125,15 +125,33 @@ class RoomManager(
     fun processViewEvent(viewEvent: RoomViewEvent) {
         Timber.d("Processing ViewEvent: $viewEvent")
         when (viewEvent) {
-            is SetupLocalMedia -> { setupLocalMedia(viewEvent.activity) }
-            TearDownLocalMedia -> { tearDownLocalMedia() }
-            is ConnectToRoom -> { connectToRoom(viewEvent.roomName, viewEvent.tokenIdentity) }
-            DisconnectFromRoom -> { disconnectFromRoom() }
-            ToggleLocalAudio -> { toggleLocalAudio() }
-            ToggleSpeakerPhone -> { toggleSpeakerPhone() }
-            is SetupScreenCapture -> { setupScreenCapture(viewEvent.data) }
-            StartScreenCapture -> { startScreenCapture() }
-            StopScreenCapture -> { stopScreenCapture() }
+            is SetupLocalMedia -> {
+                setupLocalMedia(viewEvent.activity)
+            }
+            TearDownLocalMedia -> {
+                tearDownLocalMedia()
+            }
+            is ConnectToRoom -> {
+                connectToRoom(viewEvent.roomName, viewEvent.tokenIdentity)
+            }
+            DisconnectFromRoom -> {
+                disconnectFromRoom()
+            }
+            ToggleLocalAudio -> {
+                toggleLocalAudio()
+            }
+            ToggleSpeakerPhone -> {
+                toggleSpeakerPhone()
+            }
+            is SetupScreenCapture -> {
+                setupScreenCapture(viewEvent.data)
+            }
+            StartScreenCapture -> {
+                startScreenCapture()
+            }
+            StopScreenCapture -> {
+                stopScreenCapture()
+            }
         }
     }
 
@@ -213,14 +231,16 @@ class RoomManager(
 
     private fun toggleLocalAudio() {
         if (localAudioTrack == null) {
-            localParticipant?.let { localParticipant ->
-                localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
-                localAudioTrack?.let { localParticipant.publishTrack(it) }
+            localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
+            localAudioTrack?.let { localAudioTrack ->
+                localParticipant?.publishTrack(localAudioTrack)
                 updateState { it.copy(isLocalAudioMuted = false) }
             }
         } else {
-            localAudioTrack?.let { localParticipant?.unpublishTrack(it) }
-            localAudioTrack?.release()
+            localAudioTrack?.let { localAudioTrack ->
+                localParticipant?.unpublishTrack(localAudioTrack)
+                localAudioTrack.release()
+            }
             localAudioTrack = null
             updateState { it.copy(isLocalAudioMuted = true) }
         }
@@ -295,15 +315,17 @@ class RoomManager(
      */
     private fun renderLocalParticipantStub(localParticipantName: String) {
         cameraVideoTrack?.let { cameraVideoTrack ->
-            val participantStub = ParticipantViewState(
-                    localParticipantSid,
-                    localParticipantName,
-                    cameraVideoTrack,
-                    null,
-                    localAudioTrack == null,
-                    cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
-            )
-            updateState { it.copy(primaryParticipant = participantStub) }
+            localParticipantSid?.let { localParticipantSid ->
+                val participantStub = ParticipantViewState(
+                        localParticipantSid,
+                        localParticipantName,
+                        cameraVideoTrack,
+                        null,
+                        localAudioTrack == null,
+                        cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
+                )
+                updateState { it.copy(primaryParticipant = participantStub) }
+            } ?: Timber.e("LocalParticipantSid is null")
         } ?: run {
             Timber.e("Unable to create PrimaryParticipantViewState")
         }
@@ -361,11 +383,13 @@ class RoomManager(
     private fun roomListener(): Room.Listener {
         return object : Room.Listener {
             override fun onConnected(room: Room) {
-                updateState { it.copy(isConnected = true,
-                        isConnecting = false,
-                        isDisconnected = false,
-                        isConnectFailure = false,
-                        room = room)
+                initializeRoom()
+                updateState {
+                    it.copy(isConnected = true,
+                            isConnecting = false,
+                            isDisconnected = false,
+                            isConnectFailure = false,
+                            room = room)
                 }
             }
 
@@ -373,11 +397,12 @@ class RoomManager(
                 room: Room,
                 twilioException: TwilioException
             ) {
-                updateState { it.copy(isConnected = false,
-                        isConnecting = false,
-                        isDisconnected = false,
-                        isConnectFailure = true,
-                        room = room)
+                updateState {
+                    it.copy(isConnected = false,
+                            isConnecting = false,
+                            isDisconnected = false,
+                            isConnectFailure = true,
+                            room = room)
                 }
             }
 
@@ -399,11 +424,12 @@ class RoomManager(
                 Timber.i(
                         "Disconnected from room -> sid: %s, state: %s",
                         room.sid, room.state)
-                updateState { it.copy(isConnected = false,
-                        isConnecting = false,
-                        isDisconnected = true,
-                        isConnectFailure = false,
-                        room = room)
+                updateState {
+                    it.copy(isConnected = false,
+                            isConnecting = false,
+                            isDisconnected = true,
+                            isConnectFailure = false,
+                            room = room)
                 }
             }
 
@@ -575,6 +601,122 @@ class RoomManager(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT)
     }
+
+    private fun initializeRoom() {
+        room?.let { room ->
+            Timber.i(
+                    "Connected to room -> name: %s, sid: %s, state: %s",
+                    room.name, room.sid, room.state)
+            this.localParticipant = room.localParticipant
+            localParticipantSid = localParticipant?.sid
+
+//            setAudioFocus(true);
+//            updateStats();
+
+            // remove primary view
+//            participantController.removePrimary();
+
+            // add local thumb and "click" on it to make primary
+//            participantController.addThumb(
+//                    localParticipantSid,
+//                    getString(R.string.you),
+//                    cameraVideoTrack,
+//                    localAudioTrack == null,
+//                    cameraCapturer.getCameraSource() ==
+//                            CameraCapturer.CameraSource.FRONT_CAMERA,
+//                    isNetworkQualityEnabled());
+
+//            localParticipant?.setListener(
+//                    LocalParticipantListener (
+//                            participantController.getThumb(localParticipantSid,
+//                                    cameraVideoTrack)));
+//            participantController.getThumb(localParticipantSid,
+//                    cameraVideoTrack).callOnClick();
+//
+//            // add existing room participants thumbs
+//            boolean isFirstParticipant = true;
+//            for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
+//            addParticipant(remoteParticipant, isFirstParticipant);
+//            isFirstParticipant = false;
+//            if (room.getDominantSpeaker() != null) {
+//                if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
+//                    VideoTrack videoTrack =
+//                    (remoteParticipant.getRemoteVideoTracks().size() > 0)
+//                    ? remoteParticipant
+//                            .getRemoteVideoTracks()
+//                            .get(0)
+//                            .getRemoteVideoTrack()
+//                    : null;
+//                    if (videoTrack != null) {
+//                        ParticipantView participantView =
+//                        participantController.getThumb(
+//                                remoteParticipant.getSid(), videoTrack);
+//                        participantController.setDominantSpeaker(participantView);
+//                    }
+//                }
+//            }
+//        }
+        }
+    }
+
+//    private class LocalParticipantListener internal constructor(primaryView: ParticipantView) : LocalParticipant.Listener {
+//        private val networkQualityImage: ImageView
+//        override fun onAudioTrackPublished(
+//                localParticipant: LocalParticipant,
+//                localAudioTrackPublication: LocalAudioTrackPublication) {
+//        }
+//
+//        override fun onAudioTrackPublicationFailed(
+//                localParticipant: LocalParticipant,
+//                localAudioTrack: LocalAudioTrack,
+//                twilioException: TwilioException) {
+//        }
+//
+//        override fun onVideoTrackPublished(
+//                localParticipant: LocalParticipant,
+//                localVideoTrackPublication: LocalVideoTrackPublication) {
+//        }
+//
+//        override fun onVideoTrackPublicationFailed(
+//                localParticipant: LocalParticipant,
+//                localVideoTrack: LocalVideoTrack,
+//                twilioException: TwilioException) {
+//        }
+//
+//        override fun onDataTrackPublished(
+//                localParticipant: LocalParticipant,
+//                localDataTrackPublication: LocalDataTrackPublication) {
+//        }
+//
+//        override fun onDataTrackPublicationFailed(
+//                localParticipant: LocalParticipant,
+//                localDataTrack: LocalDataTrack,
+//                twilioException: TwilioException) {
+//        }
+//
+//        override fun onNetworkQualityLevelChanged(
+//                localParticipant: LocalParticipant,
+//                networkQualityLevel: NetworkQualityLevel) {
+//            if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
+//                    || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+//                networkQualityImage.setImageResource(R.drawable.network_quality_level_0)
+//            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
+//                networkQualityImage.setImageResource(R.drawable.network_quality_level_1)
+//            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
+//                networkQualityImage.setImageResource(R.drawable.network_quality_level_2)
+//            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
+//                networkQualityImage.setImageResource(R.drawable.network_quality_level_3)
+//            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
+//                networkQualityImage.setImageResource(R.drawable.network_quality_level_4)
+//            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
+//                networkQualityImage.setImageResource(R.drawable.network_quality_level_5)
+//            }
+//        }
+//
+//        init {
+//            networkQualityImage = primaryView.networkQualityLevelImg
+//        }
+//    }
 
     private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
         val oldState = mutableViewState.value

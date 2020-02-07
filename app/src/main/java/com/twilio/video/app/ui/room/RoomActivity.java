@@ -34,7 +34,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -49,14 +48,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.google.android.material.snackbar.Snackbar;
-import com.twilio.video.LocalAudioTrack;
-import com.twilio.video.LocalAudioTrackPublication;
-import com.twilio.video.LocalDataTrack;
-import com.twilio.video.LocalDataTrackPublication;
-import com.twilio.video.LocalParticipant;
-import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.LocalVideoTrackPublication;
-import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteDataTrack;
@@ -204,7 +195,6 @@ public class RoomActivity extends BaseActivity {
         //        boolean isAppLinkProvided = checkIntentURI();
         //        updateUi(isAppLinkProvided);
         restoreCameraTrack();
-        initializeRoom();
         updateStats();
     }
 
@@ -501,6 +491,7 @@ public class RoomActivity extends BaseActivity {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
+        int audioIconButton = R.drawable.ic_mic_white_24px;
 
         boolean settingsMenuItemState = true;
 
@@ -511,6 +502,8 @@ public class RoomActivity extends BaseActivity {
         String joinStatus = "";
         int recordingWarningVisibility = View.GONE;
 
+        boolean isPauseAudioMenuItem = true;
+        int pauseAudioMenuItemTitle = R.string.pause_audio;
         if (viewState != null) {
             ParticipantViewState participantViewState = viewState.getPrimaryParticipant();
             if (participantViewState != null) {
@@ -555,17 +548,15 @@ public class RoomActivity extends BaseActivity {
                                 Snackbar.LENGTH_LONG)
                         .show();
             }
-            //            if (viewState.isLocalAudioMuted()) {
-            int icon = R.drawable.ic_mic_off_gray_24px;
-            //                pauseAudioMenuItem.setVisible(false);
-            //                pauseAudioMenuItem.setTitle(R.string.resume_audio);
-            //                localAudioImageButton.setImageResource(icon);
-            //            } else {
-            //                int icon = R.drawable.ic_mic_white_24px;
-            //                pauseAudioMenuItem.setVisible(true);
-            //                pauseAudioMenuItem.setTitle(R.string.pause_audio);
-            //                localAudioImageButton.setImageResource(icon);
-            //            }
+            if (viewState.isLocalAudioMuted()) {
+                audioIconButton = R.drawable.ic_mic_off_gray_24px;
+                isPauseAudioMenuItem = false;
+                pauseAudioMenuItemTitle = R.string.resume_audio;
+            } else {
+                audioIconButton = R.drawable.ic_mic_white_24px;
+                isPauseAudioMenuItem = true;
+                pauseAudioMenuItemTitle = R.string.pause_audio;
+            }
             //            if (viewState.isSpeakerPhoneMuted()) {
             //                ((MenuItem)
             // findViewById(R.id.speaker_menu_item)).setIcon(ic_volume_up_white_24dp);
@@ -576,13 +567,18 @@ public class RoomActivity extends BaseActivity {
             //            int icon = R.drawable.ic_screen_share_white_24dp;
             //            int title = R.string.share_screen;
             //            if (viewState.isScreenShared()) {
-            icon = R.drawable.ic_stop_screen_share_white_24dp;
+            //                icon = R.drawable.ic_stop_screen_share_white_24dp;
             //                title = R.string.stop_screen_share;
             //            }
             //            screenCaptureMenuItem.setIcon(icon);
             //            screenCaptureMenuItem.setTitle(title);
         }
 
+        if (pauseAudioMenuItem != null) {
+            pauseAudioMenuItem.setVisible(isPauseAudioMenuItem);
+            pauseAudioMenuItem.setTitle(pauseAudioMenuItemTitle);
+        }
+        localAudioImageButton.setImageResource(audioIconButton);
         statsListAdapter = new StatsListAdapter(this);
         statsRecyclerView.setAdapter(statsListAdapter);
         statsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -960,125 +956,6 @@ public class RoomActivity extends BaseActivity {
      */
     private ParticipantController.ItemClickListener participantClickListener() {
         return this::renderItemAsPrimary;
-    }
-
-    private void initializeRoom() {
-        //        if (room == null) return;
-        //        Timber.i(
-        //                "Connected to room -> name: %s, sid: %s, state: %s",
-        //                room.getName(), room.getSid(), room.getState());
-        //        localParticipant = room.getLocalParticipant();
-        //        localParticipantSid = localParticipant.getSid();
-        //
-        //        setAudioFocus(true);
-        //        updateStats();
-        //
-        //        // remove primary view
-        //        participantController.removePrimary();
-        //
-        //        // add local thumb and "click" on it to make primary
-        //        participantController.addThumb(
-        //                localParticipantSid,
-        //                getString(R.string.you),
-        //                cameraVideoTrack,
-        //                localAudioTrack == null,
-        //                cameraCapturer.getCameraSource() ==
-        // CameraCapturer.CameraSource.FRONT_CAMERA,
-        //                isNetworkQualityEnabled());
-        //
-        //        localParticipant.setListener(
-        //                new LocalParticipantListener(
-        //                        participantController.getThumb(localParticipantSid,
-        // cameraVideoTrack)));
-        //        participantController.getThumb(localParticipantSid,
-        // cameraVideoTrack).callOnClick();
-        //
-        //        // add existing room participants thumbs
-        //        boolean isFirstParticipant = true;
-        //        for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-        //            addParticipant(remoteParticipant, isFirstParticipant);
-        //            isFirstParticipant = false;
-        //            if (room.getDominantSpeaker() != null) {
-        //                if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid()))
-        // {
-        //                    VideoTrack videoTrack =
-        //                            (remoteParticipant.getRemoteVideoTracks().size() > 0)
-        //                                    ? remoteParticipant
-        //                                            .getRemoteVideoTracks()
-        //                                            .get(0)
-        //                                            .getRemoteVideoTrack()
-        //                                    : null;
-        //                    if (videoTrack != null) {
-        //                        ParticipantView participantView =
-        //                                participantController.getThumb(
-        //                                        remoteParticipant.getSid(), videoTrack);
-        //                        participantController.setDominantSpeaker(participantView);
-        //                    }
-        //                }
-        //            }
-        //        }
-    }
-
-    private class LocalParticipantListener implements LocalParticipant.Listener {
-
-        private ImageView networkQualityImage;
-
-        LocalParticipantListener(ParticipantView primaryView) {
-            networkQualityImage = primaryView.networkQualityLevelImg;
-        }
-
-        @Override
-        public void onAudioTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalAudioTrackPublication localAudioTrackPublication) {}
-
-        @Override
-        public void onAudioTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalAudioTrack localAudioTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onVideoTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalVideoTrackPublication localVideoTrackPublication) {}
-
-        @Override
-        public void onVideoTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalVideoTrack localVideoTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onDataTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalDataTrackPublication localDataTrackPublication) {}
-
-        @Override
-        public void onDataTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalDataTrack localDataTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onNetworkQualityLevelChanged(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull NetworkQualityLevel networkQualityLevel) {
-            if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
-                    || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
-            }
-        }
     }
 
     private class ParticipantListener implements RemoteParticipant.Listener {
