@@ -834,4 +834,10 @@ class RoomManager(
         Timber.d("ViewEffect: $roomViewEffect")
         mutableViewEffects.value = roomViewEffect
     }
+
+    private fun withState(action: (viewState: RoomViewState) -> Unit) {
+        mutableViewState.value?.let {
+            action(it)
+        }
+    }
 }
