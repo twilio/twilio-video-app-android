@@ -16,7 +16,7 @@ data class RoomViewState(
     val volumeControlStream: Int = 0,
     val room: Room? = null,
     val primaryParticipant: ParticipantViewState? = null,
-    val remoteParticipants: List<ParticipantViewState>? = null
+    val participants: List<ParticipantViewState>? = null
 )
 
 data class ParticipantViewState(

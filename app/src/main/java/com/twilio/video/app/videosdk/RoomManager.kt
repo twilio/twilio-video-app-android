@@ -289,6 +289,9 @@ class RoomManager(
 
     private fun disconnectFromRoom() {
         room?.disconnect()
+
+        updateState { it.copy(participants = emptyList()) }
+
         stopScreenCapture()
 
         setAudioFocus(false)
@@ -621,6 +624,13 @@ class RoomManager(
 //            participantController.removePrimary();
 
             // add local thumb and "click" on it to make primary
+            withState { viewState ->
+                val primaryParticipant = viewState.primaryParticipant
+                val participants = mutableListOf<ParticipantViewState>()
+                primaryParticipant?.let { participants.add(it) }
+                updateState { it.copy(participants = participants) }
+            }
+
 //            participantController.addThumb(
 //                    localParticipantSid,
 //                    getString(R.string.you),

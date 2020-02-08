@@ -543,6 +543,20 @@ public class RoomActivity extends BaseActivity {
         } else {
             localAudioImageButton.setImageResource(R.drawable.ic_mic_white_24px);
         }
+        List<ParticipantViewState> participants = viewState.getParticipants();
+        if (participants != null && !participants.isEmpty()) {
+            for (ParticipantViewState participant : participants) {
+                participantController.addThumb(
+                        participant.getSid(),
+                        participant.getIdentity(),
+                        participant.getVideoTrack(),
+                        participant.isMuted(),
+                        participant.isMirrored(),
+                        false);
+            }
+        } else {
+            participantController.removeAllThumbs();
+        }
         //            if (viewState.isSpeakerPhoneMuted()) {
         //                ((MenuItem)
         // findViewById(R.id.speaker_menu_item)).setIcon(ic_volume_up_white_24dp);
