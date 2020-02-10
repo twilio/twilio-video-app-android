@@ -22,7 +22,7 @@ data class RoomViewState(
 data class ParticipantViewState(
     val sid: String,
     val identity: String,
-    val videoTrack: VideoTrack,
+    val videoTrack: VideoTrack? = null,
     val audioTrack: AudioTrack? = null,
     val isMuted: Boolean = false,
     val isMirrored: Boolean = true,

@@ -193,7 +193,7 @@ class RoomManager(
 
         // Setup Video
         setupLocalVideoTrack(context.getString(R.string.video_track))
-        renderLocalParticipantStub(context.getString(R.string.you))
+        renderLocalParticipant(context.getString(R.string.you))
 
         updateLocalParticipantTracks()
     }
@@ -361,24 +361,20 @@ class RoomManager(
      * NOTE: Stub participant is created in controller. Make sure to remove it when connected to
      * room.
      */
-    private fun renderLocalParticipantStub(localParticipantName: String) {
+    private fun renderLocalParticipant(localParticipantName: String) {
         withState { currentState ->
             if (currentState.primaryParticipant == null) {
-                cameraVideoTrack?.let { cameraVideoTrack ->
-                    localParticipantSid?.let { localParticipantSid ->
-                        val participantStub = ParticipantViewState(
-                                localParticipantSid,
-                                localParticipantName,
-                                cameraVideoTrack,
-                                null,
-                                localAudioTrack == null,
-                                cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
-                        )
-                        updateState { it.copy(primaryParticipant = participantStub) }
-                    } ?: Timber.e("LocalParticipantSid is null")
-                } ?: run {
-                    Timber.e("Unable to create PrimaryParticipantViewState")
-                }
+                localParticipantSid?.let { localParticipantSid ->
+                    val localParticipant = ParticipantViewState(
+                            localParticipantSid,
+                            localParticipantName,
+                            cameraVideoTrack,
+                            localAudioTrack,
+                            localAudioTrack == null,
+                            cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
+                    )
+                    updateState { it.copy(primaryParticipant = localParticipant) }
+                } ?: Timber.e("LocalParticipantSid is null")
             }
         }
     }
@@ -670,10 +666,20 @@ class RoomManager(
 
             // add local thumb and "click" on it to make primary
             withState { viewState ->
-                val primaryParticipant = viewState.primaryParticipant
-                val participants = mutableListOf<ParticipantViewState>()
-                primaryParticipant?.let { participants.add(it) }
-                updateState { it.copy(participants = participants) }
+                localParticipantSid?.let { localParticipantSid ->
+                    val localParticipantStub = ParticipantViewState(
+                            localParticipantSid,
+                            context.getString(R.string.you),
+                            null,
+                            null,
+                            localAudioTrack == null,
+                            cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
+                    )
+
+                    val participants = mutableListOf<ParticipantViewState>()
+                    participants.add(localParticipantStub)
+                    updateState { it.copy(participants = participants) }
+                } ?: Timber.e("LocalParticipantSid is null")
             }
 
 //            participantController.addThumb(
