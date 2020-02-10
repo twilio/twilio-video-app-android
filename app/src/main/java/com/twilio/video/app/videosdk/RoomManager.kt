@@ -101,7 +101,6 @@ class RoomManager(
     private var videoConstraints: VideoConstraints? = null
     private var localAudioTrack: LocalAudioTrack? = null
     private var cameraVideoTrack: LocalVideoTrack? = null
-    private val restoreLocalVideoCameraTrack = false
     private var screenVideoTrack: LocalVideoTrack? = null
     private var cameraCapturer: CameraCapturerCompat? = null
     var screenCapturer: ScreenCapturer? = null
@@ -163,18 +162,18 @@ class RoomManager(
         audioManager.isSpeakerphoneOn = false
         // Teardown tracks
         localAudioTrack?.let { localAudioTrack ->
-            localAudioTrack.release()
             localParticipant?.unpublishTrack(localAudioTrack)
+            localAudioTrack.release()
             this.localAudioTrack = null
         }
         cameraVideoTrack?.let { cameraVideoTrack ->
-            cameraVideoTrack.release()
             localParticipant?.unpublishTrack(cameraVideoTrack)
+            cameraVideoTrack.release()
             this.cameraVideoTrack = null
         }
         screenVideoTrack?.let { screenVideoTrack ->
-            screenVideoTrack.release()
             localParticipant?.unpublishTrack(screenVideoTrack)
+            screenVideoTrack.release()
             this.screenVideoTrack = null
         }
         // dispose any token requests if needed
@@ -188,10 +187,52 @@ class RoomManager(
         savedVolumeControlStream = volumeControlStream
         obtainVideoConstraints()
         localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
+        localAudioTrack?.let { localAudioTrack ->
+            localParticipant?.let { it.publishTrack(localAudioTrack) }
+        }
 
         // Setup Video
         setupLocalVideoTrack(context.getString(R.string.video_track))
         renderLocalParticipantStub(context.getString(R.string.you))
+
+        updateLocalParticipantTracks()
+    }
+
+    private fun updateLocalParticipantTracks() {
+        localAudioTrack?.let { localAudioTrack ->
+            cameraVideoTrack?.let { cameraVideoTrack ->
+                withState { currentState ->
+
+                    var newPrimaryParticipant = currentState.primaryParticipant
+                    newPrimaryParticipant?.let { primaryParticipant ->
+                        if (primaryParticipant.identity == context.getString(R.string.you)) {
+                            newPrimaryParticipant = primaryParticipant.copy(
+                                    audioTrack = localAudioTrack,
+                                    videoTrack = cameraVideoTrack)
+                        }
+                    }
+
+                    var newParticipants = currentState.participants
+                    currentState.participants?.let { participants ->
+                        participants.find { it.identity == context.getString(R.string.you) }
+                            ?.let { localParticipant ->
+                                val mutableParticipants = participants.toMutableList()
+                                mutableParticipants.remove(localParticipant)
+                                mutableParticipants.add(localParticipant.copy(
+                                        audioTrack = localAudioTrack,
+                                        videoTrack = cameraVideoTrack))
+                                newParticipants = mutableParticipants.toList()
+                            }
+                    }
+                    updateState {
+                        it.copy(
+                                primaryParticipant = newPrimaryParticipant,
+                                participants = newParticipants
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun connectToRoom(roomName: String, tokenIdentity: String) {
@@ -321,20 +362,24 @@ class RoomManager(
      * room.
      */
     private fun renderLocalParticipantStub(localParticipantName: String) {
-        cameraVideoTrack?.let { cameraVideoTrack ->
-            localParticipantSid?.let { localParticipantSid ->
-                val participantStub = ParticipantViewState(
-                        localParticipantSid,
-                        localParticipantName,
-                        cameraVideoTrack,
-                        null,
-                        localAudioTrack == null,
-                        cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
-                )
-                updateState { it.copy(primaryParticipant = participantStub) }
-            } ?: Timber.e("LocalParticipantSid is null")
-        } ?: run {
-            Timber.e("Unable to create PrimaryParticipantViewState")
+        withState { currentState ->
+            if (currentState.primaryParticipant == null) {
+                cameraVideoTrack?.let { cameraVideoTrack ->
+                    localParticipantSid?.let { localParticipantSid ->
+                        val participantStub = ParticipantViewState(
+                                localParticipantSid,
+                                localParticipantName,
+                                cameraVideoTrack,
+                                null,
+                                localAudioTrack == null,
+                                cameraCapturer!!.cameraSource === CameraCapturer.CameraSource.FRONT_CAMERA
+                        )
+                        updateState { it.copy(primaryParticipant = participantStub) }
+                    } ?: Timber.e("LocalParticipantSid is null")
+                } ?: run {
+                    Timber.e("Unable to create PrimaryParticipantViewState")
+                }
+            }
         }
     }
 
@@ -832,11 +877,9 @@ class RoomManager(
 //    }
 
     private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
-        val oldState = mutableViewState.value
-        oldState?.let {
-            val newState = action(oldState)
-            Timber.d("ViewState: $newState")
-            mutableViewState.value = newState
+        withState { currentState ->
+            Timber.d("ViewState: $currentState")
+            mutableViewState.value = action(currentState)
         }
     }
 
