@@ -7,7 +7,7 @@ def coreHome = "${buildDir}/prebuilt/twilio-video"
 def videoAndroidLibrary = "twilio_video_android_so"
 def videoAndroidClasspathPrefix = "tvi"
 def compilerVersion = "clang-3.8"
-def libWebRtcJarHome = "${coreHome}/armeabi-v7a/${compilerVersion}/release/lib/libwebrtc.jar"
+def libWebRtcJarHome = "${coreHome}/lib/armeabi-v7a/${compilerVersion}/release/libwebrtc.jar"
 
 configurations {
     preImplementation
