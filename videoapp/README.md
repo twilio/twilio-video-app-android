@@ -39,6 +39,8 @@ token generation instructions in your application. Putting your Account SID,
 API Key, and API Key Secret inside of an Android application will compromise your Twilio API
 credentials associated with your Twilio account.**
 
+***NOTE:*** Twilio access tokens generated with Twilio Console are valid for one hour. Repeat the steps above to refresh an expired Twilio access token.
+
 To get started with the community flavor follow these steps:
 
 1. Follow [these instructions](https://www.twilio.com/docs/video/tutorials/user-identity-access-tokens#generate-in-console) to generate an access token using your Twilio account.

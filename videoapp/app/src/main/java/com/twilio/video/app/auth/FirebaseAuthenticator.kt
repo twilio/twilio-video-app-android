@@ -16,6 +16,10 @@ class FirebaseAuthenticator(
         return Observable.merge(observables)
     }
 
+    override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
+        return login(Observable.just(loginEvent))
+    }
+
     override fun loggedIn() = firebaseWrapper.instance.currentUser != null
 
     override fun logout() {

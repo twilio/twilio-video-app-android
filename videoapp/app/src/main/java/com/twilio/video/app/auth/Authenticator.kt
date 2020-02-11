@@ -22,6 +22,8 @@ interface Authenticator {
 
     fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult>
 
+    fun login(loginEvent: LoginEvent): Observable<LoginResult>
+
     fun loggedIn(): Boolean
 
     fun logout()
