@@ -176,8 +176,6 @@ public class RoomActivity extends BaseActivity {
         // Grab views
         setContentView(R.layout.activity_room);
         ButterKnife.bind(this);
-        roomManager.getViewState().observe(this, this::bindViewState);
-        roomManager.getViewEffects().observe(this, this::bindViewEffects);
 
         // Setup toolbar
         setSupportActionBar(toolbar);
@@ -280,9 +278,14 @@ public class RoomActivity extends BaseActivity {
         // Grab menu items for updating later
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
+        pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
+        pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
 
         // Screen sharing only available on lollipop and up
         screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+
+        roomManager.getViewState().observe(this, this::bindViewState);
+        roomManager.getViewEffects().observe(this, this::bindViewEffects);
 
         return true;
     }
@@ -305,6 +308,12 @@ public class RoomActivity extends BaseActivity {
                     roomManager.processViewEvent(StopScreenCapture.INSTANCE);
                 }
 
+                return true;
+            case R.id.pause_audio_menu_item:
+                roomManager.processViewEvent(ToggleLocalAudio.INSTANCE);
+                return true;
+            case R.id.pause_video_menu_item:
+                //                toggleLocalVideoTrackState();
                 return true;
             case R.id.settings_menu_item:
                 removeCameraTrack();
@@ -543,10 +552,11 @@ public class RoomActivity extends BaseActivity {
                             Snackbar.LENGTH_LONG)
                     .show();
         }
+        int audioIconButton = R.drawable.ic_mic_white_24px;
+        int pauseAudioMenuItemTitle = R.string.pause_audio;
         if (viewState.isLocalAudioMuted()) {
-            localAudioImageButton.setImageResource(R.drawable.ic_mic_off_gray_24px);
-        } else {
-            localAudioImageButton.setImageResource(R.drawable.ic_mic_white_24px);
+            audioIconButton = R.drawable.ic_mic_off_gray_24px;
+            pauseAudioMenuItemTitle = R.string.resume_audio;
         }
         List<ParticipantViewState> participants = viewState.getParticipants();
         if (participants != null && !participants.isEmpty()) {
@@ -578,6 +588,8 @@ public class RoomActivity extends BaseActivity {
         //            screenCaptureMenuItem.setIcon(icon);
         //            screenCaptureMenuItem.setTitle(title);
 
+        localAudioImageButton.setImageResource(audioIconButton);
+        pauseAudioMenuItem.setTitle(pauseAudioMenuItemTitle);
         statsListAdapter = new StatsListAdapter(this);
         statsRecyclerView.setAdapter(statsListAdapter);
         statsRecyclerView.setLayoutManager(new LinearLayoutManager(this));

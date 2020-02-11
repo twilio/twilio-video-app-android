@@ -107,7 +107,9 @@
     <string name="logout_when_conv_ends">Logout when conversation ends</string>
     <string name="room_name">Room Name</string>
     <string name="switch_camera">Switch Camera</string>
+    <string name="pause_audio">Pause audio</string>
     <string name="resume_audio">Resume audio</string>
+    <string name="pause_video">Pause video</string>
     <string name="resume_video">Resume video</string>
     <string name="share_screen">Share screen</string>
     <string name="stop_screen_share">Stop screen share</string>
