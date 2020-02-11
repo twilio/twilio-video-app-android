@@ -11,7 +11,7 @@ Enhancements
 
 Bug Fixes
 
-- Fixed a crash which could occur when destroying a video::Room while the TCP handshake for the
+- Fixed a crash which could occur when destroying a Room while the TCP handshake for the
 signaling connection is in progress.
 - Fixed intermittent crash when sending data on a data track while in the process of closing the
 track due to remote participant disconnect.
