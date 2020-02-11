@@ -1,5 +1,25 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.1.1
+
+* Programmable Video Android SDK 5.1.1 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.1), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.1/)
+
+Enhancements
+
+- Reduced bandwidth usage for Insights reporting by up to 75%. 
+- Data track per-message size limit has been increased to 64 KB.
+
+Bug Fixes
+
+- Fixed a crash which could occur when destroying a video::Room while the TCP handshake for the
+signaling connection is in progress. 
+- Fixed intermittent crash when sending data on a data track while in the process of closing the
+track due to remote participant disconnect.
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
 ### 5.1.0
 
 * Programmable Video Android SDK 5.1.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.0/)
