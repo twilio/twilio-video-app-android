@@ -41,6 +41,10 @@ class CommunityAuthenticator constructor(
         }.toObservable()
     }
 
+    override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
+        return login(Observable.just(loginEvent))
+    }
+
     override fun loggedIn(): Boolean {
         return !preferences.getString(Preferences.DISPLAY_NAME, null).isNullOrEmpty()
     }

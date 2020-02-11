@@ -7,12 +7,15 @@ import com.twilio.video.app.ui.ScreenSelectorModule;
 import com.twilio.video.app.ui.login.LoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
+import com.twilio.video.app.ui.settings.SettingsFragmentModule;
 import com.twilio.video.app.ui.splash.SplashActivityModule;
 import dagger.Component;
+import dagger.android.AndroidInjectionModule;
 
 @ApplicationScope
 @Component(
     modules = {
+        AndroidInjectionModule.class,
         ApplicationModule.class,
         TreeModule.class,
         DataModule.class,
@@ -22,7 +25,8 @@ import dagger.Component;
         SplashActivityModule.class,
         LoginActivityModule.class,
         RoomActivityModule.class,
-        SettingsActivityModule.class
+        SettingsActivityModule.class,
+        SettingsFragmentModule.class
     }
 )
 public interface VideoApplicationComponent {
