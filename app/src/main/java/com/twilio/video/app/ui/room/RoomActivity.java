@@ -33,6 +33,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -298,11 +299,23 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        boolean isAppLinkProvided = checkIntentURI();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        updateUi(room);
+        updateUi(room, isAppLinkProvided);
         restoreCameraTrack();
         initializeRoom();
         updateStats();
+    }
+
+    private boolean checkIntentURI() {
+        boolean isAppLinkProvided = false;
+        Uri uri = getIntent().getData();
+        String roomName = new UriRoomParser(new UriWrapper(uri)).parseRoom();
+        if (roomName != null) {
+            roomEditText.setText(roomName);
+            isAppLinkProvided = true;
+        }
+        return isAppLinkProvided;
     }
 
     @Override
@@ -815,13 +828,17 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void updateUi(Room room) {
+        updateUi(room, false);
+    }
+
+    private void updateUi(Room room, boolean isAppLinkProvided) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
 
         boolean settingsMenuItemState = true;
 
-        boolean connectButtonEnabled = false;
+        boolean connectButtonEnabled = isAppLinkProvided;
 
         String roomName = displayName;
         String toolbarTitle = displayName;

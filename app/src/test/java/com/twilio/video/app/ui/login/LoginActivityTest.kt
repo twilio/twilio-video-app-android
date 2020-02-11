@@ -1,6 +1,6 @@
 package com.twilio.video.app.ui.login
 
-import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ActivityScenario
@@ -20,10 +20,10 @@ import com.twilio.video.app.TestApp
 import com.twilio.video.app.DaggerIntegrationTestComponent
 import com.twilio.video.app.TestWrapperAuthModule
 import com.twilio.video.app.auth.FirebaseWrapper
-import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.auth.GoogleAuthWrapper
-import com.twilio.video.app.auth.GoogleSignInOptionsBuilderWrapper
+import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
+import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.screen.clickGoogleSignInButton
 import com.twilio.video.app.ui.room.RoomActivity
 import org.hamcrest.CoreMatchers.equalTo
@@ -54,9 +54,7 @@ class LoginActivityTest {
     private val googleSignInWrapper: GoogleSignInWrapper = mock {
         whenever(mock.getClient(any(), any())).thenReturn(googleSignInClient)
     }
-    private val googleSignInOptionsBuilderWrapper: GoogleSignInOptionsBuilderWrapper = mock {
-        whenever(mock.build()).thenReturn(mock())
-    }
+    private val googleSignInOptionsWrapper: GoogleSignInOptionsWrapper = mock()
 
     @Before
     fun setUp() {
@@ -66,7 +64,7 @@ class LoginActivityTest {
                 .testWrapperAuthModule(TestWrapperAuthModule(firebaseWrapper,
                         googleAuthWrapper,
                         googleSignInWrapper,
-                        googleSignInOptionsBuilderWrapper,
+                        googleSignInOptionsWrapper,
                         googleAuthProviderWrapper)
                 )
                 .build()
@@ -75,7 +73,7 @@ class LoginActivityTest {
     }
 
     @Test
-    fun `it should navigate to the lobby screen when google login is successful`() {
+    fun `it should finish the login flow when google login is successful`() {
         val googleSignInActivityResult = Intent()
         val signInAccount: GoogleSignInAccount = mock {
             whenever(mock.idToken).thenReturn("123456")
@@ -101,9 +99,10 @@ class LoginActivityTest {
         assertThat(actualActivityRequest, equalTo(googleSignInActivityRequest))
 
         scenario.onActivity {
+            // Trigger onActivityResult
             shadowOf(it).receiveResult(
                     actualActivityRequest,
-                    Activity.RESULT_OK,
+                    RESULT_OK,
                     googleSignInActivityResult
             )
         }
