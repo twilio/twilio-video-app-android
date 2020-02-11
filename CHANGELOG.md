@@ -6,13 +6,13 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 Enhancements
 
-- Reduced bandwidth usage for Insights reporting by up to 75%. 
+- Reduced bandwidth usage for Insights reporting by up to 75%.
 - Data track per-message size limit has been increased to 64 KB.
 
 Bug Fixes
 
 - Fixed a crash which could occur when destroying a video::Room while the TCP handshake for the
-signaling connection is in progress. 
+signaling connection is in progress.
 - Fixed intermittent crash when sending data on a data track while in the process of closing the
 track due to remote participant disconnect.
 
