@@ -34,15 +34,15 @@ AudioSinkAdapter::AudioSinkAdapter(JNIEnv *env, jobject j_audio_sink) :
                                                          j_byte_buffer_class_.obj(),
                                                          "wrap",
                                                          "([B)Ljava/nio/ByteBuffer;")){
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "AudioSinkAdapter");
 }
 
 AudioSinkAdapter::~AudioSinkAdapter() {
     setObserverDeleted();
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "~AudioSinkAdapter");
 }
 
@@ -53,8 +53,8 @@ void AudioSinkAdapter::OnData(const void *audio_data,
                               size_t number_of_frames) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
 
     {
@@ -88,15 +88,15 @@ void AudioSinkAdapter::OnData(const void *audio_data,
 
 bool AudioSinkAdapter::isObserverValid(const std::string &callback_name) {
     if (observer_deleted_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "audio sink adapter is marked for deletion, skipping %s callback",
                           callback_name.c_str());
         return false;
     };
     if (webrtc::IsNull(jni(), j_audio_sink_)) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "audio sink adapter reference has been destroyed, skipping %s callback",
                           callback_name.c_str());
         return false;
@@ -107,8 +107,8 @@ bool AudioSinkAdapter::isObserverValid(const std::string &callback_name) {
 void AudioSinkAdapter::setObserverDeleted() {
     rtc::CritScope cs(&deletion_lock_);
     observer_deleted_ = true;
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "audio sink adapter deleted");
 }
 

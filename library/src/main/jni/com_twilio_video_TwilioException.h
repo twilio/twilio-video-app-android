@@ -18,7 +18,7 @@
 #define VIDEO_ANDROID_COM_TWILIO_VIDEO_TWILIOEXCEPTION_H_
 
 #include <jni.h>
-#include "twilio/video/twilio_error.h"
+#include "twilio/video/error.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +35,7 @@ static const char *const kTwilioExceptionConstructorSignature = "("
 jobject createJavaTwilioException(JNIEnv *env,
                                   jclass j_twilio_exception_class,
                                   jmethodID j_twilio_exception_ctor_id,
-                                  const twilio::video::TwilioError &twilio_error);
+                                  const twilio::video::Error &twilio_error);
 
 };
 

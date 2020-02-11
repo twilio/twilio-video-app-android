@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- General -->
+    <string name="web_app_domain">twilio-video-react.appspot.com</string>
+
     <!--  Login Screen  -->
     <string name="login_screen_auth_error_title">Login Error</string>
     <string name="login_screen_auth_error_desc">There was an issue logging in.</string>
@@ -27,6 +30,7 @@
     <string name="settings_screen_fps">Frames per second</string>
     <string name="settings_screen_identity">User Identity</string>
     <string name="settings_screen_version">Version</string>
+    <string name="settings_screen_version_code">Version Code</string>
     <string name="settings_screen_video_library_version">Video Library Version</string>
     <string name="settings_screen_logout">Log Out</string>
     <string name="settings_screen_video_dimensions">Video dimensions</string>

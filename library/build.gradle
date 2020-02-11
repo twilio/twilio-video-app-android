@@ -7,7 +7,7 @@ def coreHome = "${buildDir}/prebuilt/twilio-video"
 def videoAndroidLibrary = "twilio_video_android_so"
 def videoAndroidClasspathPrefix = "tvi"
 def compilerVersion = "clang-3.8"
-def libWebRtcJarHome = "${coreHome}/armeabi-v7a/${compilerVersion}/release/lib/libwebrtc.jar"
+def libWebRtcJarHome = "${coreHome}/lib/armeabi-v7a/${compilerVersion}/release/libwebrtc.jar"
 
 configurations {
     preImplementation
@@ -286,10 +286,10 @@ task localizeWebRtcJniLoadUnLoad(type: Exec, dependsOn: 'unpackPrebuilts') {
                 supportedHosts.each { host ->
                     def objCopy = "${ndkToolchains}/${toolchainPrefix}-${currentToolchainVersion}" +
                             "/prebuilt/${host}-x86_64/bin/${toolChainPrebuiltPrefix}-objcopy"
-                    def libWebRtcStaticLib = "${coreHome}/${arch}/${compilerVersion}" +
-                            "/release/lib/libwebrtc-jni.a"
-                    def libWebRtcDebugStaticLib = "${coreHome}/${arch}/${compilerVersion}" +
-                            "/debug/lib/libwebrtc-jni.a"
+                    def libWebRtcStaticLib = "${coreHome}/lib/${arch}/${compilerVersion}" +
+                            "/release/libwebrtc-jni.a"
+                    def libWebRtcDebugStaticLib = "${coreHome}/lib/${arch}/${compilerVersion}" +
+                            "/debug/libwebrtc-jni.a"
                     if (file("${objCopy}").exists() &&
                             file("${libWebRtcStaticLib}").exists() &&
                             archToolChain == toolChainPrebuiltPrefix) {

@@ -46,16 +46,16 @@ AndroidRemoteDataTrackObserver::AndroidRemoteDataTrackObserver(JNIEnv *env,
 }
 
 AndroidRemoteDataTrackObserver::~AndroidRemoteDataTrackObserver() {
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "~AndroidRemoteDataTrackObserver");
 }
 
 void AndroidRemoteDataTrackObserver::setObserverDeleted() {
     rtc::CritScope cs(&deletion_lock_);
     observer_deleted_ = true;
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "local participant observer deleted");
 }
 
@@ -63,8 +63,8 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
                                                                  const std::string &message) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     {
         rtc::CritScope cs(&deletion_lock_);
@@ -86,8 +86,8 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
                                                                  size_t size) {
     webrtc::jni::ScopedLocalRefFrame local_ref_frame(jni());
     std::string func_name = std::string(__FUNCTION__);
-    VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                      twilio::video::LogLevel::kDebug,
+    VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                      twilio::LogLevel::kDebug,
                       "%s", func_name.c_str());
     {
         rtc::CritScope cs(&deletion_lock_);
@@ -116,15 +116,15 @@ void twilio_video_jni::AndroidRemoteDataTrackObserver::onMessage(twilio::media::
 
 bool AndroidRemoteDataTrackObserver::isObserverValid(const std::string &callback_name) {
     if (observer_deleted_) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "remote data track listener is marked for deletion, skipping %s callback",
                           callback_name.c_str());
         return false;
     };
     if (webrtc::IsNull(jni(), j_remote_data_track_listener_)) {
-        VIDEO_ANDROID_LOG(twilio::video::LogModule::kPlatform,
-                          twilio::video::LogLevel::kWarning,
+        VIDEO_ANDROID_LOG(twilio::LogModule::kPlatform,
+                          twilio::LogLevel::kWarning,
                           "remote data track listener reference has been destroyed, "
                                   "skipping %s callback",
                           callback_name.c_str());

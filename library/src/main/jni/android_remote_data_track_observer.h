@@ -19,7 +19,8 @@
 
 #include <jni.h>
 #include "twilio/media/track.h"
-#include "twilio/media/track_observer.h"
+#include "twilio/media/data_track.h"
+#include "twilio/media/data_track_observer.h"
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 namespace twilio_video_jni {

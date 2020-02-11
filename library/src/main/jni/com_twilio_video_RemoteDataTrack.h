@@ -19,6 +19,8 @@
 
 #include <jni.h>
 #include "twilio/media/track.h"
+#include "twilio/media/data_track.h"
+
 
 #ifdef __cplusplus
 extern "C" {

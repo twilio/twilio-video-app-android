@@ -35,7 +35,7 @@ class SplashActivity : BaseActivity() {
             Intent(this, RoomActivity::class.java)
         else
             Intent(this, screenSelector.loginScreen)
-        startActivity(newIntent)
+        startActivity(newIntent.apply { data = intent.data })
         finish()
     }
 }

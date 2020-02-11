@@ -20,6 +20,7 @@
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
 #include "twilio/media/track.h"
+#include "twilio/media/data_track.h"
 #include "twilio/video/video.h"
 #include "twilio/video/remote_participant_observer.h"
 
@@ -78,7 +79,7 @@ protected:
 
     virtual void onAudioTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
                                                 std::shared_ptr<twilio::media::RemoteAudioTrackPublication> publication,
-                                                const twilio::video::TwilioError twilio_error);
+                                                const twilio::video::Error twilio_error);
 
     virtual void onAudioTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
                                           std::shared_ptr<twilio::media::RemoteAudioTrackPublication> remote_audio_track_publication,
@@ -90,7 +91,7 @@ protected:
 
     virtual void onVideoTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
                                                 std::shared_ptr<twilio::media::RemoteVideoTrackPublication> publication,
-                                                const twilio::video::TwilioError twilio_error);
+                                                const twilio::video::Error twilio_error);
 
     virtual void onVideoTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
                                           std::shared_ptr<twilio::media::RemoteVideoTrackPublication> remote_video_track_publication,
@@ -102,7 +103,7 @@ protected:
 
     virtual void onDataTrackSubscriptionFailed(twilio::video::RemoteParticipant *participant,
                                                std::shared_ptr<twilio::media::RemoteDataTrackPublication> publication,
-                                               const twilio::video::TwilioError twilio_error);
+                                               const twilio::video::Error twilio_error);
 
     virtual void onDataTrackUnsubscribed(twilio::video::RemoteParticipant *participant,
                                          std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,

@@ -66,17 +66,6 @@
     </issue>
 
     <issue
-        id="GradleDependency"
-        message="A newer version of com.google.firebase:firebase-auth than 19.1.0 is available: 19.2.0"
-        errorLine1="    implementation &apos;com.google.firebase:firebase-auth:19.1.0&apos;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="154"
-            column="5"/>
-    </issue>
-
-    <issue
         id="MergeRootFrame"
         message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
         errorLine1="&lt;FrameLayout"
