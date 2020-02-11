@@ -174,7 +174,6 @@ video-voice-side-by-side-tests:
     device:
         - {model: m0, version: 18}
         - {model: Nexus5, version: 19}
-        - {model: Pixel2_Q, version: Q}
         - {model: flame, version: 29}
 
 video-webrtc-side-by-side-tests:
@@ -185,5 +184,4 @@ video-webrtc-side-by-side-tests:
     device:
         - {model: m0, version: 18}
         - {model: Nexus5, version: 19}
-        - {model: Pixel2_Q, version: Q}
         - {model: flame, version: 29}
