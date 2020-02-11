@@ -31,8 +31,8 @@ import android.view.Surface;
 import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.List;
-import org.webrtc.ScreenCapturerAndroid;
-import org.webrtc.SurfaceTextureHelper;
+import tvi.webrtc.ScreenCapturerAndroid;
+import tvi.webrtc.SurfaceTextureHelper;
 
 /**
  * The ScreenCapturer class is used to provide video frames for a {@link LocalVideoTrack} from a
@@ -75,8 +75,8 @@ public class ScreenCapturer implements VideoCapturer {
                 }
             };
 
-    private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
-            new org.webrtc.VideoCapturer.CapturerObserver() {
+    private final tvi.webrtc.VideoCapturer.CapturerObserver observerAdapter =
+            new tvi.webrtc.VideoCapturer.CapturerObserver() {
                 @Override
                 public void onCapturerStarted(boolean success) {
                     logger.d("screen capturer started");
@@ -97,14 +97,14 @@ public class ScreenCapturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
+                public void onFrameCaptured(tvi.webrtc.VideoFrame videoFrame) {
                     if (!firstFrameReported) {
                         if (screenCapturerListener != null) {
                             listenerHandler.post(screenCapturerListener::onFirstFrameAvailable);
                         }
                         firstFrameReported = true;
                     }
-                    org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
+                    tvi.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
                     videoDimensions = new VideoDimensions(buffer.getWidth(), buffer.getHeight());
                     VideoFrame.RotationAngle currentOrientation =
                             VideoFrame.RotationAngle.fromInt(getDeviceOrientation());

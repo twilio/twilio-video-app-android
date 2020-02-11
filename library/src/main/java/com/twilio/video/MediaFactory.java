@@ -23,7 +23,7 @@ import android.support.annotation.VisibleForTesting;
 import com.getkeepsafe.relinker.ReLinker;
 import java.util.HashSet;
 import java.util.Set;
-import org.webrtc.EglBase;
+import tvi.webrtc.EglBase;
 
 class MediaFactory {
     private static final String RELEASE_MESSAGE_TEMPLATE = "MediaFactory released %s unavailable";
@@ -41,7 +41,7 @@ class MediaFactory {
         synchronized (MediaFactory.class) {
             if (instance == null) {
                 if (!libraryIsLoaded) {
-                    ReLinker.loadLibrary(context, "jingle_peerconnection_so");
+                    ReLinker.loadLibrary(context, BuildConfig.TWILIO_VIDEO_ANDROID_LIBRARY);
                     libraryIsLoaded = true;
                 }
 
@@ -152,7 +152,7 @@ class MediaFactory {
     static MediaFactory testCreate(@NonNull Context context, @NonNull MediaOptions mediaOptions) {
         synchronized (MediaFactory.class) {
             if (!libraryIsLoaded) {
-                ReLinker.loadLibrary(context, "jingle_peerconnection_so");
+                ReLinker.loadLibrary(context, BuildConfig.TWILIO_VIDEO_ANDROID_LIBRARY);
                 libraryIsLoaded = true;
             }
 

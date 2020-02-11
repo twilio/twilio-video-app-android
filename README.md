@@ -6,6 +6,7 @@
 - [Tests](#tests)
 - [Setup an Emulator](#setup-an-emulator)
 - [Library Size](#library-size)
+- [Side-By-Side Support](#side-by-side-support)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
@@ -27,6 +28,7 @@ To get started we recommend you use Android Studio for all your development.
 In order to use our project please perform the following steps:
 
 1.  Install the Android SDK using Android Studio.
+1.  Install [bbe](https://linux.die.net/man/1/bbe)
 1.  Download Android NDK r16b. The Android NDK is a set of tools that allow developers to implement
 parts of their application or libraries in native code using languages like C and C++. The Video
 Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. The two SDKs interact using the [Java Native Interface (JNI)](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/).
@@ -42,9 +44,9 @@ Android SDK contains native C and C++ code that uses the Twilio Video C++ SDK. T
         <img width="700px" src="images/community-variant/android-ndk-location.png"/>
 
 1.  **Twilions** download the google-services.json files here:
-      * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `app/src/internal/debug`
-      * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `app/src/internal/release`
-      * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `app/src/twilio/release`
+      * [Internal Debug (default)](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal.debug) - Download to `videoapp/app/src/internal/debug`
+      * [Internal Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app.internal) - Download to `videoapp/app/src/internal/release`
+      * [Twilio Release](https://console.firebase.google.com/project/video-app-79418/settings/general/android:com.twilio.video.app) - Download to `videoapp/app/src/twilio/release`
 1.  Setup your Programmable Video credentials. Credentials are required to run the SDK
 instrumentation tests and certain app flavors. The credentials in this project are managed
 using JSON files. The table below provides a short summary of required credentials:
@@ -55,22 +57,6 @@ using JSON files. The table below provides a short summary of required credentia
     API Key | `api_key` | Used to authenticate - [generate one here](https://www.twilio.com/console/video/runtime/api-keys).
     API Secret | `api_key_secret` | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/video/runtime/api-keys).
 
-    #### Video Android App
-    Copy the JSON snippet below to `app/twilio-video-app.json` and use the
-    table above as reference to fill in your Twilio credentials. **Injecting
-    credentials into a client side app should not be done in production
-    apps. This practice is only acceptable for development and testing
-    purposes.**
-
-    ```
-    {
-      "credentials": {
-        "account_sid": "AC00000000000000000000000000000000",
-        "api_key": "SK00000000000000000000000000000000",
-        "api_key_secret": "00000000000000000000000000000000"
-      }
-    }
-    ```
 
     #### Video Android SDK
     Copy the JSON snippet below to `library/twilio-video.json` and use the
@@ -110,7 +96,7 @@ using JSON files. The table below provides a short summary of required credentia
 
 ## Project Modules
 
-* **app**: Provides a canonical multi-party voice and video calling application that uses the Android SDK
+* **videoapp-app**: Provides a canonical multi-party voice and video calling application that uses the Android SDK
 * **env**: Allows developers to set environment variables in native C/C++ using JNI.
 This is only applicable for **Twilions**. Accessing dev or stage requires VPN.
 * **library**: The Android SDK that provides the Java classes and interfaces used
@@ -127,53 +113,36 @@ generates access tokens locally. Please follow the
 
 ## Video App
 
-### WARNING
-
-This app module is no longer the customer facing reference application.
-Please refer to the [video app](https://github.com/twilio/twilio-video-app-android)
-for that. There is work in progress to determine how to directly link
-to the video app repo via a subtree in this repository.
-
 ### Description
 
 The Video App demonstrates a multi-party voice and video application built with the Android
-SDK. The application consists of the following [product flavors](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Product-flavors):
+SDK. This application is maintained in a [separate repository](https://github.com/twilio/twilio-video-app-android) and
+linked to this project as a git subtree. For details on how to get started with the app, reference
+the application [README](videoapp).
 
-1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
-1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
-1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
+### Working with the Application Subtree
+The following section provides common scenarios working with the application subtree. For more general
+information about git subtrees reference the following [article](https://www.atlassian.com/git/tutorials/git-subtree).
 
-### Building the Community Flavor
-The community flavor of the application is meant for developers who would like to work with the
-Android SDK in the context of a full-fledged application without needing to bother with implementing
-authentication and managing a token server. **This variant generates access tokens locally within
-the application. This practice is intended for local development and is not encouraged for your
-applications. Please follow the
-[User Identity and Access Tokens guide](https://www.twilio.com/docs/api/video/identity) for proper
-token generation instructions in your application. Putting your Account SID,
-API Key, and API Key Secret inside of an Android application will compromise your Twilio API
-credentials associated with your Twilio account.**
+#### Add Subtree as Remote
+The following command allows the developer to reference the subtree in short form as a remote.
 
-To get started with the community flavor follow these steps:
+```
+git remote add -f twilio-video-app-android git@github.com:twilio/twilio-video-app-android.git
+```
 
-1. Setup your `app/twilio-video-app.json` according to steps in [Getting Started](#getting-started).
+#### Updating the Application Subtree
 
-2. In Android Studio navigate to View → Tool Windows → Build Variants.
+```
+git fetch twilio-video-app-android master
+git subtree pull --prefix videoapp twilio-video-app-android master --squash
+```
 
-    <img width="700px" src="images/community-variant/build-variants.png"/>
+#### Contributing Changes
 
-3. Select the `communityDebug` Build Variant under the app module.
-
-    <img width="700px" src="images/community-variant/community-debug-variant.png"/>
-
-4. Run the application.
-
-### HockeyApp
-The internal release flavor of the application requires setting the project property `hockeyAppId`
-to register for application updates. The following snippet demonstrates how to build an internal
-release with a Hockey App ID.
-
-`./gradlew -PhockeyAppId=1234 app:assembleInternalRelease`
+```
+git subtree push --prefix=videoapp twilio-video-app-android task/update-app
+```
 
 ## Tests
 
@@ -276,6 +245,24 @@ architectures in one APK.
 
 ### Calculate the Size Report of a Specific Version
 `./gradlew -PapkScaleVideoAndroidVersion=2.0.0 librarySizeReport`
+
+## Side-by-Side Support
+
+The Video SDK can be built alongside another WebRTC based dependency, such as the Voice Android SDK
+without Java or native conflicts at build or runtime. Side-by-side support is achieved with two
+steps: renaming the WebRTC jar classpath and the native symbols that reference the previous
+classpath.
+
+### Renaming the WebRTC Jar Classpath
+
+The Video SDK uses [jarjar links](./library/jarjar) to rename the WebRTC jar package classpath from
+`org.webrtc.*` to `tvi.webrtc.*` prior to assembling the SDK.
+
+### Renaming Native Symbols
+
+The Video SDK uses `bbe` to modify the native symbol references from `org_webrtc` to `tvi_webrtc`
+in accordance with the classpath rename. CMake performs this action as a post build step of the final
+.so file packaged into the aar.
 
 ## Code Formatting
 This project maintains Google AOSP formatted code. Before submitting a pull request, make sure to run `./gradlew spotlessApply`

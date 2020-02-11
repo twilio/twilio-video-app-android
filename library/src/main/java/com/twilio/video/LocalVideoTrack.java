@@ -279,7 +279,7 @@ public class LocalVideoTrack extends VideoTrack {
             boolean enabled,
             VideoCapturer videoCapturer,
             VideoConstraints videoConstraints,
-            org.webrtc.VideoTrack webrtcVideoTrack,
+            tvi.webrtc.VideoTrack webrtcVideoTrack,
             String nativeTrackHash,
             String name,
             Context context) {

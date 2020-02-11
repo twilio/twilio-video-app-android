@@ -24,7 +24,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VideoTrackUnitTest {
-    @Mock org.webrtc.VideoTrack mockWebRtcVideoTrack;
+    @Mock tvi.webrtc.VideoTrack mockWebRtcVideoTrack;
     @Mock VideoRenderer videoRenderer;
     private VideoTrack videoTrack;
 
@@ -47,7 +47,7 @@ public class VideoTrackUnitTest {
      * Simple concrete video track to test functionality in abstract class.
      */
     private static class UnitTestVideoTrack extends VideoTrack {
-        UnitTestVideoTrack(org.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
+        UnitTestVideoTrack(tvi.webrtc.VideoTrack webRtcVideoTrack, boolean enabled) {
             super(webRtcVideoTrack, enabled, "");
         }
     }

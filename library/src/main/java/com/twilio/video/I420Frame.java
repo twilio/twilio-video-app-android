@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  *
  * <p>When a frame is represented as a texture, {@link #textureId} will be set to a positive non
  * zero value with {@link #yuvPlanes} and {@link #yuvStrides} set to {@code null}. The YUV data can
- * be extracted from the texture using an instance of {@link org.webrtc.YuvConverter} and the {@link
+ * be extracted from the texture using an instance of {@link tvi.webrtc.YuvConverter} and the {@link
  * #samplingMatrix}.
  *
  * <p>When a frame is represented as an array of {@link ByteBuffer}, {@link #textureId} will be 0,
@@ -70,9 +70,9 @@ public class I420Frame {
      */
     public final float[] samplingMatrix;
 
-    final org.webrtc.VideoRenderer.I420Frame webRtcI420Frame;
+    final tvi.webrtc.VideoRenderer.I420Frame webRtcI420Frame;
 
-    I420Frame(org.webrtc.VideoRenderer.I420Frame webRtcI420Frame) {
+    I420Frame(tvi.webrtc.VideoRenderer.I420Frame webRtcI420Frame) {
         this.width = webRtcI420Frame.width;
         this.height = webRtcI420Frame.height;
         this.yuvStrides = webRtcI420Frame.yuvStrides;
@@ -103,7 +103,7 @@ public class I420Frame {
      * each frame to ensure that resources are not leaked.
      */
     public synchronized void release() {
-        org.webrtc.VideoRenderer.renderFrameDone(webRtcI420Frame);
+        tvi.webrtc.VideoRenderer.renderFrameDone(webRtcI420Frame);
     }
 
     @Override

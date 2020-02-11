@@ -104,7 +104,7 @@ public abstract class Video {
         }
 
         if (!libraryIsLoaded) {
-            ReLinker.loadLibrary(applicationContext, "jingle_peerconnection_so");
+            ReLinker.loadLibrary(applicationContext, BuildConfig.TWILIO_VIDEO_ANDROID_LIBRARY);
             libraryIsLoaded = true;
             /*
              * The user may have set the log level prior to the native library being loaded.

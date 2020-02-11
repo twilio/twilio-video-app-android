@@ -39,7 +39,8 @@ public class JniUtilsUtf8StringsParameterizedTest extends BaseVideoTest {
 
     @BeforeClass
     public static void classSetup() {
-        ReLinker.loadLibrary(InstrumentationRegistry.getContext(), "jingle_peerconnection_so");
+        ReLinker.loadLibrary(
+                InstrumentationRegistry.getContext(), BuildConfig.TWILIO_VIDEO_ANDROID_LIBRARY);
     }
 
     @Parameterized.Parameters

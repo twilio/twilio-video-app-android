@@ -148,7 +148,7 @@ AndroidRoomObserver::AndroidRoomObserver(JNIEnv *env,
                 webrtc::GetMethodID(env,
                                     j_remote_video_track_class_.obj(),
                                     "<init>",
-                                    "(Lorg/webrtc/VideoTrack;Ljava/lang/String;Ljava/lang/String;Z)V")),
+                                    "(Ltvi/webrtc/VideoTrack;Ljava/lang/String;Ljava/lang/String;Z)V")),
         j_video_track_publication_ctor_id_(
                 webrtc::GetMethodID(env,
                                     j_remote_video_track_publication_class_.obj(),

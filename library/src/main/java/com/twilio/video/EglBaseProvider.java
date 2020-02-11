@@ -19,7 +19,7 @@ package com.twilio.video;
 import android.support.annotation.VisibleForTesting;
 import java.util.HashSet;
 import java.util.Set;
-import org.webrtc.EglBase;
+import tvi.webrtc.EglBase;
 
 class EglBaseProvider {
     private static final String RELEASE_MESSAGE_TEMPLATE =

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.webrtc.Camera1Enumerator;
+import tvi.webrtc.Camera1Enumerator;
 
 class CameraCapturerFormatProvider {
     private static final Logger logger = Logger.getLogger(CameraCapturerFormatProvider.class);

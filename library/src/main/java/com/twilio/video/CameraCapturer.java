@@ -41,11 +41,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.webrtc.Camera1Capturer;
-import org.webrtc.Camera1Session;
-import org.webrtc.CameraVideoCapturer;
-import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.ThreadUtils;
+import tvi.webrtc.Camera1Capturer;
+import tvi.webrtc.Camera1Session;
+import tvi.webrtc.CameraVideoCapturer;
+import tvi.webrtc.SurfaceTextureHelper;
+import tvi.webrtc.ThreadUtils;
 
 /**
  * The CameraCapturer class is used to provide video frames for a {@link LocalVideoTrack} from a
@@ -112,13 +112,13 @@ public class CameraCapturer implements VideoCapturer {
     private final AtomicBoolean picturePending = new AtomicBoolean(false);
     private final AtomicBoolean parameterUpdatePending = new AtomicBoolean(false);
     private CameraCapturer.Listener listener;
-    private org.webrtc.Camera1Capturer webRtcCameraCapturer;
+    private tvi.webrtc.Camera1Capturer webRtcCameraCapturer;
     private CameraSource cameraSource;
     private Camera1Session camera1Session;
     private VideoCapturer.Listener videoCapturerListener;
     private SurfaceTextureHelper surfaceTextureHelper;
-    private final org.webrtc.VideoCapturer.CapturerObserver observerAdapter =
-            new org.webrtc.VideoCapturer.CapturerObserver() {
+    private final tvi.webrtc.VideoCapturer.CapturerObserver observerAdapter =
+            new tvi.webrtc.VideoCapturer.CapturerObserver() {
                 @Override
                 public void onCapturerStarted(boolean success) {
                     videoCapturerListener.onCapturerStarted(success);
@@ -167,8 +167,8 @@ public class CameraCapturer implements VideoCapturer {
                 }
 
                 @Override
-                public void onFrameCaptured(org.webrtc.VideoFrame videoFrame) {
-                    org.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
+                public void onFrameCaptured(tvi.webrtc.VideoFrame videoFrame) {
+                    tvi.webrtc.VideoFrame.Buffer buffer = videoFrame.getBuffer();
                     VideoDimensions dimensions =
                             new VideoDimensions(buffer.getWidth(), buffer.getHeight());
                     VideoFrame.RotationAngle orientation =

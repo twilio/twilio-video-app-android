@@ -37,8 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.webrtc.MediaCodecVideoDecoder;
-import org.webrtc.MediaCodecVideoEncoder;
+import tvi.webrtc.MediaCodecVideoDecoder;
+import tvi.webrtc.MediaCodecVideoEncoder;
 
 @CodecTest
 @RunWith(Parameterized.class)

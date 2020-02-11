@@ -26,14 +26,14 @@ import java.util.Map;
 public abstract class VideoTrack implements Track {
     private static final Logger logger = Logger.getLogger(VideoTrack.class);
 
-    private Map<VideoRenderer, org.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
-    private final org.webrtc.VideoTrack webRtcVideoTrack;
+    private Map<VideoRenderer, tvi.webrtc.VideoRenderer> videoRenderersMap = new HashMap<>();
+    private final tvi.webrtc.VideoTrack webRtcVideoTrack;
     private final String name;
     private boolean isEnabled;
     private boolean isReleased = false;
 
     VideoTrack(
-            @NonNull org.webrtc.VideoTrack webRtcVideoTrack,
+            @NonNull tvi.webrtc.VideoTrack webRtcVideoTrack,
             boolean enabled,
             @NonNull String name) {
         this.isEnabled = enabled;
@@ -57,7 +57,7 @@ public abstract class VideoTrack implements Track {
          */
         if (!isReleased) {
             // Always create renderer
-            org.webrtc.VideoRenderer webrtcVideoRenderer = createWebRtcVideoRenderer(videoRenderer);
+            tvi.webrtc.VideoRenderer webrtcVideoRenderer = createWebRtcVideoRenderer(videoRenderer);
             videoRenderersMap.put(videoRenderer, webrtcVideoRenderer);
 
             // WebRTC Track may not be set yet
@@ -84,7 +84,7 @@ public abstract class VideoTrack implements Track {
          * when a remote video track is released.
          */
         if (!isReleased) {
-            org.webrtc.VideoRenderer webrtcVideoRenderer = videoRenderersMap.remove(videoRenderer);
+            tvi.webrtc.VideoRenderer webrtcVideoRenderer = videoRenderersMap.remove(videoRenderer);
             if (webRtcVideoTrack != null && webrtcVideoRenderer != null) {
                 webRtcVideoTrack.removeRenderer(webrtcVideoRenderer);
             }
@@ -136,7 +136,7 @@ public abstract class VideoTrack implements Track {
 
     synchronized void invalidateWebRtcTrack() {
         if (webRtcVideoTrack != null) {
-            for (Map.Entry<VideoRenderer, org.webrtc.VideoRenderer> entry :
+            for (Map.Entry<VideoRenderer, tvi.webrtc.VideoRenderer> entry :
                     videoRenderersMap.entrySet()) {
                 // Remove the WebRTC renderer
                 webRtcVideoTrack.removeRenderer(entry.getValue());
@@ -148,16 +148,16 @@ public abstract class VideoTrack implements Track {
      * Used in video track tests to emulate behavior of a remote video track
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    synchronized org.webrtc.VideoTrack getWebRtcTrack() {
+    synchronized tvi.webrtc.VideoTrack getWebRtcTrack() {
         return webRtcVideoTrack;
     }
 
-    private org.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
-        return new org.webrtc.VideoRenderer(
+    private tvi.webrtc.VideoRenderer createWebRtcVideoRenderer(VideoRenderer videoRenderer) {
+        return new tvi.webrtc.VideoRenderer(
                 new VideoTrack.VideoRendererCallbackAdapter(videoRenderer));
     }
 
-    private class VideoRendererCallbackAdapter implements org.webrtc.VideoRenderer.Callbacks {
+    private class VideoRendererCallbackAdapter implements tvi.webrtc.VideoRenderer.Callbacks {
         private final VideoRenderer videoRenderer;
 
         VideoRendererCallbackAdapter(VideoRenderer videoRenderer) {
@@ -165,7 +165,7 @@ public abstract class VideoTrack implements Track {
         }
 
         @Override
-        public void renderFrame(org.webrtc.VideoRenderer.I420Frame frame) {
+        public void renderFrame(tvi.webrtc.VideoRenderer.I420Frame frame) {
             videoRenderer.renderFrame(new I420Frame(frame));
         }
     }

@@ -1,1 +1,4 @@
-include ':library', ':app', ':env', ':twilioapi', ':token', ':apkscale'
+include ':library', ':env', ':twilioapi', ':token', ':apkscale', ':compatibility'
+
+include 'app'
+project(':app').projectDir = file('videoapp/app')

@@ -29,7 +29,7 @@ namespace twilio_video_jni {
 
 jobject createJavaWebRtcVideoTrack(JNIEnv *env,
                                    std::shared_ptr<twilio::media::RemoteVideoTrack> remote_video_track) {
-    webrtc::ScopedJavaLocalRef<jclass> j_webrtc_video_track_class = webrtc::GetClass(env, "org/webrtc/VideoTrack");
+    webrtc::ScopedJavaLocalRef<jclass> j_webrtc_video_track_class = webrtc::GetClass(env, "tvi/webrtc/VideoTrack");
     jmethodID j_webrtc_video_track_ctor_id = webrtc::GetMethodID(env,
                                                                  j_webrtc_video_track_class.obj(),
                                                                  "<init>",
@@ -38,7 +38,7 @@ jobject createJavaWebRtcVideoTrack(JNIEnv *env,
                                                   j_webrtc_video_track_ctor_id,
                                                   webrtc::NativeToJavaPointer(
                                                           remote_video_track->getWebRtcTrack()));
-    CHECK_EXCEPTION(env) << "Failed to create org.webrtc.VideoTrack";
+    CHECK_EXCEPTION(env) << "Failed to create tvi.webrtc.VideoTrack";
 
     return j_webrtc_video_track;
 }
@@ -178,7 +178,7 @@ AndroidParticipantObserver::AndroidParticipantObserver(JNIEnv *env,
                 webrtc::GetMethodID(env,
                                     j_remote_video_track_class_.obj(),
                                     "<init>",
-                                    "(Lorg/webrtc/VideoTrack;Ljava/lang/String;Ljava/lang/String;Z)V")),
+                                    "(Ltvi/webrtc/VideoTrack;Ljava/lang/String;Ljava/lang/String;Z)V")),
         j_video_track_publication_ctor_id_(
                 webrtc::GetMethodID(env,
                                     j_remote_video_track_publication_class_.obj(),
