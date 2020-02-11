@@ -16,6 +16,9 @@
 
 package com.twilio.video.app.ui.room;
 
+import static com.twilio.video.Room.State.CONNECTED;
+import static com.twilio.video.Room.State.DISCONNECTED;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -507,29 +510,31 @@ public class RoomActivity extends BaseActivity {
             connectButtonEnabled = false;
             joinStatus = "Joining...";
         }
-        if (viewState.isConnected()) {
-            Room room = viewState.getRoom();
-            if (room != null) {
-                roomName = room.getName();
+        Room.State connectionState = viewState.getConnectionState();
+        if (connectionState != null) {
+            if (connectionState == CONNECTED) {
+                Room room = viewState.getRoom();
+                if (room != null) {
+                    roomName = room.getName();
+                }
+                disconnectButtonState = View.VISIBLE;
+                joinRoomLayoutState = View.GONE;
+                joinStatusLayoutState = View.GONE;
+                recordingWarningVisibility = View.GONE;
+                settingsMenuItemState = false;
+                connectButtonEnabled = false;
+                toolbarTitle = roomName;
+                joinStatus = "";
+                setVolumeControl(viewState.getVolumeControl(), viewState.getVolumeControlStream());
+            } else if (connectionState == DISCONNECTED) {
+                connectButtonEnabled = true;
+                removeAllParticipants();
+                //                room = null
+                //                localParticipant = null
+                //                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
+                //                updateStats()
+                //                setAudioFocus(false)
             }
-            disconnectButtonState = View.VISIBLE;
-            joinRoomLayoutState = View.GONE;
-            joinStatusLayoutState = View.GONE;
-            recordingWarningVisibility = View.GONE;
-            settingsMenuItemState = false;
-            connectButtonEnabled = false;
-            toolbarTitle = roomName;
-            joinStatus = "";
-            setVolumeControl(viewState.getVolumeControl(), viewState.getVolumeControlStream());
-        }
-        if (viewState.isDisconnected()) {
-            connectButtonEnabled = true;
-            removeAllParticipants();
-            //                room = null
-            //                localParticipant = null
-            //                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
-            //                updateStats()
-            //                setAudioFocus(false)
         }
         if (viewState.isConnectFailure()) {
             Snackbar.make(

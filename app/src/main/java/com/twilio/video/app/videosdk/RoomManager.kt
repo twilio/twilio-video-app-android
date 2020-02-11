@@ -433,9 +433,8 @@ class RoomManager(
             override fun onConnected(room: Room) {
                 initializeRoom()
                 updateState {
-                    it.copy(isConnected = true,
+                    it.copy(connectionState = room.state,
                             isConnecting = false,
-                            isDisconnected = false,
                             isConnectFailure = false,
                             room = room)
                 }
@@ -446,9 +445,8 @@ class RoomManager(
                 twilioException: TwilioException
             ) {
                 updateState {
-                    it.copy(isConnected = false,
+                    it.copy(connectionState = room.state,
                             isConnecting = false,
-                            isDisconnected = false,
                             isConnectFailure = true,
                             room = room)
                 }
@@ -473,9 +471,8 @@ class RoomManager(
                         "Disconnected from room -> sid: %s, state: %s",
                         room.sid, room.state)
                 updateState {
-                    it.copy(isConnected = false,
+                    it.copy(connectionState = room.state,
                             isConnecting = false,
-                            isDisconnected = true,
                             isConnectFailure = false,
                             room = room)
                 }

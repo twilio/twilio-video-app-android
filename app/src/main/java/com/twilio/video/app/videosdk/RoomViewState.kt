@@ -5,9 +5,8 @@ import com.twilio.video.Room
 import com.twilio.video.VideoTrack
 
 data class RoomViewState(
+    val connectionState: Room.State? = null,
     val isConnecting: Boolean = false,
-    val isConnected: Boolean = false,
-    val isDisconnected: Boolean = true,
     val isConnectFailure: Boolean = false,
     val isLocalAudioMuted: Boolean = false,
     val isSpeakerPhoneMuted: Boolean = false,
