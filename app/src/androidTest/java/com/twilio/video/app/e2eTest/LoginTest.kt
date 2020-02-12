@@ -32,7 +32,7 @@ class LoginTest {
 
         // Test config change
         // TODO Replace with scenario.recreate once app uses single activity
-        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).run {
+        uiDevice().run {
             setOrientationRight()
             setOrientationNatural()
             Thread.sleep(250)
