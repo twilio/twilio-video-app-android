@@ -1,4 +1,4 @@
-package com.twilio.video.app.videosdk
+package com.twilio.video.app.ui.room
 
 import com.twilio.video.AudioTrack
 import com.twilio.video.Room

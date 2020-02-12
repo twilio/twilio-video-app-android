@@ -1,4 +1,4 @@
-package com.twilio.video.app.videosdk
+package com.twilio.video.app.ui.room
 
 import android.app.Activity
 import android.content.Context
@@ -44,17 +44,17 @@ import com.twilio.video.app.data.api.model.Topology
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.plus
-import com.twilio.video.app.videosdk.RoomViewEffect.RequestScreenSharePermission
-import com.twilio.video.app.videosdk.RoomViewEffect.ScreenShareError
-import com.twilio.video.app.videosdk.RoomViewEvent.ConnectToRoom
-import com.twilio.video.app.videosdk.RoomViewEvent.DisconnectFromRoom
-import com.twilio.video.app.videosdk.RoomViewEvent.SetupLocalMedia
-import com.twilio.video.app.videosdk.RoomViewEvent.SetupScreenCapture
-import com.twilio.video.app.videosdk.RoomViewEvent.StartScreenCapture
-import com.twilio.video.app.videosdk.RoomViewEvent.StopScreenCapture
-import com.twilio.video.app.videosdk.RoomViewEvent.TearDownLocalMedia
-import com.twilio.video.app.videosdk.RoomViewEvent.ToggleLocalAudio
-import com.twilio.video.app.videosdk.RoomViewEvent.ToggleSpeakerPhone
+import com.twilio.video.app.ui.room.RoomViewEffect.RequestScreenSharePermission
+import com.twilio.video.app.ui.room.RoomViewEffect.ScreenShareError
+import com.twilio.video.app.ui.room.RoomViewEvent.ConnectToRoom
+import com.twilio.video.app.ui.room.RoomViewEvent.DisconnectFromRoom
+import com.twilio.video.app.ui.room.RoomViewEvent.SetupLocalMedia
+import com.twilio.video.app.ui.room.RoomViewEvent.SetupScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.TearDownLocalMedia
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleSpeakerPhone
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

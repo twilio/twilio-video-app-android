@@ -21,10 +21,10 @@ import com.twilio.video.app.data.CommunityDataModule;
 import com.twilio.video.app.ui.CommunityScreenSelectorModule;
 import com.twilio.video.app.ui.login.CommunityLoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
+import com.twilio.video.app.ui.room.RoomManagerModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
 import com.twilio.video.app.ui.settings.SettingsFragmentModule;
 import com.twilio.video.app.ui.splash.SplashActivityModule;
-import com.twilio.video.app.videosdk.RoomManagerModule;
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
 
