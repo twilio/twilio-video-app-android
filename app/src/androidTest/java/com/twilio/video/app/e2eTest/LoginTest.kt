@@ -6,7 +6,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.twilio.video.app.retrieveEmailCredentials
-import com.twilio.video.app.retryViewMatcher
+import com.twilio.video.app.retryEspressoAction
 import com.twilio.video.app.screen.assertSignInErrorIsVisible
 import com.twilio.video.app.screen.loginWithWrongEmailCreds
 import com.twilio.video.app.screen.assertGoogleSignInButtonIsVisible
@@ -29,7 +29,7 @@ class LoginTest {
     fun `it_should_login_successfully_with_email_and_then_logout`() {
         val emailCredentials = retrieveEmailCredentials()
         loginWithEmail(emailCredentials)
-        retryViewMatcher { clickSettingsMenuItem() }
+        retryEspressoAction { clickSettingsMenuItem() }
 
         // Test config change
         // TODO Replace with scenario.recreate once app uses single activity
@@ -41,13 +41,13 @@ class LoginTest {
         }
 
         logout()
-        retryViewMatcher { assertGoogleSignInButtonIsVisible() }
+        retryEspressoAction { assertGoogleSignInButtonIsVisible() }
     }
 
     @Test
     fun `it_should_not_login_successfully_with_email`() {
         val emailCredentials = retrieveEmailCredentials()
         loginWithWrongEmailCreds(emailCredentials)
-        retryViewMatcher { assertSignInErrorIsVisible() }
+        retryEspressoAction { assertSignInErrorIsVisible() }
     }
 }
