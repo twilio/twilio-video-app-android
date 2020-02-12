@@ -630,7 +630,6 @@ jobs:
     <<: *build-defaults
     resource_class: xlarge
     steps:
-      # Setup
       - checkout
       - attach_workspace:
           at: *workspace
@@ -643,17 +642,22 @@ jobs:
       - run: *install-bbe
       - run: *configure-git-user
 
-      # Publish library rc
       - run:
-          name: Publish Library RC
-          command: ./gradlew bintrayLibraryReleaseCandidateUpload librarySizeReport incrementRc
+          name: Publish Library RC Artifact to Bintray
+          command: ./gradlew bintrayLibraryReleaseCandidateUpload
 
-      # Send webhook if successful
+      - run:
+          name: Generate and Publish Library Size Report to Github Release
+          command: ./gradlew librarySizeReport
+
+      - run:
+          name: Increment RC version
+          command: ./gradlew incrementRc
+
       - run:
           command: ./scripts/send-circleci-webhook.sh
           when: on_success
 
-      # Save cache
       - save-cache: *save-cache-android-ndk
       - save-cache: *save-cache-gradle
 
