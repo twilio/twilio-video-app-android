@@ -3,6 +3,8 @@ package com.twilio.video.app.e2eTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.twilio.video.app.retrieveEmailCredentials
 import com.twilio.video.app.retryViewMatcher
 import com.twilio.video.app.screen.assertSignInErrorIsVisible
@@ -28,8 +30,18 @@ class LoginTest {
         val emailCredentials = retrieveEmailCredentials()
         loginWithEmail(emailCredentials)
         retryViewMatcher { clickSettingsMenuItem() }
+
+        // Test config change
+        // TODO Replace with scenario.recreate once app uses single activity
+        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).run {
+            setOrientationRight()
+            setOrientationNatural()
+            Thread.sleep(250)
+            unfreezeRotation()
+        }
+
         logout()
-        assertGoogleSignInButtonIsVisible()
+        retryViewMatcher { assertGoogleSignInButtonIsVisible() }
     }
 
     @Test
