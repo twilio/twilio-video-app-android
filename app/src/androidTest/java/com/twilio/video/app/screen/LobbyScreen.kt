@@ -28,12 +28,17 @@ fun assertRoomNameIsDisplayed(roomName: String) {
     onView(withText(roomName)).check(matches(isDisplayed()))
 }
 
+fun enterRoomName(roomName: String) {
+    onView(withId(R.id.room_edit_text)).perform(typeText(roomName))
+}
+
 fun clickJoinRoomButton() {
     onView(withId(R.id.connect)).perform(click())
 }
 
-fun assertJoiningRoomIsDisplayed() {
-    onView(withText(getString(R.string.you))).check(matches(isDisplayed()))
+fun assertRoomIsConnected() {
+    onView(allOf(withId(R.id.participant_stub_image),
+            withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE))).check(matches(isDisplayed()))
 }
 
 fun clickDisconnectButton() {
