@@ -35,7 +35,6 @@ class LoginTest {
         uiDevice().run {
             setOrientationRight()
             setOrientationNatural()
-            Thread.sleep(250)
             unfreezeRotation()
         }
 
