@@ -3,10 +3,8 @@ package com.twilio.video.app.e2eTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.UiDevice
-import com.twilio.video.app.retrieveEmailCredentials
-import com.twilio.video.app.retryEspressoAction
+import com.twilio.video.app.util.retrieveEmailCredentials
+import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.screen.assertSignInErrorIsVisible
 import com.twilio.video.app.screen.loginWithWrongEmailCreds
 import com.twilio.video.app.screen.assertGoogleSignInButtonIsVisible
@@ -14,6 +12,7 @@ import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.screen.logout
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.uiDevice
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

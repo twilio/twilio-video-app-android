@@ -1,7 +1,7 @@
 package com.twilio.video.app.e2eTest
 
-import com.twilio.video.app.retrieveEmailCredentials
-import com.twilio.video.app.retryEspressoAction
+import com.twilio.video.app.util.retrieveEmailCredentials
+import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.screen.logout
