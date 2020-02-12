@@ -206,7 +206,7 @@ public class RoomActivity extends BaseActivity {
         roomManager.processViewEvent(TearDownLocalMedia.INSTANCE);
     }
 
-    private void bindViewState(@Nullable RoomViewState viewState) {
+    private void bindViewState(RoomViewState viewState) {
         updateUi(viewState);
     }
 
@@ -486,10 +486,6 @@ public class RoomActivity extends BaseActivity {
 
     private void updateUi(RoomViewState viewState) {
         updateUi(viewState, false);
-    }
-
-    private void updateUi(boolean isAppLinkProvided) {
-        updateUi(null, isAppLinkProvided);
     }
 
     private void updateUi(RoomViewState viewState, boolean isAppLinkProvided) {
