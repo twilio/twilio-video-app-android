@@ -50,7 +50,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -116,10 +115,8 @@ import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -260,6 +257,8 @@ public class RoomActivity extends BaseActivity {
 
     @Inject SharedPreferences sharedPreferences;
 
+    @Inject RoomManager roomManager;
+
     /** Coordinates participant thumbs and primary participant rendering. */
     private ParticipantController participantController;
 
@@ -377,6 +376,8 @@ public class RoomActivity extends BaseActivity {
 
         inflater.inflate(R.menu.room_menu, menu);
         settingsMenuItem = menu.findItem(R.id.settings_menu_item);
+
+        roomManager.getViewEvents().observe(this, this::bindRoomEvents);
 
         return true;
     }
@@ -501,29 +502,9 @@ public class RoomActivity extends BaseActivity {
 
             connection
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            new SingleObserver<Room>() {
-                                @Override
-                                public void onSubscribe(Disposable disposable) {
-                                    InputUtils.hideKeyboard(RoomActivity.this);
-                                    rxDisposables.add(disposable);
-                                }
-
-                                @Override
-                                public void onSuccess(Room room) {
-                                    RoomActivity.this.room = room;
-                                    updateUi(room);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    final String message = "Failed to retrieve access token";
-                                    Timber.e("%s -> reason: %s", message, e.getMessage());
-                                    Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG)
-                                            .show();
-                                    connect.setEnabled(true);
-                                }
-                            });
+                    .doFinally(rxDisposables::clear)
+                    .doOnSubscribe(disposable -> InputUtils.hideKeyboard(this))
+                    .subscribe(roomManager.getRoomConnectionObserver());
         }
     }
 
@@ -1155,9 +1136,7 @@ public class RoomActivity extends BaseActivity {
 
                     room =
                             Video.connect(
-                                    RoomActivity.this,
-                                    connectOptionsBuilder.build(),
-                                    roomListener());
+                                    RoomActivity.this, connectOptionsBuilder.build(), roomManager);
 
                     VideoService.Companion.startForeground(this);
 
@@ -1435,88 +1414,45 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    private Room.Listener roomListener() {
-        return new Room.Listener() {
-            @Override
-            public void onConnected(@NonNull final Room room) {
+    private void bindRoomEvents(RoomEvent roomEvent) {
+        if (roomEvent != null) {
+            if (roomEvent instanceof RoomEvent.Connected) {
                 initializeRoom();
             }
-
-            @Override
-            public void onConnectFailure(
-                    @NonNull Room room, @NonNull TwilioException twilioException) {
-                Timber.e(
-                        "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
-                        room.getSid(),
-                        room.getState(),
-                        twilioException.getCode(),
-                        twilioException.getMessage());
-
-                removeAllParticipants();
-
-                RoomActivity.this.room = null;
-                updateUi(room);
-
-                setAudioFocus(false);
-            }
-
-            @Override
-            public void onReconnecting(
-                    @NonNull Room room, @NonNull TwilioException twilioException) {
-                Timber.i("onReconnecting: %s", room.getName());
-            }
-
-            @Override
-            public void onReconnected(@NonNull Room room) {
-                Timber.i("onReconnected: %s", room.getName());
-            }
-
-            @Override
-            public void onDisconnected(
-                    @NonNull Room room, @Nullable TwilioException twilioException) {
-                Timber.i(
-                        "Disconnected from room -> sid: %s, state: %s",
-                        room.getSid(), room.getState());
-
+            if (roomEvent instanceof RoomEvent.Disconnected) {
                 removeAllParticipants();
                 RoomActivity.this.room = null;
                 RoomActivity.this.localParticipant = null;
                 RoomActivity.this.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
 
-                updateUi(room);
+                updateUi(((RoomEvent.Disconnected) roomEvent).getRoom());
                 updateStats();
 
                 setAudioFocus(false);
             }
-
-            @Override
-            public void onParticipantConnected(
-                    @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
-                Timber.i(
-                        "RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
-                        room.getSid(), remoteParticipant.getSid());
-
+            if (roomEvent instanceof RoomEvent.ConnectFailure) {
+                removeAllParticipants();
+                updateUi(((RoomEvent.ConnectFailure) roomEvent).getRoom());
+                setAudioFocus(false);
+            }
+            if (roomEvent instanceof RoomEvent.ParticipantConnected) {
                 boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
-                addParticipant(remoteParticipant, renderAsPrimary);
+                addParticipant(
+                        ((RoomEvent.ParticipantConnected) roomEvent).getRemoteParticipant(),
+                        renderAsPrimary);
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
-
-            @Override
-            public void onParticipantDisconnected(
-                    @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
-                Timber.i(
-                        "RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
-                        room.getSid(), remoteParticipant.getSid());
-
-                removeParticipant(remoteParticipant);
+            if (roomEvent instanceof RoomEvent.ParticipantDisconnected) {
+                removeParticipant(
+                        ((RoomEvent.ParticipantDisconnected) roomEvent).getRemoteParticipant());
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
+            if (roomEvent instanceof RoomEvent.DominantSpeakerChanged) {
+                RemoteParticipant remoteParticipant =
+                        ((RoomEvent.DominantSpeakerChanged) roomEvent).getRemoteParticipant();
 
-            @Override
-            public void onDominantSpeakerChanged(
-                    @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
                 if (remoteParticipant == null) {
                     participantController.setDominantSpeaker(null);
                     return;
@@ -1547,17 +1483,7 @@ public class RoomActivity extends BaseActivity {
                     }
                 }
             }
-
-            @Override
-            public void onRecordingStarted(@NonNull Room room) {
-                Timber.i("onRecordingStarted: %s", room.getName());
-            }
-
-            @Override
-            public void onRecordingStopped(@NonNull Room room) {
-                Timber.i("onRecordingStopped: %s", room.getName());
-            }
-        };
+        }
     }
 
     private class LocalParticipantListener implements LocalParticipant.Listener {
