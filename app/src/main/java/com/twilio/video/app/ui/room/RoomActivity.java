@@ -108,6 +108,13 @@ import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
+import com.twilio.video.app.ui.room.RoomEvent.Connected;
+import com.twilio.video.app.ui.room.RoomEvent.Connecting;
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected;
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -1416,42 +1423,43 @@ public class RoomActivity extends BaseActivity {
 
     private void bindRoomEvents(RoomEvent roomEvent) {
         if (roomEvent != null) {
-            if (roomEvent instanceof RoomEvent.Connected) {
+            if (roomEvent instanceof Connecting) {
+                updateUi(((Connecting) roomEvent).getRoom());
+            }
+            if (roomEvent instanceof Connected) {
                 initializeRoom();
             }
-            if (roomEvent instanceof RoomEvent.Disconnected) {
+            if (roomEvent instanceof Disconnected) {
                 removeAllParticipants();
                 RoomActivity.this.room = null;
                 RoomActivity.this.localParticipant = null;
                 RoomActivity.this.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
 
-                updateUi(((RoomEvent.Disconnected) roomEvent).getRoom());
+                updateUi(((Disconnected) roomEvent).getRoom());
                 updateStats();
 
                 setAudioFocus(false);
             }
-            if (roomEvent instanceof RoomEvent.ConnectFailure) {
+            if (roomEvent instanceof ConnectFailure) {
                 removeAllParticipants();
-                updateUi(((RoomEvent.ConnectFailure) roomEvent).getRoom());
+                updateUi(((ConnectFailure) roomEvent).getRoom());
                 setAudioFocus(false);
             }
-            if (roomEvent instanceof RoomEvent.ParticipantConnected) {
+            if (roomEvent instanceof ParticipantConnected) {
                 boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
                 addParticipant(
-                        ((RoomEvent.ParticipantConnected) roomEvent).getRemoteParticipant(),
-                        renderAsPrimary);
+                        ((ParticipantConnected) roomEvent).getRemoteParticipant(), renderAsPrimary);
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
-            if (roomEvent instanceof RoomEvent.ParticipantDisconnected) {
-                removeParticipant(
-                        ((RoomEvent.ParticipantDisconnected) roomEvent).getRemoteParticipant());
+            if (roomEvent instanceof ParticipantDisconnected) {
+                removeParticipant(((ParticipantDisconnected) roomEvent).getRemoteParticipant());
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
-            if (roomEvent instanceof RoomEvent.DominantSpeakerChanged) {
+            if (roomEvent instanceof DominantSpeakerChanged) {
                 RemoteParticipant remoteParticipant =
-                        ((RoomEvent.DominantSpeakerChanged) roomEvent).getRemoteParticipant();
+                        ((DominantSpeakerChanged) roomEvent).getRemoteParticipant();
 
                 if (remoteParticipant == null) {
                     participantController.setDominantSpeaker(null);

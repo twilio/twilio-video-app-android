@@ -7,6 +7,7 @@ import com.twilio.video.Room
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
+import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
@@ -79,8 +80,10 @@ class RoomManager : Room.Listener {
         override fun onSubscribe(disposable: Disposable) {}
 
         override fun onSuccess(room: Room) {
-            this@RoomManager.room = room
-//            updateUi(room)
+            this@RoomManager.run {
+                this.room = room
+                mutableViewEvents.value = Connecting(room)
+            }
         }
 
         override fun onError(e: Throwable) {
