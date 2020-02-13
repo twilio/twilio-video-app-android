@@ -12,6 +12,7 @@ import com.twilio.video.app.screen.clickDisconnectButton
 import com.twilio.video.app.screen.clickJoinRoomButton
 import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.clearTask
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
 import org.junit.Rule
@@ -36,7 +37,7 @@ class BackgroundSupportTest : BaseUITest() {
 
         uiDevice().run {
             // TODO Replace with scenario call once app uses single activity
-            pressHome()
+            clearTask()
 
             openNotification()
 
