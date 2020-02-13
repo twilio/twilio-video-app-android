@@ -18,12 +18,26 @@ import timber.log.Timber
 
 class RoomManager : Room.Listener {
 
-    val roomConnectionObserver = RoomConnectionObserver()
-
     private var room: Room? = null
     private val mutableViewEvents: MutableLiveData<RoomEvent?> = MutableLiveData()
 
     val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
+
+    val roomConnectionObserver = object: SingleObserver<Room> {
+        override fun onSuccess(room: Room) {
+            this@RoomManager.run {
+                this.room = room
+                mutableViewEvents.value = Connecting(room)
+            }
+        }
+
+        override fun onError(e: Throwable) {
+            Timber.e("%s -> reason: %s", "Failed to retrieve access token", e.message)
+        }
+
+        override fun onSubscribe(d: Disposable) {
+        }
+    }
 
     override fun onConnected(room: Room) {
         mutableViewEvents.value = Connected(room)
@@ -74,24 +88,4 @@ class RoomManager : Room.Listener {
     }
 
     override fun onRecordingStopped(room: Room) {}
-
-    inner class RoomConnectionObserver : SingleObserver<Room> {
-
-        override fun onSubscribe(disposable: Disposable) {}
-
-        override fun onSuccess(room: Room) {
-            this@RoomManager.run {
-                this.room = room
-                mutableViewEvents.value = Connecting(room)
-            }
-        }
-
-        override fun onError(e: Throwable) {
-            val message = "Failed to retrieve access token"
-            Timber.e("%s -> reason: %s", message, e.message)
-//            Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG)
-//                    .show()
-//            connect.setEnabled(true)
-        }
-    }
 }
