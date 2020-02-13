@@ -35,6 +35,7 @@ class BackgroundSupportTest : BaseUITest() {
         retryEspressoAction { assertRoomIsConnected() }
 
         uiDevice().run {
+            // TODO Replace with scenario call once app uses single activity
             pressHome()
 
             openNotification()

@@ -53,7 +53,7 @@ class VideoService : Service() {
 
         private fun createDownloadNotificationChannel(channelId: String, channelName: String, context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH).apply {
+                val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW).apply {
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 }
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
