@@ -25,7 +25,7 @@ fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> U
             currentTime = countDown(startTime)
         }
     }
-    throw TimeoutException("Timeout occurred while attempting to find a matching view")
+    throw TimeoutException("Timeout occurred while attempting to execute an espresso action")
 }
 
 fun getTargetContext(): Context = InstrumentationRegistry.getInstrumentation().targetContext
