@@ -14,7 +14,6 @@ import dagger.Provides
 class RoomManagerModule {
 
     @Provides
-    @ApplicationScope
     fun providesRoomManager(): RoomManager {
         return RoomManager()
     }
