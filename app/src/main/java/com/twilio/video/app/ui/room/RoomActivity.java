@@ -517,13 +517,8 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.disconnect)
     void disconnectButtonClick() {
-        if (room != null) {
-            Timber.i("Exiting room");
-            room.disconnect();
-
-            stopScreenCapture();
-            stopService(new Intent(this, VideoService.class));
-        }
+        roomManager.disconnect();
+        stopScreenCapture();
     }
 
     @OnClick(R.id.local_audio_image_button)

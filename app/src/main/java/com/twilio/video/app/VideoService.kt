@@ -4,24 +4,29 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.os.Process
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.Observer
 import com.twilio.video.app.ui.room.RoomActivity
+import com.twilio.video.app.ui.room.RoomEvent
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected
+import com.twilio.video.app.ui.room.RoomManager
+import dagger.android.AndroidInjection
 import timber.log.Timber
+import javax.inject.Inject
 
 const val VIDEO_SERVICE_CHANNEL = "VIDEO_SERVICE_CHANNEL"
 const val ONGOING_NOTIFICATION_ID = 1
 
-class VideoService : Service() {
+class VideoService : LifecycleService() {
 
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
@@ -37,6 +42,8 @@ class VideoService : Service() {
             }
         }
     }
+
+    @Inject lateinit var roomManager: RoomManager
 
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
@@ -75,15 +82,18 @@ class VideoService : Service() {
     }
 
     override fun onCreate() {
+        AndroidInjection.inject(this)
+        super.onCreate()
+        roomManager.viewEvents.observe(this, Observer { bindRoomEvents(it) })
         HandlerThread("VideoService StartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
             start()
-
             serviceLooper = looper
             serviceHandler = ServiceHandler(looper)
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         Timber.d("VideoService created")
         serviceHandler?.obtainMessage()?.also { msg ->
             msg.arg1 = startId
@@ -93,7 +103,18 @@ class VideoService : Service() {
         return START_NOT_STICKY
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("VideoService destroyed")
+    }
 
-    override fun onDestroy() = Timber.d("VideoService destroyed")
+    private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
+        nullableRoomEvent?.let { roomEvent ->
+            when(roomEvent) {
+                is Disconnected -> {
+                    stopSelf()
+                }
+            }
+        }
+    }
 }

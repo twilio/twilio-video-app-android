@@ -88,4 +88,8 @@ class RoomManager : Room.Listener {
     }
 
     override fun onRecordingStopped(room: Room) {}
+
+    fun disconnect() {
+        room?.disconnect()
+    }
 }
