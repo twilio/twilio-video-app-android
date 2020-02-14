@@ -309,6 +309,7 @@ public class RoomActivity extends BaseActivity {
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         updateUi(room, isAppLinkProvided);
         restoreCameraTrack();
+        initializeRoom();
         updateStats();
     }
 
@@ -1362,50 +1363,54 @@ public class RoomActivity extends BaseActivity {
         return this::renderItemAsPrimary;
     }
 
-    private void initializeRoom(Room room) {
-        localParticipant = room.getLocalParticipant();
-        if (localParticipant != null) {
-            localParticipantSid = localParticipant.getSid();
+    private void initializeRoom() {
+        if (room != null) {
+            localParticipant = room.getLocalParticipant();
+            if (localParticipant != null) {
+                localParticipantSid = localParticipant.getSid();
 
-            setAudioFocus(true);
-            updateStats();
+                setAudioFocus(true);
+                updateStats();
 
-            // remove primary view
-            participantController.removePrimary();
+                // remove primary view
+                participantController.removePrimary();
 
-            // add local thumb and "click" on it to make primary
-            participantController.addThumb(
-                    localParticipantSid,
-                    getString(R.string.you),
-                    cameraVideoTrack,
-                    localAudioTrack == null,
-                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA,
-                    isNetworkQualityEnabled());
+                // add local thumb and "click" on it to make primary
+                participantController.addThumb(
+                        localParticipantSid,
+                        getString(R.string.you),
+                        cameraVideoTrack,
+                        localAudioTrack == null,
+                        cameraCapturer.getCameraSource()
+                                == CameraCapturer.CameraSource.FRONT_CAMERA,
+                        isNetworkQualityEnabled());
 
-            localParticipant.setListener(
-                    new LocalParticipantListener(
-                            participantController.getThumb(localParticipantSid, cameraVideoTrack)));
-            participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+                localParticipant.setListener(
+                        new LocalParticipantListener(
+                                participantController.getThumb(
+                                        localParticipantSid, cameraVideoTrack)));
+                participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
 
-            // add existing room participants thumbs
-            boolean isFirstParticipant = true;
-            for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-                addParticipant(remoteParticipant, isFirstParticipant);
-                isFirstParticipant = false;
-                if (room.getDominantSpeaker() != null) {
-                    if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
-                        VideoTrack videoTrack =
-                                (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                        ? remoteParticipant
-                                                .getRemoteVideoTracks()
-                                                .get(0)
-                                                .getRemoteVideoTrack()
-                                        : null;
-                        if (videoTrack != null) {
-                            ParticipantView participantView =
-                                    participantController.getThumb(
-                                            remoteParticipant.getSid(), videoTrack);
-                            participantController.setDominantSpeaker(participantView);
+                // add existing room participants thumbs
+                boolean isFirstParticipant = true;
+                for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
+                    addParticipant(remoteParticipant, isFirstParticipant);
+                    isFirstParticipant = false;
+                    if (room.getDominantSpeaker() != null) {
+                        if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
+                            VideoTrack videoTrack =
+                                    (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                            ? remoteParticipant
+                                                    .getRemoteVideoTracks()
+                                                    .get(0)
+                                                    .getRemoteVideoTrack()
+                                            : null;
+                            if (videoTrack != null) {
+                                ParticipantView participantView =
+                                        participantController.getThumb(
+                                                remoteParticipant.getSid(), videoTrack);
+                                participantController.setDominantSpeaker(participantView);
+                            }
                         }
                     }
                 }
@@ -1418,7 +1423,7 @@ public class RoomActivity extends BaseActivity {
             this.room = roomEvent.getRoom();
             requestPermissions();
             if (roomEvent instanceof Connected) {
-                initializeRoom(room);
+                initializeRoom();
             }
             if (roomEvent instanceof Disconnected) {
                 removeAllParticipants();
