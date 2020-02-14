@@ -110,7 +110,6 @@ import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
 import com.twilio.video.app.ui.room.RoomEvent.Connected;
-import com.twilio.video.app.ui.room.RoomEvent.Connecting;
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected;
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
@@ -310,7 +309,6 @@ public class RoomActivity extends BaseActivity {
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         updateUi(room, isAppLinkProvided);
         restoreCameraTrack();
-        initializeRoom();
         updateStats();
     }
 
@@ -760,9 +758,11 @@ public class RoomActivity extends BaseActivity {
 
     /** Initialize local media and provide stub participant for primary view. */
     private void setupLocalMedia() {
-        localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
-        setupLocalVideoTrack();
-        renderLocalParticipantStub();
+        if (localAudioTrack == null && cameraVideoTrack == null) {
+            localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
+            setupLocalVideoTrack();
+            renderLocalParticipantStub();
+        }
     }
 
     /** Create local video track */
@@ -1362,54 +1362,51 @@ public class RoomActivity extends BaseActivity {
         return this::renderItemAsPrimary;
     }
 
-    private void initializeRoom() {
-        if (room == null) return;
-        Timber.i(
-                "Connected to room -> name: %s, sid: %s, state: %s",
-                room.getName(), room.getSid(), room.getState());
+    private void initializeRoom(Room room) {
         localParticipant = room.getLocalParticipant();
-        localParticipantSid = localParticipant.getSid();
+        if (localParticipant != null) {
+            localParticipantSid = localParticipant.getSid();
 
-        setAudioFocus(true);
-        updateStats();
-        updateUi(room);
+            setAudioFocus(true);
+            updateStats();
 
-        // remove primary view
-        participantController.removePrimary();
+            // remove primary view
+            participantController.removePrimary();
 
-        // add local thumb and "click" on it to make primary
-        participantController.addThumb(
-                localParticipantSid,
-                getString(R.string.you),
-                cameraVideoTrack,
-                localAudioTrack == null,
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA,
-                isNetworkQualityEnabled());
+            // add local thumb and "click" on it to make primary
+            participantController.addThumb(
+                    localParticipantSid,
+                    getString(R.string.you),
+                    cameraVideoTrack,
+                    localAudioTrack == null,
+                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA,
+                    isNetworkQualityEnabled());
 
-        localParticipant.setListener(
-                new LocalParticipantListener(
-                        participantController.getThumb(localParticipantSid, cameraVideoTrack)));
-        participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+            localParticipant.setListener(
+                    new LocalParticipantListener(
+                            participantController.getThumb(localParticipantSid, cameraVideoTrack)));
+            participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
 
-        // add existing room participants thumbs
-        boolean isFirstParticipant = true;
-        for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-            addParticipant(remoteParticipant, isFirstParticipant);
-            isFirstParticipant = false;
-            if (room.getDominantSpeaker() != null) {
-                if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
-                    VideoTrack videoTrack =
-                            (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                    ? remoteParticipant
-                                            .getRemoteVideoTracks()
-                                            .get(0)
-                                            .getRemoteVideoTrack()
-                                    : null;
-                    if (videoTrack != null) {
-                        ParticipantView participantView =
-                                participantController.getThumb(
-                                        remoteParticipant.getSid(), videoTrack);
-                        participantController.setDominantSpeaker(participantView);
+            // add existing room participants thumbs
+            boolean isFirstParticipant = true;
+            for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
+                addParticipant(remoteParticipant, isFirstParticipant);
+                isFirstParticipant = false;
+                if (room.getDominantSpeaker() != null) {
+                    if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
+                        VideoTrack videoTrack =
+                                (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                        ? remoteParticipant
+                                                .getRemoteVideoTracks()
+                                                .get(0)
+                                                .getRemoteVideoTrack()
+                                        : null;
+                        if (videoTrack != null) {
+                            ParticipantView participantView =
+                                    participantController.getThumb(
+                                            remoteParticipant.getSid(), videoTrack);
+                            participantController.setDominantSpeaker(participantView);
+                        }
                     }
                 }
             }
@@ -1418,26 +1415,22 @@ public class RoomActivity extends BaseActivity {
 
     private void bindRoomEvents(RoomEvent roomEvent) {
         if (roomEvent != null) {
-            if (roomEvent instanceof Connecting) {
-                updateUi(((Connecting) roomEvent).getRoom());
-            }
+            this.room = roomEvent.getRoom();
+            requestPermissions();
             if (roomEvent instanceof Connected) {
-                initializeRoom();
+                initializeRoom(room);
             }
             if (roomEvent instanceof Disconnected) {
                 removeAllParticipants();
-                RoomActivity.this.room = null;
-                RoomActivity.this.localParticipant = null;
-                RoomActivity.this.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
+                localParticipant = null;
+                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
 
-                updateUi(((Disconnected) roomEvent).getRoom());
                 updateStats();
 
                 setAudioFocus(false);
             }
             if (roomEvent instanceof ConnectFailure) {
                 removeAllParticipants();
-                updateUi(((ConnectFailure) roomEvent).getRoom());
                 setAudioFocus(false);
             }
             if (roomEvent instanceof ParticipantConnected) {
@@ -1486,6 +1479,7 @@ public class RoomActivity extends BaseActivity {
                     }
                 }
             }
+            updateUi(room);
         }
     }
 

@@ -17,7 +17,6 @@
 package com.twilio.video.app.ui.room;
 
 import com.twilio.video.app.VideoService;
-
 import dagger.Subcomponent;
 import dagger.android.AndroidInjector;
 

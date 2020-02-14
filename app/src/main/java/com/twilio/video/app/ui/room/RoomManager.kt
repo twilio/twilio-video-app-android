@@ -23,7 +23,7 @@ class RoomManager : Room.Listener {
 
     val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
 
-    val roomConnectionObserver = object: SingleObserver<Room> {
+    val roomConnectionObserver = object : SingleObserver<Room> {
         override fun onSuccess(room: Room) {
             this@RoomManager.run {
                 this.room = room
@@ -40,6 +40,8 @@ class RoomManager : Room.Listener {
     }
 
     override fun onConnected(room: Room) {
+        Timber.i("onConnected -> room sid: %s",
+                room.sid)
         mutableViewEvents.value = Connected(room)
     }
 

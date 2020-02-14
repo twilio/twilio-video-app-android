@@ -110,7 +110,7 @@ class VideoService : LifecycleService() {
 
     private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
         nullableRoomEvent?.let { roomEvent ->
-            when(roomEvent) {
+            when (roomEvent) {
                 is Disconnected -> {
                     stopSelf()
                 }
