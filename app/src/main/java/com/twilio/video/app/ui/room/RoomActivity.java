@@ -785,11 +785,6 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(
                     cameraVideoTrack.getName(), getString(R.string.camera_video_track));
-
-            // Share camera video track if we are connected to room
-            if (localParticipant != null) {
-                localParticipant.publishTrack(cameraVideoTrack);
-            }
         } else {
             Snackbar.make(
                             primaryVideoView,
@@ -1368,6 +1363,8 @@ public class RoomActivity extends BaseActivity {
             localParticipant = room.getLocalParticipant();
             if (localParticipant != null) {
                 localParticipantSid = localParticipant.getSid();
+
+                localParticipant.publishTrack(cameraVideoTrack);
 
                 setAudioFocus(true);
                 updateStats();
