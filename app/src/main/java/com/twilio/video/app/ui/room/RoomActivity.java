@@ -1159,7 +1159,7 @@ public class RoomActivity extends BaseActivity {
                                     connectOptionsBuilder.build(),
                                     roomListener());
 
-                    Intent serviceIntent = new Intent(this, VideoService.class);
+                    Intent serviceIntent = VideoService.Companion.createIntent(this);
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(serviceIntent);
                     } else {

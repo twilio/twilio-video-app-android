@@ -26,6 +26,10 @@ class VideoService : Service() {
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
 
+    companion object {
+        fun createIntent(context: Context) = Intent(context, VideoService::class.java)
+    }
+
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
         override fun handleMessage(msg: Message) {
