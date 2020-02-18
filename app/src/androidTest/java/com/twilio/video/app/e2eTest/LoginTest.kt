@@ -12,7 +12,6 @@ import com.twilio.video.app.screen.logout
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.retryEspressoAction
-import com.twilio.video.app.util.uiDevice
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,16 +28,8 @@ class LoginTest {
         val emailCredentials = retrieveEmailCredentials()
         loginWithEmail(emailCredentials)
         retryEspressoAction { clickSettingsMenuItem() }
-
-        // Test config change
-        // TODO Replace with scenario.recreate once app uses single activity
-        uiDevice().run {
-            setOrientationRight()
-            setOrientationNatural()
-            unfreezeRotation()
-        }
-
         logout()
+
         retryEspressoAction { assertGoogleSignInButtonIsVisible() }
     }
 
