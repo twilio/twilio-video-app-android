@@ -18,6 +18,7 @@ import com.twilio.video.app.util.uiDevice
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -30,7 +31,7 @@ class BackgroundSupportTest : BaseUITest() {
     fun it_should_show_a_notification_when_the_app_is_in_the_background() {
         retryEspressoAction { assertScreenIsDisplayed() }
 
-        enterRoomName("android-test")
+        enterRoomName(UUID.randomUUID().toString())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
