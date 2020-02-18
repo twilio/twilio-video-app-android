@@ -16,13 +16,13 @@ fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> U
     val startTime = System.currentTimeMillis()
     var currentTime = 0L
     while (currentTime <= timeoutInSeconds) {
-        try {
+        currentTime = try {
             espressoAction()
             return
         } catch (e: NoMatchingViewException) {
-            currentTime = countDown(startTime)
+            countDown(startTime)
         } catch (e: AssertionFailedError) {
-            currentTime = countDown(startTime)
+            countDown(startTime)
         }
     }
     throw TimeoutException("Timeout occurred while attempting to execute an espresso action")
