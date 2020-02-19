@@ -27,7 +27,15 @@ class VideoService : Service() {
     private var serviceHandler: ServiceHandler? = null
 
     companion object {
-        fun createIntent(context: Context) = Intent(context, VideoService::class.java)
+        fun startForeground(context: Context) {
+            Intent(context, VideoService::class.java).let { intent ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            }
+        }
     }
 
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
