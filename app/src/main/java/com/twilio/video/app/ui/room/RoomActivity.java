@@ -1167,8 +1167,6 @@ public class RoomActivity extends BaseActivity {
                             Video.connect(
                                     RoomActivity.this, connectOptionsBuilder.build(), roomManager);
 
-                    VideoService.Companion.startForeground(this);
-
                     return room;
                 });
     }
@@ -1457,6 +1455,7 @@ public class RoomActivity extends BaseActivity {
             this.room = roomEvent.getRoom();
             requestPermissions();
             if (roomEvent instanceof Connected) {
+                VideoService.Companion.startForeground(this);
                 initializeRoom();
             }
             if (roomEvent instanceof Disconnected) {
