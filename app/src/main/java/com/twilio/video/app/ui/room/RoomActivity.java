@@ -783,10 +783,14 @@ public class RoomActivity extends BaseActivity {
     private void setupLocalMedia() {
         if (localAudioTrack == null && !isAudioMuted) {
             localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
+            if (room != null && localParticipant != null)
+                localParticipant.publishTrack(localAudioTrack);
         }
         if (cameraVideoTrack == null && !isVideoMuted) {
             setupLocalVideoTrack();
             renderLocalParticipantStub();
+            if (room != null && localParticipant != null)
+                localParticipant.publishTrack(cameraVideoTrack);
         }
     }
 
