@@ -15,9 +15,10 @@ import android.os.Process
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
+import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.ui.room.RoomEvent
-import com.twilio.video.app.ui.room.RoomEvent.Disconnected
+import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomManager
 import dagger.android.AndroidInjection
 import timber.log.Timber
@@ -110,10 +111,8 @@ class VideoService : LifecycleService() {
 
     private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
         nullableRoomEvent?.let { roomEvent ->
-            when (roomEvent) {
-                is Disconnected -> {
-                    stopSelf()
-                }
+            if (roomEvent is RoomState && roomEvent.room.state == DISCONNECTED) {
+                stopSelf()
             }
         }
     }

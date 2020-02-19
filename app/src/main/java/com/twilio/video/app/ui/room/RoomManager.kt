@@ -6,12 +6,11 @@ import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
-import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
-import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
@@ -42,13 +41,13 @@ class RoomManager : Room.Listener {
     override fun onConnected(room: Room) {
         Timber.i("onConnected -> room sid: %s",
                 room.sid)
-        mutableViewEvents.value = Connected(room)
+        mutableViewEvents.value = RoomState(room)
     }
 
     override fun onDisconnected(room: Room, twilioException: TwilioException?) {
         Timber.i("Disconnected from room -> sid: %s, state: %s",
                 room.sid, room.state)
-        mutableViewEvents.value = Disconnected(room)
+        mutableViewEvents.value = RoomState(room)
     }
 
     override fun onConnectFailure(room: Room, twilioException: TwilioException) {

@@ -19,6 +19,7 @@ package com.twilio.video.app.ui.room;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
+import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
 import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
@@ -89,6 +90,7 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.Room;
+import com.twilio.video.Room.State;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.TwilioException;
@@ -109,11 +111,10 @@ import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
-import com.twilio.video.app.ui.room.RoomEvent.Connected;
-import com.twilio.video.app.ui.room.RoomEvent.Disconnected;
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
+import com.twilio.video.app.ui.room.RoomEvent.RoomState;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -607,7 +608,7 @@ public class RoomActivity extends BaseActivity {
             pauseVideoMenuItem.setVisible(false);
         }
 
-        if (room != null && room.getState() == Room.State.CONNECTED) {
+        if (room != null && room.getState() == CONNECTED) {
 
             // update local participant thumb
             participantController.updateThumb(localParticipantSid, oldVideo, cameraVideoTrack);
@@ -1360,7 +1361,7 @@ public class RoomActivity extends BaseActivity {
             statsScheduler.cancelStatsGathering();
         }
         boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
-        if (enableStats && (room != null) && (room.getState() == Room.State.CONNECTED)) {
+        if (enableStats && (room != null) && (room.getState() == CONNECTED)) {
             statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
         }
         updateStatsUI(enableStats);
@@ -1454,18 +1455,21 @@ public class RoomActivity extends BaseActivity {
         if (roomEvent != null) {
             this.room = roomEvent.getRoom();
             requestPermissions();
-            if (roomEvent instanceof Connected) {
-                VideoService.Companion.startForeground(this);
-                initializeRoom();
-            }
-            if (roomEvent instanceof Disconnected) {
-                removeAllParticipants();
-                localParticipant = null;
-                localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
-
-                updateStats();
-
-                setAudioFocus(false);
+            if (roomEvent instanceof RoomState) {
+                State state = room.getState();
+                switch (state) {
+                    case CONNECTED:
+                        VideoService.Companion.startForeground(this);
+                        initializeRoom();
+                        break;
+                    case DISCONNECTED:
+                        removeAllParticipants();
+                        localParticipant = null;
+                        localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
+                        updateStats();
+                        setAudioFocus(false);
+                        break;
+                }
             }
             if (roomEvent instanceof ConnectFailure) {
                 removeAllParticipants();
