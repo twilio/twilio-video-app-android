@@ -101,6 +101,7 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.Vp8Codec;
 import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.R;
+import com.twilio.video.app.VideoService;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
@@ -442,6 +443,7 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 Snackbar.make(
@@ -532,6 +534,7 @@ public class RoomActivity extends BaseActivity {
             room.disconnect();
 
             stopScreenCapture();
+            stopService(new Intent(this, VideoService.class));
         }
     }
 
@@ -1155,6 +1158,9 @@ public class RoomActivity extends BaseActivity {
                                     RoomActivity.this,
                                     connectOptionsBuilder.build(),
                                     roomListener());
+
+                    VideoService.Companion.startForeground(this);
+
                     return room;
                 });
     }
