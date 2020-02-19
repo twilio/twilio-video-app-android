@@ -299,7 +299,6 @@ public class RoomActivity extends BaseActivity {
         // Setup Activity
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
-        requestPermissions();
     }
 
     @Override
@@ -383,8 +382,6 @@ public class RoomActivity extends BaseActivity {
         inflater.inflate(R.menu.room_menu, menu);
         settingsMenuItem = menu.findItem(R.id.settings_menu_item);
 
-        roomManager.getViewEvents().observe(this, this::bindRoomEvents);
-
         return true;
     }
 
@@ -398,6 +395,9 @@ public class RoomActivity extends BaseActivity {
 
         // Screen sharing only available on lollipop and up
         screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+
+        requestPermissions();
+        roomManager.getViewEvents().observe(this, this::bindRoomEvents);
 
         return true;
     }
