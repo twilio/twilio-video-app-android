@@ -139,6 +139,8 @@ public class RoomActivity extends BaseActivity {
     private static final String MICROPHONE_TRACK_NAME = "microphone";
     private static final String CAMERA_TRACK_NAME = "camera";
     private static final String SCREEN_TRACK_NAME = "screen";
+    private static final String IS_AUDIO_MUTED = "IS_AUDIO_MUTED";
+    private static final String IS_VIDEO_MUTED = "IS_VIDEO_MUTED";
 
     // This will be used instead of real local participant sid,
     // because that information is unknown until room connection is fully established
@@ -271,9 +273,17 @@ public class RoomActivity extends BaseActivity {
     /** Disposes {@link VideoAppService} requests when activity is destroyed. */
     private final CompositeDisposable rxDisposables = new CompositeDisposable();
 
+    private Boolean isAudioMuted = false;
+    private Boolean isVideoMuted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            isAudioMuted = savedInstanceState.getBoolean(IS_AUDIO_MUTED);
+            isVideoMuted = savedInstanceState.getBoolean(IS_VIDEO_MUTED);
+        }
 
         // So calls can be answered when screen is locked
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -321,6 +331,13 @@ public class RoomActivity extends BaseActivity {
             isAppLinkProvided = true;
         }
         return isAppLinkProvided;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(IS_AUDIO_MUTED, isAudioMuted);
+        outState.putBoolean(IS_VIDEO_MUTED, isVideoMuted);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -524,6 +541,7 @@ public class RoomActivity extends BaseActivity {
     void toggleLocalAudio() {
         int icon;
         if (localAudioTrack == null) {
+            isAudioMuted = false;
             localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
             if (localParticipant != null && localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
@@ -533,6 +551,7 @@ public class RoomActivity extends BaseActivity {
             pauseAudioMenuItem.setTitle(
                     localAudioTrack.isEnabled() ? R.string.pause_audio : R.string.resume_audio);
         } else {
+            isAudioMuted = true;
             if (localParticipant != null) {
                 localParticipant.unpublishTrack(localAudioTrack);
             }
@@ -551,6 +570,7 @@ public class RoomActivity extends BaseActivity {
         VideoTrack oldVideo = cameraVideoTrack;
 
         if (cameraVideoTrack == null) {
+            isVideoMuted = false;
 
             // add local camera track
             cameraVideoTrack =
@@ -572,6 +592,7 @@ public class RoomActivity extends BaseActivity {
                 pauseVideoMenuItem.setVisible(true);
             }
         } else {
+            isVideoMuted = true;
             // remove local camera track
             cameraVideoTrack.removeRenderer(primaryVideoView);
 
@@ -759,8 +780,10 @@ public class RoomActivity extends BaseActivity {
 
     /** Initialize local media and provide stub participant for primary view. */
     private void setupLocalMedia() {
-        if (localAudioTrack == null && cameraVideoTrack == null) {
+        if (localAudioTrack == null && !isAudioMuted) {
             localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
+        }
+        if (cameraVideoTrack == null && !isVideoMuted) {
             setupLocalVideoTrack();
             renderLocalParticipantStub();
         }
@@ -861,6 +884,14 @@ public class RoomActivity extends BaseActivity {
                     connectButtonEnabled = true;
                     break;
             }
+        }
+
+        // Check mute state
+        if (isAudioMuted) {
+            localAudioImageButton.setImageResource(R.drawable.ic_mic_off_gray_24px);
+        }
+        if (isVideoMuted) {
+            localVideoImageButton.setImageResource(R.drawable.ic_videocam_off_gray_24px);
         }
 
         statsListAdapter = new StatsListAdapter(this);
@@ -1364,7 +1395,13 @@ public class RoomActivity extends BaseActivity {
             if (localParticipant != null) {
                 localParticipantSid = localParticipant.getSid();
 
-                localParticipant.publishTrack(cameraVideoTrack);
+                if (cameraVideoTrack != null) {
+                    localParticipant.publishTrack(cameraVideoTrack);
+                }
+
+                if (localAudioTrack != null) {
+                    localParticipant.publishTrack(localAudioTrack);
+                }
 
                 setAudioFocus(true);
                 updateStats();
