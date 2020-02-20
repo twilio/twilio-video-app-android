@@ -1170,7 +1170,9 @@ public class RoomActivity extends BaseActivity {
 
                     room =
                             Video.connect(
-                                    RoomActivity.this, connectOptionsBuilder.build(), roomManager);
+                                    RoomActivity.this,
+                                    connectOptionsBuilder.build(),
+                                    roomManager.getRoomListener());
 
                     return room;
                 });
