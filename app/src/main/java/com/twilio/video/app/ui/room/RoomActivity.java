@@ -1469,6 +1469,7 @@ public class RoomActivity extends BaseActivity {
                     case DISCONNECTED:
                         removeAllParticipants();
                         localParticipant = null;
+                        room = null;
                         localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
                         updateStats();
                         setAudioFocus(false);
