@@ -513,17 +513,18 @@ public class RoomActivity extends BaseActivity {
                                             Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
                                             Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
                             .createRoomProperties();
+            updateEnv();
 
-            Single<Room> connection =
-                    updateEnv()
-                            .andThen(tokenService.getToken(displayName, roomProperties))
-                            .flatMap(token -> connect(token, roomName));
+            String token = viewModel.connectToRoom(roomProperties);
 
-            connection
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doFinally(rxDisposables::clear)
-                    .doOnSubscribe(disposable -> InputUtils.hideKeyboard(this))
-                    .subscribe(roomManager.getRoomConnectionObserver());
+            InputUtils.hideKeyboard(this);
+
+//            connect(token, roomName);
+//            connection
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .doFinally { rxDisposables.clear() }
+//                .doOnSubscribe { disposable: Disposable? -> InputUtils.hideKeyboard(this) }
+//                .subscribe(roomManager.roomConnectionObserver)
         }
     }
 
@@ -1069,19 +1070,16 @@ public class RoomActivity extends BaseActivity {
      * @return Completable
      */
     private Completable updateEnv() {
-        return Completable.fromAction(
-                () -> {
-                    String env =
-                            sharedPreferences.getString(
-                                    Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
-                    String nativeEnvironmentVariableValue =
-                            EnvUtil.getNativeEnvironmentVariableValue(env);
-                    Env.set(
-                            RoomActivity.this,
-                            EnvUtil.TWILIO_ENV_KEY,
-                            nativeEnvironmentVariableValue,
-                            true);
-                });
+        String env =
+                sharedPreferences.getString(
+                        Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
+        String nativeEnvironmentVariableValue =
+                EnvUtil.getNativeEnvironmentVariableValue(env);
+        Env.set(
+                RoomActivity.this,
+                EnvUtil.TWILIO_ENV_KEY,
+                nativeEnvironmentVariableValue,
+                true);
     }
 
     /**

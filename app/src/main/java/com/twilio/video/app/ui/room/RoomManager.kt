@@ -17,26 +17,10 @@ import timber.log.Timber
 
 class RoomManager {
 
-    private var room: Room? = null
+    var room: Room? = null
     private val mutableViewEvents: MutableLiveData<RoomEvent?> = MutableLiveData()
 
     val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
-
-    val roomConnectionObserver = object : SingleObserver<Room> {
-        override fun onSuccess(room: Room) {
-            this@RoomManager.run {
-                this.room = room
-                mutableViewEvents.value = Connecting(room)
-            }
-        }
-
-        override fun onError(e: Throwable) {
-            Timber.e("%s -> reason: %s", "Failed to retrieve access token", e.message)
-        }
-
-        override fun onSubscribe(d: Disposable) {
-        }
-    }
 
     val roomListener = RoomListener()
 

@@ -29,7 +29,7 @@ class VideoAppServiceDelegate(
     private val videoAppServiceProd: VideoAppService
 ) : TokenService {
 
-    override fun getToken(identity: String, roomProperties: RoomProperties): Single<String> {
+    override suspend fun getToken(identity: String, roomProperties: RoomProperties): String {
         val env = sharedPreferences.getString(
                 Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
 

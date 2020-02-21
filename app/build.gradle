@@ -137,7 +137,7 @@ dependencies {
     def daggerVersion = '2.25.4'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
-    def retrofitVersion = '2.1.0'
+    def retrofitVersion = '2.6.4'
     def espressoVersion = '3.2.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     def androidXTest = '1.2.0'
@@ -156,6 +156,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
     implementation "androidx.fragment:fragment:1.2.2"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation "com.appyvet:materialrangebar:1.3"
     implementation "com.jakewharton:butterknife:$butterknifeVersion"
