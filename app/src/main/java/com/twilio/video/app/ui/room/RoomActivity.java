@@ -401,12 +401,6 @@ public class RoomActivity extends BaseActivity {
 
         inflater.inflate(R.menu.room_menu, menu);
         settingsMenuItem = menu.findItem(R.id.settings_menu_item);
-
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
         // Grab menu items for updating later
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
         pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
