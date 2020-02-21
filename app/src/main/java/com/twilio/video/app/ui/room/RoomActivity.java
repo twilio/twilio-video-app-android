@@ -26,6 +26,7 @@ import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -1480,6 +1481,11 @@ public class RoomActivity extends BaseActivity {
                 }
             }
             if (roomEvent instanceof ConnectFailure) {
+                new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                        .setTitle(getString(R.string.room_screen_connection_failure_title))
+                        .setMessage(getString(R.string.room_screen_connection_failure_message))
+                        .setNeutralButton("OK", null)
+                        .show();
                 removeAllParticipants();
                 setAudioFocus(false);
             }
