@@ -28,6 +28,7 @@ import dagger.android.AndroidInjectionModule;
         RoomActivityModule.class,
         SettingsActivityModule.class,
         SettingsFragmentModule.class,
+        VideoServiceModule.class,
         RoomManagerModule.class
     }
 )
