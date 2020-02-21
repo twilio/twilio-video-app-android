@@ -33,7 +33,7 @@ class VideoService : LifecycleService() {
     private var serviceHandler: ServiceHandler? = null
 
     companion object {
-        fun startForeground(context: Context) {
+        fun startService(context: Context) {
             Intent(context, VideoService::class.java).let { intent ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)
@@ -41,6 +41,10 @@ class VideoService : LifecycleService() {
                     context.startService(intent)
                 }
             }
+        }
+
+        fun stopService(context: Context) {
+            Intent(context, VideoService::class.java).let { context.stopService(it) }
         }
     }
 
