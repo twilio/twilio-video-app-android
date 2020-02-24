@@ -27,9 +27,9 @@ class RoomNotification(private val context: Context) {
                 context)
     }
 
-    fun buildNotification(): Notification =
+    fun buildNotification(roomName: String): Notification =
             NotificationCompat.Builder(context, VIDEO_SERVICE_CHANNEL)
-                    .setContentTitle(context.getString(R.string.room_notification_title))
+                    .setContentTitle(context.getString(R.string.room_notification_title, roomName))
                     .setContentText(context.getString(R.string.room_notification_message))
                     .setContentIntent(pendingIntent)
                     .setUsesChronometer(true)

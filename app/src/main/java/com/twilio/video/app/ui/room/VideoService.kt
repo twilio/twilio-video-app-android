@@ -3,13 +3,9 @@ package com.twilio.video.app.ui.room
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
-import android.os.Message
-import android.os.Process
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
+import com.twilio.video.Room.State.CONNECTED
 import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import dagger.android.AndroidInjection
@@ -17,9 +13,6 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class VideoService : LifecycleService() {
-
-    private var serviceLooper: Looper? = null
-    private var serviceHandler: ServiceHandler? = null
 
     companion object {
         fun startService(context: Context) {
@@ -39,33 +32,15 @@ class VideoService : LifecycleService() {
 
     @Inject lateinit var roomManager: RoomManager
 
-    private inner class ServiceHandler(looper: Looper) : Handler(looper) {
-
-        override fun handleMessage(msg: Message) {
-            val roomNotification = RoomNotification(this@VideoService)
-            startForeground(ONGOING_NOTIFICATION_ID, roomNotification.buildNotification())
-        }
-    }
-
     override fun onCreate() {
         AndroidInjection.inject(this)
         super.onCreate()
         roomManager.viewEvents.observe(this, Observer { bindRoomEvents(it) })
-        HandlerThread("VideoService StartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
-            start()
-            serviceLooper = looper
-            serviceHandler = ServiceHandler(looper)
-        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Timber.d("VideoService created")
-        serviceHandler?.obtainMessage()?.also { msg ->
-            msg.arg1 = startId
-            serviceHandler?.sendMessage(msg)
-        }
-
         return START_NOT_STICKY
     }
 
@@ -76,8 +51,14 @@ class VideoService : LifecycleService() {
 
     private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
         nullableRoomEvent?.let { roomEvent ->
-            if (roomEvent is RoomState && roomEvent.room.state == DISCONNECTED) {
-                stopSelf()
+            val room = roomEvent.room
+            if (roomEvent is RoomState) {
+                if (room.state == CONNECTED) {
+                    val roomNotification = RoomNotification(this@VideoService)
+                    startForeground(
+                            ONGOING_NOTIFICATION_ID,
+                            roomNotification.buildNotification(room.name))
+                } else if (room.state == DISCONNECTED) stopSelf()
             }
         }
     }
