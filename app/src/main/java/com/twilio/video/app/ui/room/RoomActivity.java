@@ -103,7 +103,6 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.Vp8Codec;
 import com.twilio.video.Vp9Codec;
 import com.twilio.video.app.R;
-import com.twilio.video.app.VideoService;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;

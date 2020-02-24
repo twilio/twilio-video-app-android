@@ -1,4 +1,4 @@
-package com.twilio.video.app
+package com.twilio.video.app.ui.room
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -16,10 +16,8 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
 import com.twilio.video.Room.State.DISCONNECTED
-import com.twilio.video.app.ui.room.RoomActivity
-import com.twilio.video.app.ui.room.RoomEvent
+import com.twilio.video.app.R
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
-import com.twilio.video.app.ui.room.RoomManager
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject

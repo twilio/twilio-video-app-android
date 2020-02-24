@@ -54,6 +54,6 @@
             android:parentActivityName=".ui.room.RoomActivity"
             android:label="@string/settings"
             android:theme="@style/AppTheme.Settings" />
-        <service android:name=".VideoService"/>
+        <service android:name=".ui.room.VideoService"/>
     </application>
 </manifest>
