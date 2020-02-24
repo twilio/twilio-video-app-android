@@ -32,6 +32,7 @@ class RoomNotification(private val context: Context) {
                     .setContentTitle(context.getString(R.string.room_notification_title))
                     .setContentText(context.getString(R.string.room_notification_message))
                     .setContentIntent(pendingIntent)
+                    .setUsesChronometer(true)
                     .setSmallIcon(R.drawable.ic_videocam_green_24px)
                     .setTicker(context.getString(R.string.room_notification_message))
                     .build()
