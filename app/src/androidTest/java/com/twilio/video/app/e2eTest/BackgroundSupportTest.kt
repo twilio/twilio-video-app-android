@@ -6,12 +6,14 @@ import androidx.test.filters.LargeTest
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
+import com.twilio.video.app.R
 import com.twilio.video.app.screen.assertRoomIsConnected
 import com.twilio.video.app.screen.assertScreenIsDisplayed
 import com.twilio.video.app.screen.clickDisconnectButton
 import com.twilio.video.app.screen.clickJoinRoomButton
 import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
 import org.junit.Rule
@@ -45,8 +47,8 @@ class BackgroundSupportTest : BaseUITest() {
             val notificationStackScroller = UiSelector()
                     .resourceId("com.android.systemui:id/notification_stack_scroller")
             findObject(notificationStackScroller)
-                    .getChild(UiSelector()
-                    .index(0))
+                    .getChild(UiSelector().textContains(
+                    getString(R.string.room_notification_message)))
                     .click()
         }
 

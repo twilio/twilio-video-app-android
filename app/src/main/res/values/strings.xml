@@ -13,8 +13,9 @@
     <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
 
     <!--  Notifications  -->
-    <string name="video_chat_notification_channel_title">Video Chat</string>
-    <string name="video_chat_notification_message">Live video chat in progress.</string>
+    <string name="room_notification_channel_title">Video Call</string>
+    <string name="room_notification_title">Ongoing video call in %s</string>
+    <string name="room_notification_message">Tap to return to the room.</string>
 
     <!--  Settings Screen  -->
     <string name="settings_screen_advanced">Advanced</string>
