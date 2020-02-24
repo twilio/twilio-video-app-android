@@ -1,9 +1,5 @@
 package com.twilio.video.app.ui.room
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -12,18 +8,13 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
 import android.os.Process
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
 import com.twilio.video.Room.State.DISCONNECTED
-import com.twilio.video.app.R
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
-
-const val VIDEO_SERVICE_CHANNEL = "VIDEO_SERVICE_CHANNEL"
-const val ONGOING_NOTIFICATION_ID = 1
 
 class VideoService : LifecycleService() {
 
@@ -51,36 +42,8 @@ class VideoService : LifecycleService() {
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
         override fun handleMessage(msg: Message) {
-            this@VideoService.let { videoService ->
-                val pendingIntent: PendingIntent =
-                        Intent(videoService, RoomActivity::class.java).let { notificationIntent ->
-                            PendingIntent.getActivity(videoService, 0, notificationIntent, 0)
-                        }
-
-                createDownloadNotificationChannel(VIDEO_SERVICE_CHANNEL,
-                        videoService.getString(R.string.room_notification_channel_title),
-                        videoService)
-
-                val notification: Notification = NotificationCompat.Builder(videoService, VIDEO_SERVICE_CHANNEL)
-                        .setContentTitle(videoService.getString(R.string.room_notification_title))
-                        .setContentText(videoService.getString(R.string.room_notification_message))
-                        .setContentIntent(pendingIntent)
-                        .setSmallIcon(R.drawable.ic_videocam_green_24px)
-                        .setTicker(videoService.getString(R.string.room_notification_message))
-                        .build()
-
-                startForeground(ONGOING_NOTIFICATION_ID, notification)
-            }
-        }
-
-        private fun createDownloadNotificationChannel(channelId: String, channelName: String, context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW).apply {
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                }
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(notificationChannel)
-            }
+            val roomNotification = RoomNotification(this@VideoService)
+            startForeground(ONGOING_NOTIFICATION_ID, roomNotification.buildNotification())
         }
     }
 
