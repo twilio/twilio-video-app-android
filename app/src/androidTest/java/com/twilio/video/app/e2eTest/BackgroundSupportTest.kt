@@ -48,7 +48,7 @@ class BackgroundSupportTest : BaseUITest() {
                     .resourceId("com.android.systemui:id/notification_stack_scroller")
             findObject(notificationStackScroller)
                     .getChild(UiSelector().textContains(
-                            getString(R.string.video_chat_notification_message)))
+                    getString(R.string.room_notification_message)))
                     .click()
         }
 

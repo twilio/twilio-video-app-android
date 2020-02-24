@@ -60,15 +60,15 @@ class VideoService : LifecycleService() {
                         }
 
                 createDownloadNotificationChannel(VIDEO_SERVICE_CHANNEL,
-                        videoService.getString(R.string.video_chat_notification_channel_title),
+                        videoService.getString(R.string.room_notification_channel_title),
                         videoService)
 
                 val notification: Notification = NotificationCompat.Builder(videoService, VIDEO_SERVICE_CHANNEL)
-                        .setContentTitle(videoService.getString(R.string.app_name))
-                        .setContentText(videoService.getString(R.string.video_chat_notification_message))
+                        .setContentTitle(videoService.getString(R.string.room_notification_title))
+                        .setContentText(videoService.getString(R.string.room_notification_message))
                         .setContentIntent(pendingIntent)
                         .setSmallIcon(R.drawable.ic_videocam_green_24px)
-                        .setTicker(videoService.getString(R.string.video_chat_notification_message))
+                        .setTicker(videoService.getString(R.string.room_notification_message))
                         .build()
 
                 startForeground(ONGOING_NOTIFICATION_ID, notification)
