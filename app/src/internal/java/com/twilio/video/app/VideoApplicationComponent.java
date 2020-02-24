@@ -22,6 +22,8 @@ import com.twilio.video.app.data.api.VideoAppServiceModule;
 import com.twilio.video.app.ui.ScreenSelectorModule;
 import com.twilio.video.app.ui.login.LoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
+import com.twilio.video.app.ui.room.RoomManagerModule;
+import com.twilio.video.app.ui.room.VideoServiceModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
 import com.twilio.video.app.ui.settings.SettingsFragmentModule;
 import com.twilio.video.app.ui.splash.SplashActivityModule;
@@ -42,7 +44,9 @@ import dagger.android.AndroidInjectionModule;
         LoginActivityModule.class,
         RoomActivityModule.class,
         SettingsActivityModule.class,
-        SettingsFragmentModule.class
+        SettingsFragmentModule.class,
+        VideoServiceModule.class,
+        RoomManagerModule.class
     }
 )
 public interface VideoApplicationComponent {
