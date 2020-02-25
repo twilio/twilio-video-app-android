@@ -140,7 +140,8 @@ dependencies {
     def retrofitVersion = '2.1.0'
     def espressoVersion = '3.2.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
-    def testCore = 'androidx.test:core:1.2.0'
+    def androidXTest = '1.2.0'
+    def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.2.0'
 
@@ -188,8 +189,8 @@ dependencies {
     androidTestImplementation testCore
     androidTestImplementation espresso
     androidTestImplementation junitExtensions
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation "androidx.test:runner:$androidXTest"
+    androidTestImplementation "androidx.test:rules:$androidXTest"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
