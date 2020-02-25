@@ -7,6 +7,7 @@
         <enum name="fill" value="1"/>
         <enum name="balanced" value="2"/>
     </attr>
+    <attr name="overlaySurface" format="boolean" />
 
     <declare-styleable name="VideoView">
         <attr name="mirror"/>

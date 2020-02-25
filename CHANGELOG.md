@@ -1,5 +1,17 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.1.2
+
+* Programmable Video Android SDK 5.1.2 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.2), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.2/)
+
+Bug Fixes
+
+- Fixed a bug where SDK consumers can not compile the SDK when building with the Android Gradle Plugin 3.6. [#479](https://github.com/twilio/video-quickstart-android/issues/479)
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
 ### 5.1.1
 
 * Programmable Video Android SDK 5.1.1 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.1), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.1/)
