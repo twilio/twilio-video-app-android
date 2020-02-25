@@ -133,7 +133,7 @@ android {
 }
 
 dependencies {
-    def butterknifeVersion = '10.2.1'
+    def butterknifeVersion = '10.2.0'
     def daggerVersion = '2.25.4'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
@@ -153,9 +153,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation "com.appyvet:materialrangebar:1.3"
-    //noinspection AnnotationProcessorOnCompilePath
     implementation "com.jakewharton:butterknife:$butterknifeVersion"
-    kapt "com.jakewharton:butterknife-compiler:$butterknifeVersion"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.2.2"
     implementation 'com.google.firebase:firebase-auth:19.2.0'
@@ -175,6 +173,7 @@ dependencies {
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
+    kapt "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     testImplementation testCore
     testImplementation espresso
