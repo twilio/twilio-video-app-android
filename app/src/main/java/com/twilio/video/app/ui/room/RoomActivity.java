@@ -56,6 +56,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -115,6 +116,7 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
 import com.twilio.video.app.ui.room.RoomEvent.RoomState;
+import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -277,9 +279,14 @@ public class RoomActivity extends BaseActivity {
     private Boolean isAudioMuted = false;
     private Boolean isVideoMuted = false;
 
+    private RoomViewModel roomViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        RoomViewModelFactory factory = new RoomViewModelFactory(tokenService);
+        roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
             isAudioMuted = savedInstanceState.getBoolean(IS_AUDIO_MUTED);
@@ -488,6 +495,7 @@ public class RoomActivity extends BaseActivity {
 
     @OnClick(R.id.connect)
     void connectButtonClick() {
+        InputUtils.hideKeyboard(this);
         if (!didAcceptPermissions()) {
             Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
                     .show();
@@ -515,9 +523,8 @@ public class RoomActivity extends BaseActivity {
                             .createRoomProperties();
             updateEnv();
 
-            String token = viewModel.connectToRoom(roomProperties);
-
-            InputUtils.hideKeyboard(this);
+            String token = roomViewModel.retrieveToken(roomProperties, displayName);
+            connect(token, roomName);
 
 //            connect(token, roomName);
 //            connection
@@ -1067,9 +1074,8 @@ public class RoomActivity extends BaseActivity {
     /**
      * Update {@link com.twilio.video.Video} environment.
      *
-     * @return Completable
      */
-    private Completable updateEnv() {
+    private void updateEnv() {
         String env =
                 sharedPreferences.getString(
                         Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT);
