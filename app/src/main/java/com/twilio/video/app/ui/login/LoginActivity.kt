@@ -88,7 +88,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
                                     startActivityForResult(it.intent, GOOGLE_SIGN_IN)
                                 }
                                 is GoogleLoginSuccessResult -> {
-                                    saveIdentity(it.googleSignInAccount.displayName, it.googleSignInAccount.email!!)
+                                    saveIdentity(it.googleSignInAccount.email!!, it.googleSignInAccount.displayName)
                                     onSignInSuccess()
                                 }
                             }
@@ -115,7 +115,10 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         disposables + authenticator
                 .login(loginEventSubject.hide())
                 .subscribe({
-                    if (it is EmailLoginSuccessResult) onSignInSuccess()
+                    if (it is EmailLoginSuccessResult) {
+                        saveIdentity(email)
+                        onSignInSuccess()
+                    }
                 },
                 {
                     Timber.e(it)
@@ -160,7 +163,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         startLobbyActivity()
     }
 
-    private fun saveIdentity(displayName: String?, email: String) {
+    private fun saveIdentity(email: String, displayName: String? = null) {
         sharedPreferences
                 .edit()
                 .putString(Preferences.EMAIL, email)

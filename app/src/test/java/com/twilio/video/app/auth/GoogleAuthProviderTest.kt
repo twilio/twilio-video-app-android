@@ -20,7 +20,7 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-class GoogleAuthenticatorTest {
+class GoogleAuthProviderTest {
     private val context: Context = mock {
         whenever(mock.getString(any())).thenReturn("")
     }
@@ -61,7 +61,7 @@ class GoogleAuthenticatorTest {
 
     @Test
     fun `loginWithAccount should login successfully`() {
-        val googleAuthenticator = GoogleAuthenticator(
+        val googleAuthenticator = GoogleAuthProvider(
                 firebaseWrapper,
                 context,
                 googleAuthWrapper,
@@ -79,7 +79,7 @@ class GoogleAuthenticatorTest {
 
     @Test
     fun `loginWithAccount should login successfully with no accepted domain`() {
-        val googleAuthenticator = GoogleAuthenticator(
+        val googleAuthenticator = GoogleAuthProvider(
                 firebaseWrapper,
                 context,
                 googleAuthWrapper,
@@ -98,7 +98,7 @@ class GoogleAuthenticatorTest {
     fun `loginWithAccount should not login successfully when email doesn't match the accepted domain`() {
         whenever(googleSignInAccount.email).thenReturn("test@blah.com")
 
-        val googleAuthenticator = GoogleAuthenticator(
+        val googleAuthenticator = GoogleAuthProvider(
                 mock(),
                 context,
                 googleAuthWrapper,

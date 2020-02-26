@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:name=".VideoApplication"
@@ -44,6 +45,7 @@
             android:theme="@style/AppTheme.LoginScreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
+            android:launchMode="singleTop"
             android:name=".ui.room.RoomActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.Lobby">
@@ -52,5 +54,6 @@
             android:parentActivityName=".ui.room.RoomActivity"
             android:label="@string/settings"
             android:theme="@style/AppTheme.Settings" />
+        <service android:name=".ui.room.VideoService"/>
     </application>
 </manifest>

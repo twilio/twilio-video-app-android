@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
@@ -16,7 +17,7 @@ import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
-class GoogleAuthenticator @JvmOverloads constructor(
+class GoogleAuthProvider @JvmOverloads internal constructor(
     private val firebaseWrapper: FirebaseWrapper,
     context: Context,
     private val googleAuthWrapper: GoogleAuthWrapper,
@@ -26,6 +27,22 @@ class GoogleAuthenticator @JvmOverloads constructor(
     private val acceptedDomain: String? = null,
     private val disposables: CompositeDisposable = CompositeDisposable()
 ) : AuthenticationProvider {
+
+    companion object {
+        fun newInstance(
+            context: Context,
+            googleSignInOptions: GoogleSignInOptions,
+            acceptedDomain: String? = null
+        ): AuthenticationProvider =
+            GoogleAuthProvider(
+                    FirebaseWrapper(),
+                    context,
+                    GoogleAuthWrapper(),
+                    GoogleSignInWrapper(),
+                    GoogleSignInOptionsWrapper(googleSignInOptions),
+                    GoogleAuthProviderWrapper(),
+                    acceptedDomain)
+    }
 
     private val googleSignInClient: GoogleSignInClient =
             googleSignInWrapper.getClient(context, googleSignInOptionsWrapper)

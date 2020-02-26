@@ -83,7 +83,7 @@ class SettingsActivity : BaseActivity() {
         internal lateinit var authenticator: Authenticator
         private var identityPreference: EditTextPreference? = null
 
-        override fun onAttach(context: Context?) {
+        override fun onAttach(context: Context) {
             AndroidSupportInjection.inject(this)
             super.onAttach(context)
         }

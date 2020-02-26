@@ -18,7 +18,6 @@ package com.twilio.video.app.auth;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twilio.video.app.ApplicationModule;
 import com.twilio.video.app.ApplicationScope;
@@ -33,30 +32,22 @@ public class AuthModule {
 
     @Provides
     @ApplicationScope
-    Authenticator providesAuthenticator(
-            FirebaseWrapper firebaseWrapper,
-            Application application,
-            SharedPreferences sharedPreferences) {
+    Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper, Application application) {
         Context context = application.getApplicationContext();
-        List<AuthenticationProvider> authenticators = new ArrayList<>();
+        List<AuthenticationProvider> authProviders = new ArrayList<>();
+        String acceptedDomain = "twilio.com";
         GoogleSignInOptions googleSignInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(context.getString(R.string.default_web_client_id))
                         .requestEmail()
-                        .setHostedDomain("twilio.com")
+                        .setHostedDomain(acceptedDomain)
                         .build();
 
-        authenticators.add(
-                new GoogleAuthenticator(
-                        new FirebaseWrapper(),
-                        context,
-                        new GoogleAuthWrapper(),
-                        new GoogleSignInWrapper(),
-                        new GoogleSignInOptionsWrapper(googleSignInOptions),
-                        new GoogleAuthProviderWrapper(),
-                        "twilio.com"));
-        authenticators.add(new EmailAuthenticator(firebaseWrapper, sharedPreferences));
-        return new FirebaseAuthenticator(firebaseWrapper, authenticators);
+        authProviders.add(
+                GoogleAuthProvider.Companion.newInstance(
+                        context, googleSignInOptions, acceptedDomain));
+        authProviders.add(new EmailAuthProvider(firebaseWrapper));
+        return new FirebaseAuthenticator(firebaseWrapper, authProviders);
     }
 
     @Provides

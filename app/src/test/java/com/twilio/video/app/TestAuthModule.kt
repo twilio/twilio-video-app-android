@@ -1,7 +1,6 @@
 package com.twilio.video.app
 
 import android.app.Application
-import android.content.SharedPreferences
 import com.twilio.video.app.auth.FirebaseWrapper
 import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
@@ -9,8 +8,8 @@ import com.twilio.video.app.auth.GoogleSignInWrapper
 import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.auth.AuthenticationProvider
-import com.twilio.video.app.auth.GoogleAuthenticator
-import com.twilio.video.app.auth.EmailAuthenticator
+import com.twilio.video.app.auth.GoogleAuthProvider
+import com.twilio.video.app.auth.EmailAuthProvider
 import com.twilio.video.app.auth.FirebaseAuthenticator
 import dagger.Module
 import dagger.Provides
@@ -29,12 +28,11 @@ class TestAuthModule {
         googleSignInWrapper: GoogleSignInWrapper,
         googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
         googleAuthProviderWrapper: GoogleAuthProviderWrapper,
-        application: Application,
-        sharedPreferences: SharedPreferences
+        application: Application
     ): Authenticator {
         val authenticators = ArrayList<AuthenticationProvider>()
         authenticators.add(
-                GoogleAuthenticator(
+                GoogleAuthProvider(
                         firebaseWrapper,
                         application,
                         googleAuthWrapper,
@@ -42,7 +40,7 @@ class TestAuthModule {
                         googleSignInOptionsWrapper,
                         googleAuthProviderWrapper)
         )
-        authenticators.add(EmailAuthenticator(firebaseWrapper, sharedPreferences))
+        authenticators.add(EmailAuthProvider(firebaseWrapper))
         return FirebaseAuthenticator(firebaseWrapper, authenticators)
     }
 }
