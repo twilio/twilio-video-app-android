@@ -16,8 +16,6 @@
 
 package com.twilio.video.app.ui.login;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -42,10 +40,10 @@ public class CommunityLoginActivity extends BaseActivity {
 
     @Inject Authenticator authenticator;
 
-    @BindView(R.id.name_edittext)
+    @BindView(R.id.community_login_screen_name_edittext)
     EditText nameEditText;
 
-    @BindView(R.id.login_button)
+    @BindView(R.id.community_login_screen_login_button)
     Button loginButton;
 
     @Override
@@ -57,7 +55,7 @@ public class CommunityLoginActivity extends BaseActivity {
         if (authenticator.loggedIn()) startLobbyActivity();
     }
 
-    @OnTextChanged(R.id.name_edittext)
+    @OnTextChanged(R.id.community_login_screen_name_edittext)
     public void onTextChanged(Editable editable) {
         if (nameEditText.length() != 0) {
             loginButton.setTextColor(Color.WHITE);
@@ -69,7 +67,7 @@ public class CommunityLoginActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.login_button)
+    @OnClick(R.id.community_login_screen_login_button)
     public void onLoginButton(View view) {
         String name = nameEditText.getText().toString();
         if (name.length() > 0) {
