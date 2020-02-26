@@ -8,7 +8,7 @@ buildscript {
             'targetSdk': 28,
 
             // Plugins
-            'androidGradlePlugin': '3.5.0',
+            'androidGradlePlugin': '3.6.0',
             'googleServices': '3.2.1',
             'gradleHockeyPlugin': '3.6',
             'fabricPlugin': '1.31.0',

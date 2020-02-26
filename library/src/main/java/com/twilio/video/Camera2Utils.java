@@ -16,13 +16,13 @@
 
 package com.twilio.video;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 
-@TargetApi(21)
+@RequiresApi(21)
 class Camera2Utils {
     private static final Logger logger = Logger.getLogger(Camera2Utils.class);
 

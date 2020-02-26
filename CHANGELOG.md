@@ -4,9 +4,13 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 * Programmable Video Android SDK 5.1.2 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.2), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.2/)
 
+Maintenance
+
+- Updated to Android Gradle Plugin 3.6.0.
+
 Bug Fixes
 
-- Fixed a bug where SDK consumers can not compile the SDK when building with the Android Gradle Plugin 3.6. [#479](https://github.com/twilio/video-quickstart-android/issues/479)
+- Fixed a bug where users of `VideoView` can not compile the SDK when building with Android Gradle Plugin 3.6.0. [#479](https://github.com/twilio/video-quickstart-android/issues/479)
 
 Known issues
 

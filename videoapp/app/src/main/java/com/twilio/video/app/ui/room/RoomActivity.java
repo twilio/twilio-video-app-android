@@ -19,12 +19,14 @@ package com.twilio.video.app.ui.room;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
+import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
 import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,7 +52,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -90,6 +91,7 @@ import com.twilio.video.RemoteParticipant;
 import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.Room;
+import com.twilio.video.Room.State;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.TwilioException;
@@ -108,6 +110,11 @@ import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.data.api.model.RoomProperties;
 import com.twilio.video.app.data.api.model.Topology;
+import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
+import com.twilio.video.app.ui.room.RoomEvent.RoomState;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.EnvUtil;
@@ -115,10 +122,8 @@ import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,6 +140,8 @@ public class RoomActivity extends BaseActivity {
     private static final String MICROPHONE_TRACK_NAME = "microphone";
     private static final String CAMERA_TRACK_NAME = "camera";
     private static final String SCREEN_TRACK_NAME = "screen";
+    private static final String IS_AUDIO_MUTED = "IS_AUDIO_MUTED";
+    private static final String IS_VIDEO_MUTED = "IS_VIDEO_MUTED";
 
     // This will be used instead of real local participant sid,
     // because that information is unknown until room connection is fully established
@@ -259,15 +266,25 @@ public class RoomActivity extends BaseActivity {
 
     @Inject SharedPreferences sharedPreferences;
 
+    @Inject RoomManager roomManager;
+
     /** Coordinates participant thumbs and primary participant rendering. */
     private ParticipantController participantController;
 
     /** Disposes {@link VideoAppService} requests when activity is destroyed. */
     private final CompositeDisposable rxDisposables = new CompositeDisposable();
 
+    private Boolean isAudioMuted = false;
+    private Boolean isVideoMuted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            isAudioMuted = savedInstanceState.getBoolean(IS_AUDIO_MUTED);
+            isVideoMuted = savedInstanceState.getBoolean(IS_VIDEO_MUTED);
+        }
 
         // So calls can be answered when screen is locked
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -293,7 +310,6 @@ public class RoomActivity extends BaseActivity {
         // Setup Activity
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
-        requestPermissions();
     }
 
     @Override
@@ -319,8 +335,16 @@ public class RoomActivity extends BaseActivity {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(IS_AUDIO_MUTED, isAudioMuted);
+        outState.putBoolean(IS_VIDEO_MUTED, isVideoMuted);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onDestroy() {
         // Reset the speakerphone
+        VideoService.Companion.stopService(this);
         audioManager.setSpeakerphoneOn(false);
         // Teardown tracks
         if (localAudioTrack != null) {
@@ -376,12 +400,6 @@ public class RoomActivity extends BaseActivity {
 
         inflater.inflate(R.menu.room_menu, menu);
         settingsMenuItem = menu.findItem(R.id.settings_menu_item);
-
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
         // Grab menu items for updating later
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item);
         pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
@@ -390,6 +408,9 @@ public class RoomActivity extends BaseActivity {
 
         // Screen sharing only available on lollipop and up
         screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+
+        requestPermissions();
+        roomManager.getViewEvents().observe(this, this::bindRoomEvents);
 
         return true;
     }
@@ -442,6 +463,7 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != Activity.RESULT_OK) {
                 Snackbar.make(
@@ -499,44 +521,23 @@ public class RoomActivity extends BaseActivity {
 
             connection
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            new SingleObserver<Room>() {
-                                @Override
-                                public void onSubscribe(Disposable disposable) {
-                                    InputUtils.hideKeyboard(RoomActivity.this);
-                                    rxDisposables.add(disposable);
-                                }
-
-                                @Override
-                                public void onSuccess(Room room) {
-                                    RoomActivity.this.room = room;
-                                    updateUi(room);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    final String message = "Failed to retrieve access token";
-                                    Timber.e("%s -> reason: %s", message, e.getMessage());
-                                    Snackbar.make(primaryVideoView, message, Snackbar.LENGTH_LONG)
-                                            .show();
-                                    connect.setEnabled(true);
-                                }
-                            });
+                    .doFinally(rxDisposables::clear)
+                    .doOnSubscribe(disposable -> InputUtils.hideKeyboard(this))
+                    .subscribe(roomManager.getRoomConnectionObserver());
         }
     }
 
     @OnClick(R.id.disconnect)
     void disconnectButtonClick() {
-        if (room != null) {
-            Timber.i("Exiting room");
-            room.disconnect();
-        }
+        roomManager.disconnect();
+        stopScreenCapture();
     }
 
     @OnClick(R.id.local_audio_image_button)
     void toggleLocalAudio() {
         int icon;
         if (localAudioTrack == null) {
+            isAudioMuted = false;
             localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
             if (localParticipant != null && localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
@@ -546,6 +547,7 @@ public class RoomActivity extends BaseActivity {
             pauseAudioMenuItem.setTitle(
                     localAudioTrack.isEnabled() ? R.string.pause_audio : R.string.resume_audio);
         } else {
+            isAudioMuted = true;
             if (localParticipant != null) {
                 localParticipant.unpublishTrack(localAudioTrack);
             }
@@ -564,6 +566,7 @@ public class RoomActivity extends BaseActivity {
         VideoTrack oldVideo = cameraVideoTrack;
 
         if (cameraVideoTrack == null) {
+            isVideoMuted = false;
 
             // add local camera track
             cameraVideoTrack =
@@ -585,6 +588,7 @@ public class RoomActivity extends BaseActivity {
                 pauseVideoMenuItem.setVisible(true);
             }
         } else {
+            isVideoMuted = true;
             // remove local camera track
             cameraVideoTrack.removeRenderer(primaryVideoView);
 
@@ -599,7 +603,7 @@ public class RoomActivity extends BaseActivity {
             pauseVideoMenuItem.setVisible(false);
         }
 
-        if (room != null && room.getState() == Room.State.CONNECTED) {
+        if (room != null && room.getState() == CONNECTED) {
 
             // update local participant thumb
             participantController.updateThumb(localParticipantSid, oldVideo, cameraVideoTrack);
@@ -772,9 +776,17 @@ public class RoomActivity extends BaseActivity {
 
     /** Initialize local media and provide stub participant for primary view. */
     private void setupLocalMedia() {
-        localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
-        setupLocalVideoTrack();
-        renderLocalParticipantStub();
+        if (localAudioTrack == null && !isAudioMuted) {
+            localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME);
+            if (room != null && localParticipant != null)
+                localParticipant.publishTrack(localAudioTrack);
+        }
+        if (cameraVideoTrack == null && !isVideoMuted) {
+            setupLocalVideoTrack();
+            renderLocalParticipantStub();
+            if (room != null && localParticipant != null)
+                localParticipant.publishTrack(cameraVideoTrack);
+        }
     }
 
     /** Create local video track */
@@ -796,11 +808,6 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(
                     cameraVideoTrack.getName(), getString(R.string.camera_video_track));
-
-            // Share camera video track if we are connected to room
-            if (localParticipant != null) {
-                localParticipant.publishTrack(cameraVideoTrack);
-            }
         } else {
             Snackbar.make(
                             primaryVideoView,
@@ -877,6 +884,14 @@ public class RoomActivity extends BaseActivity {
                     connectButtonEnabled = true;
                     break;
             }
+        }
+
+        // Check mute state
+        if (isAudioMuted) {
+            localAudioImageButton.setImageResource(R.drawable.ic_mic_off_gray_24px);
+        }
+        if (isVideoMuted) {
+            localVideoImageButton.setImageResource(R.drawable.ic_videocam_off_gray_24px);
         }
 
         statsListAdapter = new StatsListAdapter(this);
@@ -1152,7 +1167,8 @@ public class RoomActivity extends BaseActivity {
                             Video.connect(
                                     RoomActivity.this,
                                     connectOptionsBuilder.build(),
-                                    roomListener());
+                                    roomManager.getRoomListener());
+
                     return room;
                 });
     }
@@ -1346,7 +1362,7 @@ public class RoomActivity extends BaseActivity {
             statsScheduler.cancelStatsGathering();
         }
         boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
-        if (enableStats && (room != null) && (room.getState() == Room.State.CONNECTED)) {
+        if (enableStats && (room != null) && (room.getState() == CONNECTED)) {
             statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
         }
         updateStatsUI(enableStats);
@@ -1374,141 +1390,114 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void initializeRoom() {
-        if (room == null) return;
-        Timber.i(
-                "Connected to room -> name: %s, sid: %s, state: %s",
-                room.getName(), room.getSid(), room.getState());
-        localParticipant = room.getLocalParticipant();
-        localParticipantSid = localParticipant.getSid();
+        if (room != null) {
+            localParticipant = room.getLocalParticipant();
+            if (localParticipant != null) {
+                localParticipantSid = localParticipant.getSid();
 
-        setAudioFocus(true);
-        updateStats();
-        updateUi(room);
+                if (cameraVideoTrack != null) {
+                    localParticipant.publishTrack(cameraVideoTrack);
+                }
 
-        // remove primary view
-        participantController.removePrimary();
+                if (localAudioTrack != null) {
+                    localParticipant.publishTrack(localAudioTrack);
+                }
 
-        // add local thumb and "click" on it to make primary
-        participantController.addThumb(
-                localParticipantSid,
-                getString(R.string.you),
-                cameraVideoTrack,
-                localAudioTrack == null,
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA,
-                isNetworkQualityEnabled());
+                setAudioFocus(true);
+                updateStats();
 
-        localParticipant.setListener(
-                new LocalParticipantListener(
-                        participantController.getThumb(localParticipantSid, cameraVideoTrack)));
-        participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+                // remove primary view
+                participantController.removePrimary();
 
-        // add existing room participants thumbs
-        boolean isFirstParticipant = true;
-        for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-            addParticipant(remoteParticipant, isFirstParticipant);
-            isFirstParticipant = false;
-            if (room.getDominantSpeaker() != null) {
-                if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
-                    VideoTrack videoTrack =
-                            (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                    ? remoteParticipant
-                                            .getRemoteVideoTracks()
-                                            .get(0)
-                                            .getRemoteVideoTrack()
-                                    : null;
-                    if (videoTrack != null) {
-                        ParticipantView participantView =
+                // add local thumb and "click" on it to make primary
+                participantController.addThumb(
+                        localParticipantSid,
+                        getString(R.string.you),
+                        cameraVideoTrack,
+                        localAudioTrack == null,
+                        cameraCapturer.getCameraSource()
+                                == CameraCapturer.CameraSource.FRONT_CAMERA,
+                        isNetworkQualityEnabled());
+
+                localParticipant.setListener(
+                        new LocalParticipantListener(
                                 participantController.getThumb(
-                                        remoteParticipant.getSid(), videoTrack);
-                        participantController.setDominantSpeaker(participantView);
+                                        localParticipantSid, cameraVideoTrack)));
+                participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+
+                // add existing room participants thumbs
+                boolean isFirstParticipant = true;
+                for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
+                    addParticipant(remoteParticipant, isFirstParticipant);
+                    isFirstParticipant = false;
+                    if (room.getDominantSpeaker() != null) {
+                        if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
+                            VideoTrack videoTrack =
+                                    (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                            ? remoteParticipant
+                                                    .getRemoteVideoTracks()
+                                                    .get(0)
+                                                    .getRemoteVideoTrack()
+                                            : null;
+                            if (videoTrack != null) {
+                                ParticipantView participantView =
+                                        participantController.getThumb(
+                                                remoteParticipant.getSid(), videoTrack);
+                                participantController.setDominantSpeaker(participantView);
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    private Room.Listener roomListener() {
-        return new Room.Listener() {
-            @Override
-            public void onConnected(@NonNull final Room room) {
-                initializeRoom();
+    private void bindRoomEvents(RoomEvent roomEvent) {
+        if (roomEvent != null) {
+            this.room = roomEvent.getRoom();
+            requestPermissions();
+            if (roomEvent instanceof RoomState) {
+                State state = room.getState();
+                switch (state) {
+                    case CONNECTED:
+                        VideoService.Companion.startService(this);
+                        initializeRoom();
+                        break;
+                    case DISCONNECTED:
+                        removeAllParticipants();
+                        localParticipant = null;
+                        room = null;
+                        localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
+                        updateStats();
+                        setAudioFocus(false);
+                        break;
+                }
             }
-
-            @Override
-            public void onConnectFailure(
-                    @NonNull Room room, @NonNull TwilioException twilioException) {
-                Timber.e(
-                        "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
-                        room.getSid(),
-                        room.getState(),
-                        twilioException.getCode(),
-                        twilioException.getMessage());
-
+            if (roomEvent instanceof ConnectFailure) {
+                new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                        .setTitle(getString(R.string.room_screen_connection_failure_title))
+                        .setMessage(getString(R.string.room_screen_connection_failure_message))
+                        .setNeutralButton("OK", null)
+                        .show();
                 removeAllParticipants();
-
-                RoomActivity.this.room = null;
-                updateUi(room);
-
                 setAudioFocus(false);
             }
-
-            @Override
-            public void onReconnecting(
-                    @NonNull Room room, @NonNull TwilioException twilioException) {
-                Timber.i("onReconnecting: %s", room.getName());
-            }
-
-            @Override
-            public void onReconnected(@NonNull Room room) {
-                Timber.i("onReconnected: %s", room.getName());
-            }
-
-            @Override
-            public void onDisconnected(
-                    @NonNull Room room, @Nullable TwilioException twilioException) {
-                Timber.i(
-                        "Disconnected from room -> sid: %s, state: %s",
-                        room.getSid(), room.getState());
-
-                removeAllParticipants();
-                RoomActivity.this.room = null;
-                RoomActivity.this.localParticipant = null;
-                RoomActivity.this.localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
-
-                updateUi(room);
-                updateStats();
-
-                setAudioFocus(false);
-            }
-
-            @Override
-            public void onParticipantConnected(
-                    @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
-                Timber.i(
-                        "RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
-                        room.getSid(), remoteParticipant.getSid());
-
+            if (roomEvent instanceof ParticipantConnected) {
                 boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
-                addParticipant(remoteParticipant, renderAsPrimary);
+                addParticipant(
+                        ((ParticipantConnected) roomEvent).getRemoteParticipant(), renderAsPrimary);
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
-
-            @Override
-            public void onParticipantDisconnected(
-                    @NonNull Room room, @NonNull RemoteParticipant remoteParticipant) {
-                Timber.i(
-                        "RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
-                        room.getSid(), remoteParticipant.getSid());
-
-                removeParticipant(remoteParticipant);
+            if (roomEvent instanceof ParticipantDisconnected) {
+                removeParticipant(((ParticipantDisconnected) roomEvent).getRemoteParticipant());
 
                 updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
             }
+            if (roomEvent instanceof DominantSpeakerChanged) {
+                RemoteParticipant remoteParticipant =
+                        ((DominantSpeakerChanged) roomEvent).getRemoteParticipant();
 
-            @Override
-            public void onDominantSpeakerChanged(
-                    @NonNull Room room, @Nullable RemoteParticipant remoteParticipant) {
                 if (remoteParticipant == null) {
                     participantController.setDominantSpeaker(null);
                     return;
@@ -1539,17 +1528,8 @@ public class RoomActivity extends BaseActivity {
                     }
                 }
             }
-
-            @Override
-            public void onRecordingStarted(@NonNull Room room) {
-                Timber.i("onRecordingStarted: %s", room.getName());
-            }
-
-            @Override
-            public void onRecordingStopped(@NonNull Room room) {
-                Timber.i("onRecordingStopped: %s", room.getName());
-            }
-        };
+            updateUi(room);
+        }
     }
 
     private class LocalParticipantListener implements LocalParticipant.Listener {

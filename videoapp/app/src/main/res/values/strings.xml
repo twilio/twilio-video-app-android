@@ -8,6 +8,15 @@
     <string name="login_screen_auth_error_title">Login Error</string>
     <string name="login_screen_auth_error_desc">There was an issue logging in.</string>
 
+    <!--  Room Screen  -->
+    <string name="room_screen_connection_failure_title">Connection Failure</string>
+    <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
+
+    <!--  Notifications  -->
+    <string name="room_notification_channel_title">Video Call</string>
+    <string name="room_notification_title">Ongoing video call in %s</string>
+    <string name="room_notification_message">Tap to return to the room.</string>
+
     <!--  Settings Screen  -->
     <string name="settings_screen_advanced">Advanced</string>
     <string name="settings_screen_enable_stats">Enable Stats</string>
