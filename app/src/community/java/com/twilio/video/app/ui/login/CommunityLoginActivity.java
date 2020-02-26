@@ -32,6 +32,7 @@ import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.ui.room.RoomActivity;
 import javax.inject.Inject;
 import timber.log.Timber;
 
@@ -87,7 +88,7 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void startLobbyActivity() {
-        setResult(RESULT_OK);
+        RoomActivity.startActivity(this, getIntent().getData());
         finish();
     }
 }

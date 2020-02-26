@@ -277,6 +277,12 @@ public class RoomActivity extends BaseActivity {
     private Boolean isAudioMuted = false;
     private Boolean isVideoMuted = false;
 
+    public static void startActivity(Context context, Uri appLinkUri) {
+        Intent intent = new Intent(context, RoomActivity.class);
+        intent.setData(appLinkUri);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
