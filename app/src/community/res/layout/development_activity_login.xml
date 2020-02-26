@@ -80,7 +80,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/login_screen_app_code"
-                    android:inputType="textPersonName"/>
+                    android:inputType="numberPassword"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
