@@ -285,7 +285,7 @@ public class RoomActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RoomViewModelFactory factory = new RoomViewModelFactory(tokenService);
+        RoomViewModelFactory factory = new RoomViewModelFactory(this, tokenService, roomManager);
         roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
