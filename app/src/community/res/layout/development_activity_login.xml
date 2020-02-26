@@ -5,7 +5,7 @@
     android:id="@+id/community_login_screen_login_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="?attr/colorPrimary"
     android:fillViewport="true"
     tools:context=".ui.login.CommunityLoginActivity">
 
