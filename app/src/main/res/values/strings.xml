@@ -151,7 +151,6 @@
     <string name="sign_in_with_existing_account">Sign in with Existing Account</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="name">Your name</string>
     <string name="bitrate">bps</string>
     <string name="recording_notice">Recording may be enabled for quality assurance.</string>
     <string name="audio_toggle">Audio toggle</string>
