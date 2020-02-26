@@ -20,7 +20,7 @@
             android:text="@string/login"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/colorButtonText"
-            android:background="@color/colorPrimaryDark"/>
+            android:background="?attr/colorPrimaryDark"/>
 
     </LinearLayout>
 
