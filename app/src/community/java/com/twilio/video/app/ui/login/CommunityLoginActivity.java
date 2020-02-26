@@ -21,12 +21,12 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import androidx.core.content.res.ResourcesCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import com.google.android.material.textfield.TextInputEditText;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
@@ -42,7 +42,7 @@ public class CommunityLoginActivity extends BaseActivity {
     @Inject Authenticator authenticator;
 
     @BindView(R.id.community_login_screen_name_edittext)
-    EditText nameEditText;
+    TextInputEditText nameEditText;
 
     @BindView(R.id.community_login_screen_login_button)
     Button loginButton;

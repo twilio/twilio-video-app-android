@@ -47,8 +47,7 @@
                 android:contentDescription="@string/video_logo"
                 android:src="@drawable/video_logo_splash" />
 
-            <EditText
-                android:id="@+id/community_login_screen_name_edittext"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -56,9 +55,15 @@
                 android:layout_marginTop="@dimen/username_margin_top"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:hint="@string/name"
-                android:inputType="textPersonName" />
+                android:layout_marginBottom="@dimen/activity_horizontal_margin">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/community_login_screen_name_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/name"
+                    android:inputType="textPersonName"/>
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
