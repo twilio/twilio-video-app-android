@@ -129,8 +129,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     }
 
     private fun startLobbyActivity() {
-        val intent = Intent(this, RoomActivity::class.java).apply { data = intent.data }
-        startActivity(intent)
+        RoomActivity.startActivity(this, intent.data)
         finish()
     }
 

@@ -30,14 +30,14 @@
             android:id="@+id/range_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:connectingLineColor="@color/colorPrimary"
-            app:pinColor="@color/colorPrimary"
+            app:connectingLineColor="?attr/colorPrimary"
+            app:pinColor="?attr/colorPrimary"
             app:pinMaxFont="12sp"
             app:pinMinFont="12sp"
-            app:rangeBarColor="@color/colorPrimary"
-            app:selectorColor="@color/colorPrimary"
+            app:rangeBarColor="?attr/colorPrimary"
+            app:selectorColor="?attr/colorPrimary"
             app:temporaryPins="false"
-            app:tickColor="@color/colorPrimary"
+            app:tickColor="?attr/colorPrimary"
             app:tickInterval="1" />
 
     </LinearLayout>

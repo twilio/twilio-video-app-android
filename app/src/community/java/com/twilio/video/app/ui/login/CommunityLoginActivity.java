@@ -16,24 +16,23 @@
 
 package com.twilio.video.app.ui.login;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import androidx.core.content.res.ResourcesCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import com.google.android.material.textfield.TextInputEditText;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.ui.room.RoomActivity;
 import javax.inject.Inject;
 import timber.log.Timber;
 
@@ -42,10 +41,10 @@ public class CommunityLoginActivity extends BaseActivity {
 
     @Inject Authenticator authenticator;
 
-    @BindView(R.id.name_edittext)
-    EditText nameEditText;
+    @BindView(R.id.community_login_screen_name_edittext)
+    TextInputEditText nameEditText;
 
-    @BindView(R.id.login_button)
+    @BindView(R.id.community_login_screen_login_button)
     Button loginButton;
 
     @Override
@@ -57,7 +56,7 @@ public class CommunityLoginActivity extends BaseActivity {
         if (authenticator.loggedIn()) startLobbyActivity();
     }
 
-    @OnTextChanged(R.id.name_edittext)
+    @OnTextChanged(R.id.community_login_screen_name_edittext)
     public void onTextChanged(Editable editable) {
         if (nameEditText.length() != 0) {
             loginButton.setTextColor(Color.WHITE);
@@ -69,7 +68,7 @@ public class CommunityLoginActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.login_button)
+    @OnClick(R.id.community_login_screen_login_button)
     public void onLoginButton(View view) {
         String name = nameEditText.getText().toString();
         if (name.length() > 0) {
@@ -89,7 +88,7 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void startLobbyActivity() {
-        setResult(RESULT_OK);
+        RoomActivity.startActivity(this, getIntent().getData());
         finish();
     }
 }
