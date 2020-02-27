@@ -33,6 +33,7 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
+import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.util.EnvUtil
 import timber.log.Timber
 
@@ -67,6 +68,7 @@ class RoomManager(
             tokenService.getToken(identity, roomProperties)
         } catch (e: Exception) {
             Timber.e(e, "Failed to retrieve token")
+            mutableViewEvents.value = TokenError
             return
         }
 

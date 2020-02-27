@@ -100,6 +100,7 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
 import com.twilio.video.app.ui.room.RoomEvent.RoomState;
+import com.twilio.video.app.ui.room.RoomEvent.TokenError;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
@@ -1273,80 +1274,93 @@ public class RoomActivity extends BaseActivity {
         Timber.d("Thread: %s", Thread.currentThread().getName());
         if (roomEvent != null) {
             this.room = roomEvent.getRoom();
-            requestPermissions();
-            if (roomEvent instanceof RoomState) {
-                State state = room.getState();
-                switch (state) {
-                    case CONNECTED:
-                        VideoService.Companion.startService(this);
-                        initializeRoom();
-                        break;
-                    case DISCONNECTED:
-                        removeAllParticipants();
-                        localParticipant = null;
-                        room = null;
-                        localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
-                        updateStats();
-                        setAudioFocus(false);
-                        break;
+            if (room != null) {
+                requestPermissions();
+                if (roomEvent instanceof RoomState) {
+                    State state = room.getState();
+                    switch (state) {
+                        case CONNECTED:
+                            VideoService.Companion.startService(this);
+                            initializeRoom();
+                            break;
+                        case DISCONNECTED:
+                            removeAllParticipants();
+                            localParticipant = null;
+                            room = null;
+                            localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
+                            updateStats();
+                            setAudioFocus(false);
+                            break;
+                    }
                 }
-            }
-            if (roomEvent instanceof ConnectFailure) {
-                new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                        .setTitle(getString(R.string.room_screen_connection_failure_title))
-                        .setMessage(getString(R.string.room_screen_connection_failure_message))
-                        .setNeutralButton("OK", null)
-                        .show();
-                removeAllParticipants();
-                setAudioFocus(false);
-            }
-            if (roomEvent instanceof ParticipantConnected) {
-                boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
-                addParticipant(
-                        ((ParticipantConnected) roomEvent).getRemoteParticipant(), renderAsPrimary);
-
-                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
-            }
-            if (roomEvent instanceof ParticipantDisconnected) {
-                removeParticipant(((ParticipantDisconnected) roomEvent).getRemoteParticipant());
-
-                updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
-            }
-            if (roomEvent instanceof DominantSpeakerChanged) {
-                RemoteParticipant remoteParticipant =
-                        ((DominantSpeakerChanged) roomEvent).getRemoteParticipant();
-
-                if (remoteParticipant == null) {
-                    participantController.setDominantSpeaker(null);
-                    return;
+                if (roomEvent instanceof ConnectFailure) {
+                    new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                            .setTitle(getString(R.string.room_screen_connection_failure_title))
+                            .setMessage(getString(R.string.room_screen_connection_failure_message))
+                            .setNeutralButton("OK", null)
+                            .show();
+                    removeAllParticipants();
+                    setAudioFocus(false);
                 }
-                VideoTrack videoTrack =
-                        (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                ? remoteParticipant
-                                        .getRemoteVideoTracks()
-                                        .get(0)
-                                        .getRemoteVideoTrack()
-                                : null;
-                if (videoTrack != null) {
-                    ParticipantView participantView =
-                            participantController.getThumb(remoteParticipant.getSid(), videoTrack);
-                    if (participantView != null) {
-                        participantController.setDominantSpeaker(participantView);
-                    } else {
-                        remoteParticipant.getIdentity();
-                        ParticipantPrimaryView primaryParticipantView =
-                                participantController.getPrimaryView();
-                        if (primaryParticipantView.identity.equals(
-                                remoteParticipant.getIdentity())) {
-                            participantController.setDominantSpeaker(
-                                    participantController.getPrimaryView());
+                if (roomEvent instanceof ParticipantConnected) {
+                    boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
+                    addParticipant(
+                            ((ParticipantConnected) roomEvent).getRemoteParticipant(),
+                            renderAsPrimary);
+
+                    updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
+                }
+                if (roomEvent instanceof ParticipantDisconnected) {
+                    removeParticipant(((ParticipantDisconnected) roomEvent).getRemoteParticipant());
+
+                    updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
+                }
+                if (roomEvent instanceof DominantSpeakerChanged) {
+                    RemoteParticipant remoteParticipant =
+                            ((DominantSpeakerChanged) roomEvent).getRemoteParticipant();
+
+                    if (remoteParticipant == null) {
+                        participantController.setDominantSpeaker(null);
+                        return;
+                    }
+                    VideoTrack videoTrack =
+                            (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                    ? remoteParticipant
+                                            .getRemoteVideoTracks()
+                                            .get(0)
+                                            .getRemoteVideoTrack()
+                                    : null;
+                    if (videoTrack != null) {
+                        ParticipantView participantView =
+                                participantController.getThumb(
+                                        remoteParticipant.getSid(), videoTrack);
+                        if (participantView != null) {
+                            participantController.setDominantSpeaker(participantView);
                         } else {
-                            participantController.setDominantSpeaker(null);
+                            remoteParticipant.getIdentity();
+                            ParticipantPrimaryView primaryParticipantView =
+                                    participantController.getPrimaryView();
+                            if (primaryParticipantView.identity.equals(
+                                    remoteParticipant.getIdentity())) {
+                                participantController.setDominantSpeaker(
+                                        participantController.getPrimaryView());
+                            } else {
+                                participantController.setDominantSpeaker(null);
+                            }
                         }
                     }
                 }
+                updateUi(room);
+            } else {
+                if (roomEvent instanceof TokenError) {
+                    new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                            .setTitle(getString(R.string.room_screen_connection_failure_title))
+                            .setMessage(
+                                    getString(R.string.room_screen_token_retrieval_failure_message))
+                            .setNeutralButton("OK", null)
+                            .show();
+                }
             }
-            updateUi(room);
         }
     }
 

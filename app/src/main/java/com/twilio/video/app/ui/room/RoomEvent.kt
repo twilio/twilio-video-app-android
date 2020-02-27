@@ -3,7 +3,8 @@ package com.twilio.video.app.ui.room
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 
-sealed class RoomEvent(val room: Room) {
+sealed class RoomEvent(val room: Room? = null) {
+    object TokenError : RoomEvent()
     class Connecting(room: Room) : RoomEvent(room)
     class RoomState(room: Room) : RoomEvent(room)
     class ConnectFailure(room: Room) : RoomEvent(room)
