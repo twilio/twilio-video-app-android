@@ -17,7 +17,6 @@
 package com.twilio.video.app.data.api
 
 import com.twilio.video.app.data.api.model.RoomProperties
-import io.reactivex.Single
 
 interface TokenService {
     suspend fun getToken(identity: String, roomProperties: RoomProperties): String

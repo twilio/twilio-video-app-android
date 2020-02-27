@@ -19,7 +19,6 @@ package com.twilio.video.app.data.api
 import android.content.SharedPreferences
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.model.RoomProperties
-import io.reactivex.Single
 import timber.log.Timber
 
 class VideoAppServiceDelegate(

@@ -21,9 +21,10 @@ import retrofit2.http.Query
 interface VideoAppService {
     @GET("api/v1/token")
     suspend fun getToken(
-            @Query("identity") identity: String?,
-            @Query("roomName") roomName: String?,
-            @Query("appEnvironment") appEnvironment: String?,
-            @Query("topology") topology: String?,
-            @Query("recordParticipantsOnConnect") recordParticipantsOnConnect: Boolean): String
+        @Query("identity") identity: String?,
+        @Query("roomName") roomName: String?,
+        @Query("appEnvironment") appEnvironment: String?,
+        @Query("topology") topology: String?,
+        @Query("recordParticipantsOnConnect") recordParticipantsOnConnect: Boolean
+    ): String
 }

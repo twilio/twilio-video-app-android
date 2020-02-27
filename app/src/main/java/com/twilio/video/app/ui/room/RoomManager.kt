@@ -1,31 +1,196 @@
 package com.twilio.video.app.ui.room
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.twilio.androidenv.Env
+import com.twilio.video.AudioCodec
+import com.twilio.video.ConnectOptions
+import com.twilio.video.EncodingParameters
+import com.twilio.video.G722Codec
+import com.twilio.video.H264Codec
+import com.twilio.video.IsacCodec
+import com.twilio.video.LocalAudioTrack
+import com.twilio.video.LocalVideoTrack
+import com.twilio.video.OpusCodec
+import com.twilio.video.PcmaCodec
+import com.twilio.video.PcmuCodec
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 import com.twilio.video.TwilioException
+import com.twilio.video.Video
+import com.twilio.video.VideoCodec
+import com.twilio.video.Vp8Codec
+import com.twilio.video.Vp9Codec
+import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.data.api.model.RoomProperties
+import com.twilio.video.app.data.api.model.Topology
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.Disposable
+import com.twilio.video.app.util.EnvUtil
 import timber.log.Timber
 
-class RoomManager {
+class RoomManager(
+    private val context: Context,
+    private val sharedPreferences: SharedPreferences,
+    private val tokenService: TokenService
+) {
 
     var room: Room? = null
     private val mutableViewEvents: MutableLiveData<RoomEvent?> = MutableLiveData()
 
     val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
 
-    val roomListener = RoomListener()
+    private val roomListener = RoomListener()
 
     fun disconnect() {
         room?.disconnect()
+    }
+
+    suspend fun connectToRoom(
+        identity: String,
+        roomName: String,
+        localAudioTracks: List<LocalAudioTrack>,
+        localVideoTracks: List<LocalVideoTrack>,
+        isNetworkQualityEnabled: Boolean
+    ) {
+
+        val roomProperties = setupEnvironment(roomName)
+
+        val token = try {
+            tokenService.getToken(identity, roomProperties)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to retrieve token")
+            return
+        }
+
+        val enableInsights = sharedPreferences.getBoolean(
+                Preferences.ENABLE_INSIGHTS,
+                Preferences.ENABLE_INSIGHTS_DEFAULT)
+
+        val enableAutomaticTrackSubscription: Boolean = getPreferenceByKeyWithDefault(
+                Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION,
+                Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT)
+
+        val enableDominantSpeaker: Boolean = getPreferenceByKeyWithDefault(
+                Preferences.ENABLE_DOMINANT_SPEAKER,
+                Preferences.ENABLE_DOMINANT_SPEAKER_DEFAULT)
+
+        val preferedVideoCodec: VideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC)
+
+        val preferredAudioCodec: AudioCodec = getAudioCodecPreference()
+
+        val connectOptionsBuilder = ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .enableAutomaticSubscription(enableAutomaticTrackSubscription)
+                .enableDominantSpeaker(enableDominantSpeaker)
+                .enableInsights(enableInsights)
+                .enableNetworkQuality(isNetworkQualityEnabled)
+
+        val maxVideoBitrate = sharedPreferences.getInt(
+                Preferences.MAX_VIDEO_BITRATE,
+                Preferences.MAX_VIDEO_BITRATE_DEFAULT)
+
+        val maxAudioBitrate = sharedPreferences.getInt(
+                Preferences.MAX_AUDIO_BITRATE,
+                Preferences.MAX_AUDIO_BITRATE_DEFAULT)
+
+        val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
+
+        if (localAudioTracks.isNotEmpty()) {
+            connectOptionsBuilder.audioTracks(localAudioTracks)
+        }
+
+        if (localVideoTracks.isNotEmpty()) {
+            connectOptionsBuilder.videoTracks(localVideoTracks)
+        }
+
+        connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
+
+        connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
+
+        connectOptionsBuilder.encodingParameters(encodingParameters)
+
+        val room = Video.connect(
+                context,
+                connectOptionsBuilder.build(),
+                roomListener)
+        this.room = room
+
+        Timber.d("Thread: %s", Thread.currentThread().name)
+        mutableViewEvents.value = Connecting(room)
+    }
+
+    private fun setupEnvironment(roomName: String): RoomProperties {
+        setSdkEnvironment(sharedPreferences)
+
+        return RoomProperties.Builder()
+                .setName(roomName)
+                .setTopology(
+                        Topology.fromString(
+                                sharedPreferences.getString(
+                                        Preferences.TOPOLOGY,
+                                        Preferences.TOPOLOGY_DEFAULT)))
+                .setRecordOnParticipantsConnect(
+                        sharedPreferences.getBoolean(
+                                Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
+                                Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
+                .createRoomProperties()
+    }
+
+    private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
+        return sharedPreferences.getBoolean(key, defaultValue)
+    }
+
+    private fun getVideoCodecPreference(key: String): VideoCodec {
+        val videoCodecName = sharedPreferences.getString(key, Preferences.VIDEO_CODEC_DEFAULT)
+        return if (videoCodecName != null) {
+            when (videoCodecName) {
+                Vp8Codec.NAME -> {
+                    val simulcast = sharedPreferences.getBoolean(
+                            Preferences.VP8_SIMULCAST, Preferences.VP8_SIMULCAST_DEFAULT)
+                    Vp8Codec(simulcast)
+                }
+                H264Codec.NAME -> H264Codec()
+                Vp9Codec.NAME -> Vp9Codec()
+                else -> Vp8Codec()
+            }
+        } else {
+            Vp8Codec()
+        }
+    }
+
+    private fun getAudioCodecPreference(): AudioCodec {
+        val audioCodecName = sharedPreferences.getString(
+                Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT)
+        return if (audioCodecName != null) {
+            when (audioCodecName) {
+                IsacCodec.NAME -> IsacCodec()
+                PcmaCodec.NAME -> PcmaCodec()
+                PcmuCodec.NAME -> PcmuCodec()
+                G722Codec.NAME -> G722Codec()
+                else -> OpusCodec()
+            }
+        } else {
+            OpusCodec()
+        }
+    }
+
+    private fun setSdkEnvironment(sharedPreferences: SharedPreferences) {
+        val env = sharedPreferences.getString(
+                Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
+        val nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env)
+        Env.set(
+                context,
+                EnvUtil.TWILIO_ENV_KEY,
+                nativeEnvironmentVariableValue,
+                true)
     }
 
     inner class RoomListener : Room.Listener {
