@@ -1,72 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/community_login_screen_login_scrollview"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimary"
+    android:fillViewport="true"
+    tools:context=".ui.login.CommunityLoginActivity">
 
-    <LinearLayout
-        android:id="@+id/login_linearlayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/colorPrimary"
-        android:layout_alignParentBottom="true" >
+        android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/login_button"
-            android:layout_width="match_parent"
+            android:id="@+id/community_login_screen_login_button"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:background="?attr/colorPrimaryDark"
             android:text="@string/login"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/colorButtonText"
-            android:background="@color/colorPrimaryDark"/>
-
-    </LinearLayout>
-
-    <ScrollView
-        android:id="@+id/login_scrollview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:background="@color/colorPrimary"
-        tools:context=".ui.login.CommunityLoginActivity"
-        android:layout_above="@id/login_linearlayout" >
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <LinearLayout
-            android:id="@+id/register_layout"
+            android:id="@+id/community_login_screen_register_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingBottom="@dimen/activity_vertical_margin"
-            android:orientation="vertical" >
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/community_login_screen_login_button">
 
             <ImageView
                 android:layout_width="74dp"
                 android:layout_height="74dp"
                 android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/video_logo"
-                android:src="@drawable/video_logo_splash"/>
+                android:src="@drawable/video_logo_splash" />
 
-            <EditText
-                android:id="@+id/name_edittext"
-                android:layout_marginTop="@dimen/username_margin_top"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="@string/name"/>
-        </LinearLayout>
-    </ScrollView>
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/username_margin_top"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_horizontal_margin">
 
-</RelativeLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/community_login_screen_name_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_screen_name"
+                    android:inputType="textPersonName"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_horizontal_margin">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/community_login_screen_app_code_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_screen_app_code"
+                    android:inputType="numberPassword"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+
 
