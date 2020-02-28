@@ -4,5 +4,7 @@ ui-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: Nexus9, version: 24}
+    - {model: g3, version: 19}
+    - {model: m0, version: 18}
+    - {model: hammerhead, version: 21}
     - {model: flame, version: 29}

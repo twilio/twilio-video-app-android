@@ -14,10 +14,12 @@ import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.screen.logout
 import com.twilio.video.app.ui.splash.SplashActivity
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@Ignore
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class AppLinkRoomTest {

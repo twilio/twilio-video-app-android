@@ -14,10 +14,12 @@ import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@Ignore
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class PreferencesTest : BaseUITest() {

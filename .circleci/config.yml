@@ -197,24 +197,24 @@ workflows:
 
   build-test:
     jobs:
-      - lint:
-          <<: *build-test-filter
-      - check-format:
-          <<: *build-test-filter
+#      - lint:
+#          <<: *build-test-filter
+#      - check-format:
+#          <<: *build-test-filter
       - build-app:
           <<: *build-test-filter
-      - unit-tests:
-          <<: *build-test-filter
-          requires:
-            - build-app
-            - lint
-            - check-format
+#      - unit-tests:
+#          <<: *build-test-filter
+#          requires:
+#            - build-app
+#            - lint
+#            - check-format
       - ui-tests:
           <<: *build-test-filter
           requires:
             - build-app
-            - lint
-            - check-format
+#            - lint
+#            - check-format
 
   publish-to-appcenter:
     jobs:
