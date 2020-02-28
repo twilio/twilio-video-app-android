@@ -56,9 +56,9 @@
     </string-array>
 
     <string-array name="settings_screen_topology_array">
-        <item>peer-to-peer</item>
         <item>group</item>
         <item>group-small</item>
+        <item>peer-to-peer</item>
     </string-array>
     <string-array name="settings_screen_aspect_ratio_array">
         <item>4:3</item>
