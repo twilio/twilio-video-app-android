@@ -49,7 +49,7 @@ android {
 
         multiDexEnabled true
 
-        testInstrumentationRunner "com.twilio.video.app.InstrumentationRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
