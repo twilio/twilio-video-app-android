@@ -1271,7 +1271,6 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void bindRoomEvents(RoomEvent roomEvent) {
-        Timber.d("Thread: %s", Thread.currentThread().getName());
         if (roomEvent != null) {
             this.room = roomEvent.getRoom();
             if (room != null) {

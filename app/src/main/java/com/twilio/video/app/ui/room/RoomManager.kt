@@ -62,10 +62,8 @@ class RoomManager(
         isNetworkQualityEnabled: Boolean
     ) {
 
-        val roomProperties = setupEnvironment(roomName)
-
         val token = try {
-            tokenService.getToken(identity, roomProperties)
+            tokenService.getToken(identity, setupEnvironment(roomName))
         } catch (e: Exception) {
             Timber.e(e, "Failed to retrieve token")
             mutableViewEvents.value = TokenError
@@ -114,9 +112,7 @@ class RoomManager(
         }
 
         connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
-
         connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
-
         connectOptionsBuilder.encodingParameters(encodingParameters)
 
         val room = Video.connect(
@@ -125,7 +121,6 @@ class RoomManager(
                 roomListener)
         this.room = room
 
-        Timber.d("Thread: %s", Thread.currentThread().name)
         mutableViewEvents.value = Connecting(room)
     }
 
@@ -151,27 +146,24 @@ class RoomManager(
     }
 
     private fun getVideoCodecPreference(key: String): VideoCodec {
-        val videoCodecName = sharedPreferences.getString(key, Preferences.VIDEO_CODEC_DEFAULT)
-        return if (videoCodecName != null) {
-            when (videoCodecName) {
-                Vp8Codec.NAME -> {
-                    val simulcast = sharedPreferences.getBoolean(
-                            Preferences.VP8_SIMULCAST, Preferences.VP8_SIMULCAST_DEFAULT)
-                    Vp8Codec(simulcast)
+        return sharedPreferences.getString(key, Preferences.VIDEO_CODEC_DEFAULT)?.let { videoCodecName ->
+                when (videoCodecName) {
+                    Vp8Codec.NAME -> {
+                        val simulcast = sharedPreferences.getBoolean(
+                                Preferences.VP8_SIMULCAST, Preferences.VP8_SIMULCAST_DEFAULT)
+                        Vp8Codec(simulcast)
+                    }
+                    H264Codec.NAME -> H264Codec()
+                    Vp9Codec.NAME -> Vp9Codec()
+                    else -> Vp8Codec()
                 }
-                H264Codec.NAME -> H264Codec()
-                Vp9Codec.NAME -> Vp9Codec()
-                else -> Vp8Codec()
-            }
-        } else {
-            Vp8Codec()
-        }
+            } ?: Vp8Codec()
     }
 
     private fun getAudioCodecPreference(): AudioCodec {
-        val audioCodecName = sharedPreferences.getString(
-                Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT)
-        return if (audioCodecName != null) {
+        return sharedPreferences.getString(
+                Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT)?.let { audioCodecName ->
+
             when (audioCodecName) {
                 IsacCodec.NAME -> IsacCodec()
                 PcmaCodec.NAME -> PcmaCodec()
@@ -179,9 +171,7 @@ class RoomManager(
                 G722Codec.NAME -> G722Codec()
                 else -> OpusCodec()
             }
-        } else {
-            OpusCodec()
-        }
+        } ?: OpusCodec()
     }
 
     private fun setSdkEnvironment(sharedPreferences: SharedPreferences) {
