@@ -3,7 +3,6 @@ package com.twilio.video.app
 import com.twilio.video.app.auth.CommunityAuthModule
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.ui.login.CommunityLoginActivity
-import com.twilio.video.app.ui.login.LoginActivity
 import com.twilio.video.app.ui.login.LoginActivityModule
 
 import dagger.Component

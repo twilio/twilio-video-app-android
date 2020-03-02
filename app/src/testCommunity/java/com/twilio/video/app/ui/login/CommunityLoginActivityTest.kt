@@ -50,5 +50,34 @@ class CommunityLoginActivityTest {
                 .build()
         component.inject(testApp)
     }
-}
 
+    @Test
+    fun `it should finish the login flow when auth is successful`() {
+        TODO("not implemented")
+    }
+
+    @Test
+    fun `it should display an error message when the user doesn't provide their name`() {
+        TODO("not implemented")
+    }
+
+    @Test
+    fun `it should display an error message when the user doesn't provide a passcode`() {
+        TODO("not implemented")
+    }
+
+    @Test
+    fun `it should display an error message when the auth request fails from an invalid passcode`() {
+        TODO("not implemented")
+    }
+
+    @Test
+    fun `it should display an error message when the auth request fails from an expired passcode`() {
+        TODO("not implemented")
+    }
+
+    @Test
+    fun `it should display an error message when the auth request fails for an unknown reason`() {
+        TODO("not implemented")
+    }
+}
