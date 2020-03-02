@@ -144,10 +144,10 @@ dependencies {
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.2.0'
-    def coroutines_android_version = '1.3.3'
+    def coroutinesAndroidVersion = '1.3.3'
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_android_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_android_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     implementation 'com.twilio:twilio-android-env:1.0.0'
     implementation videoAndroidSdkDep
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
@@ -184,6 +184,7 @@ dependencies {
     testImplementation testCore
     testImplementation espresso
     testImplementation junitExtensions
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3'
