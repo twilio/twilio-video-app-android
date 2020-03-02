@@ -16,10 +16,18 @@ import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
+import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
+import com.twilio.video.app.screen.clickLoginButton
+import com.twilio.video.app.screen.enterYourName
+import com.twilio.video.app.screen.enterYourPasscode
+import com.twilio.video.app.ui.room.RoomActivity
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApp::class)
@@ -49,11 +57,22 @@ class CommunityLoginActivityTest {
                 .applicationModule(ApplicationModule(testApp))
                 .build()
         component.inject(testApp)
+
+        scenario = ActivityScenario.launch(CommunityLoginActivity::class.java)
     }
 
     @Test
     fun `it should finish the login flow when auth is successful`() {
-        TODO("not implemented")
+        enterYourName("TestUser")
+        enterYourPasscode("0123456789")
+        clickLoginButton()
+
+        assertLoadingIndicatorIsDisplayed()
+
+        // TODO Do something to return auth response
+
+        val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
+        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
     }
 
     @Test
