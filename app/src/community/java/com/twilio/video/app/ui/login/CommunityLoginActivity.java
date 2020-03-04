@@ -44,6 +44,9 @@ public class CommunityLoginActivity extends BaseActivity {
     @BindView(R.id.community_login_screen_name_edittext)
     TextInputEditText nameEditText;
 
+    @BindView(R.id.community_login_screen_passcode_edittext)
+    TextInputEditText passcodeEditText;
+
     @BindView(R.id.community_login_screen_login_button)
     Button loginButton;
 
@@ -70,9 +73,9 @@ public class CommunityLoginActivity extends BaseActivity {
 
     @OnClick(R.id.community_login_screen_login_button)
     public void onLoginButton(View view) {
-        String name = nameEditText.getText().toString();
-        if (name.length() > 0) {
-            saveIdentity(name);
+        String passcode = passcodeEditText.getText().toString();
+        if (passcode.length() > 0) {
+            saveIdentity(passcode);
         }
     }
 

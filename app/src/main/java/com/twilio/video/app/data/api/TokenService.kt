@@ -16,8 +16,8 @@
 
 package com.twilio.video.app.data.api
 
-import com.twilio.video.app.data.api.model.RoomProperties
-
 interface TokenService {
-    suspend fun getToken(identity: String, roomProperties: RoomProperties): String
+    suspend fun getToken(tokenServiceParameters: TokenServiceParameters): String
 }
+
+interface TokenServiceParameters

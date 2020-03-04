@@ -18,7 +18,6 @@ package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.model.RoomProperties
 import timber.log.Timber
 
 class VideoAppServiceDelegate(
@@ -28,18 +27,25 @@ class VideoAppServiceDelegate(
     private val videoAppServiceProd: VideoAppService
 ) : TokenService {
 
-    override suspend fun getToken(identity: String, roomProperties: RoomProperties): String {
-        val env = sharedPreferences.getString(
-                Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
+    override suspend fun getToken(tokenServiceParameters: TokenServiceParameters): String {
+        if (tokenServiceParameters is VideoServiceParameters) {
+            val identity = tokenServiceParameters.identity
+            val roomProperties = tokenServiceParameters.roomProperties
 
-        val videoAppService = resolveVideoAppService(env!!)
-        Timber.d("app service env = $videoAppService")
-        return videoAppService.getToken(
-                identity,
-                roomProperties.name,
-                "production",
-                roomProperties.topology.string,
-                roomProperties.isRecordParticipantsOnConnect)
+            val env = sharedPreferences.getString(
+                    Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
+
+            val videoAppService = resolveVideoAppService(env!!)
+            Timber.d("app service env = $videoAppService")
+            return videoAppService.getToken(
+                    identity,
+                    roomProperties.name,
+                    "production",
+                    roomProperties.topology.string,
+                    roomProperties.isRecordParticipantsOnConnect)
+        } else {
+            throw IllegalArgumentException("Parameter must be VideoServiceParameters")
+        }
     }
 
     private fun resolveVideoAppService(env: String): VideoAppService {

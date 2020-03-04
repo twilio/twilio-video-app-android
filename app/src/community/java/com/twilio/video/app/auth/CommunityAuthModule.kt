@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.twilio.video.app.auth
 
-package com.twilio.video.app.data;
+import android.content.SharedPreferences
+import com.twilio.video.app.ApplicationScope
+import com.twilio.video.app.data.AuthServiceModule
+import com.twilio.video.app.data.api.TokenService
+import dagger.Module
+import dagger.Provides
 
-import com.twilio.video.app.ApplicationScope;
-import com.twilio.video.app.data.api.TokenService;
-import dagger.Module;
-import dagger.Provides;
-
-@Module(includes = DataModule.class)
-public class CommunityDataModule {
+@Module(includes = [AuthServiceModule::class])
+class CommunityAuthModule {
     @Provides
     @ApplicationScope
-    TokenService providesTokenService() {
-        return new CommunityTokenService();
+    fun providesCommunityAuthenticator(preferences: SharedPreferences, tokenService: TokenService): Authenticator {
+        return CommunityAuthenticator(preferences, tokenService)
     }
 }

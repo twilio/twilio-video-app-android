@@ -17,32 +17,28 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
-import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent
-import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.api.AuthServiceParameters
+import com.twilio.video.app.data.api.TokenService
 import io.reactivex.Observable
-import io.reactivex.Single
-import timber.log.Timber
 
 class CommunityAuthenticator constructor(
-    private val preferences: SharedPreferences
+    private val preferences: SharedPreferences,
+    private val tokenService: TokenService
 ) : Authenticator {
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
-        return Single.create<LoginResult> { observable ->
-            loginEventObservable.subscribe({ loginEvent ->
-                if (loginEvent is CommunityLoginEvent) {
-                    preferences.edit().putString(Preferences.DISPLAY_NAME, loginEvent.displayName).apply()
-                    observable.onSuccess(CommunityLoginSuccessResult)
-                }
-            }, {
-                Timber.e(it)
-            })
-        }.toObservable()
+        return Observable.empty()
     }
 
     override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
-        return login(Observable.just(loginEvent))
+        return if (loginEvent is LoginEvent.CommunityLoginEvent) {
+            tokenService.getToken(AuthServiceParameters(loginEvent.passcode))
+                    .map { LoginResult.CommunityLoginSuccessResult as LoginResult }
+                    .toObservable()
+        } else Observable.empty<LoginResult>()
+
+//      preferences.edit().putString(Preferences.DISPLAY_NAME, loginEvent.displayName).apply()
     }
 
     override fun loggedIn(): Boolean {
