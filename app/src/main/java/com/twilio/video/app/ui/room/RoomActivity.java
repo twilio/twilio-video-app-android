@@ -260,6 +260,13 @@ public class RoomActivity extends BaseActivity {
     private Boolean isAudioMuted = false;
     private Boolean isVideoMuted = false;
 
+    public static void startActivity(Context context, Uri appLink) {
+        Intent intent = new Intent(context, RoomActivity.class);
+        intent.setData(appLink);
+
+        context.startActivity(intent);
+    }
+
     private RoomViewModel roomViewModel;
 
     @Override
