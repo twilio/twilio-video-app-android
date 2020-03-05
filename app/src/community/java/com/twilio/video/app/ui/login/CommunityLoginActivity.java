@@ -36,7 +36,7 @@ import com.twilio.video.app.ui.room.RoomActivity;
 import javax.inject.Inject;
 import timber.log.Timber;
 
-// TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-93
+// TODO Create view model and fragment for this screen
 public class CommunityLoginActivity extends BaseActivity {
 
     @Inject Authenticator authenticator;
@@ -73,15 +73,20 @@ public class CommunityLoginActivity extends BaseActivity {
 
     @OnClick(R.id.community_login_screen_login_button)
     public void onLoginButton(View view) {
+        String identity = nameEditText.getText().toString();
         String passcode = passcodeEditText.getText().toString();
-        if (passcode.length() > 0) {
-            saveIdentity(passcode);
+        if (areIdentityAndPasscodeValid(identity, passcode)) {
+            login(identity, passcode);
         }
     }
 
-    private void saveIdentity(String displayName) {
+    private boolean areIdentityAndPasscodeValid(String identity, String passcode) {
+        return !identity.isEmpty() && !passcode.isEmpty();
+    }
+
+    private void login(String identity, String passcode) {
         authenticator
-                .login(new CommunityLoginEvent(displayName))
+                .login(new CommunityLoginEvent(identity, passcode))
                 .subscribe(
                         loginResult -> {
                             if (loginResult instanceof CommunityLoginSuccessResult)

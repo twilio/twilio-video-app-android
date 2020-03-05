@@ -17,13 +17,16 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
-import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.AuthServiceParameters
+import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
+import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.data.Preferences.DISPLAY_NAME
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.util.putString
+import com.twilio.video.app.util.remove
 import io.reactivex.Observable
 
 class CommunityAuthenticator constructor(
-    private val preferences: SharedPreferences,
+    private val sharedPreferences: SharedPreferences,
     private val tokenService: TokenService
 ) : Authenticator {
 
@@ -33,19 +36,25 @@ class CommunityAuthenticator constructor(
 
     override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
         return if (loginEvent is LoginEvent.CommunityLoginEvent) {
-            tokenService.getToken(AuthServiceParameters(loginEvent.passcode))
-                    .map { LoginResult.CommunityLoginSuccessResult as LoginResult }
+            sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
+            sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt
+
+            tokenService.getToken(loginEvent.identity)
+                    .map { CommunityLoginSuccessResult as LoginResult }
+                    .doOnError {
+                        sharedPreferences.remove(DISPLAY_NAME)
+                        sharedPreferences.remove(PASSCODE)
+                    }
                     .toObservable()
         } else Observable.empty<LoginResult>()
-
-//      preferences.edit().putString(Preferences.DISPLAY_NAME, loginEvent.displayName).apply()
     }
 
     override fun loggedIn(): Boolean {
-        return !preferences.getString(Preferences.DISPLAY_NAME, null).isNullOrEmpty()
+        return !sharedPreferences.getString(PASSCODE, null).isNullOrEmpty()
     }
 
     override fun logout() {
-        preferences.edit().remove(Preferences.DISPLAY_NAME).apply()
+        sharedPreferences.remove(DISPLAY_NAME)
+        sharedPreferences.remove(PASSCODE)
     }
 }

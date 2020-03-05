@@ -15,22 +15,35 @@
  */
 package com.twilio.video.app.data.api
 
+import android.content.SharedPreferences
+import com.twilio.video.app.data.PASSCODE
 import io.reactivex.Single
 import timber.log.Timber
 
-class AuthServiceRepository(private val authService: AuthService) : TokenService {
+class AuthServiceRepository(
+    private val authService: AuthService,
+    private val sharedPreferences: SharedPreferences
+) : TokenService {
 
-    override fun getToken(tokenServiceParameters: TokenServiceParameters): Single<String> {
-        val params = tokenServiceParameters as AuthServiceParameters
-        val requestBody = AuthServiceRequestDTO(
-                params.passcode,
-                params.userIdentity,
-                params.roomName)
-        val appId = params.passcode.takeLast(4)
-        val url = "https://video-app-$appId-dev.twil.io/token"
+    override fun getToken(identity: String?, roomName: String?): Single<String> {
+        sharedPreferences.getString(PASSCODE, null)?.let { passcode ->
+            identity?.let { identity ->
+                // TODO Use mapper to handle DTOs
+                val requestBody = AuthServiceRequestDTO(
+                        passcode,
+                        identity,
+                        roomName)
+                val appId = passcode.takeLast(4)
+                val url = "https://video-app-$appId-dev.twil.io/token"
 
-        return authService.getToken(url, requestBody)
-                .doOnSuccess { Timber.d("Token returned from Twilio auth service: %s", it.token) }
-                .map { it.token }
+                return authService.getToken(url, requestBody)
+                        .doOnSuccess { Timber.d("Token returned from Twilio auth service: %s", it.token) }
+                        .map {
+                            it.token
+                        }
+            }
+        }
+
+        return Single.error(IllegalArgumentException("Username and Identity cannot be null"))
     }
 }

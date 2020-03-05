@@ -27,25 +27,24 @@ class VideoAppServiceDelegate(
     private val videoAppServiceProd: VideoAppService
 ) : TokenService {
 
-    override suspend fun getToken(tokenServiceParameters: TokenServiceParameters): String {
-        if (tokenServiceParameters is VideoServiceParameters) {
-            val identity = tokenServiceParameters.identity
-            val roomProperties = tokenServiceParameters.roomProperties
+    override suspend fun getToken(identity: String?, roomName: String?): String {
+        val topology = sharedPreferences.getString(
+                Preferences.TOPOLOGY,
+                Preferences.TOPOLOGY_DEFAULT)
+        val isRecordParticipantsOnConnect = sharedPreferences.getBoolean(
+                Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
+                Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)
+        val env = sharedPreferences.getString(
+                Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
 
-            val env = sharedPreferences.getString(
-                    Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
-
-            val videoAppService = resolveVideoAppService(env!!)
-            Timber.d("app service env = $videoAppService")
-            return videoAppService.getToken(
-                    identity,
-                    roomProperties.name,
-                    "production",
-                    roomProperties.topology.string,
-                    roomProperties.isRecordParticipantsOnConnect)
-        } else {
-            throw IllegalArgumentException("Parameter must be VideoServiceParameters")
-        }
+        val videoAppService = resolveVideoAppService(env!!)
+        Timber.d("app service env = $videoAppService")
+        return videoAppService.getToken(
+                identity,
+                roomName,
+                "production",
+                topology,
+                isRecordParticipantsOnConnect)
     }
 
     private fun resolveVideoAppService(env: String): VideoAppService {

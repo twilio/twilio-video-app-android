@@ -16,6 +16,7 @@
 
 package com.twilio.video.app.data;
 
+import android.content.SharedPreferences;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.twilio.video.app.data.api.AuthService;
 import com.twilio.video.app.data.api.AuthServiceRepository;
@@ -57,7 +58,8 @@ public class AuthServiceModule {
     }
 
     @Provides
-    TokenService providesTokenService(AuthService authService) {
-        return new AuthServiceRepository(authService);
+    TokenService providesTokenService(
+            AuthService authService, SharedPreferences sharedPreferences) {
+        return new AuthServiceRepository(authService, sharedPreferences);
     }
 }

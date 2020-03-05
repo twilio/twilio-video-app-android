@@ -17,7 +17,5 @@
 package com.twilio.video.app.data.api
 
 interface TokenService {
-    suspend fun getToken(tokenServiceParameters: TokenServiceParameters): String
+    suspend fun getToken(identity: String? = null, roomName: String? = null): String
 }
-
-interface TokenServiceParameters
