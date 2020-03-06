@@ -35,7 +35,7 @@ class AuthServiceRepository(
                 val requestBody = AuthServiceRequestDTO(
                         passcode,
                         identity)
-                val appId = passcode.takeLast(4)
+                val appId = passcode.substring(6)
                 val url = URL_PREFIX + appId + URL_SUFFIX
 
                 return authService.getToken(url, requestBody)

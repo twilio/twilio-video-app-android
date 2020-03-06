@@ -67,7 +67,7 @@ class CommunityLoginActivityTest {
     @Test
     fun `it should finish the login flow when auth is successful`() {
         val passcode = "0123456789"
-        val url = URL_PREFIX + passcode.takeLast(4) + URL_SUFFIX
+        val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
         val identity = "TestUser"
         val requestBody = AuthServiceRequestDTO(passcode, identity)
         val response = AuthServiceResponseDTO("token")
