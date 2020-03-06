@@ -34,7 +34,7 @@ class AuthServiceRepository(
                         identity,
                         roomName)
                 val appId = passcode.takeLast(4)
-                val url = "https://video-app-$appId-dev.twil.io/token"
+                val url = URL_PREFIX + appId + URL_SUFFIX
 
                 return authService.getToken(url, requestBody)
                         .doOnSuccess { Timber.d("Token returned from Twilio auth service: %s", it.token) }

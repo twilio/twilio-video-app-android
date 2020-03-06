@@ -46,7 +46,7 @@ class CommunityAuthenticator constructor(
                         sharedPreferences.remove(PASSCODE)
                     }
                     .toObservable()
-        } else Observable.empty<LoginResult>()
+        } else Observable.empty()
     }
 
     override fun loggedIn(): Boolean {
