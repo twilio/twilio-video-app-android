@@ -12,10 +12,6 @@ fun enterYourName(name: String) {
     onView(withId(R.id.community_login_screen_name_edittext)).perform(typeText(name))
 }
 
-fun enterYourPasscode(passcode: String) {
-    onView(withId(R.id.community_login_screen_passcode_edittext)).perform(typeText(passcode))
-}
-
 fun clickLoginButton() {
     onView(withId(R.id.community_login_screen_login_button)).perform(click())
 }
