@@ -137,14 +137,17 @@ dependencies {
     def daggerVersion = '2.25.4'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
-    def retrofitVersion = '2.1.0'
+    def retrofitVersion = '2.6.4'
     def espressoVersion = '3.2.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     def androidXTest = '1.2.0'
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.2.0'
+    def coroutinesAndroidVersion = '1.3.3'
 
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     implementation 'com.twilio:twilio-android-env:1.0.0'
     implementation videoAndroidSdkDep
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
@@ -153,6 +156,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
     implementation "androidx.fragment:fragment:1.2.2"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation "com.appyvet:materialrangebar:1.3"
     implementation "com.jakewharton:butterknife:$butterknifeVersion"
@@ -169,7 +173,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
-    implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0"
 
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:2.5.1"
 
@@ -180,6 +183,7 @@ dependencies {
     testImplementation testCore
     testImplementation espresso
     testImplementation junitExtensions
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3'

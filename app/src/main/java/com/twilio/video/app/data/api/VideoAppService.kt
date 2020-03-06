@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.twilio.video.app.data.api
 
-package com.twilio.video.app.data.api;
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-import io.reactivex.Single;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-
-public interface VideoAppService {
+interface VideoAppService {
     @GET("api/v1/token")
-    Single<String> getToken(
-            @Query("identity") String identity,
-            @Query("roomName") String roomName,
-            @Query("appEnvironment") String appEnvironment,
-            @Query("topology") String topology,
-            @Query("recordParticipantsOnConnect") boolean recordParticipantsOnConnect);
+    suspend fun getToken(
+        @Query("identity") identity: String?,
+        @Query("roomName") roomName: String?,
+        @Query("appEnvironment") appEnvironment: String?,
+        @Query("topology") topology: String?,
+        @Query("recordParticipantsOnConnect") recordParticipantsOnConnect: Boolean
+    ): String
 }

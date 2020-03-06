@@ -19,7 +19,6 @@ package com.twilio.video.app.data.api
 import android.content.SharedPreferences
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.model.RoomProperties
-import io.reactivex.Single
 import timber.log.Timber
 
 class VideoAppServiceDelegate(
@@ -29,7 +28,7 @@ class VideoAppServiceDelegate(
     private val videoAppServiceProd: VideoAppService
 ) : TokenService {
 
-    override fun getToken(identity: String, roomProperties: RoomProperties): Single<String> {
+    override suspend fun getToken(identity: String, roomProperties: RoomProperties): String {
         val env = sharedPreferences.getString(
                 Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
 
