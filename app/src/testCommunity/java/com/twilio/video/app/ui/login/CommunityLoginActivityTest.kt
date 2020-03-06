@@ -115,4 +115,14 @@ class CommunityLoginActivityTest {
     fun `it should display an error message when the auth request fails for an unknown reason`() {
         TODO("not implemented")
     }
+
+    @Test
+    fun `it should enable the login button after all required fields have been entered`() {
+        TODO("not implemented")
+    }
+
+    @Test
+    fun `it should enable and disable the proper view state before and after login`() {
+        TODO("not implemented")
+    }
 }
