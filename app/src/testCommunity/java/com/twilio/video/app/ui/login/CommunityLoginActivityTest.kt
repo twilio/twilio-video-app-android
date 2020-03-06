@@ -21,6 +21,8 @@ import com.twilio.video.app.data.api.URL_PREFIX
 import com.twilio.video.app.data.api.URL_SUFFIX
 import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
+import com.twilio.video.app.screen.assertLoginButtonIsDisabled
+import com.twilio.video.app.screen.assertLoginButtonIsEnabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.ui.room.RoomActivity
@@ -80,12 +82,7 @@ class CommunityLoginActivityTest {
             passcodeEditText.setText(passcode)
         }
         clickLoginButton()
-
-        assertLoadingIndicatorIsDisplayed()
-
         scheduler.triggerActions()
-
-        assertLoadingIndicatorIsNotDisplayed()
 
         val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
         assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
@@ -123,6 +120,37 @@ class CommunityLoginActivityTest {
 
     @Test
     fun `it should enable and disable the proper view state before and after login`() {
-        TODO("not implemented")
+        val passcode = "0123456789"
+        val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
+        val identity = "TestUser"
+        val requestBody = AuthServiceRequestDTO(passcode, identity)
+        val response = AuthServiceResponseDTO("token")
+        whenever(authService.getToken(url, requestBody)).thenReturn(Single.just(response))
+
+        assertLoginButtonIsDisabled()
+
+        enterYourName(identity)
+
+        assertLoginButtonIsDisabled()
+
+        scenario.onActivity {
+            val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
+            passcodeEditText.setText(passcode)
+        }
+
+        assertLoginButtonIsEnabled()
+
+        clickLoginButton()
+
+        assertLoadingIndicatorIsDisplayed()
+        assertLoginButtonIsDisabled()
+
+        scheduler.triggerActions()
+
+        assertLoadingIndicatorIsNotDisplayed()
+        assertLoginButtonIsEnabled()
+
+        val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
+        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
     }
 }
