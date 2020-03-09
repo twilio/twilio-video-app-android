@@ -17,18 +17,14 @@ package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
 import com.twilio.video.app.data.PASSCODE
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class AuthServiceRepository(
     private val authService: AuthService,
-    private val sharedPreferences: SharedPreferences,
-    private val scheduler: Scheduler = Schedulers.io()
+    private val sharedPreferences: SharedPreferences
 ) : TokenService {
 
-    override fun getToken(identity: String?, roomName: String?): Single<String> {
+    override suspend fun getToken(identity: String?, roomName: String?): String {
         sharedPreferences.getString(PASSCODE, null)?.let { passcode ->
             identity?.let { identity ->
                 // TODO Use mapper to handle DTOs
@@ -38,15 +34,12 @@ class AuthServiceRepository(
                 val appId = passcode.substring(6)
                 val url = URL_PREFIX + appId + URL_SUFFIX
 
-                return authService.getToken(url, requestBody)
-                        .subscribeOn(scheduler)
-                        .doOnSuccess { Timber.d("Token returned from Twilio auth service: %s", it.token) }
-                        .map {
-                            it.token
-                        }
+                val response = authService.getToken(url, requestBody)
+                Timber.d("Token returned from Twilio auth service: %s", response)
+                return response.token!!
             }
         }
 
-        return Single.error(IllegalArgumentException("Username and Identity cannot be null"))
+        throw IllegalArgumentException("Username and Identity cannot be null")
     }
 }

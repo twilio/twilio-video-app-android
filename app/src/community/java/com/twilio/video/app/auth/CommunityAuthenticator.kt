@@ -17,6 +17,7 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
+import com.twilio.video.app.auth.LoginResult.CommunityLoginFailureResult
 import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.PASSCODE
 import com.twilio.video.app.data.Preferences.DISPLAY_NAME
@@ -24,10 +25,15 @@ import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.putString
 import com.twilio.video.app.util.remove
 import io.reactivex.Observable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.rxSingle
+import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 class CommunityAuthenticator constructor(
     private val sharedPreferences: SharedPreferences,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val coroutineContext: CoroutineContext = Dispatchers.IO
 ) : Authenticator {
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
@@ -35,18 +41,24 @@ class CommunityAuthenticator constructor(
     }
 
     override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
-        return if (loginEvent is LoginEvent.CommunityLoginEvent) {
-            sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
-            sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt
+        return rxSingle<LoginResult>(coroutineContext) {
+            if (loginEvent is LoginEvent.CommunityLoginEvent) {
+                sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
+                sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt
 
-            tokenService.getToken(loginEvent.identity)
-                    .map { CommunityLoginSuccessResult as LoginResult }
-                    .doOnError {
-                        sharedPreferences.remove(DISPLAY_NAME)
-                        sharedPreferences.remove(PASSCODE)
-                    }
-                    .toObservable()
-        } else Observable.empty()
+                try {
+                    tokenService.getToken(loginEvent.identity)
+                    CommunityLoginSuccessResult
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to retrieve token")
+                    sharedPreferences.remove(DISPLAY_NAME)
+                    sharedPreferences.remove(PASSCODE)
+                    CommunityLoginFailureResult
+                }
+            } else {
+                CommunityLoginFailureResult
+            }
+        }.toObservable()
     }
 
     override fun loggedIn(): Boolean {

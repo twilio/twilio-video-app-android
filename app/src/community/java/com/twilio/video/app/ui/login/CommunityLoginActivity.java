@@ -99,6 +99,9 @@ public class CommunityLoginActivity extends BaseActivity {
                                 loginResult -> {
                                     if (loginResult instanceof CommunityLoginSuccessResult)
                                         startLobbyActivity();
+                                    else {
+                                        displayAuthError();
+                                    }
                                 },
                                 exception -> {
                                     displayAuthError();

@@ -16,13 +16,11 @@
 package com.twilio.video.app.data
 
 import android.content.SharedPreferences
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.TokenService
 import dagger.Module
 import dagger.Provides
-import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -47,8 +45,6 @@ class AuthServiceModule {
         return Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl("https://video-app-dev.twil.io/token/")
-                .addCallAdapterFactory(
-                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(AuthService::class.java)
