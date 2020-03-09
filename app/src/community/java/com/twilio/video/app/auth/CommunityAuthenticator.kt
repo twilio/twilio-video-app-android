@@ -41,7 +41,7 @@ class CommunityAuthenticator constructor(
     }
 
     override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
-        return rxSingle<LoginResult>(coroutineContext) {
+        return rxSingle(coroutineContext) {
             if (loginEvent is LoginEvent.CommunityLoginEvent) {
                 sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
                 sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt

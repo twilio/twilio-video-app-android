@@ -12,6 +12,8 @@ import com.twilio.video.app.ApplicationModule
 import com.twilio.video.app.DaggerCommunityIntegrationTestComponent
 import com.twilio.video.app.R
 import com.twilio.video.app.TestApp
+import com.twilio.video.app.auth.CommunityAuthModule
+import com.twilio.video.app.auth.CommunityAuthenticator
 import com.twilio.video.app.data.AuthServiceModule
 import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
@@ -26,11 +28,12 @@ import com.twilio.video.app.screen.assertLoginButtonIsEnabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.ui.room.RoomActivity
-import io.reactivex.Single
-import io.reactivex.schedulers.TestScheduler
+import com.twilio.video.app.util.MainCoroutineScopeRule
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -41,17 +44,26 @@ import org.robolectric.annotation.Config
 @Config(application = TestApp::class)
 class CommunityLoginActivityTest {
 
+    @get:Rule
+    val coroutineScope = MainCoroutineScopeRule()
+
     private lateinit var scenario: ActivityScenario<CommunityLoginActivity>
     private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
     private val authService: AuthService = mock()
-    private val scheduler = TestScheduler()
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(testApp)
     private val authServiceRepository = AuthServiceRepository(authService,
-            PreferenceManager.getDefaultSharedPreferences(testApp),
-            scheduler)
+            preferences)
     private val authServiceModule: AuthServiceModule = mock {
         whenever(mock.providesOkHttpClient()).thenReturn(mock())
         whenever(mock.providesAuthService(any())).thenReturn(authService)
         whenever(mock.providesTokenService(any(), any())).thenReturn(authServiceRepository)
+    }
+    private val authenticator = CommunityAuthenticator(
+            preferences,
+            authServiceRepository,
+            coroutineScope.coroutineContext)
+    private val communityAuthModule: CommunityAuthModule = mock {
+        whenever(mock.providesCommunityAuthenticator(any(), any())).thenReturn(authenticator)
     }
 
     @Before
@@ -60,6 +72,7 @@ class CommunityLoginActivityTest {
                 .builder()
                 .applicationModule(ApplicationModule(testApp))
                 .authServiceModule(authServiceModule)
+                .communityAuthModule(communityAuthModule)
                 .build()
         component.inject(testApp)
 
@@ -68,24 +81,26 @@ class CommunityLoginActivityTest {
 
     @Test
     fun `it should finish the login flow when auth is successful`() {
-        val passcode = "0123456789"
-        val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-        val identity = "TestUser"
-        val requestBody = AuthServiceRequestDTO(passcode, identity)
-        val response = AuthServiceResponseDTO("token")
-        whenever(authService.getToken(url, requestBody)).thenReturn(Single.just(response))
+        coroutineScope.runBlockingTest {
+            val passcode = "0123456789"
+            val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
+            val identity = "TestUser"
+            val requestBody = AuthServiceRequestDTO(passcode, identity)
+            val response = AuthServiceResponseDTO("token")
+            whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-        enterYourName(identity)
-        // TODO Use Espresso for passcode entering as soon as Robolectric bug is fixed https://github.com/robolectric/robolectric/issues/5110
-        scenario.onActivity {
-            val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
-            passcodeEditText.setText(passcode)
+            enterYourName(identity)
+            // TODO Use Espresso for passcode entering as soon as Robolectric bug is fixed https://github.com/robolectric/robolectric/issues/5110
+            scenario.onActivity {
+                val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
+                passcodeEditText.setText(passcode)
+            }
+            clickLoginButton()
+//        scheduler.triggerActions()
+
+            val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
+            assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
         }
-        clickLoginButton()
-        scheduler.triggerActions()
-
-        val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
-        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
     }
 
     @Test
@@ -120,37 +135,39 @@ class CommunityLoginActivityTest {
 
     @Test
     fun `it should enable and disable the proper view state before and after login`() {
-        val passcode = "0123456789"
-        val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-        val identity = "TestUser"
-        val requestBody = AuthServiceRequestDTO(passcode, identity)
-        val response = AuthServiceResponseDTO("token")
-        whenever(authService.getToken(url, requestBody)).thenReturn(Single.just(response))
+        coroutineScope.runBlockingTest {
+            val passcode = "0123456789"
+            val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
+            val identity = "TestUser"
+            val requestBody = AuthServiceRequestDTO(passcode, identity)
+            val response = AuthServiceResponseDTO("token")
+            whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-        assertLoginButtonIsDisabled()
+            assertLoginButtonIsDisabled()
 
-        enterYourName(identity)
+            enterYourName(identity)
 
-        assertLoginButtonIsDisabled()
+            assertLoginButtonIsDisabled()
 
-        scenario.onActivity {
-            val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
-            passcodeEditText.setText(passcode)
+            scenario.onActivity {
+                val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
+                passcodeEditText.setText(passcode)
+            }
+
+            assertLoginButtonIsEnabled()
+
+            clickLoginButton()
+
+            assertLoadingIndicatorIsDisplayed()
+            assertLoginButtonIsDisabled()
+
+//        scheduler.triggerActions()
+
+            assertLoadingIndicatorIsNotDisplayed()
+            assertLoginButtonIsEnabled()
+
+            val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
+            assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
         }
-
-        assertLoginButtonIsEnabled()
-
-        clickLoginButton()
-
-        assertLoadingIndicatorIsDisplayed()
-        assertLoginButtonIsDisabled()
-
-        scheduler.triggerActions()
-
-        assertLoadingIndicatorIsNotDisplayed()
-        assertLoginButtonIsEnabled()
-
-        val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
-        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
     }
 }
