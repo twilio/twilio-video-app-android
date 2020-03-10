@@ -104,16 +104,6 @@ class CommunityLoginFragmentTest {
     }
 
     @Test
-    fun `it should display an error message when the user doesn't provide their name`() {
-        TODO("not implemented")
-    }
-
-    @Test
-    fun `it should display an error message when the user doesn't provide a passcode`() {
-        TODO("not implemented")
-    }
-
-    @Test
     fun `it should display an error message when the auth request fails from an invalid passcode`() {
         TODO("not implemented")
     }
