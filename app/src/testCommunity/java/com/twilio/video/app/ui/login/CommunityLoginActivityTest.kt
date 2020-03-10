@@ -21,6 +21,7 @@ import com.twilio.video.app.data.api.AuthServiceRequestDTO
 import com.twilio.video.app.data.api.AuthServiceResponseDTO
 import com.twilio.video.app.data.api.URL_PREFIX
 import com.twilio.video.app.data.api.URL_SUFFIX
+import com.twilio.video.app.screen.assertInvalidPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
 import com.twilio.video.app.screen.assertLoginButtonIsDisabled
@@ -31,6 +32,7 @@ import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import okhttp3.ResponseBody
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -40,6 +42,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+import retrofit2.HttpException
+import retrofit2.Response
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApp::class)
@@ -66,6 +70,10 @@ class CommunityLoginActivityTest {
     private val communityAuthModule: CommunityAuthModule = mock {
         whenever(mock.providesCommunityAuthenticator(any(), any())).thenReturn(authenticator)
     }
+    private val passcode = "0123456789"
+    private val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
+    private val identity = "TestUser"
+    private val requestBody = AuthServiceRequestDTO(passcode, identity)
 
     @Before
     fun setUp() {
@@ -83,19 +91,11 @@ class CommunityLoginActivityTest {
     @Test
     fun `it should finish the login flow when auth is successful`() {
         coroutineScope.runBlockingTest {
-            val passcode = "0123456789"
-            val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-            val identity = "TestUser"
-            val requestBody = AuthServiceRequestDTO(passcode, identity)
             val response = AuthServiceResponseDTO("token")
             whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
             enterYourName(identity)
-            // TODO Use Espresso for passcode entering as soon as Robolectric bug is fixed https://github.com/robolectric/robolectric/issues/5110
-            scenario.onActivity {
-                val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
-                passcodeEditText.setText(passcode)
-            }
+            enterPasscode(passcode)
             clickLoginButton()
 
             val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
@@ -105,6 +105,32 @@ class CommunityLoginActivityTest {
 
     @Test
     fun `it should display an error message when the auth request fails from an invalid passcode`() {
+        coroutineScope.runBlockingTest {
+            val responseBody: ResponseBody = mock {
+                val errorString = """{
+                "error": {
+                    "message": "passcode expired",
+                    "explanation": "The passcode used to validate application users has expired. Re-deploy the application to refresh the passcode."
+                }
+            }"""
+                whenever(mock.string()).thenReturn(errorString)
+            }
+            val response: Response<AuthServiceResponseDTO> = mock {
+                whenever(mock.errorBody()).thenReturn(responseBody)
+            }
+            val exception = HttpException(response)
+            whenever(authService.getToken(url, requestBody)).thenThrow(exception)
+
+            enterYourName(identity)
+            enterPasscode(passcode)
+            clickLoginButton()
+
+            assertInvalidPasscodeErrorIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `it should display an error message when the passcode is the incorrect length`() {
         TODO("not implemented")
     }
 
@@ -157,6 +183,14 @@ class CommunityLoginActivityTest {
 
             assertLoadingIndicatorIsNotDisplayed()
             assertLoginButtonIsEnabled()
+        }
+    }
+
+    // TODO Use Espresso for passcode entering as soon as Robolectric bug is fixed https://github.com/robolectric/robolectric/issues/5110
+    private fun enterPasscode(passcode: String) {
+        scenario.onActivity {
+            val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
+            passcodeEditText.setText(passcode)
         }
     }
 }

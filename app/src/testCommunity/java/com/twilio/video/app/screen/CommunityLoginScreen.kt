@@ -7,6 +7,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.twilio.video.app.R
 import org.hamcrest.CoreMatchers.not
 
@@ -32,4 +33,10 @@ fun assertLoginButtonIsEnabled() {
 
 fun assertLoginButtonIsDisabled() {
     onView(withId(R.id.community_login_screen_login_button)).check(matches(not(isEnabled())))
+}
+
+fun assertInvalidPasscodeErrorIsDisplayed() {
+    onView(withText(R.string.login_screen_error_title)).check(matches(isDisplayed()))
+    onView(withText(R.string.login_screen_invalid_passcode_error)).check(matches(isDisplayed()))
+    onView(withText(android.R.string.ok)).check(matches(isDisplayed()))
 }
