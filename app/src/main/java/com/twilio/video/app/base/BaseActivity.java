@@ -18,6 +18,8 @@ package com.twilio.video.app.base;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+
 import dagger.android.AndroidInjection;
 
 public abstract class BaseActivity extends AppCompatActivity {

@@ -16,17 +16,12 @@
 
 package com.twilio.video.app.ui.login;
 
-import dagger.Binds;
-import dagger.Module;
+import dagger.Subcomponent;
 import dagger.android.AndroidInjector;
-import dagger.multibindings.ClassKey;
-import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = CommunityLoginActivitySubcomponent.class)
-public abstract class CommunityLoginActivityModule {
-    @Binds
-    @IntoMap
-    @ClassKey(CommunityLoginActivity.class)
-    abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
-            CommunityLoginActivitySubcomponent.Factory factory);
+@Subcomponent
+public interface CommunityLoginFragmentSubcomponent
+        extends AndroidInjector<CommunityLoginFragment> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<CommunityLoginFragment> {}
 }
