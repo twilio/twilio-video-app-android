@@ -97,7 +97,6 @@ class CommunityLoginActivityTest {
                 passcodeEditText.setText(passcode)
             }
             clickLoginButton()
-//        scheduler.triggerActions()
 
             val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
             assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
@@ -158,9 +157,6 @@ class CommunityLoginActivityTest {
 
             assertLoadingIndicatorIsNotDisplayed()
             assertLoginButtonIsEnabled()
-
-            val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
-            assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
         }
     }
 }
