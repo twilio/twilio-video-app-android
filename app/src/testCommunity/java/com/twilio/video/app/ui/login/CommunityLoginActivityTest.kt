@@ -29,6 +29,7 @@ import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.MainCoroutineScopeRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -123,6 +124,7 @@ class CommunityLoginActivityTest {
         TODO("not implemented")
     }
 
+    @ExperimentalCoroutinesApi
     @Test
     fun `it should enable and disable the proper view state before and after login`() {
         coroutineScope.runBlockingTest {
@@ -146,12 +148,13 @@ class CommunityLoginActivityTest {
 
             assertLoginButtonIsEnabled()
 
+            pauseDispatcher()
             clickLoginButton()
 
             assertLoadingIndicatorIsDisplayed()
             assertLoginButtonIsDisabled()
 
-//        scheduler.triggerActions()
+            resumeDispatcher()
 
             assertLoadingIndicatorIsNotDisplayed()
             assertLoginButtonIsEnabled()

@@ -70,21 +70,20 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     @OnTextChanged(R.id.community_login_screen_name_edittext)
-    public void onTextChanged(Editable editable) {
-        enableLoginButton(!nameEditText.getText().toString().isEmpty());
+    public void onNameTextChanged(Editable editable) {
+        enableLoginButton(isInputValid());
+    }
+
+    @OnTextChanged(R.id.community_login_screen_passcode_edittext)
+    public void onPasscodeTextChanged(Editable editable) {
+        enableLoginButton(isInputValid());
     }
 
     @OnClick(R.id.community_login_screen_login_button)
     public void onLoginButton(View view) {
         String identity = nameEditText.getText().toString();
         String passcode = passcodeEditText.getText().toString();
-        if (areIdentityAndPasscodeValid(identity, passcode)) {
-            login(identity, passcode);
-        }
-    }
-
-    private boolean areIdentityAndPasscodeValid(String identity, String passcode) {
-        return !identity.isEmpty() && !passcode.isEmpty();
+        login(identity, passcode);
     }
 
     private void login(String identity, String passcode) {
@@ -118,6 +117,19 @@ public class CommunityLoginActivity extends BaseActivity {
     private void postLoginViewState() {
         progressBar.setVisibility(View.GONE);
         enableLoginButton(true);
+    }
+
+    private boolean isInputValid() {
+        Editable nameEditable = nameEditText.getText();
+        Editable passcodeEditable = passcodeEditText.getText();
+
+        if (nameEditable != null
+                && passcodeEditable != null
+                && !nameEditable.toString().isEmpty()
+                && !passcodeEditable.toString().isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     private void enableLoginButton(boolean isEnabled) {
