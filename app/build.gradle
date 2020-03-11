@@ -148,7 +148,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
-    // TODO Remove once authenticator code has been converted to use coroutines
+    // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
     implementation 'com.twilio:twilio-android-env:1.0.0'
     implementation videoAndroidSdkDep
