@@ -16,6 +16,7 @@
 package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
+import com.google.gson.Gson
 import com.twilio.video.app.data.PASSCODE
 import retrofit2.HttpException
 import timber.log.Timber
@@ -40,9 +41,11 @@ class AuthServiceRepository(
                 Timber.d("Token returned from Twilio auth service: %s", response)
                 return response.token!!
             } catch (e: HttpException) {
-                throw e
-//                val errorJson = e.response()!!.errorBody()!!.string()
-//                val error = Gson().fromJson(errorJson, AuthServiceErrorDTO::class.java)
+                val errorJson = e.response()!!.errorBody()!!.string()
+                val errorDTO = Gson().fromJson(errorJson, AuthServiceErrorDTO::class.java)
+                Timber.e(e, errorDTO.error!!.explanation)
+                val error = AuthServiceError.value(errorDTO.error.message!!)
+                throw AuthServiceException(e, error)
             }
         }
 
