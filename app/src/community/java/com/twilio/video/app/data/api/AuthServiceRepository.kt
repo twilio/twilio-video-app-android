@@ -24,23 +24,24 @@ class AuthServiceRepository(
     private val sharedPreferences: SharedPreferences
 ) : TokenService {
 
-    override suspend fun getToken(identity: String?, roomName: String?): String {
-        sharedPreferences.getString(PASSCODE, null)?.let { passcode ->
-            identity?.let { identity ->
-                // TODO Use mapper to handle DTOs
-                val requestBody = AuthServiceRequestDTO(
-                        passcode,
-                        identity,
-                        roomName)
-                val appId = passcode.substring(6)
-                val url = URL_PREFIX + appId + URL_SUFFIX
+    override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
+        getPasscode(passcode)?.let { passcode ->
+            // TODO Use mapper to handle DTOs
+            val requestBody = AuthServiceRequestDTO(
+                    passcode,
+                    identity,
+                    roomName)
+            val appId = passcode.substring(6)
+            val url = URL_PREFIX + appId + URL_SUFFIX
 
-                val response = authService.getToken(url, requestBody)
-                Timber.d("Token returned from Twilio auth service: %s", response)
-                return response.token!!
-            }
+            val response = authService.getToken(url, requestBody)
+            Timber.d("Token returned from Twilio auth service: %s", response)
+            return response.token!!
         }
 
-        throw IllegalArgumentException("Username and Identity cannot be null")
+        throw IllegalArgumentException("Passcode cannot be null")
     }
+
+    private fun getPasscode(passcode: String?) =
+        passcode ?: sharedPreferences.getString(PASSCODE, null)
 }

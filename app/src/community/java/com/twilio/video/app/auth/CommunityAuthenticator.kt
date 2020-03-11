@@ -43,16 +43,15 @@ class CommunityAuthenticator constructor(
     override fun login(loginEvent: LoginEvent): Observable<LoginResult> {
         return rxSingle(coroutineContext) {
             if (loginEvent is LoginEvent.CommunityLoginEvent) {
-                sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
-                sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt
-
                 try {
-                    tokenService.getToken(loginEvent.identity)
+                    tokenService.getToken(identity = loginEvent.identity, passcode = loginEvent.passcode)
+
+                    sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
+                    sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt
+
                     CommunityLoginSuccessResult
                 } catch (e: Exception) {
                     Timber.e(e, "Failed to retrieve token")
-                    sharedPreferences.remove(DISPLAY_NAME)
-                    sharedPreferences.remove(PASSCODE)
                     CommunityLoginFailureResult
                 }
             } else {
