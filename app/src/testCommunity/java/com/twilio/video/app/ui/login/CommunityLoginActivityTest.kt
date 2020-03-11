@@ -29,10 +29,11 @@ import com.twilio.video.app.screen.assertLoginButtonIsEnabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.ui.room.RoomActivity
+import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
+import com.twilio.video.app.util.getMockHttpException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import okhttp3.ResponseBody
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -42,9 +43,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
-import retrofit2.HttpException
-import retrofit2.Response
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApp::class)
 class CommunityLoginActivityTest {
@@ -106,19 +106,7 @@ class CommunityLoginActivityTest {
     @Test
     fun `it should display an error message when the auth request fails from an invalid passcode`() {
         coroutineScope.runBlockingTest {
-            val responseBody: ResponseBody = mock {
-                val errorString = """{
-                "error": {
-                    "message": "passcode expired",
-                    "explanation": "The passcode used to validate application users has expired. Re-deploy the application to refresh the passcode."
-                }
-            }"""
-                whenever(mock.string()).thenReturn(errorString)
-            }
-            val response: Response<AuthServiceResponseDTO> = mock {
-                whenever(mock.errorBody()).thenReturn(responseBody)
-            }
-            val exception = HttpException(response)
+            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
             whenever(authService.getToken(url, requestBody)).thenThrow(exception)
 
             enterYourName(identity)
@@ -149,7 +137,6 @@ class CommunityLoginActivityTest {
         TODO("not implemented")
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun `it should enable and disable the proper view state before and after login`() {
         coroutineScope.runBlockingTest {
