@@ -30,7 +30,8 @@ class AuthServiceRepository(
                 // TODO Use mapper to handle DTOs
                 val requestBody = AuthServiceRequestDTO(
                         passcode,
-                        identity)
+                        identity,
+                        roomName)
                 val appId = passcode.substring(6)
                 val url = URL_PREFIX + appId + URL_SUFFIX
 
