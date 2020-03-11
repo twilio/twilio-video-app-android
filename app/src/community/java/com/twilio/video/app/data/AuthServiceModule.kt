@@ -44,7 +44,11 @@ class AuthServiceModule {
     fun providesAuthService(okHttpClient: OkHttpClient): AuthService {
         return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("https://video-app-dev.twil.io/token/")
+                /*
+                 * Retrofit requires a base URL when constructing a client. The final URL will be determined by the
+                 * user, so insert a placeholder base URL to be replaced at runtime.
+                 */
+                .baseUrl("https://PLACEHOLDER_URL")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(AuthService::class.java)
