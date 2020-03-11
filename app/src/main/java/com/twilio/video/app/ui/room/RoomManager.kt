@@ -25,8 +25,6 @@ import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
-import com.twilio.video.app.data.api.model.RoomProperties
-import com.twilio.video.app.data.api.model.Topology
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
@@ -67,7 +65,8 @@ class RoomManager(
     ) {
         coroutineScope.launch {
             try {
-                val token = tokenService.getToken(identity, setupEnvironment(roomName))
+                setSdkEnvironment(sharedPreferences)
+                val token = tokenService.getToken(identity, roomName)
                 val enableInsights = sharedPreferences.getBoolean(
                         Preferences.ENABLE_INSIGHTS,
                         Preferences.ENABLE_INSIGHTS_DEFAULT)
@@ -125,23 +124,6 @@ class RoomManager(
                 mutableViewEvents.postValue(TokenError)
             }
         }
-    }
-
-    private fun setupEnvironment(roomName: String): RoomProperties {
-        setSdkEnvironment(sharedPreferences)
-
-        return RoomProperties.Builder()
-                .setName(roomName)
-                .setTopology(
-                        Topology.fromString(
-                                sharedPreferences.getString(
-                                        Preferences.TOPOLOGY,
-                                        Preferences.TOPOLOGY_DEFAULT)))
-                .setRecordOnParticipantsConnect(
-                        sharedPreferences.getBoolean(
-                                Preferences.RECORD_PARTICIPANTS_ON_CONNECT,
-                                Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT))
-                .createRoomProperties()
     }
 
     private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {

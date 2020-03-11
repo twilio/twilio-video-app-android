@@ -139,6 +139,20 @@ jobs:
           command: ./gradlew app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
 
+  community-unit-tests:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
+      - run:
+          name: Community Unit Tests
+          command: ./gradlew app:testCommunityDebugUnitTest
+      - save-cache: *save-cache-gradle
+
   ui-tests:
     <<: *ui-test-defaults
     steps:
@@ -204,6 +218,12 @@ workflows:
       - build-app:
           <<: *build-test-filter
       - unit-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - community-unit-tests:
           <<: *build-test-filter
           requires:
             - build-app

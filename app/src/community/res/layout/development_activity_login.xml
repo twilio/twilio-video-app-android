@@ -13,6 +13,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ProgressBar
+            android:id="@+id/community_login_screen_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
         <Button
             android:id="@+id/community_login_screen_login_button"
             android:layout_width="0dp"
@@ -21,6 +32,7 @@
             android:text="@string/login"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/colorButtonText"
+            android:enabled="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -76,10 +88,10 @@
                 android:layout_marginBottom="@dimen/activity_horizontal_margin">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/community_login_screen_app_code_edittext"
+                    android:id="@+id/community_login_screen_passcode_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/login_screen_app_code"
+                    android:hint="@string/login_screen_passcode"
                     android:inputType="numberPassword"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
