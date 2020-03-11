@@ -492,10 +492,16 @@ public class RoomActivity extends BaseActivity {
             roomViewModel.connectToRoom(
                     displayName,
                     roomName,
-                    Collections.singletonList(localAudioTrack),
+                    getLocalAudioTracks(),
                     getLocalVideoTracks(),
                     isNetworkQualityEnabled());
         }
+    }
+
+    private List<LocalAudioTrack> getLocalAudioTracks() {
+        return localAudioTrack != null
+                ? Collections.singletonList(localAudioTrack)
+                : Collections.emptyList();
     }
 
     private List<LocalVideoTrack> getLocalVideoTracks() {
