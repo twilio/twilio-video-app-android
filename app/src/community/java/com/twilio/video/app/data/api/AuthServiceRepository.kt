@@ -17,6 +17,7 @@ package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
 import com.twilio.video.app.data.PASSCODE
+import retrofit2.HttpException
 import timber.log.Timber
 
 class AuthServiceRepository(
@@ -34,9 +35,15 @@ class AuthServiceRepository(
             val appId = passcode.substring(6)
             val url = URL_PREFIX + appId + URL_SUFFIX
 
-            val response = authService.getToken(url, requestBody)
-            Timber.d("Token returned from Twilio auth service: %s", response)
-            return response.token!!
+            try {
+                val response = authService.getToken(url, requestBody)
+                Timber.d("Token returned from Twilio auth service: %s", response)
+                return response.token!!
+            } catch (e: HttpException) {
+                throw e
+//                val errorJson = e.response()!!.errorBody()!!.string()
+//                val error = Gson().fromJson(errorJson, AuthServiceErrorDTO::class.java)
+            }
         }
 
         throw IllegalArgumentException("Passcode cannot be null")
