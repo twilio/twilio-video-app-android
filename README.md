@@ -14,7 +14,7 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
-# Features
+## Features
 
 - [x] Video conferencing with real-time video and audio
 - [x] Enable/disable camera
@@ -22,15 +22,15 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
 - [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
 
-# Languages
+## Languages
 
 This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
 
-# Getting Started
+## Getting Started
 
 In order to run this application on an Android device or emulator, complete the following steps.
 
-## Build
+### Build
 
 Currently there are three product flavors for the application.
 
@@ -38,11 +38,11 @@ Currently there are three product flavors for the application.
 1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
 1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
-### Twilions
+#### Twilions
 
 Twilio employees should follow [these instructions](Twilions.md) for building the Internal and Twilio product flavors.
 
-### Building the Community Flavor
+#### Building the Community Flavor
 
 The community flavor of the application is meant for developers who would like to work with the Video Android SDK in the context of a full-fledged application.
 **This variant uses a hard coded access tokens locally within
@@ -92,6 +92,6 @@ For each device:
 
 This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project administrators.
 
-# License
+## License
 
 Apache 2.0 license. See [LICENSE.txt](LICENSE.txt) for details.
