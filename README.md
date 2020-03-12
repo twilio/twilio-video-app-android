@@ -15,9 +15,11 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
 - [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
 
-## Languages
+## Requirements
 
-This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
+Android Studio Version | Android API Version Min
+------------ | -------------
+3.5+ | 16
 
 ## Getting Started
 
@@ -81,6 +83,10 @@ The passcode will expire after one week. Follow the steps below to sign in with 
 ### UI Tests
 
 UI tests require credentials that are only available to Twilio employees.
+
+## Languages
+
+This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
 
 ## Related
 
