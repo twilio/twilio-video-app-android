@@ -31,10 +31,6 @@ Currently there are three product flavors for the application.
 1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
 1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
-#### Twilions
-
-Twilio employees should follow [these instructions](Twilions.md) for building the Internal and Twilio product flavors.
-
 #### Building the Community Flavor
 
 The community flavor of the application is meant for developers who would like to work with the Video Android SDK in the context of a full-fledged application.
@@ -80,6 +76,10 @@ For each device:
 
 - [Twilio Video iOS App](https://github.com/twilio/twilio-video-app-ios)
 - [Twilio Video React App](https://github.com/twilio/twilio-video-app-react)
+
+## For Twilions
+
+Twilio employees should follow [these instructions](Twilions.md) for internal testing.
 
 ## License
 
