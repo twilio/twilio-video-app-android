@@ -1,6 +1,10 @@
-# Android Video Ahoy App
+# Twilio Video Android App
+
+[![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=shield&circle-token=40105862db5fbadac9bdcff973375d5114417b66)](https://circleci.com/gh/twilio/twilio-video-app-android)
 
 This application demonstrates multi-party voice and video built with [Twilio’s Programmable Video Android SDK](https://www.twilio.com/docs/video).
+
+![video-app-screenshots](https://user-images.githubusercontent.com/1930363/76543029-867ec080-644b-11ea-8145-d15d3fe9f7ea.png)
 
 - [Languages](#languages)
 - [Getting Started](#getting-started)
@@ -10,7 +14,16 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
 
+# Features
+
+- [x] Video conferencing with real-time video and audio
+- [x] Enable/disable camera
+- [x] Mute/unmute mic
+- [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
+- [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
+
 # Languages
+
 This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
 
 # Getting Started
@@ -18,6 +31,7 @@ This application was originally written in Java. However, all new code will be w
 In order to run this application on an Android device or emulator, complete the following steps.
 
 ## Build
+
 Currently there are three product flavors for the application.
 
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
@@ -68,6 +82,11 @@ For each device:
 
 * Android Studio - Right click and run unit tests on package ```app/src/main/java/com/twilio/video/app```
 * Terminal - ```./gradlew app:testInternalDebugUnitTest```
+
+## Other Platforms
+
+- [Twilio Video React App](https://github.com/twilio/twilio-video-app-react)
+- [Twilio Video iOS App](https://github.com/twilio/twilio-video-app-ios)
 
 ## Code of Conduct
 
