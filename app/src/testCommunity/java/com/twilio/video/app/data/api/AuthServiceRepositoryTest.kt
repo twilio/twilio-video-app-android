@@ -106,13 +106,13 @@ class AuthServiceRepositoryTest {
         }
     }
 
-    @Ignore
+    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should throw an AuthServiceException when the request is successful but the token is null`() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    @Ignore
+    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should throw an AuthServiceException with no error type request fails for an unknown reason`() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -125,7 +125,7 @@ class AuthServiceRepositoryTest {
                     arrayOf("123456", null)
             )
 
-    @Ignore
+    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     @Parameters(method = "invalidParams")
     fun `it should throw an IllegalArgumentException for invalid parameters`(
