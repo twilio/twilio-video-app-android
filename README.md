@@ -1,6 +1,6 @@
 # Twilio Video Android App
 
-[![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=shield&circle-token=40105862db5fbadac9bdcff973375d5114417b66)](https://circleci.com/gh/twilio/twilio-video-app-android)
+[![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=shield)](https://circleci.com/gh/twilio/twilio-video-app-android)
 
 This application demonstrates multi-party voice and video built with [Twilio’s Programmable Video Android SDK](https://www.twilio.com/docs/video).
 
