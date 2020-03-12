@@ -71,10 +71,16 @@ The passcode will expire after one week. Follow the steps below to sign in with 
 1. In the app tap `Settings > Sign Out`.
 1. Repeat the [steps above](#start-video-conference).
 
-## Unit Tests
+## Tests
+
+### Unit Tests
 
 * Android Studio - Right click and run unit tests on package ```app/src/main/java/com/twilio/video/app```
 * Terminal - ```./gradlew app:testInternalDebugUnitTest```
+
+### UI Tests
+
+UI tests require credentials that are only available to Twilio employees.
 
 ## Other Platforms
 
