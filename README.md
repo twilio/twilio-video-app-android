@@ -18,6 +18,7 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 
 - [x] Video conferencing with real-time video and audio
 - [x] Enable/disable camera
+- [x] Switch between front and back camera
 - [x] Mute/unmute mic
 - [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
 - [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
