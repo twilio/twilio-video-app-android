@@ -146,6 +146,7 @@ dependencies {
     def lifecycleVersion = '2.2.0'
     def coroutinesAndroidVersion = '1.3.3'
 
+    implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
