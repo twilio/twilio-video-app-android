@@ -22,6 +22,7 @@ import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.PASSCODE
 import com.twilio.video.app.data.Preferences.DISPLAY_NAME
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.util.SecurePreferences
 import com.twilio.video.app.util.putString
 import com.twilio.video.app.util.remove
 import io.reactivex.Observable
@@ -32,6 +33,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CommunityAuthenticator constructor(
     private val sharedPreferences: SharedPreferences,
+    private val securePreferences: SecurePreferences,
     private val tokenService: TokenService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO
 ) : Authenticator {
@@ -47,7 +49,7 @@ class CommunityAuthenticator constructor(
                     tokenService.getToken(identity = loginEvent.identity, passcode = loginEvent.passcode)
 
                     sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
-                    sharedPreferences.putString(PASSCODE, loginEvent.passcode) // TODO Encrypt
+                    securePreferences.putString(PASSCODE, loginEvent.passcode)
 
                     CommunityLoginSuccessResult
                 } catch (e: Exception) {
@@ -61,7 +63,7 @@ class CommunityAuthenticator constructor(
     }
 
     override fun loggedIn(): Boolean {
-        return !sharedPreferences.getString(PASSCODE, null).isNullOrEmpty()
+        return !securePreferences.getString(PASSCODE).isNullOrEmpty()
     }
 
     override fun logout() {

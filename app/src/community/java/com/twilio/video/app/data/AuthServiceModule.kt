@@ -15,10 +15,11 @@
  */
 package com.twilio.video.app.data
 
-import android.content.SharedPreferences
 import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.security.SecurityModule
+import com.twilio.video.app.util.SecurePreferences
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -27,7 +28,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-@Module(includes = [DataModule::class])
+@Module(includes = [SecurityModule::class])
 class AuthServiceModule {
     @Provides
     fun providesOkHttpClient(): OkHttpClient {
@@ -57,8 +58,8 @@ class AuthServiceModule {
     @Provides
     fun providesTokenService(
         authService: AuthService,
-        sharedPreferences: SharedPreferences
+        securePreferences: SecurePreferences
     ): TokenService {
-        return AuthServiceRepository(authService, sharedPreferences)
+        return AuthServiceRepository(authService, securePreferences)
     }
 }
