@@ -82,7 +82,7 @@ The passcode will expire after one week. Follow the steps below to sign in with 
 
 UI tests require credentials that are only available to Twilio employees.
 
-## Other Platforms
+## Related
 
 - [Twilio Video iOS App](https://github.com/twilio/twilio-video-app-ios)
 - [Twilio Video React App](https://github.com/twilio/twilio-video-app-react)
