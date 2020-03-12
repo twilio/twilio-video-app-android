@@ -84,10 +84,6 @@ The passcode will expire after one week. Follow the steps below to sign in with 
 
 UI tests require credentials that are only available to Twilio employees.
 
-## Languages
-
-This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
-
 ## Related
 
 - [Twilio Video iOS App](https://github.com/twilio/twilio-video-app-ios)
