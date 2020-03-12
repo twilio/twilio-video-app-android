@@ -15,15 +15,15 @@
  */
 package com.twilio.video.app.data.api
 
-import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.util.SecurePreferences
 import retrofit2.HttpException
 import timber.log.Timber
 
 class AuthServiceRepository(
     private val authService: AuthService,
-    private val sharedPreferences: SharedPreferences
+    private val securePreferences: SecurePreferences
 ) : TokenService {
 
     override suspend fun getToken(identity: String?, roomName: String?): String {
@@ -58,5 +58,5 @@ class AuthServiceRepository(
     }
 
     private fun getPasscode(passcode: String?) =
-        passcode ?: sharedPreferences.getString(PASSCODE, null)
+        passcode ?: securePreferences.getString(PASSCODE)
 }
