@@ -81,10 +81,6 @@ For each device:
 - [Twilio Video iOS App](https://github.com/twilio/twilio-video-app-ios)
 - [Twilio Video React App](https://github.com/twilio/twilio-video-app-react)
 
-## Code of Conduct
-
-This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project administrators.
-
 ## License
 
 Apache 2.0 license. See [LICENSE.txt](LICENSE.txt) for details.
