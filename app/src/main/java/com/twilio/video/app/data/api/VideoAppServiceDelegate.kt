@@ -32,7 +32,7 @@ class VideoAppServiceDelegate(
     private val videoAppServiceProd: VideoAppService
 ) : TokenService {
 
-    override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
+    override suspend fun getToken(identity: String?, roomName: String?): String {
         val topology = sharedPreferences.getString(
                 TOPOLOGY,
                 TOPOLOGY_DEFAULT)

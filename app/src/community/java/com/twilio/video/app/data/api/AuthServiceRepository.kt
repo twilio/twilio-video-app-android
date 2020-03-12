@@ -26,6 +26,10 @@ class AuthServiceRepository(
     private val sharedPreferences: SharedPreferences
 ) : TokenService {
 
+    override suspend fun getToken(identity: String?, roomName: String?): String {
+        return getToken(identity, roomName, passcode = null)
+    }
+
     override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
         getPasscode(passcode)?.let { passcode ->
             // TODO Use mapper to handle DTOs
