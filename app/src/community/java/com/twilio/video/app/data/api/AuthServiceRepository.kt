@@ -41,6 +41,7 @@ class AuthServiceRepository(
                 Timber.d("Token returned from Twilio auth service: %s", response)
                 return response.token!!
             } catch (e: HttpException) {
+                // TODO Handle all error scenarios as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446
                 val errorJson = e.response()!!.errorBody()!!.string()
                 val errorDTO = Gson().fromJson(errorJson, AuthServiceErrorDTO::class.java)
                 Timber.e(e, errorDTO.error!!.explanation)
