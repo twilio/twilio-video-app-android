@@ -6,14 +6,6 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 
 ![video-app-screenshots](https://user-images.githubusercontent.com/1930363/76543029-867ec080-644b-11ea-8145-d15d3fe9f7ea.png)
 
-- [Languages](#languages)
-- [Getting Started](#getting-started)
-    - [Build](#build)
-    - [Unit Tests](#unit-tests)
-- [Contributing](#contributing)
-- [Code of Conduct](#code-of-conduct)
-- [License](#license)
-
 ## Features
 
 - [x] Video conferencing with real-time video and audio
