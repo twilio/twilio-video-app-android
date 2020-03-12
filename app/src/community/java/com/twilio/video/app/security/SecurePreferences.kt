@@ -8,6 +8,7 @@ import com.facebook.crypto.Crypto
 import com.facebook.crypto.CryptoConfig
 import android.util.Base64
 import com.facebook.crypto.Entity
+import com.facebook.soloader.SoLoader
 
 class SecurePreferences(
     context: Context,
@@ -18,6 +19,7 @@ class SecurePreferences(
     private val crypto: Crypto
 
     init {
+        SoLoader.init(context, false)
         val keyChain = SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256)
         crypto = AndroidConceal.get().createCrypto256Bits(keyChain)
     }
