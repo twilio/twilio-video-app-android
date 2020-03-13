@@ -7,12 +7,12 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
     <style name="AppTheme.SplashScreen" parent="AppTheme.NoActionBar">
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
     <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
         <item name="colorAccent">@android:color/white</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColorHint">@color/login_hint</item>
     </style>

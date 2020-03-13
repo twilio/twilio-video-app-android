@@ -1,78 +1,99 @@
-# Android Video Ahoy App
+# Twilio Video Android App
+
+[![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=svg)](https://circleci.com/gh/twilio/twilio-video-app-android)
 
 This application demonstrates multi-party voice and video built with [Twilio’s Programmable Video Android SDK](https://www.twilio.com/docs/video).
 
-- [Languages](#languages)
-- [Getting Started](#getting-started)
-    - [Build](#build)
-    - [Unit Tests](#unit-tests)
-- [Contributing](#contributing)
-- [Code of Conduct](#code-of-conduct)
-- [License](#license)
+![video-app-screenshots](https://user-images.githubusercontent.com/1930363/76543029-867ec080-644b-11ea-8145-d15d3fe9f7ea.png)
 
-# Languages
-This application was originally written in Java. However, all new code will be written in Kotlin and we are gradually converting existing Java code to Kotlin.
+## Features
 
-# Getting Started
+- [x] Video conferencing with real-time video and audio
+- [x] Enable/disable camera
+- [x] Mute/unmute mic
+- [x] Switch between front and back camera
+- [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
+- [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
+
+## Requirements
+
+Android Studio Version | Android API Version Min
+------------ | -------------
+3.5+ | 16
+
+## Getting Started
 
 In order to run this application on an Android device or emulator, complete the following steps.
 
-## Build
+### Deploy Twilio Access Token Server
+
+The app requires a back-end to generate [Twilio access tokens](https://www.twilio.com/docs/video/tutorials/user-identity-access-tokens). Follow the instructions below to deploy a serverless back-end using [Twilio Functions](https://www.twilio.com/docs/runtime/functions).
+
+1. [Install Twilio CLI](https://www.twilio.com/docs/twilio-cli/quickstart).
+1. Run `twilio plugins:install @twilio-labs/plugin-rtc`.
+1. Run `twilio rtc:apps:video:deploy --authentication passcode`.
+1. The passcode that is output will be used later to [sign in to the app](#start-video-conference).
+
+The passcode will expire after one week. To generate a new passcode:
+
+1. Run `twilio rtc:apps:video:delete`.
+1. Run `twilio rtc:apps:video:deploy --authentication passcode`.
+
+### Build
+
 Currently there are three product flavors for the application.
 
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
 1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
 1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
 
-### Twilions
-
-Twilio employees should follow [these instructions](Twilions.md) for building the Internal and Twilio product flavors.
-
-### Building the Community Flavor
+#### Building the Community Flavor
 
 The community flavor of the application is meant for developers who would like to work with the Video Android SDK in the context of a full-fledged application.
-**This variant uses a hard coded access tokens locally within
-the application. This practice is intended for local development and is not encouraged for your
-applications. Please follow the
-[User Identity and Access Tokens guide](https://www.twilio.com/docs/api/video/identity) for proper
-token generation instructions in your application. Putting your Account SID,
-API Key, and API Key Secret inside of an Android application will compromise your Twilio API
-credentials associated with your Twilio account.**
-
-***NOTE:*** Twilio access tokens generated with Twilio Console are valid for one hour. Repeat the steps above to refresh an expired Twilio access token.
 
 To get started with the community flavor follow these steps:
 
-1. Follow [these instructions](https://www.twilio.com/docs/video/tutorials/user-identity-access-tokens#generate-in-console) to generate an access token using your Twilio account.
+1. Select the `communityDebug` Build Variant.
+1. Run the application.
 
-2. Add the access token string copied from the console to a variable named `TWILIO_ACCESS_TOKEN`
-in your **local.properties** file.
-
-```
-TWILIO_ACCESS_TOKEN=abcdef0123456789
-```
-
-3. Select the `communityDebug` Build Variant.
-
-4. Run the application.
-
-### Start video conference
+### Start Video Conference
 
 For each device:
 
-1. Repeat steps to generate a Twilio access token and run.
+1. [Run](#building-the-community-flavor) the app.
+1. Enter any unique name in the `Your name` field.
+1. Enter the passcode from [Deploy Twilio Access Token Server](#deploy-twilio-access-token-server) in the `Passcode` field.
+1. Tap `Log in`.
 1. Enter a room name.
 1. Tap `Join`.
 
-## Unit Tests
+The passcode will expire after one week. Follow the steps below to sign in with a new passcode.
+
+1. [Generate a new passcode](#deploy-twilio-access-token-server).
+1. In the app tap `Settings > Sign Out`.
+1. Repeat the [steps above](#start-video-conference).
+
+## Tests
+
+### Unit Tests
 
 * Android Studio - Right click and run unit tests on package ```app/src/main/java/com/twilio/video/app```
 * Terminal - ```./gradlew app:testInternalDebugUnitTest```
 
-## Code of Conduct
+### UI Tests
 
-This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project administrators.
+UI tests require credentials that are only available to Twilio employees.
 
-# License
+## Related
+
+- [Twilio Video iOS App](https://github.com/twilio/twilio-video-app-ios)
+- [Twilio Video React App](https://github.com/twilio/twilio-video-app-react)
+- [Twilio CLI RTC Plugin](https://github.com/twilio-labs/plugin-rtc)
+
+## For Twilions
+
+Twilio employees should follow [these instructions](Twilions.md) for internal testing.
+
+## License
 
 Apache 2.0 license. See [LICENSE.txt](LICENSE.txt) for details.

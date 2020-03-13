@@ -17,8 +17,12 @@
 package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
-import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.model.RoomProperties
+import com.twilio.video.app.data.Preferences.ENVIRONMENT
+import com.twilio.video.app.data.Preferences.ENVIRONMENT_DEFAULT
+import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT
+import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT
+import com.twilio.video.app.data.Preferences.TOPOLOGY
+import com.twilio.video.app.data.Preferences.TOPOLOGY_DEFAULT
 import timber.log.Timber
 
 class VideoAppServiceDelegate(
@@ -28,18 +32,24 @@ class VideoAppServiceDelegate(
     private val videoAppServiceProd: VideoAppService
 ) : TokenService {
 
-    override suspend fun getToken(identity: String, roomProperties: RoomProperties): String {
+    override suspend fun getToken(identity: String?, roomName: String?): String {
+        val topology = sharedPreferences.getString(
+                TOPOLOGY,
+                TOPOLOGY_DEFAULT)
+        val isRecordParticipantsOnConnect = sharedPreferences.getBoolean(
+                RECORD_PARTICIPANTS_ON_CONNECT,
+                RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)
         val env = sharedPreferences.getString(
-                Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
+                ENVIRONMENT, ENVIRONMENT_DEFAULT)
 
         val videoAppService = resolveVideoAppService(env!!)
         Timber.d("app service env = $videoAppService")
         return videoAppService.getToken(
                 identity,
-                roomProperties.name,
+                roomName,
                 "production",
-                roomProperties.topology.string,
-                roomProperties.isRecordParticipantsOnConnect)
+                topology,
+                isRecordParticipantsOnConnect)
     }
 
     private fun resolveVideoAppService(env: String): VideoAppService {

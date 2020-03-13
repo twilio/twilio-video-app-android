@@ -8,4 +8,5 @@ sealed class LoginResult {
     data class GoogleLoginSuccessResult(val googleSignInAccount: GoogleSignInAccount) : LoginResult()
     data class EmailLoginSuccessResult(val email: String) : LoginResult()
     object CommunityLoginSuccessResult : LoginResult()
+    object CommunityLoginFailureResult : LoginResult()
 }
