@@ -15,6 +15,8 @@ import com.twilio.video.app.TestApp
 import com.twilio.video.app.auth.CommunityAuthModule
 import com.twilio.video.app.auth.CommunityAuthenticator
 import com.twilio.video.app.data.AuthServiceModule
+import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.data.Preferences.DISPLAY_NAME
 import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.AuthServiceRequestDTO
@@ -28,6 +30,8 @@ import com.twilio.video.app.screen.assertLoginButtonIsDisabled
 import com.twilio.video.app.screen.assertLoginButtonIsEnabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
+import com.twilio.video.app.security.SecurePreferencesFake
+import com.twilio.video.app.security.SecurityModule
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
@@ -53,12 +57,20 @@ class CommunityLoginActivityTest {
     @get:Rule
     val coroutineScope = MainCoroutineScopeRule()
 
+    private val passcode = "0123456789"
+    private val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
+    private val identity = "TestUser"
+    private val requestBody = AuthServiceRequestDTO(passcode, identity)
     private lateinit var scenario: ActivityScenario<CommunityLoginActivity>
     private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
     private val authService: AuthService = mock()
     private val preferences = PreferenceManager.getDefaultSharedPreferences(testApp)
+    private val securePreferences = SecurePreferencesFake()
     private val authServiceRepository = AuthServiceRepository(authService,
-            preferences)
+            securePreferences)
+    private val securityModule: SecurityModule = mock {
+        whenever(mock.providesSecurePreferences(any(), any())).thenReturn(securePreferences)
+    }
     private val authServiceModule: AuthServiceModule = mock {
         whenever(mock.providesOkHttpClient()).thenReturn(mock())
         whenever(mock.providesAuthService(any())).thenReturn(authService)
@@ -66,15 +78,12 @@ class CommunityLoginActivityTest {
     }
     private val authenticator = CommunityAuthenticator(
             preferences,
+            securePreferences,
             authServiceRepository,
             coroutineScope.coroutineContext)
     private val communityAuthModule: CommunityAuthModule = mock {
-        whenever(mock.providesCommunityAuthenticator(any(), any())).thenReturn(authenticator)
+        whenever(mock.providesCommunityAuthenticator(any(), any(), any())).thenReturn(authenticator)
     }
-    private val passcode = "0123456789"
-    private val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-    private val identity = "TestUser"
-    private val requestBody = AuthServiceRequestDTO(passcode, identity)
 
     @Before
     fun setUp() {
@@ -83,6 +92,7 @@ class CommunityLoginActivityTest {
                 .applicationModule(ApplicationModule(testApp))
                 .authServiceModule(authServiceModule)
                 .communityAuthModule(communityAuthModule)
+                .securityModule(securityModule)
                 .build()
         component.inject(testApp)
 
@@ -90,7 +100,7 @@ class CommunityLoginActivityTest {
     }
 
     @Test
-    fun `it should finish the login flow when auth is successful`() {
+    fun `it should store the passcode and identity and finish the login flow when auth is successful`() {
         coroutineScope.runBlockingTest {
             val response = AuthServiceResponseDTO("token")
             whenever(authService.getToken(url, requestBody)).thenReturn(response)
@@ -98,6 +108,9 @@ class CommunityLoginActivityTest {
             enterYourName(identity)
             enterPasscode(passcode)
             clickLoginButton()
+
+            assertThat(securePreferences.getSecureString(PASSCODE), equalTo(passcode))
+            assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(identity))
 
             val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
             assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
