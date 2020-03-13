@@ -17,7 +17,7 @@ package com.twilio.video.app.data.api
 
 import com.google.gson.Gson
 import com.twilio.video.app.data.PASSCODE
-import com.twilio.video.app.util.SecurePreferences
+import com.twilio.video.app.security.SecurePreferences
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -58,5 +58,5 @@ class AuthServiceRepository(
     }
 
     private fun getPasscode(passcode: String?) =
-        passcode ?: securePreferences.getString(PASSCODE)
+        passcode ?: securePreferences.getSecureString(PASSCODE)
 }

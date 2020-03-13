@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import com.twilio.video.app.ApplicationModule
 import com.twilio.video.app.ApplicationScope
 import com.twilio.video.app.data.DataModule
-import com.twilio.video.app.util.SecurePreferences
 import dagger.Module
 import dagger.Provides
 
@@ -18,6 +17,6 @@ class SecurityModule {
     @Provides
     @ApplicationScope
     fun providesSecurePreferences(app: Application, preferences: SharedPreferences): SecurePreferences {
-        return SecurePreferences(app.applicationContext, preferences)
+        return SecurePreferencesImpl(app.applicationContext, preferences)
     }
 }

@@ -18,8 +18,8 @@ package com.twilio.video.app.data
 import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.security.SecurityModule
-import com.twilio.video.app.util.SecurePreferences
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
