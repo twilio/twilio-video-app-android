@@ -1,5 +1,68 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.2.0
+
+* Programmable Video Android SDK 5.2.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.2.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.2.0/)
+
+Features
+
+- Implemented Network Quality for Remote Participants in Group Rooms:
+    - To enable the Network Quality functionality, set the `ConnectOptions.Builder.enableNetworkQuality` property to `true` when connecting to a Group Room. By default this enables network quality level changes to be reported for the Local Participant. To also receive network quality level changes for the Remote Participants, a configured `NetworkQualityConfiguration` object needs to be supplied to the `ConnectOptions.Builder.networkQualityConfiguration` property.
+    - The `networkQualityLevel` property has been moved from the `LocalParticipant` class to the `Participant` interface.
+    - To determine the current network quality level for both Local and Remote Participants, query the `networkQualityLevel` property. Note, this will return `NETWORK_QUALITY_LEVEL_UNKNOWN` if:
+        - The `ConnectOptions.networkQualityEnabled` property was set to `false` OR
+        - Using a Peer-to-Peer room OR
+        - The network quality level has not yet been computed
+    - Implementing the `onNetworkQualityLevelChanged` method on your `LocalParticipant.Listener` will allow you to receive callbacks when the network quality level changes for the Local Participant.
+    - Implementing the `onNetworkQualityLevelChanged` method on your `RemoteParticipant.Listener` will allow you to receive callbacks when the network quality level changes for the Remote Participant.
+
+```.java
+// Enable network quality
+NetworkQualityConfiguration configuration =
+        new NetworkQualityConfiguration(
+                NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+                NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL);
+
+ConnectOptions connectOptions =
+        new ConnectOptions.Builder(token)
+                .roomName(roomName)
+                .enableNetworkQuality(true)
+                .networkQualityConfiguration(configuration)
+                .build();
+
+// Override onNetworkLevelChanged to observe network quality level changes
+LocalParticipant.Listener localParticipantListener = new LocalParticipant.Listener() {
+    ...
+
+    @Override
+    public void onNetworkQualityLevelChanged(
+        @NonNull LocalParticipant localParticipant,
+        @NonNull NetworkQualityLevel networkQualityLevel) {}
+}
+
+RemoteParticipant.Listener remoteParticipantListener = new RemoteParticipant.Listener() {
+    ...
+
+    @Override
+    public void onNetworkQualityLevelChanged(
+        @NonNull RemoteParticipant remoteParticipant,
+        @NonNull NetworkQualityLevel networkQualityLevel) {}
+}
+
+// Connect to room and register listener
+Room room = Video.connect(context, connectOptions, roomListener);
+LocalParticipant localParticipant = room.getLocalParticipant();
+localParticipant.setListener(localParticipantListener);
+
+// Get current network quality
+localParticipant.getNetworkQualityLevel();
+```
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
+
 ### 5.1.2
 
 * Programmable Video Android SDK 5.1.2 [[bintray]](https://bintray.com/twilio/releases/video-android/5.1.2), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.1.2/)

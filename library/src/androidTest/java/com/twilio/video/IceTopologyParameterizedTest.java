@@ -91,8 +91,8 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         roomName = random(Constants.ROOM_NAME_LENGTH);
         videoRoom = RoomUtils.createRoom(roomName, topology);
         assertNotNull(videoRoom);
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
     }
 
     @After
@@ -373,10 +373,10 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
                         .build();
         CallbackHelper.FakeRoomListener bobListener = new CallbackHelper.FakeRoomListener();
         bobListener.onConnectedLatch = new CountDownLatch(1);
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        CallbackHelper.FakeRemoteParticipantListener remoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
+        remoteParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         Room bobRoom = Video.connect(mediaTestActivity, connectOptions, bobListener);
         assertTrue(
                 bobListener.onConnectedLatch.await(
@@ -384,12 +384,12 @@ public class IceTopologyParameterizedTest extends BaseVideoTest {
         assertTrue(
                 aliceListener.onParticipantConnectedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        aliceRoom.getRemoteParticipants().get(0).setListener(participantListener);
+        aliceRoom.getRemoteParticipants().get(0).setListener(remoteParticipantListener);
         assertTrue(
-                participantListener.onSubscribedToAudioTrackLatch.await(
+                remoteParticipantListener.onSubscribedToAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onSubscribedToVideoTrackLatch.await(
+                remoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         aliceListener.onDisconnectedLatch = new CountDownLatch(1);

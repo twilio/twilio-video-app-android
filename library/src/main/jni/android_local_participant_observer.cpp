@@ -22,6 +22,7 @@
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
 #include "com_twilio_video_LocalDataTrack.h"
+#include "com_twilio_video_NetworkQuality.h"
 #include "com_twilio_video_TwilioException.h"
 #include "jni_utils.h"
 #include "webrtc/modules/utility/include/helpers_android.h"
@@ -49,8 +50,6 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                         webrtc::JavaParamRef<jclass>(twilio_video_jni::FindClass(env, "com/twilio/video/LocalDataTrackPublication"))),
           j_twilio_exception_class_(env, webrtc::JavaParamRef<jclass>(twilio_video_jni::FindClass(env,
                                                                                                   "com/twilio/video/TwilioException"))),
-          j_network_quality_level_class_(env, webrtc::JavaParamRef<jclass>(twilio_video_jni::FindClass(env,
-                                                                                                       "com/twilio/video/NetworkQualityLevel"))),
           j_on_published_audio_track_(webrtc::GetMethodID(env,
                                                           j_local_participant_observer_class_.obj(),
                                                           "onAudioTrackPublished",
@@ -75,12 +74,10 @@ AndroidLocalParticipantObserver::AndroidLocalParticipantObserver(JNIEnv *env,
                                                                   j_local_participant_observer_class_.obj(),
                                                                   "onDataTrackPublicationFailed",
                                                                   "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/LocalDataTrack;Lcom/twilio/video/TwilioException;)V")),
-
           j_on_network_quality_level_changed_(webrtc::GetMethodID(env,
                                                                  j_local_participant_observer_class_.obj(),
                                                                  "onNetworkQualityLevelChanged",
                                                                  "(Lcom/twilio/video/LocalParticipant;Lcom/twilio/video/NetworkQualityLevel;)V")),
-
           j_published_audio_track_ctor_id_(webrtc::GetMethodID(env,
                                                                j_published_audio_track_class_.obj(),
                                                                "<init>",
@@ -312,50 +309,10 @@ void AndroidLocalParticipantObserver::onNetworkQualityLevelChanged(twilio::video
             return;
         }
 
-        jfieldID j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                         "NETWORK_QUALITY_LEVEL_UNKNOWN",
-                                                         "Lcom/twilio/video/NetworkQualityLevel;");
-
-
-        if(level == twilio::video::kNetworkQualityLevelZero) {
-            j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                         "NETWORK_QUALITY_LEVEL_ZERO",
-                                                         "Lcom/twilio/video/NetworkQualityLevel;");
-        } else if(level == twilio::video::kNetworkQualityLevelOne) {
-            j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                    "NETWORK_QUALITY_LEVEL_ONE",
-                                                    "Lcom/twilio/video/NetworkQualityLevel;");
-
-        } else if(level == twilio::video::kNetworkQualityLevelTwo) {
-            j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                    "NETWORK_QUALITY_LEVEL_TWO",
-                                                    "Lcom/twilio/video/NetworkQualityLevel;");
-
-        } else if(level == twilio::video::kNetworkQualityLevelThree) {
-            j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                    "NETWORK_QUALITY_LEVEL_THREE",
-                                                    "Lcom/twilio/video/NetworkQualityLevel;");
-
-        } else if(level == twilio::video::kNetworkQualityLevelFour) {
-            j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                    "NETWORK_QUALITY_LEVEL_FOUR",
-                                                    "Lcom/twilio/video/NetworkQualityLevel;");
-
-        } else if(level == twilio::video::kNetworkQualityLevelFive) {
-            j_level_field = jni()->GetStaticFieldID(j_network_quality_level_class_.obj(),
-                                                    "NETWORK_QUALITY_LEVEL_FIVE",
-                                                    "Lcom/twilio/video/NetworkQualityLevel;");
-        } else {
-            FATAL() << "Unknown quality level. There is no corresponding Java enum value";
-        }
-
-        jobject j_level = jni()->GetStaticObjectField(j_network_quality_level_class_.obj(),
-                                                      j_level_field);
-
         jni()->CallVoidMethod(j_local_participant_observer_.obj(),
                 j_on_network_quality_level_changed_,
                 j_local_participant_.obj(),
-                j_level);
+                createJavaNetworkQualityLevel(jni(), level));
         CHECK_EXCEPTION(jni()) << "Error calling onNetworkQualityLevelChanged";
     }
 }

@@ -21,7 +21,7 @@
 #include <memory>
 #include <map>
 #include "twilio/video/remote_participant.h"
-#include "android_participant_observer.h"
+#include "android_remote_participant_observer.h"
 
 namespace twilio_video_jni {
 
@@ -37,7 +37,7 @@ struct RemoteParticipantContext {
     std::map<std::shared_ptr<twilio::media::RemoteVideoTrack>, jobject> remote_video_track_map;
     std::map<std::shared_ptr<twilio::media::RemoteDataTrackPublication>, jobject> remote_data_track_publication_map;
     std::map<std::shared_ptr<twilio::media::RemoteDataTrack>, jobject> remote_data_track_map;
-    std::shared_ptr<AndroidParticipantObserver> android_participant_observer;
+    std::shared_ptr<AndroidRemoteParticipantObserver> android_participant_observer;
 };
 
 jobject createJavaRemoteParticipant(JNIEnv *env,

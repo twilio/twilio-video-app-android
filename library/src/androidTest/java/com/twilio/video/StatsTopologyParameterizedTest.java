@@ -120,19 +120,19 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Add audio track to Bob and check stats
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
-        participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
+        CallbackHelper.FakeRemoteParticipantListener remoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
+        remoteParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
         RemoteParticipant bob = aliceRoom.getRemoteParticipants().get(0);
-        bob.setListener(participantListener);
+        bob.setListener(remoteParticipantListener);
 
         LocalParticipant bobLocalParticipant = bobRoom.getLocalParticipant();
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
         assertTrue(
-                participantListener.onSubscribedToAudioTrackLatch.await(
+                remoteParticipantListener.onSubscribedToAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         expectStatsReportTracksSize(1, 0, 1, 0);
@@ -142,14 +142,14 @@ public class StatsTopologyParameterizedTest extends BaseStatsTest {
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(
-                participantListener.onSubscribedToVideoTrackLatch.await(
+                remoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         expectStatsReportTracksSize(1, 0, 1, 1);
 
         // Remove Bob's video track and check the stats
         bobLocalParticipant.unpublishTrack(bobLocalVideoTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromVideoTrackLatch.await(
+                remoteParticipantListener.onUnsubscribedFromVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         expectStatsReportTracksSize(1, 0, 1, 0);
     }

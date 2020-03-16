@@ -100,6 +100,10 @@ public class DominantSpeakerTest extends BaseParticipantTest {
         super.setup();
         testRoomName = RandomStringUtils.random(Constants.ROOM_NAME_LENGTH);
         mediaTestActivity = activityRule.getActivity();
+
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
+        charlieToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE);
     }
 
     @After
@@ -118,11 +122,6 @@ public class DominantSpeakerTest extends BaseParticipantTest {
 
     @Test
     public void canObserveDominantSpeaker() throws InterruptedException {
-        Topology topology = Topology.GROUP;
-
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-
         MediaOptions mediaOptions =
                 new MediaOptions.Builder().enableH264(false).audioFilePath(audioFilePath).build();
         MediaFactory mediaFactory = MediaFactory.testCreate(mediaTestActivity, mediaOptions);
@@ -179,12 +178,6 @@ public class DominantSpeakerTest extends BaseParticipantTest {
 
     @Test
     public void canObserveDominantSpeakerFromMultipleParticipants() throws InterruptedException {
-        Topology topology = Topology.GROUP;
-
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-        charlieToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE, topology);
-
         MediaOptions mediaOptions =
                 new MediaOptions.Builder().enableH264(false).audioFilePath(audioFilePath).build();
         MediaFactory mediaFactory = MediaFactory.testCreate(mediaTestActivity, mediaOptions);
@@ -263,8 +256,6 @@ public class DominantSpeakerTest extends BaseParticipantTest {
         Topology topology = Topology.P2P;
         videoRoom = RoomUtils.createRoom(testRoomName, topology);
         assertNotNull(videoRoom);
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
 
         MediaOptions mediaOptions =
                 new MediaOptions.Builder().enableH264(false).audioFilePath(audioFilePath).build();
@@ -317,10 +308,6 @@ public class DominantSpeakerTest extends BaseParticipantTest {
     @Test
     public void canObserveDominantSpeakerAfterReconnected() throws InterruptedException {
         Topology topology = Topology.GROUP;
-
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
-        charlieToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_CHARLIE, topology);
 
         MediaOptions mediaOptions =
                 new MediaOptions.Builder().enableH264(false).audioFilePath(audioFilePath).build();

@@ -99,8 +99,8 @@ public class MultiCodecTest extends BaseCodecTest {
         assertEquals(1, aliceRoom.getRemoteParticipants().size());
 
         // Set bob participant listener
-        CallbackHelper.FakeParticipantListener bobRemoteParticipantListener =
-                new CallbackHelper.FakeParticipantListener();
+        CallbackHelper.FakeRemoteParticipantListener bobRemoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
         RemoteParticipant aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
 
         bobRemoteParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);

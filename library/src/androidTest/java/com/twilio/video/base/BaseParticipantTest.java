@@ -84,10 +84,10 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     protected LocalDataTrack charlieLocalDataTrack;
     protected Room charlieRoom;
     protected CallbackHelper.FakeRoomListener aliceRoomListener;
-    protected CallbackHelper.FakeParticipantListener aliceParticipantListener;
+    protected CallbackHelper.FakeRemoteParticipantListener aliceRemoteParticipantListener;
     protected CallbackHelper.FakeRoomListener bobRoomListener;
     protected CallbackHelper.FakeLocalParticipantListener bobLocalParticipantListener;
-    protected CallbackHelper.FakeParticipantListener bobParticipantListener;
+    protected CallbackHelper.FakeRemoteParticipantListener bobRemoteParticipantListener;
     protected CallbackHelper.FakeRoomListener charlieRoomListener =
             new CallbackHelper.FakeRoomListener();
     private VideoRoom videoRoom;
@@ -140,9 +140,9 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
                         .build();
 
         // Setup alice
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         aliceRoomListener = new CallbackHelper.FakeRoomListener();
-        aliceParticipantListener = new CallbackHelper.FakeParticipantListener();
+        aliceRemoteParticipantListener = new CallbackHelper.FakeRemoteParticipantListener();
         aliceRoomListener.onParticipantConnectedLatch = new CountDownLatch(1);
         ConnectOptions aliceConnectOptions =
                 new ConnectOptions.Builder(aliceToken)
@@ -151,11 +151,11 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
                         .build();
 
         // Setup bob
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         bobAudioTrackName = random(10);
         bobVideoTrackName = random(10);
         bobRoomListener = new CallbackHelper.FakeRoomListener();
-        bobParticipantListener = new CallbackHelper.FakeParticipantListener();
+        bobRemoteParticipantListener = new CallbackHelper.FakeRemoteParticipantListener();
         ConnectOptions bobConnectOptions =
                 new ConnectOptions.Builder(bobToken)
                         .roomName(testRoomName)
@@ -169,7 +169,7 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         // Connect bob
         bobRoom = connect(bobConnectOptions, bobRoomListener);
         aliceRemoteParticipant = bobRoom.getRemoteParticipants().get(0);
-        aliceRemoteParticipant.setListener(bobParticipantListener);
+        aliceRemoteParticipant.setListener(bobRemoteParticipantListener);
 
         // Alice wait for bob to connect
         assertTrue(
@@ -181,7 +181,7 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
         assertEquals(1, remoteParticipantList.size());
         bobRemoteParticipant = remoteParticipantList.get(0);
         assertNotNull(bobRemoteParticipant);
-        bobRemoteParticipant.setListener(aliceParticipantListener);
+        bobRemoteParticipant.setListener(aliceRemoteParticipantListener);
     }
 
     @After
@@ -235,31 +235,31 @@ public abstract class BaseParticipantTest extends BaseVideoTest {
     }
 
     protected void publishAudioTrack() throws InterruptedException {
-        aliceParticipantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
-        aliceParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(aliceParticipantListener);
+        aliceRemoteParticipantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
+        aliceRemoteParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceRemoteParticipantListener);
         if (bobLocalAudioTrack == null) {
             bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true, bobAudioTrackName);
         }
         assertTrue(bobLocalParticipant.publishTrack(bobLocalAudioTrack));
         assertTrue(
-                aliceParticipantListener.onAudioTrackPublishedLatch.await(
+                aliceRemoteParticipantListener.onAudioTrackPublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onSubscribedToAudioTrackLatch.await(
+                aliceRemoteParticipantListener.onSubscribedToAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 
     protected void unpublishAudioTrack() throws InterruptedException {
-        aliceParticipantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
-        aliceParticipantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(aliceParticipantListener);
+        aliceRemoteParticipantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
+        aliceRemoteParticipantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(aliceRemoteParticipantListener);
         assertTrue(bobLocalParticipant.unpublishTrack(bobLocalAudioTrack));
         assertTrue(
-                aliceParticipantListener.onUnsubscribedFromAudioTrackLatch.await(
+                aliceRemoteParticipantListener.onUnsubscribedFromAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onAudioTrackUnpublishedLatch.await(
+                aliceRemoteParticipantListener.onAudioTrackUnpublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 }

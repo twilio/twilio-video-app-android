@@ -28,6 +28,20 @@ public interface Participant {
     @NonNull
     String getIdentity();
 
+    /**
+     * Returns the participant's Network Quality Level.
+     *
+     * <p>This property represents the quality of a Participant's connection in a Room. This value
+     * may not be immediately available, and, in some cases, it's impossible to calculate it. In
+     * these instances, {@link Participant#getNetworkQualityLevel()} will return {@link
+     * NetworkQualityLevel#NETWORK_QUALITY_LEVEL_UNKNOWN}. Calling this API in a Peer-to-Peer Room
+     * will always return {@link NetworkQualityLevel#NETWORK_QUALITY_LEVEL_UNKNOWN}. This is part of
+     * the Network Quality API and must be enabled by enabling the {@code enableNetworkQuality}
+     * option in {@link ConnectOptions}.
+     */
+    @NonNull
+    NetworkQualityLevel getNetworkQualityLevel();
+
     /** Returns {@link AudioTrackPublication}s of participant. */
     @NonNull
     List<AudioTrackPublication> getAudioTracks();

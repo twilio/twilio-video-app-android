@@ -80,8 +80,8 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
         videoRoom = RoomUtils.createRoom(roomName, topology);
         assertNotNull(videoRoom);
         context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        tokenOne = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        tokenTwo = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
     }
 
     @After
@@ -209,7 +209,7 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     @Test
     public void participantShouldHaveValidIdentity() throws InterruptedException {
         String expectedIdentity = random(50);
-        tokenOne = CredentialsUtils.getAccessToken(expectedIdentity, topology);
+        tokenOne = CredentialsUtils.getAccessToken(expectedIdentity);
         roomListener.onConnectedLatch = new CountDownLatch(1);
         roomListener.onDisconnectedLatch = new CountDownLatch(1);
         roomListener.onParticipantDisconnectedLatch = new CountDownLatch(1);
@@ -281,104 +281,104 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
     @Test
     public void shouldReceiveTrackEvents() throws InterruptedException {
         // Audio track added and subscribed
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
-        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(participantListener);
+        CallbackHelper.FakeRemoteParticipantListener remoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
+        remoteParticipantListener.onAudioTrackPublishedLatch = new CountDownLatch(1);
+        remoteParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(remoteParticipantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
         assertTrue(
-                participantListener.onAudioTrackPublishedLatch.await(
+                remoteParticipantListener.onAudioTrackPublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onSubscribedToAudioTrackLatch.await(
+                remoteParticipantListener.onSubscribedToAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Audio track disabled
-        participantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
+        remoteParticipantListener.onAudioTrackDisabledLatch = new CountDownLatch(1);
         bobLocalAudioTrack.enable(false);
         assertTrue(
-                participantListener.onAudioTrackDisabledLatch.await(
+                remoteParticipantListener.onAudioTrackDisabledLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Audio track enabled
-        participantListener.onAudioTrackEnabledLatch = new CountDownLatch(1);
+        remoteParticipantListener.onAudioTrackEnabledLatch = new CountDownLatch(1);
         bobLocalAudioTrack.enable(true);
         assertTrue(
-                participantListener.onAudioTrackEnabledLatch.await(
+                remoteParticipantListener.onAudioTrackEnabledLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Audio track removed and unsubscribed
-        participantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
-        participantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onAudioTrackUnpublishedLatch = new CountDownLatch(1);
+        remoteParticipantListener.onUnsubscribedFromAudioTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalAudioTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromAudioTrackLatch.await(
+                remoteParticipantListener.onUnsubscribedFromAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onAudioTrackUnpublishedLatch.await(
+                remoteParticipantListener.onAudioTrackUnpublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track added and subscribed
-        participantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
+        remoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
         assertTrue(
-                participantListener.onVideoTrackPublishedLatch.await(
+                remoteParticipantListener.onVideoTrackPublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onSubscribedToVideoTrackLatch.await(
+                remoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track disabled
-        participantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
+        remoteParticipantListener.onVideoTrackDisabledLatch = new CountDownLatch(1);
         bobLocalVideoTrack.enable(false);
         assertTrue(
-                participantListener.onVideoTrackDisabledLatch.await(
+                remoteParticipantListener.onVideoTrackDisabledLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track enabled
-        participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
+        remoteParticipantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
         bobLocalVideoTrack.enable(true);
         assertTrue(
-                participantListener.onVideoTrackEnabledLatch.await(
+                remoteParticipantListener.onVideoTrackEnabledLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Video track removed and unsubscribed
-        participantListener.onVideoTrackUnpublishedLatch = new CountDownLatch(1);
-        participantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onVideoTrackUnpublishedLatch = new CountDownLatch(1);
+        remoteParticipantListener.onUnsubscribedFromVideoTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalVideoTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromVideoTrackLatch.await(
+                remoteParticipantListener.onUnsubscribedFromVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onVideoTrackUnpublishedLatch.await(
+                remoteParticipantListener.onVideoTrackUnpublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Data track published and subscribed
-        participantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
-        participantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onDataTrackPublishedLatch = new CountDownLatch(1);
+        remoteParticipantListener.onSubscribedToDataTrackLatch = new CountDownLatch(1);
         bobLocalDataTrack = LocalDataTrack.create(mediaTestActivity);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalDataTrack));
         assertTrue(
-                participantListener.onDataTrackPublishedLatch.await(
+                remoteParticipantListener.onDataTrackPublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onSubscribedToDataTrackLatch.await(
+                remoteParticipantListener.onSubscribedToDataTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Data track unsubscribed and unpublished
-        participantListener.onDataTrackUnpublishedLatch = new CountDownLatch(1);
-        participantListener.onUnsubscribedFromDataTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onDataTrackUnpublishedLatch = new CountDownLatch(1);
+        remoteParticipantListener.onUnsubscribedFromDataTrackLatch = new CountDownLatch(1);
         bobRoom.getLocalParticipant().unpublishTrack(bobLocalDataTrack);
         assertTrue(
-                participantListener.onUnsubscribedFromDataTrackLatch.await(
+                remoteParticipantListener.onUnsubscribedFromDataTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onDataTrackUnpublishedLatch.await(
+                remoteParticipantListener.onDataTrackUnpublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate the order of events
@@ -402,27 +402,27 @@ public class RemoteParticipantTopologyParameterizedTest extends BaseParticipantT
                         "onDataTrackUnpublished");
         assertArrayEquals(
                 expectedParticipantEvents.toArray(),
-                participantListener.participantEvents.toArray());
+                remoteParticipantListener.remoteParticipantEvents.toArray());
     }
 
     @Test
     public void shouldHaveTracksAfterDisconnected() throws InterruptedException {
         // Add audio and video tracks
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
-        this.bobRemoteParticipant.setListener(participantListener);
+        CallbackHelper.FakeRemoteParticipantListener remoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
+        remoteParticipantListener.onSubscribedToAudioTrackLatch = new CountDownLatch(1);
+        this.bobRemoteParticipant.setListener(remoteParticipantListener);
         bobLocalAudioTrack = LocalAudioTrack.create(mediaTestActivity, false);
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalAudioTrack));
         assertTrue(
-                participantListener.onSubscribedToAudioTrackLatch.await(
+                remoteParticipantListener.onSubscribedToAudioTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         bobLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, true, new FakeVideoCapturer());
         assertTrue(bobRoom.getLocalParticipant().publishTrack(bobLocalVideoTrack));
         assertTrue(
-                participantListener.onSubscribedToVideoTrackLatch.await(
+                remoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Cache bobRemoteParticipant two tracks

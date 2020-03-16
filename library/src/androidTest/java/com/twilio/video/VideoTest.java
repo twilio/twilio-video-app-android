@@ -72,7 +72,7 @@ public class VideoTest extends BaseVideoTest {
         roomName = random(Constants.ROOM_NAME_LENGTH);
         videoRoom = RoomUtils.createRoom(roomName, Topology.P2P);
         assertNotNull(videoRoom);
-        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, Topology.P2P);
+        token = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
     }
 
     @After

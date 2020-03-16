@@ -92,7 +92,7 @@ public class AudioOptions {
             return this;
         }
 
-        /** Remove background noise of lower frequences. */
+        /** Remove background noise of lower frequencies. */
         @NonNull
         public Builder highpassFilter(boolean highpassFilter) {
             this.highpassFilter = highpassFilter;

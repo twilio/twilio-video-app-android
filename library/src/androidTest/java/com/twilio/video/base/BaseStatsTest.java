@@ -68,8 +68,8 @@ public abstract class BaseStatsTest extends BaseVideoTest {
     protected LocalAudioTrack bobLocalAudioTrack;
     protected CallbackHelper.FakeRoomListener aliceListener;
     protected CallbackHelper.FakeRoomListener bobListener;
-    protected CallbackHelper.FakeParticipantListener aliceMediaListener;
-    protected CallbackHelper.FakeParticipantListener bobMediaListener;
+    protected CallbackHelper.FakeRemoteParticipantListener aliceMediaListener;
+    protected CallbackHelper.FakeRemoteParticipantListener bobMediaListener;
     protected Topology topology;
     private VideoRoom videoRoom;
 
@@ -84,11 +84,11 @@ public abstract class BaseStatsTest extends BaseVideoTest {
         roomName = random(Constants.ROOM_NAME_LENGTH);
         videoRoom = RoomUtils.createRoom(roomName, topology, false, null, null, videoCodecs);
         assertNotNull(videoRoom);
-        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
-        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
+        bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         aliceListener = new CallbackHelper.FakeRoomListener();
-        aliceMediaListener = new CallbackHelper.FakeParticipantListener();
-        bobMediaListener = new CallbackHelper.FakeParticipantListener();
+        aliceMediaListener = new CallbackHelper.FakeRemoteParticipantListener();
+        bobMediaListener = new CallbackHelper.FakeRemoteParticipantListener();
         bobListener = new CallbackHelper.FakeRoomListener();
     }
 

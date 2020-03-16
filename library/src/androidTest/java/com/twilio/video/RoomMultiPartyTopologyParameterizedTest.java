@@ -81,7 +81,7 @@ public class RoomMultiPartyTopologyParameterizedTest extends BaseVideoTest {
         rooms = new ArrayList<>();
         tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i], topology));
+            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i]));
         }
     }
 

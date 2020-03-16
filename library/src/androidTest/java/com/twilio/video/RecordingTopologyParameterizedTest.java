@@ -96,7 +96,7 @@ public class RecordingTopologyParameterizedTest extends BaseVideoTest {
 
         videoRoom = RoomUtils.createRoom(roomName, topology, enableRecording);
         assertNotNull(videoRoom);
-        token = CredentialsUtils.getAccessToken(identity, topology);
+        token = CredentialsUtils.getAccessToken(identity);
     }
 
     @After

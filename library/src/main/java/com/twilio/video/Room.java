@@ -546,7 +546,7 @@ public class Room {
          * <ul>
          *   <li>The {@link Room} topology is P2P.
          *   <li>The dominant speaker feature was not enabled via {@link
-         *       ConnectOptions.Builder#enableDominantSpeaker}.
+         *       ConnectOptions.Builder#enableDominantSpeaker(boolean)}
          * </ul>
          *
          * @param room The {@link Room} in which the dominant speaker changed.

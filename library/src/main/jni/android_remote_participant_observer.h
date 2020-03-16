@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef VIDEO_ANDROID_INCLUDE_ANDROID_PARTICIPANT_OBSERVER_H_
-#define VIDEO_ANDROID_INCLUDE_ANDROID_PARTICIPANT_OBSERVER_H_
+#ifndef VIDEO_ANDROID_INCLUDE_ANDROID_REMOTE_PARTICIPANT_OBSERVER_H_
+#define VIDEO_ANDROID_INCLUDE_ANDROID_REMOTE_PARTICIPANT_OBSERVER_H_
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 
@@ -26,9 +26,9 @@
 
 namespace twilio_video_jni {
 
-class AndroidParticipantObserver : public twilio::video::RemoteParticipantObserver {
+class AndroidRemoteParticipantObserver : public twilio::video::RemoteParticipantObserver {
 public:
-    AndroidParticipantObserver(JNIEnv *env,
+    AndroidRemoteParticipantObserver(JNIEnv *env,
                                jobject j_remote_participant,
                                jobject j_remote_participant_observer,
                                std::map<std::shared_ptr<twilio::media::RemoteAudioTrackPublication>, jobject>& remote_audio_track_publication_map,
@@ -38,7 +38,7 @@ public:
                                std::map<std::shared_ptr<twilio::media::RemoteDataTrackPublication>, jobject>& remote_data_track_publication_map,
                                std::map<std::shared_ptr<twilio::media::RemoteDataTrack>, jobject>& remote_data_track_map);
 
-    ~AndroidParticipantObserver();
+    ~AndroidRemoteParticipantObserver();
 
     void setObserverDeleted();
 
@@ -109,6 +109,7 @@ protected:
                                          std::shared_ptr<twilio::media::RemoteDataTrackPublication> remote_data_track_publication,
                                          std::shared_ptr<twilio::media::RemoteDataTrack> remote_data_track);
 
+    virtual void onNetworkQualityLevelChanged(twilio::video::RemoteParticipant *participant, twilio::video::NetworkQualityLevel level);
 private:
     JNIEnv *jni() {
         return webrtc::jni::AttachCurrentThreadIfNeeded();
@@ -135,6 +136,7 @@ private:
     const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_class_;
     const webrtc::ScopedJavaGlobalRef<jclass> j_remote_data_track_publication_class_;
     const webrtc::ScopedJavaGlobalRef<jclass> j_twilio_exception_class_;
+
     jmethodID j_on_audio_track_published_;
     jmethodID j_on_audio_track_unpublished_;
     jmethodID j_on_audio_track_subscribed_;
@@ -160,9 +162,10 @@ private:
     jmethodID j_video_track_publication_ctor_id_;
     jmethodID j_data_track_ctor_id_;
     jmethodID j_data_track_publication_ctor_id_;
+    jmethodID j_on_network_quality_level_changed_;
     jmethodID j_twilio_exception_ctor_id_;
 };
 
 }
 
-#endif // VIDEO_ANDROID_INCLUDE_ANDROID_PARTICIPANT_OBSERVER_H_
+#endif // VIDEO_ANDROID_INCLUDE_ANDROID_REMOTE_PARTICIPANT_OBSERVER_H_

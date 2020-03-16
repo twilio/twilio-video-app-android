@@ -1804,7 +1804,7 @@ public class TrackSubscriptionTest extends BaseVideoTest {
     private void initTokensWithTopology(Topology topology) {
         tokens = new ArrayList<>();
         for (int i = 0; i < PARTICIPANT_NUM; i++) {
-            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i], topology));
+            tokens.add(CredentialsUtils.getAccessToken(PARTICIPANTS[i]));
         }
     }
 

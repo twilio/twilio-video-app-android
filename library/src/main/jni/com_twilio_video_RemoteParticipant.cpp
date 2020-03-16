@@ -32,22 +32,22 @@ void bindRemoteParticipantListenerProxy(JNIEnv *env,
                                         RemoteParticipantContext *remote_participant_context) {
     jfieldID j_remote_participant_listener_proxy_field = GetFieldID(env,
                                                                     j_remote_participant_class,
-                                                                    "participantListenerProxy",
+                                                                    "remoteParticipantListenerProxy",
                                                                     "Lcom/twilio/video/RemoteParticipant$Listener;");
     jobject j_remote_participant_listener_proxy = GetObjectField(env,
                                                                  j_remote_participant,
                                                                  j_remote_participant_listener_proxy_field);
 
     remote_participant_context->android_participant_observer =
-            std::make_shared<AndroidParticipantObserver>(env,
-                                                         j_remote_participant,
-                                                         j_remote_participant_listener_proxy,
-                                                         remote_participant_context->remote_audio_track_publication_map,
-                                                         remote_participant_context->remote_audio_track_map,
-                                                         remote_participant_context->remote_video_track_publication_map,
-                                                         remote_participant_context->remote_video_track_map,
-                                                         remote_participant_context->remote_data_track_publication_map,
-                                                         remote_participant_context->remote_data_track_map);
+            std::make_shared<AndroidRemoteParticipantObserver>(env,
+                                                               j_remote_participant,
+                                                               j_remote_participant_listener_proxy,
+                                                               remote_participant_context->remote_audio_track_publication_map,
+                                                               remote_participant_context->remote_audio_track_map,
+                                                               remote_participant_context->remote_video_track_publication_map,
+                                                               remote_participant_context->remote_video_track_map,
+                                                               remote_participant_context->remote_data_track_publication_map,
+                                                               remote_participant_context->remote_data_track_map);
     remote_participant_context->remote_participant->setObserver(
             remote_participant_context->android_participant_observer);
 }

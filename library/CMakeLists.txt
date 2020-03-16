@@ -37,7 +37,8 @@ file(GLOB_RECURSE SOURCE_FILES
 # of twilio::media::AudioCodec and twilio::media::VideoCodec passed in ConnectOptions.
 # std::dynamic_pointer_cast requires -frtti to properly cast the pointer to its rightful subclass.
 set_source_files_properties(
-    src/main/jni/com_twilio_video_ConnectOptions.cpp PROPERTIES COMPILE_FLAGS "-frtti")
+    src/main/jni/com_twilio_video_ConnectOptions.cpp PROPERTIES COMPILE_FLAGS "-frtti"
+)
 
 # Create the library with name provided from build.gradle
 add_library(${VIDEO_ANDROID_LIBRARY} SHARED ${SOURCE_FILES})

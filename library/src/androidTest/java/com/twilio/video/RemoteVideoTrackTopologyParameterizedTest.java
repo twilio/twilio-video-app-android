@@ -114,17 +114,17 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
 
     @Test
     public void shouldEnableVideoTrackAfterConnectedToRoom() throws InterruptedException {
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
-        participantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
-        bobRemoteParticipant.setListener(participantListener);
+        CallbackHelper.FakeRemoteParticipantListener remoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
+        remoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        remoteParticipantListener.onVideoTrackEnabledLatch = new CountDownLatch(1);
+        bobRemoteParticipant.setListener(remoteParticipantListener);
         bobLocalVideoTrack =
                 LocalVideoTrack.create(mediaTestActivity, false, new FakeVideoCapturer());
 
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(
-                participantListener.onSubscribedToVideoTrackLatch.await(
+                remoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertFalse(
                 aliceRoom
@@ -135,7 +135,7 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
                         .isTrackEnabled());
         bobLocalVideoTrack.enable(true);
         assertTrue(
-                participantListener.onVideoTrackEnabledLatch.await(
+                remoteParticipantListener.onVideoTrackEnabledLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
                 aliceRoom
@@ -147,17 +147,17 @@ public class RemoteVideoTrackTopologyParameterizedTest extends BaseParticipantTe
     }
 
     private void publishVideoTrack() throws InterruptedException {
-        aliceParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
-        aliceParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
+        aliceRemoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        aliceRemoteParticipantListener.onVideoTrackPublishedLatch = new CountDownLatch(1);
         bobLocalVideoTrack =
                 LocalVideoTrack.create(
                         mediaTestActivity, true, new FakeVideoCapturer(), bobVideoTrackName);
         assertTrue(bobLocalParticipant.publishTrack(bobLocalVideoTrack));
         assertTrue(
-                aliceParticipantListener.onVideoTrackPublishedLatch.await(
+                aliceRemoteParticipantListener.onVideoTrackPublishedLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                aliceParticipantListener.onSubscribedToVideoTrackLatch.await(
+                aliceRemoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
     }
 }

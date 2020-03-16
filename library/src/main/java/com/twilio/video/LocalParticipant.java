@@ -244,6 +244,17 @@ public class LocalParticipant implements Participant {
     }
 
     /**
+     * Returns the {@link LocalParticipant}'s Network Quality Level.
+     *
+     * @see Participant#getNetworkQualityLevel()
+     */
+    @NonNull
+    @Override
+    public NetworkQualityLevel getNetworkQualityLevel() {
+        return networkQualityLevel;
+    }
+
+    /**
      * Where the {@link LocalParticipant}'s signaling traffic enters and exits Twilio's
      * communications cloud. This property reflects the region passed to {@link
      * ConnectOptions.Builder#region(String)} and when `gll` (the default value) is provided, the
@@ -252,11 +263,6 @@ public class LocalParticipant implements Participant {
     @NonNull
     public String getSignalingRegion() {
         return signalingRegion;
-    }
-
-    /** Returns the network quality of the local participant. */
-    public @NonNull NetworkQualityLevel getNetworkQualityLevel() {
-        return networkQualityLevel;
     }
 
     /** Returns read-only list of audio track publications. */
@@ -605,7 +611,7 @@ public class LocalParticipant implements Participant {
          * This method notifies the listener that the {@link LocalParticipant}'s {@link
          * NetworkQualityLevel} has changed.
          *
-         * @param localParticipant The {@link LocalParticipant} The local participant.
+         * @param localParticipant The {@link LocalParticipant}.
          * @param networkQualityLevel The new {@link NetworkQualityLevel}.
          */
         default void onNetworkQualityLevelChanged(

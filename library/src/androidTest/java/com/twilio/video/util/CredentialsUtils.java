@@ -39,7 +39,7 @@ public class CredentialsUtils {
             "library/twilio-video.json is "
                     + "required to create tokens for library tests that connect to a Room";
 
-    public static String getAccessToken(String username, Topology topology) {
+    public static String getAccessToken(String username) {
         Preconditions.checkNotNull(BuildConfig.twilioCredentials, TWILIO_VIDEO_JSON_NOT_PROVIDED);
         Map<String, String> credentials =
                 resolveCredentials(Environment.fromString(BuildConfig.ENVIRONMENT));

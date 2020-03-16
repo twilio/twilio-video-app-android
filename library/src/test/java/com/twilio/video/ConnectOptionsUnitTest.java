@@ -18,6 +18,7 @@ package com.twilio.video;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -193,5 +194,32 @@ public class ConnectOptionsUnitTest {
                 new ConnectOptions.Builder("token").enableNetworkQuality(false).build();
 
         assertFalse(connectOptions.isNetworkQualityEnabled());
+    }
+
+    @Test
+    public void networkQualityConfigurationShouldBeNullByDefault() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("token").build();
+
+        assertNull(connectOptions.getNetworkQualityConfiguration());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldNotAllowNullNetworkQualityConfiguration() {
+        new ConnectOptions.Builder("token").networkQualityConfiguration(null).build();
+    }
+
+    @Test
+    public void shouldAcceptNetoworkQualityConfiguration() {
+        NetworkQualityConfiguration configuration =
+                new NetworkQualityConfiguration(
+                        NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+                        NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL);
+
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("token")
+                        .networkQualityConfiguration(configuration)
+                        .build();
+
+        assertEquals(connectOptions.getNetworkQualityConfiguration(), configuration);
     }
 }

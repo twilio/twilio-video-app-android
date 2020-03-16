@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Twilio, Inc.
+ * Copyright (C) 2020 Twilio, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,13 @@
 
 package com.twilio.video;
 
-import android.os.Handler;
-import android.os.Looper;
-
-class ThreadChecker {
-    /*
-     * Check if current thread matches handler thread.
+/** The verbosity level of Network Quality information for a {@link Participant}. */
+public enum NetworkQualityVerbosity {
+    /**
+     * Nothing is reported for the {@link Participant}. This is not a valid option for the {@link
+     * LocalParticipant}.
      */
-    static void checkIsValidThread(Handler handler) {
-        Preconditions.checkState(
-                Looper.myLooper() == null
-                        || handler.getLooper().getThread().getId()
-                                == Looper.myLooper().getThread().getId());
-    }
+    NETWORK_QUALITY_VERBOSITY_NONE,
+    /** Reports only the {@link NetworkQualityLevel} for the {@link Participant}. */
+    NETWORK_QUALITY_VERBOSITY_MINIMAL
 }

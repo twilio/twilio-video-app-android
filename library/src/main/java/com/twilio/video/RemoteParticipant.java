@@ -29,6 +29,8 @@ public class RemoteParticipant implements Participant {
 
     private final String identity;
     private final String sid;
+    private NetworkQualityLevel networkQualityLevel =
+            NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN;
     private final List<RemoteAudioTrackPublication> remoteAudioTrackPublications;
     private final List<AudioTrackPublication> audioTrackPublications;
     private final List<RemoteVideoTrackPublication> remoteVideoTrackPublications;
@@ -59,7 +61,7 @@ public class RemoteParticipant implements Participant {
      * an audio track event would be missed if the callback is not posted to the developer's thread.
      */
     @SuppressWarnings("unused")
-    private final Listener participantListenerProxy =
+    final Listener remoteParticipantListenerProxy =
             new Listener() {
                 @Override
                 public void onAudioTrackPublished(
@@ -518,6 +520,24 @@ public class RemoteParticipant implements Participant {
                             });
                 }
 
+                @Override
+                public void onNetworkQualityLevelChanged(
+                        @NonNull final RemoteParticipant remoteParticipant,
+                        @NonNull final NetworkQualityLevel networkQualityLevel) {
+                    handler.post(
+                            () -> {
+                                ThreadChecker.checkIsValidThread(handler);
+                                logger.d("onNetworkQualityLevelChanged");
+                                remoteParticipant.networkQualityLevel = networkQualityLevel;
+                                Listener listener = listenerReference.get();
+
+                                if (listener != null) {
+                                    listener.onNetworkQualityLevelChanged(
+                                            remoteParticipant, networkQualityLevel);
+                                }
+                            });
+                }
+
                 private void checkCallback(
                         RemoteParticipant remoteParticipant,
                         TrackPublication trackPublication,
@@ -570,6 +590,17 @@ public class RemoteParticipant implements Participant {
     @Override
     public String getIdentity() {
         return identity;
+    }
+
+    /**
+     * Returns the {@link RemoteParticipant}'s Network Quality Level.
+     *
+     * @see Participant#getNetworkQualityLevel()
+     */
+    @NonNull
+    @Override
+    public NetworkQualityLevel getNetworkQualityLevel() {
+        return networkQualityLevel;
     }
 
     /** Returns read-only list of audio track publications. */
@@ -916,6 +947,17 @@ public class RemoteParticipant implements Participant {
         void onVideoTrackDisabled(
                 @NonNull RemoteParticipant remoteParticipant,
                 @NonNull RemoteVideoTrackPublication remoteVideoTrackPublication);
+
+        /**
+         * This method notifies the listener that the {@link RemoteParticipant}'s {@link
+         * NetworkQualityLevel} has changed.
+         *
+         * @param remoteParticipant The {@link RemoteParticipant}.
+         * @param networkQualityLevel The new {@link NetworkQualityLevel}.
+         */
+        default void onNetworkQualityLevelChanged(
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull NetworkQualityLevel networkQualityLevel) {}
     }
 
     private native boolean nativeIsConnected(long nativeHandle);

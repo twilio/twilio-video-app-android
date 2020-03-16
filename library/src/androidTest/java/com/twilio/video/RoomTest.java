@@ -59,7 +59,7 @@ public class RoomTest extends BaseVideoTest {
         Topology topology = Topology.GROUP;
         videoRoom = RoomUtils.createRoom(roomName, topology);
         assertNotNull(videoRoom);
-        token = CredentialsUtils.getAccessToken(identity, topology);
+        token = CredentialsUtils.getAccessToken(identity);
     }
 
     @After

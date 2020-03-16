@@ -53,6 +53,7 @@ public class ConnectOptions {
     private final boolean enableAutomaticSubscription;
     private final boolean enableDominantSpeaker;
     private final boolean enableNetworkQuality;
+    private final NetworkQualityConfiguration networkQualityConfiguration;
     private final List<AudioCodec> preferredAudioCodecs;
     private final List<VideoCodec> preferredVideoCodecs;
     private final EncodingParameters encodingParameters;
@@ -110,6 +111,7 @@ public class ConnectOptions {
         this.enableAutomaticSubscription = builder.enableAutomaticSubscription;
         this.enableDominantSpeaker = builder.enableDominantSpeaker;
         this.enableNetworkQuality = builder.enableNetworkQuality;
+        this.networkQualityConfiguration = builder.networkQualityConfiguration;
         this.preferredAudioCodecs = builder.preferredAudioCodecs;
         this.preferredVideoCodecs = builder.preferredVideoCodecs;
         this.region = builder.region;
@@ -151,6 +153,10 @@ public class ConnectOptions {
 
     boolean isNetworkQualityEnabled() {
         return enableNetworkQuality;
+    }
+
+    NetworkQualityConfiguration getNetworkQualityConfiguration() {
+        return networkQualityConfiguration;
     }
 
     private LocalAudioTrack[] getLocalAudioTracksArray() {
@@ -225,8 +231,9 @@ public class ConnectOptions {
                 iceOptions,
                 enableInsights,
                 enableAutomaticSubscription,
-                enableNetworkQuality,
                 enableDominantSpeaker,
+                enableNetworkQuality,
+                networkQualityConfiguration,
                 PlatformInfo.getNativeHandle(),
                 getAudioCodecsArray(),
                 getVideoCodecsArray(),
@@ -243,8 +250,9 @@ public class ConnectOptions {
             IceOptions iceOptions,
             boolean enableInsights,
             boolean enableAutomaticSubscription,
-            boolean enableNetworkQuality,
             boolean enableDominantSpeaker,
+            boolean enableNetworkQuality,
+            NetworkQualityConfiguration networkQualityConfiguration,
             long platformInfoNativeHandle,
             AudioCodec[] preferredAudioCodecs,
             VideoCodec[] preferredVideoCodecs,
@@ -267,6 +275,7 @@ public class ConnectOptions {
         private boolean enableAutomaticSubscription = true;
         private boolean enableDominantSpeaker = false;
         private boolean enableNetworkQuality = false;
+        private NetworkQualityConfiguration networkQualityConfiguration;
         private List<AudioCodec> preferredAudioCodecs;
         private List<VideoCodec> preferredVideoCodecs;
         private String region = "gll";
@@ -346,7 +355,7 @@ public class ConnectOptions {
          * {@link Room} topology is P2P.
          *
          * @see Room#getDominantSpeaker()
-         * @see Room.Listner#onDominantSpeakerChanged()
+         * @see Room.Listener#onDominantSpeakerChanged(Room, RemoteParticipant)
          */
         @NonNull
         public Builder enableDominantSpeaker(boolean enableDominantSpeaker) {
@@ -363,6 +372,23 @@ public class ConnectOptions {
         @NonNull
         public Builder enableNetworkQuality(boolean enableNetworkQuality) {
             this.enableNetworkQuality = enableNetworkQuality;
+            return this;
+        }
+
+        /**
+         * Sets the verbosity level for network quality information returned by the Network Quality
+         * API.
+         *
+         * <p>If a {@link NetworkQualityConfiguration} is not provided, the default configuration is
+         * used: {@link NetworkQualityVerbosity#NETWORK_QUALITY_VERBOSITY_MINIMAL} for the Local
+         * Participant and {@link NetworkQualityVerbosity#NETWORK_QUALITY_VERBOSITY_NONE} for the
+         * Remote Participants.
+         */
+        @NonNull
+        public Builder networkQualityConfiguration(
+                @NonNull NetworkQualityConfiguration networkQualityConfiguration) {
+            Preconditions.checkNotNull(networkQualityConfiguration);
+            this.networkQualityConfiguration = networkQualityConfiguration;
             return this;
         }
 

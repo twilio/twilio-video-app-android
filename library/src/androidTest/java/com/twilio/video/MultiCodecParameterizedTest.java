@@ -252,18 +252,18 @@ public class MultiCodecParameterizedTest extends BaseCodecTest {
         LocalParticipant aliceLocalParticipant = aliceRoom.getLocalParticipant();
         CallbackHelper.FakeLocalParticipantListener localParticipantListener =
                 new CallbackHelper.FakeLocalParticipantListener();
-        CallbackHelper.FakeParticipantListener participantListener =
-                new CallbackHelper.FakeParticipantListener();
-        participantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
+        CallbackHelper.FakeRemoteParticipantListener remoteParticipantListener =
+                new CallbackHelper.FakeRemoteParticipantListener();
+        remoteParticipantListener.onSubscribedToVideoTrackLatch = new CountDownLatch(1);
         localParticipantListener.onPublishedVideoTrackLatch = new CountDownLatch(1);
-        aliceRemoteParticipant.setListener(participantListener);
+        aliceRemoteParticipant.setListener(remoteParticipantListener);
         aliceLocalParticipant.setListener(localParticipantListener);
         aliceLocalParticipant.publishTrack(aliceLocalVideoTrack);
         assertTrue(
                 localParticipantListener.onPublishedVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
         assertTrue(
-                participantListener.onSubscribedToVideoTrackLatch.await(
+                remoteParticipantListener.onSubscribedToVideoTrackLatch.await(
                         TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
 
         // Validate the codec published

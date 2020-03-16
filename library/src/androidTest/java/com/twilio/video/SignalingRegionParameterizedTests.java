@@ -101,8 +101,8 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
         identities.put(BOB, Constants.PARTICIPANT_BOB);
 
         roomName = random(Constants.ROOM_NAME_LENGTH);
-        tokens.put(ALICE, CredentialsUtils.getAccessToken(identities.get(ALICE), Topology.GROUP));
-        tokens.put(BOB, CredentialsUtils.getAccessToken(identities.get(BOB), Topology.GROUP));
+        tokens.put(ALICE, CredentialsUtils.getAccessToken(identities.get(ALICE)));
+        tokens.put(BOB, CredentialsUtils.getAccessToken(identities.get(BOB)));
 
         Video.setModuleLogLevel(LogModule.SIGNALING, LogLevel.ALL);
         Video.setModuleLogLevel(LogModule.CORE, LogLevel.ALL);

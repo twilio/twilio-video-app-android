@@ -86,7 +86,7 @@ public class RemoteParticipantTest extends BaseVideoTest {
         Topology topology = Topology.P2P;
         videoRoom = RoomUtils.createRoom(roomName, topology);
         Assert.assertNotNull(videoRoom);
-        String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE, topology);
+        String aliceToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_ALICE);
         final CountDownLatch aliceConnected = new CountDownLatch(1);
         final CountDownLatch aliceSeesBobConnected = new CountDownLatch(1);
         final CountDownLatch bobPublishedAudioTrack = new CountDownLatch(1);
@@ -112,7 +112,7 @@ public class RemoteParticipantTest extends BaseVideoTest {
                 };
         final CallbackHelper.FakeRoomListener bobRoomListener =
                 new CallbackHelper.FakeRoomListener();
-        String bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB, topology);
+        String bobToken = CredentialsUtils.getAccessToken(Constants.PARTICIPANT_BOB);
         bobRoomListener.onConnectedLatch = new CountDownLatch(1);
         bobRoomListener.onDisconnectedLatch = new CountDownLatch(1);
         final AtomicReference<Room> bobRoom = new AtomicReference<>(null);

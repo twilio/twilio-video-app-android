@@ -20,6 +20,7 @@
 #include "com_twilio_video_LocalAudioTrack.h"
 #include "com_twilio_video_LocalVideoTrack.h"
 #include "com_twilio_video_EncodingParameters.h"
+#include "com_twilio_video_NetworkQuality.h"
 
 #include "webrtc/sdk/android/src/jni/jni_helpers.h"
 #include "class_reference_holder.h"
@@ -98,8 +99,9 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobject j_ice_options,
                                                   jboolean j_enable_insights,
                                                   jboolean j_enable_automatic_subscription,
-                                                  jboolean j_enable_network_quality,
                                                   jboolean j_enable_dominant_speaker,
+                                                  jboolean j_enable_network_quality,
+                                                  jobject j_network_quality_configuration,
                                                   jlong j_platform_info_handle,
                                                   jobjectArray j_preferred_audio_codecs,
                                                   jobjectArray j_preferred_video_codecs,
@@ -238,8 +240,11 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
 
     builder->enableInsights(j_enable_insights);
     builder->enableAutomaticSubscription(j_enable_automatic_subscription);
-    builder->enableNetworkQuality(j_enable_network_quality);
     builder->enableDominantSpeaker(j_enable_dominant_speaker);
+    builder->enableNetworkQuality(j_enable_network_quality);
+    if (!IsNull(env, j_network_quality_configuration)) {
+        builder->setNetworkQualityConfiguration(getCoreNetworkQualityConfiguration(env, j_network_quality_configuration));
+    }
 
     return webrtc::NativeToJavaPointer(builder);
 }

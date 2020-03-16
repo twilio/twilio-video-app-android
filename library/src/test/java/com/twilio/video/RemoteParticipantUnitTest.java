@@ -16,12 +16,18 @@
 
 package com.twilio.video;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import android.os.Handler;
 import java.util.Arrays;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -75,5 +81,64 @@ public class RemoteParticipantUnitTest {
     @Test(expected = UnsupportedOperationException.class)
     public void shouldNotAllowModifyingSubscribedVideoTracks() {
         remoteParticipant.getRemoteVideoTracks().add(mockRemoteVideoTrackPublicationOne);
+    }
+
+    @Test
+    public void networkQualityLevelShouldBeUnknownByDefault() {
+        assertEquals(
+                remoteParticipant.getNetworkQualityLevel(),
+                NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN);
+    }
+
+    @Test
+    public void onNetworkQualityLevelChangedShouldInvokeCallbackOnNetworkQualityChange() {
+        RemoteParticipant.Listener remoteParticipantListener =
+                mock(RemoteParticipant.Listener.class);
+        remoteParticipant.setListener(remoteParticipantListener);
+        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        NetworkQualityLevel networkQualityLevel = NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE;
+
+        remoteParticipant.remoteParticipantListenerProxy.onNetworkQualityLevelChanged(
+                remoteParticipant, networkQualityLevel);
+        verify(handler).post(captor.capture());
+        Runnable callback = captor.getValue();
+        callback.run();
+
+        assertEquals(networkQualityLevel, remoteParticipant.getNetworkQualityLevel());
+    }
+
+    @Test
+    public void
+            onNetworkQualityLevelChangedShouldInvokeCallbackOnNetworkQualityChangeWithAnotherQualityLevel() {
+        RemoteParticipant.Listener remoteParticipantListener =
+                mock(RemoteParticipant.Listener.class);
+        remoteParticipant.setListener(remoteParticipantListener);
+        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+
+        NetworkQualityLevel networkQualityLevel = NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO;
+        remoteParticipant.remoteParticipantListenerProxy.onNetworkQualityLevelChanged(
+                remoteParticipant, networkQualityLevel);
+        verify(handler).post(captor.capture());
+        Runnable callback = captor.getValue();
+        callback.run();
+
+        assertEquals(networkQualityLevel, remoteParticipant.getNetworkQualityLevel());
+    }
+
+    @Test
+    public void onNetworkQualityLevelChangedShouldNotInvokeListenerIfItHasNotBeenSet() {
+        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+
+        remoteParticipant.remoteParticipantListenerProxy.onNetworkQualityLevelChanged(
+                remoteParticipant, NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE);
+        verify(handler).post(captor.capture());
+        Runnable callback = captor.getValue();
+        try {
+            callback.run();
+        } catch (NullPointerException e) {
+            fail("NullPointerException should not be thrown here!");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
