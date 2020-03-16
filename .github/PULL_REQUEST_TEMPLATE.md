@@ -19,5 +19,5 @@
 [Any additional comments, notes, or information relevant to reviewers.]
 
 ## Submission Checklist
-
+ - [ ] The source has been evaluated for semantic versioning changes and are reflected in ```versionName``` under `app/build.gradle`
  - [ ] The `CHANGELOG.md` reflects any **feature**, **bug fixes**, or **known issues** made in the source code
