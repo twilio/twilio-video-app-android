@@ -13,6 +13,8 @@ import com.twilio.video.H264Codec
 import com.twilio.video.IsacCodec
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalVideoTrack
+import com.twilio.video.NetworkQualityConfiguration
+import com.twilio.video.NetworkQualityVerbosity
 import com.twilio.video.OpusCodec
 import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
@@ -83,12 +85,17 @@ class RoomManager(
 
                 val preferredAudioCodec: AudioCodec = getAudioCodecPreference()
 
+                val configuration = NetworkQualityConfiguration(
+                        NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+                        NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
+
                 val connectOptionsBuilder = ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .enableAutomaticSubscription(enableAutomaticTrackSubscription)
                         .enableDominantSpeaker(enableDominantSpeaker)
                         .enableInsights(enableInsights)
                         .enableNetworkQuality(isNetworkQualityEnabled)
+                        .networkQualityConfiguration(configuration)
 
                 val maxVideoBitrate = sharedPreferences.getInt(
                         Preferences.MAX_VIDEO_BITRATE,
