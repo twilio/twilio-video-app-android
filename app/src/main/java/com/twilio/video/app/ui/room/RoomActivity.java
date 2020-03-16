@@ -51,6 +51,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -1010,8 +1011,6 @@ public class RoomActivity extends BaseActivity {
      * @param remoteParticipant newly joined room remoteParticipant
      */
     private void addParticipant(RemoteParticipant remoteParticipant, boolean renderAsPrimary) {
-        ParticipantListener listener = new ParticipantListener();
-        remoteParticipant.setListener(listener);
         boolean muted =
                 remoteParticipant.getRemoteAudioTracks().size() <= 0
                         || !remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled();
@@ -1023,20 +1022,14 @@ public class RoomActivity extends BaseActivity {
              * Add placeholder UI by passing null video track for a participant that is not
              * sharing any video tracks.
              */
-            addParticipantVideoTrack(
-                    remoteParticipant.getSid(),
-                    remoteParticipant.getIdentity(),
-                    null,
-                    muted,
-                    renderAsPrimary);
+            addParticipantVideoTrack(remoteParticipant, muted, null, renderAsPrimary);
         } else {
             for (RemoteVideoTrackPublication remoteVideoTrackPublication :
                     remoteVideoTrackPublications) {
                 addParticipantVideoTrack(
-                        remoteParticipant.getSid(),
-                        remoteParticipant.getIdentity(),
-                        remoteVideoTrackPublication.getRemoteVideoTrack(),
+                        remoteParticipant,
                         muted,
+                        remoteVideoTrackPublication.getRemoteVideoTrack(),
                         renderAsPrimary);
                 renderAsPrimary = false;
             }
@@ -1044,18 +1037,39 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void addParticipantVideoTrack(
-            String participantSid,
-            String participantIdentity,
-            RemoteVideoTrack remoteVideoTrack,
+            RemoteParticipant remoteParticipant,
             boolean muted,
+            RemoteVideoTrack remoteVideoTrack,
             boolean renderAsPrimary) {
+        boolean isNetworkQualityEnabled = isNetworkQualityEnabled();
         if (renderAsPrimary) {
+            ParticipantPrimaryView primaryView = participantController.getPrimaryView();
+
             renderItemAsPrimary(
                     new ParticipantController.Item(
-                            participantSid, participantIdentity, remoteVideoTrack, muted, false));
+                            remoteParticipant.getSid(),
+                            remoteParticipant.getIdentity(),
+                            remoteVideoTrack,
+                            muted,
+                            false,
+                            isNetworkQualityEnabled));
+            primaryView.showNetworkQualityLevel(true);
+            RemoteParticipantListener listener = new RemoteParticipantListener(primaryView);
+            remoteParticipant.setListener(listener);
         } else {
             participantController.addThumb(
-                    participantSid, participantIdentity, remoteVideoTrack, muted, false, false);
+                    remoteParticipant.getSid(),
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack,
+                    muted,
+                    false,
+                    isNetworkQualityEnabled);
+
+            RemoteParticipantListener listener =
+                    new RemoteParticipantListener(
+                            participantController.getThumb(
+                                    remoteParticipant.getSid(), remoteVideoTrack));
+            remoteParticipant.setListener(listener);
         }
     }
 
@@ -1421,24 +1435,25 @@ public class RoomActivity extends BaseActivity {
         public void onNetworkQualityLevelChanged(
                 @NonNull LocalParticipant localParticipant,
                 @NonNull NetworkQualityLevel networkQualityLevel) {
-            if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
-                    || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
-            }
+            networkQualityImage.setImageResource(getNetworkQuality(networkQualityLevel));
         }
     }
 
-    private class ParticipantListener implements RemoteParticipant.Listener {
+    private class RemoteParticipantListener implements RemoteParticipant.Listener {
+
+        private ImageView networkQualityImage;
+
+        RemoteParticipantListener(ParticipantView primaryView) {
+            networkQualityImage = primaryView.networkQualityLevelImg;
+        }
+
+        @Override
+        public void onNetworkQualityLevelChanged(
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull NetworkQualityLevel networkQualityLevel) {
+            networkQualityImage.setImageResource(getNetworkQuality(networkQualityLevel));
+        }
+
         @Override
         public void onAudioTrackPublished(
                 @NonNull RemoteParticipant remoteParticipant,
@@ -1762,6 +1777,27 @@ public class RoomActivity extends BaseActivity {
 
             // TODO: need design
         }
+    }
+
+    private @DrawableRes int getNetworkQuality(NetworkQualityLevel networkQualityLevel) {
+        int result = R.drawable.network_quality_level_0;
+
+        if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
+                || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+            result = R.drawable.network_quality_level_0;
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
+            result = R.drawable.network_quality_level_1;
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
+            result = R.drawable.network_quality_level_2;
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
+            result = R.drawable.network_quality_level_3;
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
+            result = R.drawable.network_quality_level_4;
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
+            result = R.drawable.network_quality_level_5;
+        }
+
+        return result;
     }
 
     private boolean didAcceptPermissions() {
