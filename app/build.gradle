@@ -18,7 +18,7 @@ apply plugin: 'kotlin-kapt'
 def videoAndroidSdkDepProp = "videoAppSdkDependency"
 def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
         project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:5.1.1")
+        "com.twilio:video-android:5.2.0")
 def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
