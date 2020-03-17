@@ -1054,7 +1054,7 @@ public class RoomActivity extends BaseActivity {
                             muted,
                             false,
                             isNetworkQualityEnabled));
-            primaryView.showNetworkQualityLevel(true);
+            primaryView.showNetworkQualityLevel(isNetworkQualityEnabled);
             RemoteParticipantListener listener = new RemoteParticipantListener(primaryView);
             remoteParticipant.setListener(listener);
         } else {
@@ -1126,7 +1126,7 @@ public class RoomActivity extends BaseActivity {
         RemoteParticipant remoteParticipant = getRemoteParticipant(item);
         if (remoteParticipant != null) {
             ParticipantPrimaryView primaryView = participantController.getPrimaryView();
-            primaryView.showNetworkQualityLevel(true);
+            primaryView.showNetworkQualityLevel(isNetworkQualityEnabled());
             RemoteParticipantListener listener = new RemoteParticipantListener(primaryView);
             remoteParticipant.setListener(listener);
         }
