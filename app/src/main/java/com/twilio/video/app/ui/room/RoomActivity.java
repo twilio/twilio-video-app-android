@@ -53,6 +53,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -1102,12 +1103,33 @@ public class RoomActivity extends BaseActivity {
             } else {
 
                 // add thumb for remote participant
-                participantController.addThumb(old);
+                RemoteParticipant remoteParticipant = getRemoteParticipant(old);
+                if (remoteParticipant != null) {
+                    participantController.addThumb(
+                            old.sid,
+                            old.identity,
+                            old.videoTrack,
+                            old.muted,
+                            old.mirror,
+                            isNetworkQualityEnabled());
+                    RemoteParticipantListener listener =
+                            new RemoteParticipantListener(
+                                    participantController.getThumb(old.sid, old.videoTrack));
+                    remoteParticipant.setListener(listener);
+                }
             }
         }
 
         // handle new primary participant click
         participantController.renderAsPrimary(item);
+
+        RemoteParticipant remoteParticipant = getRemoteParticipant(item);
+        if (remoteParticipant != null) {
+            ParticipantPrimaryView primaryView = participantController.getPrimaryView();
+            primaryView.showNetworkQualityLevel(true);
+            RemoteParticipantListener listener = new RemoteParticipantListener(primaryView);
+            remoteParticipant.setListener(listener);
+        }
 
         if (item.sid.equals(localParticipantSid)) {
 
@@ -1120,6 +1142,16 @@ public class RoomActivity extends BaseActivity {
             // remove remote participant thumb
             participantController.removeThumb(item);
         }
+    }
+
+    private @Nullable RemoteParticipant getRemoteParticipant(ParticipantController.Item item) {
+        RemoteParticipant remoteParticipant = null;
+
+        for (RemoteParticipant temp : room.getRemoteParticipants()) {
+            if (temp.getSid().equals(item.sid)) remoteParticipant = temp;
+        }
+
+        return remoteParticipant;
     }
 
     /** Removes all participant thumbs and push local camera as primary with empty sid. */
