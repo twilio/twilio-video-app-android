@@ -23,6 +23,8 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import timber.log.Timber
+import tvi.webrtc.voiceengine.WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage
+import tvi.webrtc.voiceengine.WebRtcAudioUtils.deviceIsBlacklistedForOpenSLESUsage
 import javax.inject.Inject
 
 class VideoApplication : Application(), HasAndroidInjector {
@@ -38,6 +40,10 @@ class VideoApplication : Application(), HasAndroidInjector {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (!deviceIsBlacklistedForOpenSLESUsage()) {
+            setBlacklistDeviceForOpenSLESUsage(true)
+        }
 
         DaggerVideoApplicationComponent
                 .builder()
