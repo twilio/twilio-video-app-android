@@ -52,6 +52,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -244,6 +245,9 @@ public class RoomActivity extends BaseActivity {
     private StatsScheduler statsScheduler;
     private StatsListAdapter statsListAdapter;
     private Map<String, String> localVideoTrackNames = new HashMap<>();
+    // TODO This should be decoupled from this Activity as part of
+    // https://issues.corp.twilio.com/browse/AHOYAPPS-473
+    private Map<String, NetworkQualityLevel> networkQualityLevels = new HashMap<>();
 
     @Inject TokenService tokenService;
 
@@ -1010,8 +1014,6 @@ public class RoomActivity extends BaseActivity {
      * @param remoteParticipant newly joined room remoteParticipant
      */
     private void addParticipant(RemoteParticipant remoteParticipant, boolean renderAsPrimary) {
-        ParticipantListener listener = new ParticipantListener();
-        remoteParticipant.setListener(listener);
         boolean muted =
                 remoteParticipant.getRemoteAudioTracks().size() <= 0
                         || !remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled();
@@ -1023,20 +1025,14 @@ public class RoomActivity extends BaseActivity {
              * Add placeholder UI by passing null video track for a participant that is not
              * sharing any video tracks.
              */
-            addParticipantVideoTrack(
-                    remoteParticipant.getSid(),
-                    remoteParticipant.getIdentity(),
-                    null,
-                    muted,
-                    renderAsPrimary);
+            addParticipantVideoTrack(remoteParticipant, muted, null, renderAsPrimary);
         } else {
             for (RemoteVideoTrackPublication remoteVideoTrackPublication :
                     remoteVideoTrackPublications) {
                 addParticipantVideoTrack(
-                        remoteParticipant.getSid(),
-                        remoteParticipant.getIdentity(),
-                        remoteVideoTrackPublication.getRemoteVideoTrack(),
+                        remoteParticipant,
                         muted,
+                        remoteVideoTrackPublication.getRemoteVideoTrack(),
                         renderAsPrimary);
                 renderAsPrimary = false;
             }
@@ -1044,18 +1040,37 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void addParticipantVideoTrack(
-            String participantSid,
-            String participantIdentity,
-            RemoteVideoTrack remoteVideoTrack,
+            RemoteParticipant remoteParticipant,
             boolean muted,
+            RemoteVideoTrack remoteVideoTrack,
             boolean renderAsPrimary) {
         if (renderAsPrimary) {
+            ParticipantPrimaryView primaryView = participantController.getPrimaryView();
+
             renderItemAsPrimary(
                     new ParticipantController.Item(
-                            participantSid, participantIdentity, remoteVideoTrack, muted, false));
+                            remoteParticipant.getSid(),
+                            remoteParticipant.getIdentity(),
+                            remoteVideoTrack,
+                            muted,
+                            false));
+            RemoteParticipantListener listener =
+                    new RemoteParticipantListener(primaryView, remoteParticipant.getSid());
+            remoteParticipant.setListener(listener);
         } else {
             participantController.addThumb(
-                    participantSid, participantIdentity, remoteVideoTrack, muted, false, false);
+                    remoteParticipant.getSid(),
+                    remoteParticipant.getIdentity(),
+                    remoteVideoTrack,
+                    muted,
+                    false);
+
+            RemoteParticipantListener listener =
+                    new RemoteParticipantListener(
+                            participantController.getThumb(
+                                    remoteParticipant.getSid(), remoteVideoTrack),
+                            remoteParticipant.getSid());
+            remoteParticipant.setListener(listener);
         }
     }
 
@@ -1088,12 +1103,29 @@ public class RoomActivity extends BaseActivity {
             } else {
 
                 // add thumb for remote participant
-                participantController.addThumb(old);
+                RemoteParticipant remoteParticipant = getRemoteParticipant(old);
+                if (remoteParticipant != null) {
+                    participantController.addThumb(
+                            old.sid, old.identity, old.videoTrack, old.muted, old.mirror);
+                    RemoteParticipantListener listener =
+                            new RemoteParticipantListener(
+                                    participantController.getThumb(old.sid, old.videoTrack),
+                                    remoteParticipant.getSid());
+                    remoteParticipant.setListener(listener);
+                }
             }
         }
 
         // handle new primary participant click
         participantController.renderAsPrimary(item);
+
+        RemoteParticipant remoteParticipant = getRemoteParticipant(item);
+        if (remoteParticipant != null) {
+            ParticipantPrimaryView primaryView = participantController.getPrimaryView();
+            RemoteParticipantListener listener =
+                    new RemoteParticipantListener(primaryView, remoteParticipant.getSid());
+            remoteParticipant.setListener(listener);
+        }
 
         if (item.sid.equals(localParticipantSid)) {
 
@@ -1106,6 +1138,16 @@ public class RoomActivity extends BaseActivity {
             // remove remote participant thumb
             participantController.removeThumb(item);
         }
+    }
+
+    private @Nullable RemoteParticipant getRemoteParticipant(ParticipantController.Item item) {
+        RemoteParticipant remoteParticipant = null;
+
+        for (RemoteParticipant temp : room.getRemoteParticipants()) {
+            if (temp.getSid().equals(item.sid)) remoteParticipant = temp;
+        }
+
+        return remoteParticipant;
     }
 
     /** Removes all participant thumbs and push local camera as primary with empty sid. */
@@ -1247,8 +1289,7 @@ public class RoomActivity extends BaseActivity {
                         cameraVideoTrack,
                         localAudioTrack == null,
                         cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA,
-                        isNetworkQualityEnabled());
+                                == CameraCapturer.CameraSource.FRONT_CAMERA);
 
                 localParticipant.setListener(
                         new LocalParticipantListener(
@@ -1302,6 +1343,7 @@ public class RoomActivity extends BaseActivity {
                             localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
                             updateStats();
                             setAudioFocus(false);
+                            networkQualityLevels.clear();
                             break;
                     }
                 }
@@ -1323,7 +1365,10 @@ public class RoomActivity extends BaseActivity {
                     updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
                 }
                 if (roomEvent instanceof ParticipantDisconnected) {
-                    removeParticipant(((ParticipantDisconnected) roomEvent).getRemoteParticipant());
+                    RemoteParticipant remoteParticipant =
+                            ((ParticipantDisconnected) roomEvent).getRemoteParticipant();
+                    networkQualityLevels.remove(remoteParticipant.getSid());
+                    removeParticipant(remoteParticipant);
 
                     updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
                 }
@@ -1421,24 +1466,28 @@ public class RoomActivity extends BaseActivity {
         public void onNetworkQualityLevelChanged(
                 @NonNull LocalParticipant localParticipant,
                 @NonNull NetworkQualityLevel networkQualityLevel) {
-            if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
-                    || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
-            } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
-                networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
-            }
+            setNetworkQualityLevelImage(
+                    networkQualityImage, networkQualityLevel, localParticipant.getSid());
         }
     }
 
-    private class ParticipantListener implements RemoteParticipant.Listener {
+    private class RemoteParticipantListener implements RemoteParticipant.Listener {
+
+        private ImageView networkQualityImage;
+
+        RemoteParticipantListener(ParticipantView primaryView, String sid) {
+            networkQualityImage = primaryView.networkQualityLevelImg;
+            setNetworkQualityLevelImage(networkQualityImage, networkQualityLevels.get(sid), sid);
+        }
+
+        @Override
+        public void onNetworkQualityLevelChanged(
+                @NonNull RemoteParticipant remoteParticipant,
+                @NonNull NetworkQualityLevel networkQualityLevel) {
+            setNetworkQualityLevelImage(
+                    networkQualityImage, networkQualityLevel, remoteParticipant.getSid());
+        }
+
         @Override
         public void onAudioTrackPublished(
                 @NonNull RemoteParticipant remoteParticipant,
@@ -1761,6 +1810,30 @@ public class RoomActivity extends BaseActivity {
                     remoteVideoTrackPublication.isTrackEnabled());
 
             // TODO: need design
+        }
+    }
+
+    private void setNetworkQualityLevelImage(
+            ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel, String sid) {
+        networkQualityLevels.put(sid, networkQualityLevel);
+        if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
+                || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+            networkQualityImage.setVisibility(View.GONE);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
         }
     }
 

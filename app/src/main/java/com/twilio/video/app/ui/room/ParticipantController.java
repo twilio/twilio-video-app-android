@@ -52,21 +52,15 @@ class ParticipantController {
     }
 
     private void addThumb(String sid, String identity) {
-        addThumb(sid, identity, null, true, false, false);
+        addThumb(sid, identity, null, true, false);
     }
 
     void addThumb(Item item) {
-        addThumb(
-                item.sid,
-                item.identity,
-                item.videoTrack,
-                item.muted,
-                item.mirror,
-                item.showNetworkQualityLevel);
+        addThumb(item.sid, item.identity, item.videoTrack, item.muted, item.mirror);
     }
 
     private void addThumb(String sid, String identity, VideoTrack videoTrack) {
-        addThumb(sid, identity, videoTrack, true, false, false);
+        addThumb(sid, identity, videoTrack, true, false);
     }
 
     /**
@@ -78,14 +72,9 @@ class ParticipantController {
      * @param muted participant audio state.
      */
     void addThumb(
-            String sid,
-            String identity,
-            VideoTrack videoTrack,
-            boolean muted,
-            boolean mirror,
-            boolean showNetworkQualityLevel) {
+            String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
 
-        Item item = new Item(sid, identity, videoTrack, muted, mirror, showNetworkQualityLevel);
+        Item item = new Item(sid, identity, videoTrack, muted, mirror);
         ParticipantView view = createThumb(item);
         thumbs.put(item, view);
         thumbsViewContainer.addView(view);
@@ -399,7 +388,6 @@ class ParticipantController {
         view.setIdentity(item.identity);
         view.setMuted(item.muted);
         view.setMirror(item.mirror);
-        view.showNetworkQualityLevel(item.showNetworkQualityLevel);
 
         view.setOnClickListener(
                 participantView -> {
@@ -451,8 +439,6 @@ class ParticipantController {
         /** Video track mirroring enabled/disabled. */
         boolean mirror;
 
-        boolean showNetworkQualityLevel;
-
         Item(String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
 
             this.sid = sid;
@@ -460,18 +446,6 @@ class ParticipantController {
             this.videoTrack = videoTrack;
             this.muted = muted;
             this.mirror = mirror;
-        }
-
-        Item(
-                String sid,
-                String identity,
-                VideoTrack videoTrack,
-                boolean muted,
-                boolean mirror,
-                boolean showNetworkQualityLevel) {
-
-            this(sid, identity, videoTrack, muted, mirror);
-            this.showNetworkQualityLevel = showNetworkQualityLevel;
         }
     }
 

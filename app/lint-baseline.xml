@@ -816,6 +816,17 @@
 
     <issue
         id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;10dp&quot;` to better support right-to-left layouts"
+        errorLine1="                android:layout_marginRight=&quot;10dp&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/participant_view_primary.xml"
+            line="72"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
         message="Consider adding `android:layout_marginStart=&quot;10dp&quot;` to better support right-to-left layouts"
         errorLine1="                android:layout_marginLeft=&quot;10dp&quot;"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
