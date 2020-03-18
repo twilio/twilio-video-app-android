@@ -108,11 +108,11 @@ class RoomManager(
                 val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
 
                 if (localAudioTracks.isNotEmpty()) {
-                    connectOptionsBuilder.audioTracks(localAudioTracks)
+                    connectOptionsBuilder.audioTracks(localAudioTracks.filter { it.isEnabled })
                 }
 
                 if (localVideoTracks.isNotEmpty()) {
-                    connectOptionsBuilder.videoTracks(localVideoTracks)
+                    connectOptionsBuilder.videoTracks(localVideoTracks.filter { it.isEnabled })
                 }
 
                 connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
