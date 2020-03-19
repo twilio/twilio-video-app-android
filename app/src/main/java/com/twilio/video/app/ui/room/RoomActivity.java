@@ -314,9 +314,9 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean isAppLinkProvided = checkIntentURI();
+        checkIntentURI();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        updateUi(room, isAppLinkProvided);
+        updateUi(room);
         restoreCameraTrack();
         initializeRoom();
         updateStats();
@@ -780,17 +780,13 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void updateUi(Room room) {
-        updateUi(room, false);
-    }
-
-    private void updateUi(Room room, boolean isAppLinkProvided) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
 
         boolean settingsMenuItemState = true;
 
-        boolean connectButtonEnabled = isAppLinkProvided;
+        boolean connectButtonEnabled = !roomEditText.getText().toString().isEmpty();
 
         String roomName = displayName;
         String toolbarTitle = displayName;
