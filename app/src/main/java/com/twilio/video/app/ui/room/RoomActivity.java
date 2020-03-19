@@ -321,9 +321,7 @@ public class RoomActivity extends BaseActivity {
 
         updateStats();
 
-        // TODO Remove once the ViewModel is used to persist the view state
-        RoomEvent currentRoomEvent = roomViewModel.getRoomEvents().getValue();
-        if (isPostRoomConnectionEvent(currentRoomEvent)) addParticipantViews();
+        addParticipantViews();
     }
 
     @Override
@@ -331,15 +329,6 @@ public class RoomActivity extends BaseActivity {
         super.onResume();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
         setTitle(displayName);
-    }
-
-    private boolean isPostRoomConnectionEvent(RoomEvent currentRoomEvent) {
-        return currentRoomEvent != null
-                && currentRoomEvent.getRoom() != null
-                && (currentRoomEvent.getRoom().getState() == CONNECTED
-                        || currentRoomEvent instanceof RoomEvent.ParticipantConnected
-                        || currentRoomEvent instanceof RoomEvent.ParticipantDisconnected
-                        || currentRoomEvent instanceof RoomEvent.DominantSpeakerChanged);
     }
 
     private boolean checkIntentURI() {
