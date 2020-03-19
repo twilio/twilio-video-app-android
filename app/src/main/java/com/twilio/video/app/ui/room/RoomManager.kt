@@ -11,8 +11,6 @@ import com.twilio.video.EncodingParameters
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
 import com.twilio.video.IsacCodec
-import com.twilio.video.LocalAudioTrack
-import com.twilio.video.LocalVideoTrack
 import com.twilio.video.NetworkQualityConfiguration
 import com.twilio.video.NetworkQualityVerbosity
 import com.twilio.video.OpusCodec
@@ -61,8 +59,6 @@ class RoomManager(
     suspend fun connectToRoom(
         identity: String,
         roomName: String,
-        localAudioTracks: List<LocalAudioTrack>,
-        localVideoTracks: List<LocalVideoTrack>,
         isNetworkQualityEnabled: Boolean
     ) {
         coroutineScope.launch {
@@ -106,14 +102,6 @@ class RoomManager(
                         Preferences.MAX_AUDIO_BITRATE_DEFAULT)
 
                 val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
-
-                if (localAudioTracks.isNotEmpty()) {
-                    connectOptionsBuilder.audioTracks(localAudioTracks.filter { it.isEnabled })
-                }
-
-                if (localVideoTracks.isNotEmpty()) {
-                    connectOptionsBuilder.videoTracks(localVideoTracks.filter { it.isEnabled })
-                }
 
                 connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
                 connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))

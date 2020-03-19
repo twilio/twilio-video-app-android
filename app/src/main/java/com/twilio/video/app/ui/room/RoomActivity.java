@@ -108,8 +108,6 @@ import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import io.reactivex.disposables.CompositeDisposable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -522,26 +520,8 @@ public class RoomActivity extends BaseActivity {
         if (text != null) {
             final String roomName = text.toString();
 
-            roomViewModel.connectToRoom(
-                    displayName,
-                    roomName,
-                    getLocalAudioTracks(),
-                    getLocalVideoTracks(),
-                    isNetworkQualityEnabled());
+            roomViewModel.connectToRoom(displayName, roomName, isNetworkQualityEnabled());
         }
-    }
-
-    private List<LocalAudioTrack> getLocalAudioTracks() {
-        return localAudioTrack != null
-                ? Collections.singletonList(localAudioTrack)
-                : Collections.emptyList();
-    }
-
-    private List<LocalVideoTrack> getLocalVideoTracks() {
-        List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
-        if (cameraVideoTrack != null) localVideoTracks.add(cameraVideoTrack);
-        if (screenVideoTrack != null) localVideoTracks.add(screenVideoTrack);
-        return localVideoTracks;
     }
 
     @OnClick(R.id.disconnect)
