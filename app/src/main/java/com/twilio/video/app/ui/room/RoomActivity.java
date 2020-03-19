@@ -777,7 +777,8 @@ public class RoomActivity extends BaseActivity {
 
         boolean settingsMenuItemState = true;
 
-        boolean connectButtonEnabled = !roomEditText.getText().toString().isEmpty();
+        Editable roomEditable = roomEditText.getText();
+        boolean connectButtonEnabled = roomEditable != null && !roomEditable.toString().isEmpty();
 
         String roomName = displayName;
         String toolbarTitle = displayName;
