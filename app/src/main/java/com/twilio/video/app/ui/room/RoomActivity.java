@@ -312,14 +312,36 @@ public class RoomActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        checkIntentURI();
+
+        restoreCameraTrack();
+
+        publishLocalTracks();
+
+        updateStats();
+
+        // TODO Remove once the ViewModel is used to persist the view state
+        RoomEvent currentRoomEvent = roomViewModel.getRoomEvents().getValue();
+        if (isPostRoomConnectionEvent(currentRoomEvent)) addParticipantViews();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        checkIntentURI();
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null);
-        updateUi(room);
-        restoreCameraTrack();
-        initializeRoom();
-        updateStats();
+        setTitle(displayName);
+    }
+
+    private boolean isPostRoomConnectionEvent(RoomEvent currentRoomEvent) {
+        return currentRoomEvent != null
+                && currentRoomEvent.getRoom() != null
+                && (currentRoomEvent.getRoom().getState() == CONNECTED
+                        || currentRoomEvent instanceof RoomEvent.ParticipantConnected
+                        || currentRoomEvent instanceof RoomEvent.ParticipantDisconnected
+                        || currentRoomEvent instanceof RoomEvent.DominantSpeakerChanged);
     }
 
     private boolean checkIntentURI() {
@@ -387,10 +409,10 @@ public class RoomActivity extends BaseActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         removeCameraTrack();
         removeAllParticipants();
-        super.onPause();
+        super.onStop();
     }
 
     @Override
@@ -844,10 +866,7 @@ public class RoomActivity extends BaseActivity {
         joinStatusLayout.setVisibility(joinStatusLayoutState);
         connect.setEnabled(connectButtonEnabled);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(toolbarTitle);
-        }
+        setTitle(toolbarTitle);
 
         joinStatusTextView.setText(joinStatus);
         joinRoomNameTextView.setText(roomName);
@@ -856,6 +875,13 @@ public class RoomActivity extends BaseActivity {
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         if (settingsMenuItem != null) {
             settingsMenuItem.setVisible(settingsMenuItemState);
+        }
+    }
+
+    private void setTitle(String toolbarTitle) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(toolbarTitle);
         }
     }
 
@@ -1260,59 +1286,70 @@ public class RoomActivity extends BaseActivity {
 
     private void initializeRoom() {
         if (room != null) {
+
             localParticipant = room.getLocalParticipant();
-            if (localParticipant != null) {
-                localParticipantSid = localParticipant.getSid();
 
-                if (cameraVideoTrack != null) {
-                    localParticipant.publishTrack(cameraVideoTrack);
-                }
+            publishLocalTracks();
 
-                if (localAudioTrack != null) {
-                    localParticipant.publishTrack(localAudioTrack);
-                }
+            setAudioFocus(true);
 
-                setAudioFocus(true);
-                updateStats();
+            updateStats();
 
-                // remove primary view
-                participantController.removePrimary();
+            addParticipantViews();
+        }
+    }
 
-                // add local thumb and "click" on it to make primary
-                participantController.addThumb(
-                        localParticipantSid,
-                        getString(R.string.you),
-                        cameraVideoTrack,
-                        localAudioTrack == null,
-                        cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA);
+    private void publishLocalTracks() {
+        if (localParticipant != null) {
+            if (cameraVideoTrack != null) {
+                Timber.d("Camera track: %s", cameraVideoTrack);
+                localParticipant.publishTrack(cameraVideoTrack);
+            }
 
-                localParticipant.setListener(
-                        new LocalParticipantListener(
-                                participantController.getThumb(
-                                        localParticipantSid, cameraVideoTrack)));
-                participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+            if (localAudioTrack != null) {
+                localParticipant.publishTrack(localAudioTrack);
+            }
+        }
+    }
 
-                // add existing room participants thumbs
-                boolean isFirstParticipant = true;
-                for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-                    addParticipant(remoteParticipant, isFirstParticipant);
-                    isFirstParticipant = false;
-                    if (room.getDominantSpeaker() != null) {
-                        if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
-                            VideoTrack videoTrack =
-                                    (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                            ? remoteParticipant
-                                                    .getRemoteVideoTracks()
-                                                    .get(0)
-                                                    .getRemoteVideoTrack()
-                                            : null;
-                            if (videoTrack != null) {
-                                ParticipantView participantView =
-                                        participantController.getThumb(
-                                                remoteParticipant.getSid(), videoTrack);
-                                participantController.setDominantSpeaker(participantView);
-                            }
+    private void addParticipantViews() {
+        if (room != null && localParticipant != null) {
+            localParticipantSid = localParticipant.getSid();
+            // remove primary view
+            participantController.removePrimary();
+
+            // add local thumb and "click" on it to make primary
+            participantController.addThumb(
+                    localParticipantSid,
+                    getString(R.string.you),
+                    cameraVideoTrack,
+                    localAudioTrack == null,
+                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+
+            localParticipant.setListener(
+                    new LocalParticipantListener(
+                            participantController.getThumb(localParticipantSid, cameraVideoTrack)));
+            participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+
+            // add existing room participants thumbs
+            boolean isFirstParticipant = true;
+            for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
+                addParticipant(remoteParticipant, isFirstParticipant);
+                isFirstParticipant = false;
+                if (room.getDominantSpeaker() != null) {
+                    if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
+                        VideoTrack videoTrack =
+                                (remoteParticipant.getRemoteVideoTracks().size() > 0)
+                                        ? remoteParticipant
+                                                .getRemoteVideoTracks()
+                                                .get(0)
+                                                .getRemoteVideoTrack()
+                                        : null;
+                        if (videoTrack != null) {
+                            ParticipantView participantView =
+                                    participantController.getThumb(
+                                            remoteParticipant.getSid(), videoTrack);
+                            participantController.setDominantSpeaker(participantView);
                         }
                     }
                 }
