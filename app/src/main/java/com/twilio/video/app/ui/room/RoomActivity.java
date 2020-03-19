@@ -1815,10 +1815,13 @@ public class RoomActivity extends BaseActivity {
 
     private void setNetworkQualityLevelImage(
             ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel, String sid) {
+
         networkQualityLevels.put(sid, networkQualityLevel);
-        if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
-                || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+        if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN) {
             networkQualityImage.setVisibility(View.GONE);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
         } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
             networkQualityImage.setVisibility(View.VISIBLE);
             networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
