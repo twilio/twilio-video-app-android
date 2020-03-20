@@ -1281,10 +1281,6 @@ public class RoomActivity extends BaseActivity {
             if (localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
             }
-
-            if (screenVideoTrack != null) {
-                localParticipant.publishTrack(screenVideoTrack);
-            }
         }
     }
 
