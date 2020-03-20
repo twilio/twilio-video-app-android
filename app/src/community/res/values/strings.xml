@@ -6,5 +6,6 @@
     <string name="login_screen_name">Your name</string>
     <string name="login_screen_passcode">Passcode</string>
     <string name="login_screen_error_title">Log In Error</string>
-    <string name="login_screen_invalid_passcode_error">Expired passcode.</string>
+    <string name="login_screen_invalid_passcode_error">Passcode incorrect.</string>
+    <string name="login_screen_expired_passcode_error">Passcode expired. Please sign in with a new passcode.</string>
 </resources>

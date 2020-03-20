@@ -33,7 +33,7 @@ import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.security.SecurePreferencesFake
 import com.twilio.video.app.security.SecurityModule
 import com.twilio.video.app.ui.room.RoomActivity
-import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
+import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import com.twilio.video.app.util.getMockHttpException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -117,11 +117,10 @@ class CommunityLoginActivityTest {
         }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the auth request fails from an invalid passcode`() {
         coroutineScope.runBlockingTest {
-            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
+            val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
             whenever(authService.getToken(url, requestBody)).thenThrow(exception)
 
             enterYourName(identity)
