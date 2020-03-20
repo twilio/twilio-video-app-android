@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.twilio.video.LocalAudioTrack
-import com.twilio.video.LocalVideoTrack
 import kotlinx.coroutines.launch
 
 class RoomViewModel(private val roomManager: RoomManager) : ViewModel() {
@@ -18,16 +16,12 @@ class RoomViewModel(private val roomManager: RoomManager) : ViewModel() {
     fun connectToRoom(
         identity: String,
         roomName: String,
-        localAudioTracks: List<LocalAudioTrack>,
-        localVideoTracks: List<LocalVideoTrack>,
         isNetworkQualityEnabled: Boolean
     ) =
         viewModelScope.launch {
             roomManager.connectToRoom(
                     identity,
                     roomName,
-                    localAudioTracks,
-                    localVideoTracks,
                     isNetworkQualityEnabled)
         }
 

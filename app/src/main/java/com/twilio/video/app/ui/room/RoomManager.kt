@@ -11,8 +11,6 @@ import com.twilio.video.EncodingParameters
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
 import com.twilio.video.IsacCodec
-import com.twilio.video.LocalAudioTrack
-import com.twilio.video.LocalVideoTrack
 import com.twilio.video.NetworkQualityConfiguration
 import com.twilio.video.NetworkQualityVerbosity
 import com.twilio.video.OpusCodec
@@ -34,6 +32,8 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.VideoService.Companion.startService
+import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import com.twilio.video.app.util.EnvUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,12 +61,11 @@ class RoomManager(
     suspend fun connectToRoom(
         identity: String,
         roomName: String,
-        localAudioTracks: List<LocalAudioTrack>,
-        localVideoTracks: List<LocalVideoTrack>,
         isNetworkQualityEnabled: Boolean
     ) {
         coroutineScope.launch {
             try {
+                mutableViewEvents.postValue(Connecting)
                 setSdkEnvironment(sharedPreferences)
                 val token = tokenService.getToken(identity, roomName)
                 val enableInsights = sharedPreferences.getBoolean(
@@ -107,14 +106,6 @@ class RoomManager(
 
                 val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
 
-                if (localAudioTracks.isNotEmpty()) {
-                    connectOptionsBuilder.audioTracks(localAudioTracks)
-                }
-
-                if (localVideoTracks.isNotEmpty()) {
-                    connectOptionsBuilder.videoTracks(localVideoTracks)
-                }
-
                 connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
                 connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
                 connectOptionsBuilder.encodingParameters(encodingParameters)
@@ -124,8 +115,6 @@ class RoomManager(
                         connectOptionsBuilder.build(),
                         roomListener)
                 this@RoomManager.room = room
-
-                mutableViewEvents.postValue(Connecting(room))
             } catch (e: Exception) {
                 Timber.e(e, "Failed to retrieve token")
                 mutableViewEvents.postValue(TokenError)
@@ -181,12 +170,19 @@ class RoomManager(
         override fun onConnected(room: Room) {
             Timber.i("onConnected -> room sid: %s",
                     room.sid)
+
+            startService(context)
+
+            // Reset the speakerphone
             mutableViewEvents.value = RoomState(room)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
             Timber.i("Disconnected from room -> sid: %s, state: %s",
                     room.sid, room.state)
+
+            stopService(context)
+
             mutableViewEvents.value = RoomState(room)
         }
 
