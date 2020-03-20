@@ -32,6 +32,8 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.VideoService.Companion.startService
+import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import com.twilio.video.app.util.EnvUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -168,12 +170,19 @@ class RoomManager(
         override fun onConnected(room: Room) {
             Timber.i("onConnected -> room sid: %s",
                     room.sid)
+
+            startService(context)
+
+            // Reset the speakerphone
             mutableViewEvents.value = RoomState(room)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
             Timber.i("Disconnected from room -> sid: %s, state: %s",
                     room.sid, room.state)
+            
+            stopService(context)
+
             mutableViewEvents.value = RoomState(room)
         }
 

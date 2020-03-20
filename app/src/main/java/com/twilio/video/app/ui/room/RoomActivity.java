@@ -353,7 +353,6 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         // Reset the speakerphone
-        VideoService.Companion.stopService(this);
         audioManager.setSpeakerphoneOn(false);
         // Teardown tracks
         if (localAudioTrack != null) {
@@ -1339,7 +1338,6 @@ public class RoomActivity extends BaseActivity {
                     State state = room.getState();
                     switch (state) {
                         case CONNECTED:
-                            VideoService.Companion.startService(this);
                             initializeRoom();
                             break;
                         case DISCONNECTED:
