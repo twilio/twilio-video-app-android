@@ -180,7 +180,7 @@ class RoomManager(
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
             Timber.i("Disconnected from room -> sid: %s, state: %s",
                     room.sid, room.state)
-            
+
             stopService(context)
 
             mutableViewEvents.value = RoomState(room)
