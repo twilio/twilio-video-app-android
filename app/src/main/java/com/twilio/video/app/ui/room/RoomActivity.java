@@ -97,6 +97,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
+import com.twilio.video.app.ui.room.RoomEvent.Connecting;
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
@@ -770,7 +771,7 @@ public class RoomActivity extends BaseActivity {
         primaryVideoView.showIdentityBadge(false);
     }
 
-    private void updateUi(Room room) {
+    private void updateUi(Room room, RoomEvent roomEvent) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
@@ -785,21 +786,23 @@ public class RoomActivity extends BaseActivity {
         String joinStatus = "";
         int recordingWarningVisibility = View.GONE;
 
+        if (roomEvent instanceof Connecting) {
+            disconnectButtonState = View.VISIBLE;
+            joinRoomLayoutState = View.GONE;
+            joinStatusLayoutState = View.VISIBLE;
+            recordingWarningVisibility = View.VISIBLE;
+            settingsMenuItemState = false;
+
+            connectButtonEnabled = false;
+
+            if (roomEditable != null) {
+                roomName = roomEditable.toString();
+            }
+            joinStatus = "Joining...";
+        }
+
         if (room != null) {
             switch (room.getState()) {
-                case CONNECTING:
-                    disconnectButtonState = View.VISIBLE;
-                    joinRoomLayoutState = View.GONE;
-                    joinStatusLayoutState = View.VISIBLE;
-                    recordingWarningVisibility = View.VISIBLE;
-                    settingsMenuItemState = false;
-
-                    connectButtonEnabled = false;
-
-                    roomName = room.getName();
-                    joinStatus = "Joining...";
-
-                    break;
                 case CONNECTED:
                     disconnectButtonState = View.VISIBLE;
                     joinRoomLayoutState = View.GONE;
@@ -1410,7 +1413,6 @@ public class RoomActivity extends BaseActivity {
                         }
                     }
                 }
-                updateUi(room);
             } else {
                 if (roomEvent instanceof TokenError) {
                     new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
@@ -1421,6 +1423,7 @@ public class RoomActivity extends BaseActivity {
                             .show();
                 }
             }
+            updateUi(room, roomEvent);
         }
     }
 

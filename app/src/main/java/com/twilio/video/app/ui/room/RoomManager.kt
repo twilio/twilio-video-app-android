@@ -63,6 +63,7 @@ class RoomManager(
     ) {
         coroutineScope.launch {
             try {
+                mutableViewEvents.postValue(Connecting)
                 setSdkEnvironment(sharedPreferences)
                 val token = tokenService.getToken(identity, roomName)
                 val enableInsights = sharedPreferences.getBoolean(
@@ -112,8 +113,6 @@ class RoomManager(
                         connectOptionsBuilder.build(),
                         roomListener)
                 this@RoomManager.room = room
-
-                mutableViewEvents.postValue(Connecting(room))
             } catch (e: Exception) {
                 Timber.e(e, "Failed to retrieve token")
                 mutableViewEvents.postValue(TokenError)
