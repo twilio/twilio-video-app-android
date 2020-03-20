@@ -414,9 +414,6 @@ public class RoomActivity extends BaseActivity {
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
 
-        // Screen sharing only available on lollipop and up
-        screenCaptureMenuItem.setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
-
         requestPermissions();
         roomViewModel.getRoomEvents().observe(this, this::bindRoomEvents);
 
@@ -776,6 +773,7 @@ public class RoomActivity extends BaseActivity {
         int joinStatusLayoutState = View.GONE;
 
         boolean settingsMenuItemState = true;
+        boolean screenCaptureMenuItemState = false;
 
         Editable roomEditable = roomEditText.getText();
         boolean connectButtonEnabled = roomEditable != null && !roomEditable.toString().isEmpty();
@@ -807,6 +805,7 @@ public class RoomActivity extends BaseActivity {
                     joinRoomLayoutState = View.GONE;
                     joinStatusLayoutState = View.GONE;
                     settingsMenuItemState = false;
+                    screenCaptureMenuItemState = true;
 
                     connectButtonEnabled = false;
 
@@ -817,6 +816,7 @@ public class RoomActivity extends BaseActivity {
                     break;
                 case DISCONNECTED:
                     connectButtonEnabled = true;
+                    screenCaptureMenuItemState = false;
                     break;
             }
         }
@@ -847,6 +847,11 @@ public class RoomActivity extends BaseActivity {
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         if (settingsMenuItem != null) {
             settingsMenuItem.setVisible(settingsMenuItemState);
+        }
+
+        if (screenCaptureMenuItem != null
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            screenCaptureMenuItem.setVisible(screenCaptureMenuItemState);
         }
     }
 
