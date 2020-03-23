@@ -2,6 +2,8 @@ package com.twilio.video.app.data.api
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
@@ -32,6 +34,32 @@ class AuthServiceRepositoryTest {
     var coroutineScope = MainCoroutineScopeRule()
     private var expectedUrl = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
     private var expectedRequestDTO = AuthServiceRequestDTO(passcode)
+
+    @Test
+    fun `it should retrieve the passcode from SecurePreferences for a null passcode`() {
+        coroutineScope.runBlockingTest {
+            val authService: AuthService = mock {
+                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
+                        .thenReturn(AuthServiceResponseDTO(token))
+            }
+            val securePreferences = mock<SecurePreferences> {
+                whenever(mock.getSecureString(PASSCODE)).thenReturn(passcode)
+            }
+            val repository = AuthServiceRepository(authService, securePreferences)
+
+            val actualToken = repository.getToken()
+
+            assertThat(actualToken, equalTo(token))
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `it should throw an IllegalArgumentException if the passcode parameter and passcode retrieved from SecurePreferences are null`() {
+        coroutineScope.runBlockingTest {
+            val repository = AuthServiceRepository(mock(), mock())
+            repository.getToken()
+        }
+    }
 
     @Test
     fun `it should return a token if the request is successful`() {
@@ -155,21 +183,5 @@ class AuthServiceRepositoryTest {
                 assertThat(e.error, `is`(nullValue()))
             }
         }
-    }
-
-    fun invalidParams() =
-            arrayOf(
-                    arrayOf(null, passcode),
-                    arrayOf<String?>(null, null),
-                    arrayOf("123456", null)
-            )
-
-    @Test
-    @Parameters(method = "invalidParams")
-    fun `it should throw an IllegalArgumentException for invalid parameters`(
-        identity: String,
-        passcode: String
-    ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
