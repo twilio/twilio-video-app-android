@@ -20,7 +20,6 @@ import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import retrofit2.HttpException
 
 private const val passcode = "1234567890"
 private const val token = "token"
@@ -107,103 +106,47 @@ class AuthServiceRepositoryTest {
         }
     }
 
-    @Test
-    fun `it should throw an AuthServiceException when the request is successful but the token is null`() {
+    fun authServiceExceptionParams(): Array<Array<AuthService>> {
+        var parameters = arrayOf(arrayOf<AuthService>())
+
         coroutineScope.runBlockingTest {
-            val authService: AuthService = mock {
+
+            val nullToken: AuthService = mock {
                 whenever(mock.getToken(expectedUrl, expectedRequestDTO))
                         .thenReturn(AuthServiceResponseDTO())
             }
-            val repository = AuthServiceRepository(authService, mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(nullValue()))
-            }
+
+            val nullResponse: AuthService = getMockAuthService()
+            val invalidJson: AuthService = getMockAuthService("Bad format!")
+            val nullErrorBody: AuthService = getMockAuthService("{}")
+            val nullErrorDTO: AuthService = getMockAuthService("")
+            val unknownErrorType: AuthService = getMockAuthService(UNKNOWN_ERROR_MESSAGE)
+
+            parameters =
+                    arrayOf(
+                            arrayOf(nullToken),
+                            arrayOf(nullResponse),
+                            arrayOf(invalidJson),
+                            arrayOf(nullErrorBody),
+                            arrayOf(nullErrorDTO),
+                            arrayOf(unknownErrorType)
+                    )
         }
+
+        return parameters
     }
 
-    @Test
-    fun `it should throw an AuthServiceException with no error type when request fails with a null response`() {
-        coroutineScope.runBlockingTest {
-            val exception: HttpException = mock()
-            val authService: AuthService = mock {
+    private suspend fun getMockAuthService(json: String? = null): AuthService =
+            mock {
+                val exception = json?.let { getMockHttpException(it) } ?: mock()
                 whenever(mock.getToken(expectedUrl, expectedRequestDTO))
                         .thenThrow(exception)
             }
-            val repository = AuthServiceRepository(authService, mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(nullValue()))
-            }
-        }
-    }
 
+    @Parameters(method = "authServiceExceptionParams")
     @Test
-    fun `it should throw an AuthServiceException with no error type when request fails with an invalid JSON error body`() {
+    fun `it should throw an AuthServiceException with no error type`(authService: AuthService) {
         coroutineScope.runBlockingTest {
-            val exception = getMockHttpException("bad format!")
-            val authService: AuthService = mock {
-                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
-                        .thenThrow(exception)
-            }
-            val repository = AuthServiceRepository(authService, mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(nullValue()))
-            }
-        }
-    }
-
-    @Test
-    fun `it should throw an AuthServiceException with no error type when request fails with a null errorBody`() {
-        coroutineScope.runBlockingTest {
-            val exception = getMockHttpException("{}")
-            val authService: AuthService = mock {
-                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
-                        .thenThrow(exception)
-            }
-            val repository = AuthServiceRepository(authService, mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(nullValue()))
-            }
-        }
-    }
-
-    @Test
-    fun `it should throw an AuthServiceException with no error type when request fails with a null ErrorDTO`() {
-        coroutineScope.runBlockingTest {
-            val exception = getMockHttpException("")
-            val authService: AuthService = mock {
-                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
-                        .thenThrow(exception)
-            }
-            val repository = AuthServiceRepository(authService, mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(nullValue()))
-            }
-        }
-    }
-
-    @Test
-    fun `it should throw an AuthServiceException with no error type when request fails with a null AuthServiceError`() {
-        coroutineScope.runBlockingTest {
-            val exception = getMockHttpException(UNKNOWN_ERROR_MESSAGE)
-            val authService: AuthService = mock {
-                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
-                        .thenThrow(exception)
-            }
             val repository = AuthServiceRepository(authService, mock())
             try {
                 repository.getToken(passcode = passcode)
