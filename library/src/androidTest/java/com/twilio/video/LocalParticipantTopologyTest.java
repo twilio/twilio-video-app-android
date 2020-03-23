@@ -1063,4 +1063,32 @@ public class LocalParticipantTopologyTest extends BaseVideoTest {
         assertEquals(1, localParticipant.getDataTracks().size());
         assertEquals(localDataTrack, localParticipant.getDataTracks().get(0).getDataTrack());
     }
+
+    @Test
+    public void unpublishTrack_shouldNotCrashWhenTrackNotPublished() throws InterruptedException {
+        IceOptions iceOptions =
+                new IceOptions.Builder()
+                        .abortOnIceServersTimeout(true)
+                        .iceServersTimeout(TestUtils.ICE_TIMEOUT)
+                        .build();
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder(token).roomName(roomName).iceOptions(iceOptions).build();
+        roomListener.onConnectedLatch = new CountDownLatch(1);
+        room = Video.connect(mediaTestActivity, connectOptions, roomListener);
+        assertTrue(
+                roomListener.onConnectedLatch.await(
+                        TestUtils.STATE_TRANSITION_TIMEOUT, TimeUnit.SECONDS));
+        LocalParticipant localParticipant = room.getLocalParticipant();
+        assertNotNull(localParticipant);
+
+        localAudioTrack = LocalAudioTrack.create(mediaTestActivity, true);
+        assertFalse(localParticipant.unpublishTrack(localAudioTrack));
+
+        FakeVideoCapturer fakeVideoCapturer = new FakeVideoCapturer();
+        localVideoTrack = LocalVideoTrack.create(mediaTestActivity, true, fakeVideoCapturer);
+        assertFalse(localParticipant.unpublishTrack(localVideoTrack));
+
+        localDataTrack = LocalDataTrack.create(mediaTestActivity);
+        assertFalse(localParticipant.unpublishTrack(localDataTrack));
+    }
 }

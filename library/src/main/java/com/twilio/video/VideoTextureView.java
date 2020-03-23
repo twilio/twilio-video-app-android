@@ -44,7 +44,7 @@ public class VideoTextureView extends TextureView
             new RendererCommon.VideoLayoutMeasure();
     private final EglRenderer eglRenderer;
     private VideoScaleType videoScaleType = VideoScaleType.ASPECT_FIT;
-    // Callback for reporting renderer events. Read-only after initilization so no lock required.
+    // Callback for reporting renderer events. Read-only after initialization so no lock required.
     private RendererCommon.RendererEvents rendererEvents =
             new RendererCommon.RendererEvents() {
                 @Override

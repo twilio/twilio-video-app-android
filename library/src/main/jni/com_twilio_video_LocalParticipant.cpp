@@ -468,9 +468,12 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublis
     // Remove the local audio track and delete global ref
     auto it = local_participant_context->local_audio_tracks_map.find(
             getLocalAudioTrackHash(audio_track));
-    jobject j_local_audio_track = it->second;
-    local_participant_context->local_audio_tracks_map.erase(it);
-    webrtc::DeleteGlobalRef(jni, j_local_audio_track);
+
+    if (it != local_participant_context->local_audio_tracks_map.end()) {
+        jobject j_local_audio_track = it->second;
+        local_participant_context->local_audio_tracks_map.erase(it);
+        webrtc::DeleteGlobalRef(jni, j_local_audio_track);
+    }
 
     return result;
 }
@@ -489,9 +492,12 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublis
     // Remove the local video track and delete global ref
     auto it = local_participant_context->local_video_tracks_map.find(
             getLocalVideoTrackHash(video_track));
-    jobject j_local_video_track = it->second;
-    local_participant_context->local_video_tracks_map.erase(it);
-    webrtc::DeleteGlobalRef(jni, j_local_video_track);
+
+    if (it != local_participant_context->local_video_tracks_map.end()) {
+        jobject j_local_video_track = it->second;
+        local_participant_context->local_video_tracks_map.erase(it);
+        webrtc::DeleteGlobalRef(jni, j_local_video_track);
+    }
 
     return result;
 }
@@ -509,9 +515,12 @@ JNIEXPORT jboolean JNICALL Java_com_twilio_video_LocalParticipant_nativeUnpublis
     // Remove the local data track and delete global ref
     auto it = local_participant_context->local_data_tracks_map.find(
             getLocalDataTrackHash(data_track));
-    jobject j_local_video_track = it->second;
-    local_participant_context->local_data_tracks_map.erase(it);
-    webrtc::DeleteGlobalRef(jni, j_local_video_track);
+
+    if (it != local_participant_context->local_data_tracks_map.end()) {
+        jobject j_local_video_track = it->second;
+        local_participant_context->local_data_tracks_map.erase(it);
+        webrtc::DeleteGlobalRef(jni, j_local_video_track);
+    }
 
     return result;
 }
