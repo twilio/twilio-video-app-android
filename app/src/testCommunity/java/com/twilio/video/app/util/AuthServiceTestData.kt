@@ -23,7 +23,15 @@ const val EXPIRED_PASSCODE_ERROR =
     }
 }"""
 
-fun getMockHttpException(errorBody: String): HttpException {
+const val UNKNOWN_ERROR_MESSAGE =
+        """{
+    "error": {
+        "message": "Unknown",
+        "explanation": "Something went wrong ¯\_(ツ)_/¯"
+    }
+}"""
+
+fun getMockHttpException(errorBody: String?): HttpException {
         val responseBody: ResponseBody = mock {
             val errorString = errorBody
             whenever(mock.string()).thenReturn(errorString)
