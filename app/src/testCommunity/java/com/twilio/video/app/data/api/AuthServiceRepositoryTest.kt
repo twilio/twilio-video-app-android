@@ -109,7 +109,19 @@ class AuthServiceRepositoryTest {
 
     @Test
     fun `it should throw an AuthServiceException when the request is successful but the token is null`() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        coroutineScope.runBlockingTest {
+            val authService: AuthService = mock {
+                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
+                        .thenReturn(AuthServiceResponseDTO())
+            }
+            val repository = AuthServiceRepository(authService, mock())
+            try {
+                repository.getToken(passcode = passcode)
+                fail("Exception was never thrown!")
+            } catch (e: AuthServiceException) {
+                assertThat(e.error, `is`(nullValue()))
+            }
+        }
     }
 
     @Test

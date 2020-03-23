@@ -33,7 +33,6 @@ class AuthServiceRepository(
 
     override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
         getPasscode(passcode)?.let { passcode ->
-            // TODO Use mapper to handle DTOs
             val requestBody = AuthServiceRequestDTO(
                     passcode,
                     identity,
@@ -42,9 +41,13 @@ class AuthServiceRepository(
             val url = URL_PREFIX + appId + URL_SUFFIX
 
             try {
-                val response = authService.getToken(url, requestBody)
-                Timber.d("Token returned from Twilio auth service: %s", response)
-                return response.token!!
+                authService.getToken(url, requestBody).let { response ->
+                    response.token?.let { token ->
+                        Timber.d("Token returned from Twilio auth service: %s", response)
+                        return token
+                    }
+                    throw AuthServiceException(message = "Token cannot be null")
+                }
             } catch (httpException: HttpException) {
                 handleException(httpException)
             }
