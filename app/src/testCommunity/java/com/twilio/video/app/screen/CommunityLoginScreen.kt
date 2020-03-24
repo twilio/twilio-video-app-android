@@ -1,6 +1,7 @@
 package com.twilio.video.app.screen
 
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -12,7 +13,7 @@ import com.twilio.video.app.R
 import org.hamcrest.CoreMatchers.not
 
 fun enterYourName(name: String) {
-    onView(withId(R.id.community_login_screen_name_edittext)).perform(typeText(name))
+    onView(withId(R.id.community_login_screen_name_edittext)).perform(clearText(), typeText(name))
 }
 
 fun clickLoginButton() {
@@ -36,7 +37,9 @@ fun assertLoginButtonIsDisabled() {
 }
 
 fun assertInvalidPasscodeErrorIsDisplayed() {
-    onView(withText(R.string.login_screen_error_title)).check(matches(isDisplayed()))
     onView(withText(R.string.login_screen_invalid_passcode_error)).check(matches(isDisplayed()))
-    onView(withText(android.R.string.ok)).check(matches(isDisplayed()))
+}
+
+fun assertExpiredPasscodeErrorIsDisplayed() {
+    onView(withText(R.string.login_screen_expired_passcode_error)).check(matches(isDisplayed()))
 }

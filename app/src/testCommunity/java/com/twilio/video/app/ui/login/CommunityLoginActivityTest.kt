@@ -23,6 +23,7 @@ import com.twilio.video.app.data.api.AuthServiceRequestDTO
 import com.twilio.video.app.data.api.AuthServiceResponseDTO
 import com.twilio.video.app.data.api.URL_PREFIX
 import com.twilio.video.app.data.api.URL_SUFFIX
+import com.twilio.video.app.screen.assertExpiredPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertInvalidPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
@@ -33,6 +34,7 @@ import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.security.SecurePreferencesFake
 import com.twilio.video.app.security.SecurityModule
 import com.twilio.video.app.ui.room.RoomActivity
+import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import com.twilio.video.app.util.getMockHttpException
@@ -120,8 +122,11 @@ class CommunityLoginActivityTest {
     @Test
     fun `it should display an error message when the auth request fails from an invalid passcode`() {
         coroutineScope.runBlockingTest {
+            val response = AuthServiceResponseDTO("token")
             val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
-            whenever(authService.getToken(url, requestBody)).thenThrow(exception)
+            whenever(authService.getToken(url, requestBody))
+                    .thenThrow(exception)
+                    .thenReturn(response)
 
             enterYourName(identity)
             enterPasscode(passcode)
@@ -137,10 +142,19 @@ class CommunityLoginActivityTest {
         TODO("not implemented")
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the auth request fails from an expired passcode`() {
-        TODO("not implemented")
+        coroutineScope.runBlockingTest {
+            val response = AuthServiceResponseDTO("token")
+            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
+            whenever(authService.getToken(url, requestBody)).thenThrow(exception)
+
+            enterYourName(identity)
+            enterPasscode(passcode)
+            clickLoginButton()
+
+            assertExpiredPasscodeErrorIsDisplayed()
+        }
     }
 
     @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
