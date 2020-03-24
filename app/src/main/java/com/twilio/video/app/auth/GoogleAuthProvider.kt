@@ -8,8 +8,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
-import com.twilio.video.app.auth.LoginResult.GoogleLoginIntentResult
-import com.twilio.video.app.auth.LoginResult.GoogleLoginSuccessResult
+import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
+import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -48,7 +48,7 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
             googleSignInWrapper.getClient(context, googleSignInOptionsWrapper)
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
-        return Observable.create<LoginResult> { observable ->
+        return Observable.create { observable ->
             disposables + loginEventObservable.subscribe({ loginEvent ->
                 when (loginEvent) {
                     GoogleLoginIntentRequestEvent -> {
