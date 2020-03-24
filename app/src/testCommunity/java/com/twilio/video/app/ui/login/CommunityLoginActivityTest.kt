@@ -23,17 +23,21 @@ import com.twilio.video.app.data.api.AuthServiceRequestDTO
 import com.twilio.video.app.data.api.AuthServiceResponseDTO
 import com.twilio.video.app.data.api.URL_PREFIX
 import com.twilio.video.app.data.api.URL_SUFFIX
+import com.twilio.video.app.screen.assertErrorDialogIsDisplayed
+import com.twilio.video.app.screen.assertExpiredPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertInvalidPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
 import com.twilio.video.app.screen.assertLoginButtonIsDisabled
 import com.twilio.video.app.screen.assertLoginButtonIsEnabled
+import com.twilio.video.app.screen.assertThatPasscodeErrorIsDisabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.security.SecurePreferencesFake
 import com.twilio.video.app.security.SecurityModule
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
+import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import com.twilio.video.app.util.getMockHttpException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,13 +45,15 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+
+private const val IDENTITY = "Identity"
+private const val VALID_PASSCODE = "0123456789"
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
@@ -57,10 +63,8 @@ class CommunityLoginActivityTest {
     @get:Rule
     val coroutineScope = MainCoroutineScopeRule()
 
-    private val passcode = "0123456789"
-    private val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-    private val identity = "TestUser"
-    private val requestBody = AuthServiceRequestDTO(passcode, identity)
+    private val url = URL_PREFIX + VALID_PASSCODE.substring(6) + URL_SUFFIX
+    private val requestBody = AuthServiceRequestDTO(VALID_PASSCODE, IDENTITY)
     private lateinit var scenario: ActivityScenario<CommunityLoginActivity>
     private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
     private val authService: AuthService = mock()
@@ -105,55 +109,79 @@ class CommunityLoginActivityTest {
             val response = AuthServiceResponseDTO("token")
             whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-            enterYourName(identity)
-            enterPasscode(passcode)
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
             clickLoginButton()
 
-            assertThat(securePreferences.getSecureString(PASSCODE), equalTo(passcode))
-            assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(identity))
+            assertThat(securePreferences.getSecureString(PASSCODE), equalTo(VALID_PASSCODE))
+            assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(IDENTITY))
 
             val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
             assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
         }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the auth request fails from an invalid passcode`() {
         coroutineScope.runBlockingTest {
-            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
-            whenever(authService.getToken(url, requestBody)).thenThrow(exception)
+            val response = AuthServiceResponseDTO("token")
+            val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
+            whenever(authService.getToken(url, requestBody))
+                    .thenThrow(exception)
+                    .thenReturn(response)
 
-            enterYourName(identity)
-            enterPasscode(passcode)
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
             clickLoginButton()
 
             assertInvalidPasscodeErrorIsDisplayed()
         }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
-    @Test
-    fun `it should display an error message when the passcode is the incorrect length`() {
-        TODO("not implemented")
-    }
-
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the auth request fails from an expired passcode`() {
-        TODO("not implemented")
+        coroutineScope.runBlockingTest {
+            val response = AuthServiceResponseDTO("token")
+            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
+            whenever(authService.getToken(url, requestBody))
+                    .thenThrow(exception)
+                    .thenReturn(response)
+
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
+            clickLoginButton()
+
+            assertExpiredPasscodeErrorIsDisplayed()
+
+            // Re enter input again for valid response
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
+            clickLoginButton()
+
+            assertThatPasscodeErrorIsDisabled()
+        }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the auth request fails for an unknown reason`() {
-        TODO("not implemented")
+        enterYourName(IDENTITY)
+        enterPasscode("123")
+        clickLoginButton()
+
+        assertErrorDialogIsDisplayed()
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should enable the login button after all required fields have been entered`() {
-        TODO("not implemented")
+        assertLoginButtonIsDisabled()
+
+        enterYourName(IDENTITY)
+
+        assertLoginButtonIsDisabled()
+
+        enterPasscode(VALID_PASSCODE)
+
+        assertLoginButtonIsEnabled()
     }
 
     @Test
@@ -166,25 +194,13 @@ class CommunityLoginActivityTest {
             val response = AuthServiceResponseDTO("token")
             whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-            assertLoginButtonIsDisabled()
-
             enterYourName(identity)
-
-            assertLoginButtonIsDisabled()
-
-            scenario.onActivity {
-                val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
-                passcodeEditText.setText(passcode)
-            }
-
-            assertLoginButtonIsEnabled()
-
+            enterPasscode(VALID_PASSCODE)
             pauseDispatcher()
             clickLoginButton()
 
             assertLoadingIndicatorIsDisplayed()
             assertLoginButtonIsDisabled()
-
             resumeDispatcher()
 
             assertLoadingIndicatorIsNotDisplayed()

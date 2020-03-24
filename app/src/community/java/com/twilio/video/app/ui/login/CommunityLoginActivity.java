@@ -29,11 +29,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
+import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginFailureResult;
+import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginSuccessResult;
 import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
-import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult;
+import com.twilio.video.app.auth.LoginResult;
 import com.twilio.video.app.base.BaseActivity;
+import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.InputUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -48,6 +52,9 @@ public class CommunityLoginActivity extends BaseActivity {
 
     @BindView(R.id.community_login_screen_progressbar)
     ProgressBar progressBar;
+
+    @BindView(R.id.community_login_screen_passcode)
+    TextInputLayout passcodeTextInputLayout;
 
     @BindView(R.id.community_login_screen_name_edittext)
     TextInputEditText nameEditText;
@@ -65,6 +72,7 @@ public class CommunityLoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.development_activity_login);
+
         ButterKnife.bind(this);
         if (authenticator.loggedIn()) startLobbyActivity();
     }
@@ -99,19 +107,42 @@ public class CommunityLoginActivity extends BaseActivity {
                                     if (loginResult instanceof CommunityLoginSuccessResult)
                                         startLobbyActivity();
                                     else {
-                                        displayAuthError();
+                                        handleAuthError(loginResult);
                                     }
                                 },
                                 exception -> {
-                                    displayAuthError();
+                                    handleAuthError(null);
                                     Timber.e(exception);
                                 }));
+    }
+
+    private void handleAuthError(LoginResult loginResult) {
+
+        if (loginResult instanceof CommunityLoginFailureResult) {
+            String errorMessage;
+            AuthServiceError error = ((CommunityLoginFailureResult) loginResult).getError();
+            switch (error) {
+                case INVALID_PASSCODE_ERROR:
+                    errorMessage = getString(R.string.login_screen_invalid_passcode_error);
+                    passcodeTextInputLayout.setError(errorMessage);
+                    passcodeTextInputLayout.setErrorEnabled(true);
+                    return;
+                case EXPIRED_PASSCODE_ERROR:
+                    errorMessage = getString(R.string.login_screen_expired_passcode_error);
+                    passcodeTextInputLayout.setError(errorMessage);
+                    passcodeTextInputLayout.setErrorEnabled(true);
+                    return;
+            }
+        }
+
+        displayAuthError();
     }
 
     private void preLoginViewState() {
         InputUtils.hideKeyboard(this);
         enableLoginButton(false);
         progressBar.setVisibility(View.VISIBLE);
+        passcodeTextInputLayout.setErrorEnabled(false);
     }
 
     private void postLoginViewState() {
@@ -150,7 +181,7 @@ public class CommunityLoginActivity extends BaseActivity {
 
     private void displayAuthError() {
         new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                .setTitle(getString(R.string.login_screen_auth_error_title))
+                .setTitle(getString(R.string.login_screen_error_title))
                 .setMessage(getString(R.string.login_screen_auth_error_desc))
                 .setPositiveButton("OK", null)
                 .show();

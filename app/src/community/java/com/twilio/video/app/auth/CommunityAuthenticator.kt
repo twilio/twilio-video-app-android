@@ -17,10 +17,11 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
-import com.twilio.video.app.auth.LoginResult.CommunityLoginFailureResult
-import com.twilio.video.app.auth.LoginResult.CommunityLoginSuccessResult
+import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginFailureResult
+import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.PASSCODE
 import com.twilio.video.app.data.Preferences.DISPLAY_NAME
+import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.util.putString
@@ -52,12 +53,12 @@ class CommunityAuthenticator constructor(
                     securePreferences.putSecureString(PASSCODE, loginEvent.passcode)
 
                     CommunityLoginSuccessResult
-                } catch (e: Exception) {
+                } catch (e: AuthServiceException) {
                     Timber.e(e, "Failed to retrieve token")
-                    CommunityLoginFailureResult
+                    CommunityLoginFailureResult(e.error) as LoginResult
                 }
             } else {
-                CommunityLoginFailureResult
+                CommunityLoginFailureResult()
             }
         }.toObservable()
     }

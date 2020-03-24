@@ -2,9 +2,12 @@ package com.twilio.video.app.data.api
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
+import com.twilio.video.app.util.UNKNOWN_ERROR_MESSAGE
 import com.twilio.video.app.util.getMockHttpException
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
@@ -16,7 +19,6 @@ import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +34,32 @@ class AuthServiceRepositoryTest {
     var coroutineScope = MainCoroutineScopeRule()
     private var expectedUrl = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
     private var expectedRequestDTO = AuthServiceRequestDTO(passcode)
+
+    @Test
+    fun `it should retrieve the passcode from SecurePreferences for a null passcode`() {
+        coroutineScope.runBlockingTest {
+            val authService: AuthService = mock {
+                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
+                        .thenReturn(AuthServiceResponseDTO(token))
+            }
+            val securePreferences = mock<SecurePreferences> {
+                whenever(mock.getSecureString(PASSCODE)).thenReturn(passcode)
+            }
+            val repository = AuthServiceRepository(authService, securePreferences)
+
+            val actualToken = repository.getToken()
+
+            assertThat(actualToken, equalTo(token))
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `it should throw an IllegalArgumentException if the passcode parameter and passcode retrieved from SecurePreferences are null`() {
+        coroutineScope.runBlockingTest {
+            val repository = AuthServiceRepository(mock(), mock())
+            repository.getToken()
+        }
+    }
 
     @Test
     fun `it should return a token if the request is successful`() {
@@ -106,32 +134,54 @@ class AuthServiceRepositoryTest {
         }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
-    @Test
-    fun `it should throw an AuthServiceException when the request is successful but the token is null`() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun authServiceExceptionParams(): Array<Array<AuthService>> {
+        var parameters = arrayOf(arrayOf<AuthService>())
+
+        coroutineScope.runBlockingTest {
+
+            val nullToken: AuthService = mock {
+                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
+                        .thenReturn(AuthServiceResponseDTO())
+            }
+
+            val nullResponse: AuthService = getMockAuthService()
+            val invalidJson: AuthService = getMockAuthService("Bad format!")
+            val nullErrorBody: AuthService = getMockAuthService("{}")
+            val nullErrorDTO: AuthService = getMockAuthService("")
+            val unknownErrorType: AuthService = getMockAuthService(UNKNOWN_ERROR_MESSAGE)
+
+            parameters =
+                    arrayOf(
+                            arrayOf(nullToken),
+                            arrayOf(nullResponse),
+                            arrayOf(invalidJson),
+                            arrayOf(nullErrorBody),
+                            arrayOf(nullErrorDTO),
+                            arrayOf(unknownErrorType)
+                    )
+        }
+
+        return parameters
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
-    @Test
-    fun `it should throw an AuthServiceException with no error type request fails for an unknown reason`() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    private suspend fun getMockAuthService(json: String? = null): AuthService =
+            mock {
+                val exception = json?.let { getMockHttpException(it) } ?: mock()
+                whenever(mock.getToken(expectedUrl, expectedRequestDTO))
+                        .thenThrow(exception)
+            }
 
-    fun invalidParams() =
-            arrayOf(
-                    arrayOf(null, passcode),
-                    arrayOf<String?>(null, null),
-                    arrayOf("123456", null)
-            )
-
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
+    @Parameters(method = "authServiceExceptionParams")
     @Test
-    @Parameters(method = "invalidParams")
-    fun `it should throw an IllegalArgumentException for invalid parameters`(
-        identity: String,
-        passcode: String
-    ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun `it should throw an AuthServiceException with no error type`(authService: AuthService) {
+        coroutineScope.runBlockingTest {
+            val repository = AuthServiceRepository(authService, mock())
+            try {
+                repository.getToken(passcode = passcode)
+                fail("Exception was never thrown!")
+            } catch (e: AuthServiceException) {
+                assertThat(e.error, `is`(nullValue()))
+            }
+        }
     }
 }
