@@ -44,7 +44,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -155,19 +154,24 @@ class CommunityLoginActivityTest {
 
     @Test
     fun `it should display an error message when the auth request fails for an unknown reason`() {
-        coroutineScope.runBlockingTest {
-            enterYourName(IDENTITY)
-            enterPasscode("123")
-            clickLoginButton()
+        enterYourName(IDENTITY)
+        enterPasscode("123")
+        clickLoginButton()
 
-            assertErrorDialogIsDisplayed()
-        }
+        assertErrorDialogIsDisplayed()
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should enable the login button after all required fields have been entered`() {
-        TODO("not implemented")
+        assertLoginButtonIsDisabled()
+
+        enterYourName(IDENTITY)
+
+        assertLoginButtonIsDisabled()
+
+        enterPasscode(VALID_PASSCODE)
+
+        assertLoginButtonIsEnabled()
     }
 
     @Test
@@ -180,25 +184,13 @@ class CommunityLoginActivityTest {
             val response = AuthServiceResponseDTO("token")
             whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-            assertLoginButtonIsDisabled()
-
             enterYourName(identity)
-
-            assertLoginButtonIsDisabled()
-
-            scenario.onActivity {
-                val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
-                passcodeEditText.setText(passcode)
-            }
-
-            assertLoginButtonIsEnabled()
-
+            enterPasscode(VALID_PASSCODE)
             pauseDispatcher()
             clickLoginButton()
 
             assertLoadingIndicatorIsDisplayed()
             assertLoginButtonIsDisabled()
-
             resumeDispatcher()
 
             assertLoadingIndicatorIsNotDisplayed()
