@@ -2,19 +2,6 @@
 <issues format="5" by="lint 3.5.0" client="gradle" variant="all" version="3.5.0">
 
     <issue
-        id="UnusedResources"
-        message="The resource `R.style.ErrorTextAppearance` appears to be unused"
-        errorLine1="    &lt;style name=&quot;ErrorTextAppearance&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        includedVariants="internalDebug,internalRelease,twilioRelease"
-        excludedVariants="communityDebug">
-        <location
-            file="src/main/res/values/styles.xml"
-            line="11"
-            column="12"/>
-    </issue>
-
-    <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/colorPrimary` with a theme that also paints a background (inferred theme is `@style/AppTheme_LoginScreen`)"
         errorLine1="    android:background=&quot;?attr/colorPrimary&quot;"
