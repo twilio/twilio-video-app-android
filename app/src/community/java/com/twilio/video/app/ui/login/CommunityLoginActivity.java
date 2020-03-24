@@ -147,6 +147,7 @@ public class CommunityLoginActivity extends BaseActivity {
         InputUtils.hideKeyboard(this);
         enableLoginButton(false);
         progressBar.setVisibility(View.VISIBLE);
+        passcodeTextInputLayout.setErrorEnabled(false);
     }
 
     private void postLoginViewState() {

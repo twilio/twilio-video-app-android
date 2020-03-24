@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.twilio.video.app.R
+import com.twilio.video.app.util.isTextInputLayoutError
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
@@ -47,6 +48,10 @@ fun assertInvalidPasscodeErrorIsDisplayed() {
 
 fun assertExpiredPasscodeErrorIsDisplayed() {
     onView(withText(R.string.login_screen_expired_passcode_error)).check(matches(isDisplayed()))
+}
+
+fun assertThatPasscodeErrorIsDisabled() {
+    onView(withId(R.id.community_login_screen_passcode)).check(matches(not(isTextInputLayoutError())))
 }
 
 fun assertErrorDialogIsDisplayed() {

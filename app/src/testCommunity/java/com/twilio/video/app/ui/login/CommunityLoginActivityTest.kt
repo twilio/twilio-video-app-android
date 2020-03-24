@@ -30,6 +30,7 @@ import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
 import com.twilio.video.app.screen.assertLoginButtonIsDisabled
 import com.twilio.video.app.screen.assertLoginButtonIsEnabled
+import com.twilio.video.app.screen.assertThatPasscodeErrorIsDisabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.security.SecurePreferencesFake
@@ -142,13 +143,22 @@ class CommunityLoginActivityTest {
         coroutineScope.runBlockingTest {
             val response = AuthServiceResponseDTO("token")
             val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
-            whenever(authService.getToken(url, requestBody)).thenThrow(exception)
+            whenever(authService.getToken(url, requestBody))
+                    .thenThrow(exception)
+                    .thenReturn(response)
 
             enterYourName(IDENTITY)
             enterPasscode(VALID_PASSCODE)
             clickLoginButton()
 
             assertExpiredPasscodeErrorIsDisplayed()
+
+            // Re enter input again for valid response
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
+            clickLoginButton()
+
+            assertThatPasscodeErrorIsDisabled()
         }
     }
 
