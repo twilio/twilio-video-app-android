@@ -23,6 +23,7 @@ import com.twilio.video.app.data.api.AuthServiceRequestDTO
 import com.twilio.video.app.data.api.AuthServiceResponseDTO
 import com.twilio.video.app.data.api.URL_PREFIX
 import com.twilio.video.app.data.api.URL_SUFFIX
+import com.twilio.video.app.screen.assertErrorDialogIsDisplayed
 import com.twilio.video.app.screen.assertExpiredPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertInvalidPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
@@ -152,10 +153,15 @@ class CommunityLoginActivityTest {
         }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the auth request fails for an unknown reason`() {
-        TODO("not implemented")
+        coroutineScope.runBlockingTest {
+            enterYourName(IDENTITY)
+            enterPasscode("123")
+            clickLoginButton()
+
+            assertErrorDialogIsDisplayed()
+        }
     }
 
     @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
