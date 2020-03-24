@@ -17,7 +17,6 @@ package com.twilio.video.app.data.api
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.twilio.video.app.auth.AuthenticationException
 import com.twilio.video.app.data.PASSCODE
 import com.twilio.video.app.security.SecurePreferences
 import retrofit2.HttpException

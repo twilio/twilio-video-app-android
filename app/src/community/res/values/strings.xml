@@ -8,4 +8,5 @@
     <string name="login_screen_error_title">Log In Error</string>
     <string name="login_screen_invalid_passcode_error">Passcode incorrect.</string>
     <string name="login_screen_expired_passcode_error">Passcode expired.</string>
+    <string name="login_screen_expired_passcode_length_error">Passcode must be at least seven characters.</string>
 </resources>

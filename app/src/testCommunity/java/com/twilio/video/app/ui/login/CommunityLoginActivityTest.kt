@@ -29,6 +29,7 @@ import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
 import com.twilio.video.app.screen.assertLoginButtonIsDisabled
 import com.twilio.video.app.screen.assertLoginButtonIsEnabled
+import com.twilio.video.app.screen.assertShortPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.security.SecurePreferencesFake
@@ -51,6 +52,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 
+private const val IDENTITY = "Identity"
+private const val SHORT_PASSCODE = "123456"
+private const val VALID_PASSCODE = "0123456789"
+
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApp::class)
@@ -59,10 +64,8 @@ class CommunityLoginActivityTest {
     @get:Rule
     val coroutineScope = MainCoroutineScopeRule()
 
-    private val passcode = "0123456789"
-    private val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-    private val identity = "TestUser"
-    private val requestBody = AuthServiceRequestDTO(passcode, identity)
+    private val url = URL_PREFIX + VALID_PASSCODE.substring(6) + URL_SUFFIX
+    private val requestBody = AuthServiceRequestDTO(VALID_PASSCODE, IDENTITY)
     private lateinit var scenario: ActivityScenario<CommunityLoginActivity>
     private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
     private val authService: AuthService = mock()
@@ -107,12 +110,12 @@ class CommunityLoginActivityTest {
             val response = AuthServiceResponseDTO("token")
             whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-            enterYourName(identity)
-            enterPasscode(passcode)
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
             clickLoginButton()
 
-            assertThat(securePreferences.getSecureString(PASSCODE), equalTo(passcode))
-            assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(identity))
+            assertThat(securePreferences.getSecureString(PASSCODE), equalTo(VALID_PASSCODE))
+            assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(IDENTITY))
 
             val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
             assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
@@ -128,18 +131,23 @@ class CommunityLoginActivityTest {
                     .thenThrow(exception)
                     .thenReturn(response)
 
-            enterYourName(identity)
-            enterPasscode(passcode)
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
             clickLoginButton()
 
             assertInvalidPasscodeErrorIsDisplayed()
         }
     }
 
-    @Ignore("Will be implemented as part of https://issues.corp.twilio.com/browse/AHOYAPPS-446")
     @Test
     fun `it should display an error message when the passcode is the incorrect length`() {
-        TODO("not implemented")
+        coroutineScope.runBlockingTest {
+            enterYourName(IDENTITY)
+            enterPasscode(SHORT_PASSCODE)
+            clickLoginButton()
+
+            assertShortPasscodeErrorIsDisplayed()
+        }
     }
 
     @Test
@@ -149,8 +157,8 @@ class CommunityLoginActivityTest {
             val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
             whenever(authService.getToken(url, requestBody)).thenThrow(exception)
 
-            enterYourName(identity)
-            enterPasscode(passcode)
+            enterYourName(IDENTITY)
+            enterPasscode(VALID_PASSCODE)
             clickLoginButton()
 
             assertExpiredPasscodeErrorIsDisplayed()
