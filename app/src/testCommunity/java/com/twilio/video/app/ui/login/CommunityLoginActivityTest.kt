@@ -29,7 +29,6 @@ import com.twilio.video.app.screen.assertLoadingIndicatorIsDisplayed
 import com.twilio.video.app.screen.assertLoadingIndicatorIsNotDisplayed
 import com.twilio.video.app.screen.assertLoginButtonIsDisabled
 import com.twilio.video.app.screen.assertLoginButtonIsEnabled
-import com.twilio.video.app.screen.assertShortPasscodeErrorIsDisplayed
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
 import com.twilio.video.app.security.SecurePreferencesFake
@@ -53,7 +52,6 @@ import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 
 private const val IDENTITY = "Identity"
-private const val SHORT_PASSCODE = "123456"
 private const val VALID_PASSCODE = "0123456789"
 
 @ExperimentalCoroutinesApi
@@ -136,17 +134,6 @@ class CommunityLoginActivityTest {
             clickLoginButton()
 
             assertInvalidPasscodeErrorIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `it should display an error message when the passcode is the incorrect length`() {
-        coroutineScope.runBlockingTest {
-            enterYourName(IDENTITY)
-            enterPasscode(SHORT_PASSCODE)
-            clickLoginButton()
-
-            assertShortPasscodeErrorIsDisplayed()
         }
     }
 

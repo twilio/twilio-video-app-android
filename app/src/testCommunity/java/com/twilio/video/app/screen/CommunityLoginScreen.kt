@@ -40,10 +40,6 @@ fun assertInvalidPasscodeErrorIsDisplayed() {
     onView(withText(R.string.login_screen_invalid_passcode_error)).check(matches(isDisplayed()))
 }
 
-fun assertShortPasscodeErrorIsDisplayed() {
-    onView(withText(R.string.login_screen_expired_passcode_length_error)).check(matches(isDisplayed()))
-}
-
 fun assertExpiredPasscodeErrorIsDisplayed() {
     onView(withText(R.string.login_screen_expired_passcode_error)).check(matches(isDisplayed()))
 }
