@@ -77,11 +77,6 @@ public class CommunityLoginActivity extends BaseActivity {
         if (authenticator.loggedIn()) startLobbyActivity();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     @OnTextChanged(R.id.community_login_screen_name_edittext)
     public void onNameTextChanged(Editable editable) {
         enableLoginButton(isInputValid());
