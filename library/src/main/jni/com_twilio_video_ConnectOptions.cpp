@@ -97,6 +97,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
                                                   jobjectArray j_video_tracks,
                                                   jobjectArray j_data_tracks,
                                                   jobject j_ice_options,
+                                                  jboolean j_enable_ice_gathering_on_any_address_ports,
                                                   jboolean j_enable_insights,
                                                   jboolean j_enable_automatic_subscription,
                                                   jboolean j_enable_dominant_speaker,
@@ -238,6 +239,7 @@ Java_com_twilio_video_ConnectOptions_nativeCreate(JNIEnv *env,
         builder->setPlatformInfo(platform_info_context->platform_info);
     }
 
+    builder->enableIceGatheringOnAnyAddressPorts(j_enable_ice_gathering_on_any_address_ports);
     builder->enableInsights(j_enable_insights);
     builder->enableAutomaticSubscription(j_enable_automatic_subscription);
     builder->enableDominantSpeaker(j_enable_dominant_speaker);

@@ -1,8 +1,12 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
-### 5.2.1
+### 5.3.0
 
-* Programmable Video Android SDK 5.2.1 [[bintray]](https://bintray.com/twilio/releases/video-android/5.2.1), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.2.1/)
+* Programmable Video Android SDK 5.3.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.3.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.3.0/)
+
+Features
+
+- Implemented a boolean Connect Option `enableIceGatheringOnAnyAddressPorts` that allows gathering of ICE candidates from "any address" ports. The default value is false. Setting it to true will allow applications to work in a wider set of VPN environments.
 
 Bug Fixes
 

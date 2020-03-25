@@ -46,6 +46,33 @@ public class ConnectOptionsUnitTest {
     }
 
     @Test
+    public void iceGatheringOnAnyAddressPortsShouldBeDisabledByDefault() {
+        ConnectOptions connectOptions = new ConnectOptions.Builder("test").build();
+
+        assertFalse(connectOptions.isIceGatheringOnAnyAddressPortsEnabled());
+    }
+
+    @Test
+    public void shouldEnableIceGatheringOnAnyAddressPorts() {
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("test")
+                        .enableIceGatheringOnAnyAddressPorts(true)
+                        .build();
+
+        assertTrue(connectOptions.isIceGatheringOnAnyAddressPortsEnabled());
+    }
+
+    @Test
+    public void shouldDisableIceGatheringOnAnyAddressPorts() {
+        ConnectOptions connectOptions =
+                new ConnectOptions.Builder("test")
+                        .enableIceGatheringOnAnyAddressPorts(false)
+                        .build();
+
+        assertFalse(connectOptions.isIceGatheringOnAnyAddressPortsEnabled());
+    }
+
+    @Test
     public void insightsShouldBeEnabledByDefault() {
         ConnectOptions connectOptions = new ConnectOptions.Builder("test").build();
 

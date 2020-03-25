@@ -49,6 +49,7 @@ public class ConnectOptions {
     private final List<LocalVideoTrack> videoTracks;
     private final List<LocalDataTrack> dataTracks;
     private final IceOptions iceOptions;
+    private final boolean enableIceGatheringOnAnyAddressPorts;
     private final boolean enableInsights;
     private final boolean enableAutomaticSubscription;
     private final boolean enableDominantSpeaker;
@@ -107,6 +108,7 @@ public class ConnectOptions {
         this.videoTracks = builder.videoTracks;
         this.dataTracks = builder.dataTracks;
         this.iceOptions = builder.iceOptions;
+        this.enableIceGatheringOnAnyAddressPorts = builder.enableIceGatheringOnAnyAddressPorts;
         this.enableInsights = builder.enableInsights;
         this.enableAutomaticSubscription = builder.enableAutomaticSubscription;
         this.enableDominantSpeaker = builder.enableDominantSpeaker;
@@ -145,6 +147,10 @@ public class ConnectOptions {
 
     IceOptions getIceOptions() {
         return iceOptions;
+    }
+
+    boolean isIceGatheringOnAnyAddressPortsEnabled() {
+        return enableIceGatheringOnAnyAddressPorts;
     }
 
     boolean isInsightsEnabled() {
@@ -229,6 +235,7 @@ public class ConnectOptions {
                 getLocalVideoTracksArray(),
                 getLocalDataTracksArray(),
                 iceOptions,
+                enableIceGatheringOnAnyAddressPorts,
                 enableInsights,
                 enableAutomaticSubscription,
                 enableDominantSpeaker,
@@ -248,6 +255,7 @@ public class ConnectOptions {
             LocalVideoTrack[] videoTracks,
             LocalDataTrack[] dataTracks,
             IceOptions iceOptions,
+            boolean enableIceGatheringOnAnyAddressPorts,
             boolean enableInsights,
             boolean enableAutomaticSubscription,
             boolean enableDominantSpeaker,
@@ -271,6 +279,7 @@ public class ConnectOptions {
         private List<LocalAudioTrack> audioTracks;
         private List<LocalVideoTrack> videoTracks;
         private List<LocalDataTrack> dataTracks;
+        private boolean enableIceGatheringOnAnyAddressPorts = false;
         private boolean enableInsights = true;
         private boolean enableAutomaticSubscription = true;
         private boolean enableDominantSpeaker = false;
@@ -324,6 +333,21 @@ public class ConnectOptions {
         public Builder iceOptions(@NonNull IceOptions iceOptions) {
             Preconditions.checkNotNull(iceOptions);
             this.iceOptions = iceOptions;
+            return this;
+        }
+
+        /**
+         * Enable gathering of ICE candidates on "any address" ports. When this flag is set, ports
+         * not bound to any specific network interface will be used, in addition to normal ports
+         * bound to the enumerated interfaces. This flag may need to be set to support certain
+         * network configurations (e.g. some VPN implementations) where ports are not bound to
+         * specific interfaces. Setting this flag means that additional candidates might need to be
+         * gathered and evaluated, which could lead to slower ICE connection times for regular
+         * networks.
+         */
+        @NonNull
+        public Builder enableIceGatheringOnAnyAddressPorts(boolean enable) {
+            this.enableIceGatheringOnAnyAddressPorts = enable;
             return this;
         }
 
