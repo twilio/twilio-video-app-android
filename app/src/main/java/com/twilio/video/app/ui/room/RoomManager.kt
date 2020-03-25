@@ -24,6 +24,8 @@ import com.twilio.video.VideoCodec
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.api.AuthServiceError
+import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
@@ -115,11 +117,17 @@ class RoomManager(
                         connectOptionsBuilder.build(),
                         roomListener)
                 this@RoomManager.room = room
+            } catch (e: AuthServiceException) {
+                handleTokenException(e, e.error)
             } catch (e: Exception) {
-                Timber.e(e, "Failed to retrieve token")
-                mutableViewEvents.postValue(TokenError)
+                handleTokenException(e)
             }
         }
+    }
+
+    private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
+        Timber.e(e, "Failed to retrieve token")
+        mutableViewEvents.postValue(TokenError(error))
     }
 
     private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {

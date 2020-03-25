@@ -12,6 +12,7 @@
     <string name="room_screen_connection_failure_title">Connection Failure</string>
     <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
     <string name="room_screen_token_retrieval_failure_message">Failed to retrieve the room token.</string>
+    <string name="room_screen_token_expired_message">Passcode expired. Please sign in with a new passcode.</string>
 
     <!--  Notifications  -->
     <string name="room_notification_channel_title">Video Call</string>

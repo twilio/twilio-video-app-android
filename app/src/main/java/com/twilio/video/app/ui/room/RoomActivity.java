@@ -22,6 +22,7 @@ import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.R.drawable.ic_phonelink_ring_white_24dp;
 import static com.twilio.video.app.R.drawable.ic_volume_up_white_24dp;
+import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -94,6 +95,7 @@ import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
+import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
@@ -1418,16 +1420,25 @@ public class RoomActivity extends BaseActivity {
                 }
             } else {
                 if (roomEvent instanceof TokenError) {
-                    new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                            .setTitle(getString(R.string.room_screen_connection_failure_title))
-                            .setMessage(
-                                    getString(R.string.room_screen_token_retrieval_failure_message))
-                            .setNeutralButton("OK", null)
-                            .show();
+                    AuthServiceError error = ((TokenError) roomEvent).getServiceError();
+                    handleTokenError(error);
                 }
             }
             updateUi(room, roomEvent);
         }
+    }
+
+    private void handleTokenError(AuthServiceError error) {
+        int errorMessage =
+                error == EXPIRED_PASSCODE_ERROR
+                        ? R.string.room_screen_token_expired_message
+                        : R.string.room_screen_token_retrieval_failure_message;
+
+        new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
+                .setTitle(getString(R.string.room_screen_connection_failure_title))
+                .setMessage(getString(errorMessage))
+                .setNeutralButton("OK", null)
+                .show();
     }
 
     private class LocalParticipantListener implements LocalParticipant.Listener {
