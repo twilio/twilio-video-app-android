@@ -76,7 +76,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/fab_margin"
             android:layout_marginRight="@dimen/fab_margin"
             android:orientation="vertical"
             android:gravity="end|bottom">
@@ -136,8 +135,7 @@
                 android:textSize="20sp"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_gravity="end"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
+                android:layout_gravity="end"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/stats_recycler_view"
