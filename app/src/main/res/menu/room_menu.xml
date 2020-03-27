@@ -19,6 +19,11 @@
           android:visible="false"
           app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/device_menu_item"
+        android:title="@string/select_audio_device"
+        android:icon="@drawable/ic_devices_white_24dp"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/pause_audio_menu_item"
           android:title="@string/pause_audio"
           app:showAsAction="never"/>

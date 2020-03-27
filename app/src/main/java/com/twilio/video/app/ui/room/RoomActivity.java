@@ -29,6 +29,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -66,6 +67,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.google.android.material.snackbar.Snackbar;
+import com.twilio.audio_manager.AudioDevice;
+import com.twilio.audio_manager.AudioDeviceSelector;
 import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
@@ -111,6 +114,7 @@ import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -256,6 +260,8 @@ public class RoomActivity extends BaseActivity {
 
     @Inject RoomManager roomManager;
 
+    @Inject AudioDeviceSelector audioDeviceSelector;
+
     /** Coordinates participant thumbs and primary participant rendering. */
     private ParticipantController participantController;
 
@@ -299,6 +305,7 @@ public class RoomActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         // Setup Audio
+        audioDeviceSelector.start((audioDevices, selectedAudioDevice) -> {});
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setSpeakerphoneOn(true);
         savedVolumeControlStream = getVolumeControlStream();
@@ -449,7 +456,9 @@ public class RoomActivity extends BaseActivity {
                 } else {
                     stopScreenCapture();
                 }
-
+                return true;
+            case R.id.device_menu_item:
+                setupAudioDevices();
                 return true;
             case R.id.pause_audio_menu_item:
                 toggleLocalAudioTrackState();
@@ -621,6 +630,44 @@ public class RoomActivity extends BaseActivity {
                 cameraVideoTrack != null
                         ? R.drawable.ic_videocam_white_24px
                         : R.drawable.ic_videocam_off_gray_24px);
+    }
+
+    private void setupAudioDevices() {
+        AudioDevice audioDevice = audioDeviceSelector.getSelectedAudioDevice();
+        List<AudioDevice> audioDevices = audioDeviceSelector.getAudioDevices();
+
+        int index = audioDevices.indexOf(audioDevice);
+
+        ArrayList<String> audioDeviceNames = new ArrayList<>();
+        for (AudioDevice a : audioDevices) {
+            audioDeviceNames.add(a.name);
+        }
+
+        createAudioDeviceDialog(
+                        this,
+                        index,
+                        audioDeviceNames,
+                        (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            audioDeviceSelector.selectDevice(audioDevices.get(i));
+                        })
+                .show();
+    }
+
+    private AlertDialog createAudioDeviceDialog(
+            final Activity activity,
+            int currentDevice,
+            ArrayList<String> availableDevices,
+            DialogInterface.OnClickListener audioDeviceClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AppTheme_Dialog);
+        builder.setTitle(activity.getString(R.string.room_screen_select_device));
+
+        builder.setSingleChoiceItems(
+                availableDevices.toArray(new CharSequence[0]),
+                currentDevice,
+                audioDeviceClickListener);
+
+        return builder.create();
     }
 
     private boolean isNetworkQualityEnabled() {

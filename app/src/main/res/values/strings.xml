@@ -13,6 +13,7 @@
     <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
     <string name="room_screen_token_retrieval_failure_message">Failed to retrieve the room token.</string>
     <string name="room_screen_token_expired_message">Passcode expired. Please sign in with a new passcode.</string>
+    <string name="room_screen_select_device">Select Device</string>
 
     <!--  Notifications  -->
     <string name="room_notification_channel_title">Video Call</string>
@@ -119,6 +120,7 @@
     <string name="pause_video">Pause video</string>
     <string name="resume_video">Resume video</string>
     <string name="share_screen">Share screen</string>
+    <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
     <string name="screen_capture_error">Screen capturer error occurred.</string>
