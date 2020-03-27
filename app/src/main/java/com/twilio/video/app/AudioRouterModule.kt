@@ -9,7 +9,6 @@ import dagger.Provides
 class AudioRouterModule {
 
     @Provides
-    @ApplicationScope
     fun providesAudioDeviceSelector(application: Application): AudioDeviceSelector =
             AudioDeviceSelector(application.applicationContext)
 }
