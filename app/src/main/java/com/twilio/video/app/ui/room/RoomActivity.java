@@ -108,6 +108,8 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
 import com.twilio.video.app.ui.room.RoomEvent.RoomState;
 import com.twilio.video.app.ui.room.RoomEvent.TokenError;
+import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
+import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
@@ -284,7 +286,7 @@ public class RoomActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RoomViewModelFactory factory = new RoomViewModelFactory(roomManager);
+        RoomViewModelFactory factory = new RoomViewModelFactory(roomManager, audioDeviceSelector);
         roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
@@ -305,7 +307,6 @@ public class RoomActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         // Setup Audio
-        audioDeviceSelector.start((audioDevices, selectedAudioDevice) -> {});
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setSpeakerphoneOn(true);
         savedVolumeControlStream = getVolumeControlStream();
@@ -376,6 +377,7 @@ public class RoomActivity extends BaseActivity {
             screenVideoTrack.release();
             screenVideoTrack = null;
         }
+
         // dispose any token requests if needed
         rxDisposables.clear();
         super.onDestroy();
@@ -425,6 +427,7 @@ public class RoomActivity extends BaseActivity {
 
         requestPermissions();
         roomViewModel.getRoomEvents().observe(this, this::bindRoomEvents);
+        roomViewModel.getAudioViewState().observe(this, this::bindAudioViewState);
 
         return true;
     }
@@ -458,7 +461,7 @@ public class RoomActivity extends BaseActivity {
                 }
                 return true;
             case R.id.device_menu_item:
-                setupAudioDevices();
+                displayAudioDeviceList();
                 return true;
             case R.id.pause_audio_menu_item:
                 toggleLocalAudioTrackState();
@@ -517,13 +520,15 @@ public class RoomActivity extends BaseActivity {
         if (text != null) {
             final String roomName = text.toString();
 
-            roomViewModel.connectToRoom(displayName, roomName, isNetworkQualityEnabled());
+            RoomViewEvent.Connect viewEvent =
+                    new RoomViewEvent.Connect(displayName, roomName, isNetworkQualityEnabled());
+            roomViewModel.processInput(viewEvent);
         }
     }
 
     @OnClick(R.id.disconnect)
     void disconnectButtonClick() {
-        roomViewModel.disconnect();
+        roomViewModel.processInput(Disconnect.INSTANCE);
         stopScreenCapture();
     }
 
@@ -630,44 +635,6 @@ public class RoomActivity extends BaseActivity {
                 cameraVideoTrack != null
                         ? R.drawable.ic_videocam_white_24px
                         : R.drawable.ic_videocam_off_gray_24px);
-    }
-
-    private void setupAudioDevices() {
-        AudioDevice audioDevice = audioDeviceSelector.getSelectedAudioDevice();
-        List<AudioDevice> audioDevices = audioDeviceSelector.getAudioDevices();
-
-        int index = audioDevices.indexOf(audioDevice);
-
-        ArrayList<String> audioDeviceNames = new ArrayList<>();
-        for (AudioDevice a : audioDevices) {
-            audioDeviceNames.add(a.name);
-        }
-
-        createAudioDeviceDialog(
-                        this,
-                        index,
-                        audioDeviceNames,
-                        (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            audioDeviceSelector.selectDevice(audioDevices.get(i));
-                        })
-                .show();
-    }
-
-    private AlertDialog createAudioDeviceDialog(
-            final Activity activity,
-            int currentDevice,
-            ArrayList<String> availableDevices,
-            DialogInterface.OnClickListener audioDeviceClickListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AppTheme_Dialog);
-        builder.setTitle(activity.getString(R.string.room_screen_select_device));
-
-        builder.setSingleChoiceItems(
-                availableDevices.toArray(new CharSequence[0]),
-                currentDevice,
-                audioDeviceClickListener);
-
-        return builder.create();
     }
 
     private boolean isNetworkQualityEnabled() {
@@ -1473,6 +1440,53 @@ public class RoomActivity extends BaseActivity {
             }
             updateUi(room, roomEvent);
         }
+    }
+
+    private void bindAudioViewState(AudioViewState audioViewState) {
+        // TODO Toggle visibility of audio device menu item
+    }
+
+    private void displayAudioDeviceList() {
+        AudioViewState viewState = roomViewModel.getAudioViewState().getValue();
+        AudioDevice selectedDevice = viewState.getSelectedDevice();
+        List<AudioDevice> audioDevices = viewState.getAvailableAudioDevices();
+
+        if (selectedDevice != null && audioDevices != null) {
+            int index = audioDevices.indexOf(selectedDevice);
+
+            ArrayList<String> audioDeviceNames = new ArrayList<>();
+            for (AudioDevice a : audioDevices) {
+                audioDeviceNames.add(a.name);
+            }
+
+            createAudioDeviceDialog(
+                            this,
+                            index,
+                            audioDeviceNames,
+                            (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                                SelectAudioDevice viewEvent =
+                                        new SelectAudioDevice(audioDevices.get(i));
+                                roomViewModel.processInput(viewEvent);
+                            })
+                    .show();
+        }
+    }
+
+    private AlertDialog createAudioDeviceDialog(
+            final Activity activity,
+            int currentDevice,
+            ArrayList<String> availableDevices,
+            DialogInterface.OnClickListener audioDeviceClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AppTheme_Dialog);
+        builder.setTitle(activity.getString(R.string.room_screen_select_device));
+
+        builder.setSingleChoiceItems(
+                availableDevices.toArray(new CharSequence[0]),
+                currentDevice,
+                audioDeviceClickListener);
+
+        return builder.create();
     }
 
     private void handleTokenError(AuthServiceError error) {
