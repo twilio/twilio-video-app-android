@@ -1,2 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.twilio.audio_manager" />
+    package="com.twilio.audio_manager" >
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
+</manifest>
