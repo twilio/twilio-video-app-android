@@ -36,7 +36,13 @@ android {
 }
 
 dependencies {
-    implementation "io.jsonwebtoken:jjwt:${versions.jjwt}"
+    implementation "com.google.code.gson:gson:${versions.gson}"
+    implementation "io.jsonwebtoken:jjwt-api:${versions.jjwt}"
+    implementation "io.jsonwebtoken:jjwt-gson:${versions.jjwt}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${versions.jjwt}"
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:${versions.jjwt}") {
+        exclude group: 'org.json', module: 'json' //provided by Android natively
+    }
 
     testImplementation "junit:junit:${versions.junit}"
 

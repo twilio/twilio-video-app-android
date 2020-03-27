@@ -22,7 +22,6 @@ buildscript {
             'junit': '4.12',
             'mockito': '1.10.19',
             'guava': '19.0',
-            'retrofit': '1.9.0',
             'supportLibrary': '27.1.1',
             'designLibrary': '27.1.1',
             'preferenceLibrary': '27.1.1',
@@ -33,7 +32,7 @@ buildscript {
             'apacheCommons': '3.6',
             'junitParams': '1.1.1',
             'relinker': '1.3.1',
-            'jjwt': '0.7.0',
+            'jjwt': '0.11.1',
             'hockey': '3.5.0',
             'timber': '4.1.0',
             'materialrangebar': '1.3',
@@ -48,7 +47,21 @@ buildscript {
             'rxJava2': '2.0.6',
             'rxJava2Adapter': '1.0.0',
             'rxAndroid2': '2.0.1',
-            'retrofit2': '2.1.0'
+            /*
+             * Use Retrofit 2.5.0 to ensure that OkHttp 3.12.x is used because starting with OkHttp
+             * 3.13.x Android API level 21 or higher is required.
+             */
+            'retrofit2': '2.5.0',
+
+            /*
+             * Use this version of Google Play Services Basement to successfully make use of
+             * ProviderInstaller.installIfNeeded(...) on emulators and Firebase Test Lab devices.
+             * Calling this method installs the latest available security protocols which may
+             * include support for TLS 1.2.
+             *
+             * https://firebase.google.com/docs/test-lab/android/overview#and_google_play_services
+             */
+            'playServicesBasement': '8.1.0'
     ]
     repositories {
         google()

@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.twilio.video.twilioapi;
+package com.twilio.video.util;
 
 import android.util.Base64;
 import android.util.Log;
-import com.google.gson.GsonBuilder;
-import com.twilio.video.twilioapi.model.VideoRoom;
+import com.twilio.video.model.VideoRoom;
+import java.io.IOException;
 import java.util.List;
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.converter.GsonConverter;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
-import retrofit.http.GET;
-import retrofit.http.Header;
-import retrofit.http.POST;
-import retrofit.http.Path;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public class VideoApiUtils {
     private static final int MAX_RETRIES = 3;
@@ -64,7 +64,7 @@ public class VideoApiUtils {
 
         @POST("/v1/Rooms")
         @FormUrlEncoded
-        VideoRoom createRoom(
+        Call<VideoRoom> createRoom(
                 @Header("Authorization") String authorization,
                 @Field("UniqueName") String name,
                 @Field("Type") String type,
@@ -75,12 +75,12 @@ public class VideoApiUtils {
                 @Field("media_region") String mediaRegion);
 
         @GET("/v1/Rooms/{unique_name}")
-        VideoRoom getRoom(
+        Call<VideoRoom> getRoom(
                 @Header("Authorization") String authorization, @Path("unique_name") String name);
 
         @POST("/v1/Rooms/{room_sid}")
         @FormUrlEncoded
-        VideoRoom modifyRoom(
+        Call<VideoRoom> modifyRoom(
                 @Header("Authorization") String authorization,
                 @Path("room_sid") String roomSid,
                 @Field("Status") String status);
@@ -95,12 +95,13 @@ public class VideoApiUtils {
         } else if (currentEnvironment.equalsIgnoreCase(DEV)) {
             apiBaseUrl = DEV_BASE_URL;
         }
-        return new RestAdapter.Builder()
-                .setEndpoint(apiBaseUrl)
-                .setConverter(new GsonConverter(new GsonBuilder().create()))
-                .setLogLevel(RestAdapter.LogLevel.NONE)
-                .build()
-                .create(VideoApiUtils.VideoApiService.class);
+        Retrofit restAdapter =
+                new Retrofit.Builder()
+                        .baseUrl(apiBaseUrl)
+                        .client(OkHttpClientProvider.setupOkHttpClient())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+        return restAdapter.create(VideoApiUtils.VideoApiService.class);
     }
 
     public static void createRoom(
@@ -199,22 +200,20 @@ public class VideoApiUtils {
         do {
             try {
                 videoRoom =
-                        videoApiService.createRoom(
-                                authorization,
-                                name,
-                                type,
-                                enableTurn,
-                                enableRecording,
-                                videoCodecs,
-                                region,
-                                mediaRegion);
-            } catch (RetrofitError createRoomError) {
-                Log.e(
-                        "VideoApiUtils",
-                        String.format("RetrofitError: %s", createRoomError.getKind().name()));
-                if (createRoomError.getResponse() != null) {
-                    throw createRoomError;
-                }
+                        videoApiService
+                                .createRoom(
+                                        authorization,
+                                        name,
+                                        type,
+                                        enableTurn,
+                                        enableRecording,
+                                        videoCodecs,
+                                        region,
+                                        mediaRegion)
+                                .execute()
+                                .body();
+            } catch (IOException e) {
+                Log.e("VideoApiUtils", e.getMessage());
             }
 
             // Wait some time before trying again
@@ -273,6 +272,17 @@ public class VideoApiUtils {
         String authorization =
                 "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
 
-        return videoApiService.modifyRoom(authorization, roomSid, "completed");
+        VideoRoom videoRoom = null;
+        try {
+            videoRoom =
+                    videoApiService
+                            .modifyRoom(authorization, roomSid, "completed")
+                            .execute()
+                            .body();
+        } catch (IOException e) {
+            Log.e("VideoApiUtils", e.getMessage());
+        }
+
+        return videoRoom;
     }
 }

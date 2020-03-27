@@ -140,9 +140,9 @@ dependencies {
     testImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
 
     androidTestImplementation project(':env')
-    androidTestImplementation project(':twilioapi')
     androidTestImplementation project(':token')
-    androidTestImplementation "com.squareup.retrofit:retrofit:${versions.retrofit}"
+    androidTestImplementation "com.squareup.retrofit2:retrofit:${versions.retrofit2}"
+    androidTestImplementation "com.squareup.retrofit2:converter-gson:${versions.retrofit2}"
     androidTestImplementation "com.android.support:design:${versions.supportLibrary}"
     androidTestImplementation "com.android.support:recyclerview-v7:${versions.supportLibrary}"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:${versions.espresso}"
@@ -154,6 +154,7 @@ dependencies {
     androidTestImplementation "org.apache.commons:commons-lang3:${versions.apacheCommons}"
     androidTestImplementation "pl.pragmatists:JUnitParams:${versions.junitParams}"
     androidTestImplementation 'com.github.anrwatchdog:anrwatchdog:1.3.0'
+    androidTestImplementation "com.google.android.gms:play-services-basement:${versions.playServicesBasement}"
 
     implementation "com.android.support:support-annotations:${versions.supportLibrary}"
     implementation "com.getkeepsafe.relinker:relinker:${versions.relinker}"

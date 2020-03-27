@@ -16,9 +16,12 @@
 
 package com.twilio.video.token;
 
+import com.google.gson.Gson;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.gson.io.GsonDeserializer;
+import io.jsonwebtoken.gson.io.GsonSerializer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +92,12 @@ public class VideoAccessToken {
 
     @Override
     public String toString() {
-        return Jwts.parser().setSigningKey(keySpec).parseClaimsJws(jwt).toString();
+        return Jwts.parserBuilder()
+                .deserializeJsonWith(new GsonDeserializer<>(new Gson()))
+                .setSigningKey(keySpec)
+                .build()
+                .parseClaimsJws(jwt)
+                .toString();
     }
 
     public String getJwt() {
@@ -97,10 +105,10 @@ public class VideoAccessToken {
     }
 
     private String buildJwt() {
-        // Initialize jwt builder
         JwtBuilder builder =
-                new VideoJwtBuilder()
-                        .signWith(ALGORITHM, keySpec)
+                Jwts.builder()
+                        .signWith(keySpec, ALGORITHM)
+                        .serializeToJsonWith(new GsonSerializer<>(new Gson()))
                         .setHeaderParams(headers)
                         .setIssuer(apiKey)
                         .setExpiration(expiration);

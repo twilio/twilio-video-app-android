@@ -17,10 +17,9 @@
 package com.twilio.video.util;
 
 import com.twilio.video.IceServer;
+import com.twilio.video.model.TwilioIceServer;
+import com.twilio.video.model.TwilioServiceToken;
 import com.twilio.video.test.BuildConfig;
-import com.twilio.video.twilioapi.TwilioApiUtils;
-import com.twilio.video.twilioapi.model.TwilioIceServer;
-import com.twilio.video.twilioapi.model.TwilioServiceToken;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

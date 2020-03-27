@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.twilio.video.twilioapi.model;
+package com.twilio.video.model;
 
 import com.google.gson.annotations.SerializedName;
 

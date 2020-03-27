@@ -20,14 +20,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import com.twilio.video.Room;
 import com.twilio.video.VideoCodec;
+import com.twilio.video.model.VideoRoom;
 import com.twilio.video.test.BuildConfig;
-import com.twilio.video.twilioapi.VideoApiUtils;
-import com.twilio.video.twilioapi.model.VideoRoom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class RoomUtils {
     private static final String TAG = "RoomUtils";
@@ -107,20 +104,15 @@ public class RoomUtils {
                 CredentialsUtils.resolveCredentials(
                         Environment.fromString(BuildConfig.ENVIRONMENT));
 
-        VideoRoom videoRoom = null;
-        try {
-            videoRoom =
-                    VideoApiUtils.completeRoom(
-                            credentials.get(CredentialsUtils.API_KEY),
-                            credentials.get(CredentialsUtils.API_KEY_SECRET),
-                            roomSid,
-                            BuildConfig.ENVIRONMENT);
-        } catch (RetrofitError e) {
-            Response errorResponse = e.getResponse();
+        VideoRoom videoRoom =
+                VideoApiUtils.completeRoom(
+                        credentials.get(CredentialsUtils.API_KEY),
+                        credentials.get(CredentialsUtils.API_KEY_SECRET),
+                        roomSid,
+                        BuildConfig.ENVIRONMENT);
 
-            if (errorResponse != null) {
-                Log.w(TAG, "Failed to complete room: " + errorResponse.getReason());
-            }
+        if (videoRoom == null) {
+            Log.w(TAG, "Failed to complete room: " + roomSid);
         }
 
         return videoRoom;

@@ -34,7 +34,7 @@ import com.twilio.video.TestUtils;
 import com.twilio.video.Video;
 import com.twilio.video.VideoCodec;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.twilioapi.model.VideoRoom;
+import com.twilio.video.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;

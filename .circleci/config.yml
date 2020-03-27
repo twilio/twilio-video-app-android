@@ -81,6 +81,9 @@ aliases:
     command: >
               gcloud auth activate-service-account travis@video-app-79418.iam.gserviceaccount.com
               --key-file=secrets/video-app-46437ca14fdd.json
+  - &set-test-environment
+    name: Set test environment
+    command: scripts/set-ci-test-environment.sh
 
   # Trigger QE tests
   - &trigger-qe-tests
@@ -279,6 +282,7 @@ jobs:
       - run: *install-secrets
       - run: *install-cmake
       - run: *install-bbe
+      - run: *set-test-environment
 
       # Build compatibility
       - run:
@@ -299,7 +303,6 @@ jobs:
     <<: *build-defaults
     resource_class: xlarge
     steps:
-      # Setup
       - checkout
       - attach_workspace:
           at: *workspace
@@ -310,19 +313,16 @@ jobs:
       - run: *install-secrets
       - run: *install-cmake
       - run: *install-bbe
-
-      # Build library and tests
+      - run: *set-test-environment
       - run:
           name: Build Library and Tests
           command: ./gradlew -q library:assemble library:assembleAndroidTest
 
-      # Save the builds to workspace
       - persist_to_workspace:
           root: .
           paths:
             - library/build
 
-      # Save cache
       - save-cache: *save-cache-android-ndk
       - save-cache: *save-cache-gradle
 

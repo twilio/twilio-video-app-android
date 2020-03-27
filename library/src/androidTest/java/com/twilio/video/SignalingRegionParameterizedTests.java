@@ -18,8 +18,8 @@ import android.support.test.rule.GrantPermissionRule;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
 import com.twilio.video.helper.TrackContainer;
+import com.twilio.video.model.VideoRoom;
 import com.twilio.video.testcategories.NetworkTest;
-import com.twilio.video.twilioapi.model.VideoRoom;
 import com.twilio.video.ui.MediaTestActivity;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
@@ -44,9 +44,10 @@ import org.junit.runner.RunWith;
 @LargeTest
 public class SignalingRegionParameterizedTests extends BaseVideoTest {
 
+    // Use media regions available in both stage and prod
     enum MediaRegion {
         GLL("gll"),
-        BR1("br1"),
+        AU1("au1"),
         US1("us1");
 
         private final String value;
@@ -56,9 +57,10 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
         }
     }
 
+    // Use signaling regions available in both stage and prod
     enum SignalingRegion {
         GLL("gll"),
-        BR1("br1"),
+        AU1("au1"),
         US1("us1");
 
         private final String value;
@@ -218,8 +220,8 @@ public class SignalingRegionParameterizedTests extends BaseVideoTest {
     @SdkSuppress(minSdkVersion = 20) // TLS 1.1 is deprecated for the Twilio REST API
     @Parameters({
         "GLL, GLL, GLL",
-        "GLL, BR1, US1",
-        "BR1, GLL, GLL",
+        "GLL, AU1, US1",
+        "AU1, GLL, GLL",
     })
     public void shouldAllowConnectFromDifferentRegionsWithTracks(
             MediaRegion mediaRegion, SignalingRegion aliceRegion, SignalingRegion bobRegion)

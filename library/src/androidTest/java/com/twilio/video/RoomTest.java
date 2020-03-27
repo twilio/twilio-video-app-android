@@ -26,7 +26,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.twilio.video.base.BaseVideoTest;
 import com.twilio.video.helper.CallbackHelper;
-import com.twilio.video.twilioapi.model.VideoRoom;
+import com.twilio.video.model.VideoRoom;
 import com.twilio.video.util.Constants;
 import com.twilio.video.util.CredentialsUtils;
 import com.twilio.video.util.RoomUtils;

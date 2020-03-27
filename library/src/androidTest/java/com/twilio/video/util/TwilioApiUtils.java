@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.twilio.video.twilioapi;
+package com.twilio.video.util;
 
 import android.util.Base64;
-import com.google.gson.GsonBuilder;
-import com.twilio.video.twilioapi.model.TwilioServiceToken;
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.converter.GsonConverter;
-import retrofit.http.Header;
-import retrofit.http.POST;
-import retrofit.http.Path;
+import android.util.Log;
+import com.twilio.video.model.TwilioServiceToken;
+import java.io.IOException;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Header;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public class TwilioApiUtils {
     private static final String PROD_BASE_URL = "https://api.twilio.com";
@@ -45,7 +47,7 @@ public class TwilioApiUtils {
                 Callback<TwilioServiceToken> serviceTokenCallback);
 
         @POST("/2010-04-01/Accounts/{accountSid}/Tokens.json")
-        TwilioServiceToken getServiceToken(
+        Call<TwilioServiceToken> getServiceToken(
                 @Header("Authorization") String authorization,
                 @Path("accountSid") String accountSid);
     }
@@ -59,11 +61,14 @@ public class TwilioApiUtils {
         } else if (currentEnvironment.equalsIgnoreCase(DEV)) {
             apiBaseUrl = DEV_BASE_URL;
         }
-        return new RestAdapter.Builder()
-                .setEndpoint(apiBaseUrl)
-                .setConverter(new GsonConverter(new GsonBuilder().create()))
-                .build()
-                .create(TwilioApiService.class);
+
+        Retrofit restAdapter =
+                new Retrofit.Builder()
+                        .baseUrl(apiBaseUrl)
+                        .client(OkHttpClientProvider.setupOkHttpClient())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+        return restAdapter.create(TwilioApiService.class);
     }
 
     public static void getServiceToken(
@@ -105,6 +110,14 @@ public class TwilioApiUtils {
         String authorization =
                 "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
 
-        return twilioApiService.getServiceToken(authorization, accountSid);
+        TwilioServiceToken twilioServiceToken = null;
+        try {
+            twilioServiceToken =
+                    twilioApiService.getServiceToken(authorization, accountSid).execute().body();
+        } catch (IOException e) {
+            Log.e("TwilioApiUtils", e.getMessage());
+        }
+
+        return twilioServiceToken;
     }
 }

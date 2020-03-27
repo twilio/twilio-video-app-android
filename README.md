@@ -108,7 +108,6 @@ generates access tokens locally. Please follow the
  instructions. Putting your Account SID, API Key, and API Key Secret inside
  of an Android application will compromise your Twilio API credentials associated with your Twilio
  account.**
-* **twilioapi**: A utility module for using the Twilio REST API to get ice servers
 * **apkscale**: A utility app module for determining the size impact of the Video Android SDK
 
 ## Video App
@@ -148,6 +147,21 @@ git subtree push --prefix=videoapp twilio-video-app-android task/update-app
 
 The tests are located in the library module and use the AndroidJUnitRunner.
 The tests interact with the backend infrastructure and will result in billing activity on your account.
+
+### Test Environment Policies
+
+This section describes the policies related to the Twilio environment (dev, stage, or prod) where
+SDK tests are executed. For local development, all SDK tests are executed in prod by
+default. Reference [switching server environments](#switching-server-environments-twilions-only)
+to change this behavior. In an effort to preserve production traffic for customers, tests run in CI
+adhere to the following policies:
+
+- All CI tests run for commits pushed to working branches are run in stage by default. Developers
+can change this behavior by specifying an environment slug in commit messages. For example, to run
+tests in the CI pipeline in prod, specify the following commit message `Check behavior [env:prod]`.
+The supported slug env values are `stage` and `prod`.
+- All CI tests run when changes are pushed to `master` or branches with the pattern `feature/*` will be run in prod regardless
+of the environment specified in a commit slug.
 
 ### Setting Test Log Level
 By default, the log level is set to `LogLevel.INFO` during test execution. To change the log level
