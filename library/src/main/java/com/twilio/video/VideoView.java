@@ -72,10 +72,10 @@ public class VideoView extends SurfaceViewRenderer implements VideoRenderer {
                 context.getTheme().obtainStyledAttributes(attrs, R.styleable.VideoView, 0, 0);
 
         try {
-            mirror = a.getBoolean(R.styleable.VideoView_mirror, false);
+            mirror = a.getBoolean(R.styleable.VideoView_tviMirror, false);
             videoScaleType =
-                    VideoScaleType.fromInt(a.getInteger(R.styleable.VideoView_scaleType, 0));
-            overlaySurface = a.getBoolean(R.styleable.VideoView_overlaySurface, false);
+                    VideoScaleType.fromInt(a.getInteger(R.styleable.VideoView_tviScaleType, 0));
+            overlaySurface = a.getBoolean(R.styleable.VideoView_tviOverlaySurface, false);
         } finally {
             a.recycle();
         }

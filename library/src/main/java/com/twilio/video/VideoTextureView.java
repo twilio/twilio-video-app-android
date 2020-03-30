@@ -91,9 +91,10 @@ public class VideoTextureView extends TextureView
                 context.getTheme()
                         .obtainStyledAttributes(attrs, R.styleable.VideoTextureView, 0, 0);
         try {
-            mirror = a.getBoolean(R.styleable.VideoTextureView_mirror, false);
+            mirror = a.getBoolean(R.styleable.VideoTextureView_tviMirror, false);
             videoScaleType =
-                    VideoScaleType.fromInt(a.getInteger(R.styleable.VideoTextureView_scaleType, 0));
+                    VideoScaleType.fromInt(
+                            a.getInteger(R.styleable.VideoTextureView_tviScaleType, 0));
         } finally {
             a.recycle();
         }

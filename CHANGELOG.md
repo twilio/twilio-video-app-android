@@ -1,5 +1,47 @@
 The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.org).
 
+### 5.4.0
+
+* Programmable Video Android SDK 5.4.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.4.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.4.0/)
+
+Bug Fixes
+
+- Fixed [an issue](https://github.com/twilio/video-quickstart-android/issues/487) integrating the
+SDK with applications that contain an attribute of `scaleType`, `mirror`, or `overlaySurface`.
+These attributes defined for `VideoView` and `VideoTextureView` have been prefixed with `tvi` to
+prevent attribute name clashes. Reference the following snippets to update your application
+layout files.
+
+    Configure video views before 5.4.0
+
+    ```xml
+    <com.twilio.video.VideoView
+        app:overlaySurface="true"
+        app:mirror="true"
+        app:scaleType="fit"/>
+
+    <com.twilio.video.VideoTextureView
+        app:mirror="true"
+        app:scaleType="fit"/>
+    ```
+
+    Configure video views in 5.4.0+
+
+    ```xml
+    <com.twilio.video.VideoView
+        app:tviOverlaySurface="true"
+        app:tviMirror="true"
+        app:tviScaleType="fit"/>
+
+    <com.twilio.video.VideoTextureView
+        app:tviMirror="true"
+        app:tviScaleType="fit"/>
+    ```
+
+Known issues
+
+- Unpublishing and republishing a `LocalAudioTrack` or `LocalVideoTrack` might not be seen by Participants. As a result, tracks published after a `Room.State.RECONNECTED` event might not be subscribed to by a `RemoteParticipant`.
+
 ### 5.3.0
 
 * Programmable Video Android SDK 5.3.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.3.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.3.0/)
