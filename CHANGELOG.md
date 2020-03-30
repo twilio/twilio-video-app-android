@@ -4,6 +4,18 @@ The Twilio Programmable Video SDKs use [Semantic Versioning](http://www.semver.o
 
 * Programmable Video Android SDK 5.4.0 [[bintray]](https://bintray.com/twilio/releases/video-android/5.4.0), [[docs]](https://twilio.github.io/twilio-video-android/docs/5.4.0/)
 
+Enhancements
+
+- Reduced the SDK size. The table below highlights the updated app size impact.
+
+| ABI             | App Size Impact 5.3.0 | App Size Impact 5.4.0 |
+| --- | --- | --- |
+| universal       | 22.9MB | 21.8MB          |
+| armeabi-v7a     | 5MB | 4.8MB           |
+| arm64-v8a       | 5.9MB | 5.6MB           |
+| x86             | 6.2MB | 6MB             |
+| x86_64          | 6.4MB | 6MB             |
+
 Bug Fixes
 
 - Fixed [an issue](https://github.com/twilio/video-quickstart-android/issues/487) integrating the

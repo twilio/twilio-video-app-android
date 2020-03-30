@@ -55,29 +55,6 @@ target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-lEGL")
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-lGLESv1_CM")
 target_link_libraries(${VIDEO_ANDROID_LIBRARY} "-landroid")
 
-# These libraries are purposefully ordered to satisfy the linker. If the linker complains about
-# undefined symbols that are clearly defined in the static libraries then reorder these
-# libraries accordingly.
-target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
-        ${CORE_STATIC_LIB_DIR}/libPocoNet.a
-        ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a
-        ${CORE_STATIC_LIB_DIR}/libPocoUtil.a
-        ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a
-        ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
-        ${CORE_STATIC_LIB_DIR}/libboost_system.a
-        ${CORE_STATIC_LIB_DIR}/libboost_coroutine.a
-        ${CORE_STATIC_LIB_DIR}/libboost_context.a
-        ${CORE_STATIC_LIB_DIR}/libboost_thread.a
-        # Several WebRTC classes use native JNI code that are only
-        # called from Java classes. The compiler will incorrectly strip some
-        # of these native objects during linking because it believes
-        # they are unused by the native library. Tell the linker to keep
-        # the whole archive to prevent this stripping and then specify in the
-        # dependency after we are not using whole archive anymore because the linker
-        # applies this option to every library after the option is specified.
-        "-Wl,--whole-archive ${CORE_STATIC_LIB_DIR}/libwebrtc.a -Wl,--no-whole-archive"
-        ${CORE_STATIC_LIB_DIR}/libjsoncpp.a)
-
 # Extract and rename all WebRTC JNI signature symbols to contain correct classpath prefix.
 #
 # This process must be done before the creation of the .so file in order to ensure
@@ -94,12 +71,49 @@ add_custom_command(
         # Java_org_webrtc_SymbolTwo Java_tvi_webrtc_SymbolTwo
         cut -d \" \" -f3 |
         sed 's/\\\(Java_\\\)org\\\(_.*\\\)/\\1org\\2 \\1${VIDEO_ANDROID_CLASSPATH_PREFIX}\\2/' >
-        ${CMAKE_BINARY_DIR}/webrtc-jni-symbols-definitions.txt &&
+        ${CMAKE_BINARY_DIR}/webrtc-jni-symbols-redefinitions.txt &&
         # Rename the JNI symbols
         ${CMAKE_OBJCOPY}
-        --redefine-syms=${CMAKE_BINARY_DIR}/webrtc-jni-symbols-definitions.txt
+        --redefine-syms=${CMAKE_BINARY_DIR}/webrtc-jni-symbols-redefinitions.txt
         ${CORE_STATIC_LIB_DIR}/libwebrtc.a
 )
+
+# Create linker options file that informs the linker to define WebRTC JNI native symbols.
+#
+# Some WebRTC classes use native JNI code that are only called from Java classes. The linker will
+# incorrectly strip some of these native objects during linking because it believes
+# they are unused by the native library. The following commands extracts the WebRTC JNI symbols
+# to a linker options file which defines each symbol to prevent being stripped.
+add_custom_command(
+        TARGET ${VIDEO_ANDROID_LIBRARY}
+        PRE_LINK
+        COMMAND
+        # Extract all JNI symbols
+        ${CMAKE_NM} -g ${CORE_STATIC_LIB_DIR}/libwebrtc.a | grep 'Java_${VIDEO_ANDROID_CLASSPATH_PREFIX}_webrtc' |
+        # Output symbol definitions to the following single-line format
+        # -u Java_tvi_webrtc_SymbolOne -u Java_tvi_webrtc_SymbolTwo
+        cut -d \" \" -f3 |
+        sed 's/\\\(.*\\\)/-u \\1/' | tr \"\\n\" \" \" >
+        ${CMAKE_BINARY_DIR}/webrtc-jni-symbols-definitions.txt
+)
+
+# These libraries are purposefully ordered to satisfy the linker. If the linker complains about
+# undefined symbols that are clearly defined in the static libraries then reorder these
+# libraries accordingly.
+target_link_libraries(${VIDEO_ANDROID_LIBRARY} ${CORE_STATIC_LIB_DIR}/libtwilio-video.a
+        ${CORE_STATIC_LIB_DIR}/libPocoNet.a
+        ${CORE_STATIC_LIB_DIR}/libPocoNetSSL.a
+        ${CORE_STATIC_LIB_DIR}/libPocoUtil.a
+        ${CORE_STATIC_LIB_DIR}/libPocoCrypto.a
+        ${CORE_STATIC_LIB_DIR}/libPocoFoundation.a
+        ${CORE_STATIC_LIB_DIR}/libboost_system.a
+        ${CORE_STATIC_LIB_DIR}/libboost_coroutine.a
+        ${CORE_STATIC_LIB_DIR}/libboost_context.a
+        ${CORE_STATIC_LIB_DIR}/libboost_thread.a
+        ${CORE_STATIC_LIB_DIR}/libwebrtc.a
+        ${CORE_STATIC_LIB_DIR}/libjsoncpp.a
+        # Tell the linker to define WebRTC JNI symbols
+        "-Wl,@${CMAKE_BINARY_DIR}/webrtc-jni-symbols-definitions.txt")
 
 # Rename classpath reference symbols
 add_custom_command(
