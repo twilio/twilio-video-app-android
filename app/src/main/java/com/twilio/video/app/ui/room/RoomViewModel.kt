@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audio_manager.AudioDevice
 import com.twilio.audio_manager.AudioDeviceSelector
+import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
+import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import kotlinx.coroutines.launch
@@ -42,6 +44,8 @@ class RoomViewModel(
             is SelectAudioDevice -> {
                 selectAudioDevice(viewEvent.device)
             }
+            ActivateAudioDevice -> { audioDeviceSelector.activate() }
+            DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
             is Connect -> {
                 connect(
                         viewEvent.identity,

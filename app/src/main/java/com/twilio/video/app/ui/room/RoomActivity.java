@@ -31,8 +31,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -106,6 +104,7 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
 import com.twilio.video.app.ui.room.RoomEvent.RoomState;
 import com.twilio.video.app.ui.room.RoomEvent.TokenError;
+import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
@@ -212,7 +211,6 @@ public class RoomActivity extends BaseActivity {
     private MenuItem settingsMenuItem;
     private MenuItem deviceMenuItem;
 
-    private AudioManager audioManager;
     private int savedAudioMode = AudioManager.MODE_INVALID;
     private int savedVolumeControlStream;
     private boolean savedIsMicrophoneMute = false;
@@ -305,9 +303,7 @@ public class RoomActivity extends BaseActivity {
         // Setup toolbar
         setSupportActionBar(toolbar);
 
-        // Setup Audio
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setSpeakerphoneOn(true);
+        // Cache volume control stream
         savedVolumeControlStream = getVolumeControlStream();
 
         // setup participant controller
@@ -361,8 +357,6 @@ public class RoomActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        // Reset the speakerphone
-        audioManager.setSpeakerphoneOn(false);
         // Teardown tracks
         if (localAudioTrack != null) {
             localAudioTrack.release();
@@ -885,60 +879,6 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    private void setAudioFocus(boolean setFocus) {
-        if (setFocus) {
-            savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
-            savedIsMicrophoneMute = audioManager.isMicrophoneMute();
-            setMicrophoneMute();
-            savedAudioMode = audioManager.getMode();
-            // Request audio focus before making any device switch.
-            requestAudioFocus();
-            /*
-             * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-             * required to be in this mode when playout and/or recording starts for
-             * best possible VoIP performance.
-             * Some devices have difficulties with speaker mode if this is not set.
-             */
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            setVolumeControl(true);
-        } else {
-            audioManager.setMode(savedAudioMode);
-            audioManager.abandonAudioFocus(null);
-            audioManager.setMicrophoneMute(savedIsMicrophoneMute);
-            audioManager.setSpeakerphoneOn(savedIsSpeakerPhoneOn);
-            setVolumeControl(false);
-        }
-    }
-
-    private void requestAudioFocus() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            AudioAttributes playbackAttributes =
-                    new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                            .build();
-            AudioFocusRequest focusRequest =
-                    new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                            .setAudioAttributes(playbackAttributes)
-                            .setAcceptsDelayedFocusGain(true)
-                            .setOnAudioFocusChangeListener(i -> {})
-                            .build();
-            audioManager.requestAudioFocus(focusRequest);
-        } else {
-            audioManager.requestAudioFocus(
-                    null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        }
-    }
-
-    /** Sets the microphone mute state. */
-    private void setMicrophoneMute() {
-        boolean wasMuted = audioManager.isMicrophoneMute();
-        if (!wasMuted) {
-            return;
-        }
-        audioManager.setMicrophoneMute(false);
-    }
-
     private void setVolumeControl(boolean setVolumeControl) {
         if (setVolumeControl) {
             /*
@@ -1275,8 +1215,6 @@ public class RoomActivity extends BaseActivity {
 
             publishLocalTracks();
 
-            setAudioFocus(true);
-
             updateStats();
 
             addParticipantViews();
@@ -1350,6 +1288,7 @@ public class RoomActivity extends BaseActivity {
                     State state = room.getState();
                     switch (state) {
                         case CONNECTED:
+                            toggleAudioDevice(true);
                             initializeRoom();
                             break;
                         case DISCONNECTED:
@@ -1358,7 +1297,7 @@ public class RoomActivity extends BaseActivity {
                             room = null;
                             localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
                             updateStats();
-                            setAudioFocus(false);
+                            toggleAudioDevice(false);
                             networkQualityLevels.clear();
                             break;
                     }
@@ -1370,7 +1309,7 @@ public class RoomActivity extends BaseActivity {
                             .setNeutralButton("OK", null)
                             .show();
                     removeAllParticipants();
-                    setAudioFocus(false);
+                    toggleAudioDevice(false);
                 }
                 if (roomEvent instanceof ParticipantConnected) {
                     boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
@@ -1431,6 +1370,15 @@ public class RoomActivity extends BaseActivity {
             }
             updateUi(room, roomEvent);
         }
+    }
+
+    private void toggleAudioDevice(boolean enableAudioDevice) {
+        setVolumeControl(enableAudioDevice);
+        RoomViewEvent viewEvent =
+                enableAudioDevice
+                        ? ActivateAudioDevice.INSTANCE
+                        : RoomViewEvent.DeactivateAudioDevice.INSTANCE;
+        roomViewModel.processInput(viewEvent);
     }
 
     private void bindAudioViewState(AudioViewState audioViewState) {
