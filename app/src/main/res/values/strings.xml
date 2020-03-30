@@ -127,7 +127,6 @@
     <string name="general">General</string>
     <string name="join">Join</string>
     <string name="room">Room</string>
-    <string name="turn_speaker_on">Speaker ON</string>
     <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
     <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
     <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
