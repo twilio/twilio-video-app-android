@@ -212,6 +212,7 @@ public class RoomActivity extends BaseActivity {
     private MenuItem pauseAudioMenuItem;
     private MenuItem screenCaptureMenuItem;
     private MenuItem settingsMenuItem;
+    private MenuItem deviceMenuItem;
 
     private AudioManager audioManager;
     private int savedAudioMode = AudioManager.MODE_INVALID;
@@ -424,6 +425,7 @@ public class RoomActivity extends BaseActivity {
         pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item);
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item);
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item);
+        deviceMenuItem = menu.findItem(R.id.device_menu_item);
 
         requestPermissions();
         roomViewModel.getRoomEvents().observe(this, this::bindRoomEvents);
@@ -1443,7 +1445,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void bindAudioViewState(AudioViewState audioViewState) {
-        // TODO Toggle visibility of audio device menu item
+        deviceMenuItem.setVisible(!audioViewState.getAvailableAudioDevices().isEmpty());
     }
 
     private void displayAudioDeviceList() {
