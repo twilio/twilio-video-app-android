@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.List;
 
-public class BluetoothController {
+class BluetoothController {
     private static final String TAG = "BluetoothController";
     private final @NonNull AudioManager audioManager;
     private final @NonNull Context context;
@@ -22,20 +22,20 @@ public class BluetoothController {
     private final @Nullable BluetoothAdapter bluetoothAdapter;
     private @Nullable BluetoothDevice bluetoothDevice;
 
-    public interface Listener {
+    interface Listener {
         void onBluetoothConnected(@NonNull BluetoothDevice bluetoothDevice);
 
         void onBluetoothDisconnected();
     }
 
-    public BluetoothController(@NonNull Context context, @NonNull Listener listener) {
+    BluetoothController(@NonNull Context context, @NonNull Listener listener) {
         this.context = context;
         this.listener = listener;
         this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
-    public void start() {
+    void start() {
         if (bluetoothAdapter != null) {
             // Use the profile proxy to detect a bluetooth device that is already connected
             bluetoothAdapter.getProfileProxy(
@@ -71,17 +71,17 @@ public class BluetoothController {
         }
     }
 
-    public void stop() {
+    void stop() {
         if (bluetoothAdapter != null) {
             context.unregisterReceiver(broadcastReceiver);
         }
     }
 
-    public void activate() {
+    void activate() {
         audioManager.startBluetoothSco();
     }
 
-    public void deactivate() {
+    void deactivate() {
         audioManager.stopBluetoothSco();
     }
 
