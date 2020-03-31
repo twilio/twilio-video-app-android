@@ -17,11 +17,9 @@
 package com.twilio.video.app.data.api;
 
 import android.content.SharedPreferences;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.twilio.video.app.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
-import io.reactivex.schedulers.Schedulers;
 import javax.inject.Named;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -50,8 +48,6 @@ public class VideoAppServiceModule {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(VIDEO_APP_SERVICE_DEV_URL)
-                .addCallAdapterFactory(
-                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -66,8 +62,6 @@ public class VideoAppServiceModule {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(VIDEO_APP_SERVICE_STAGE_URL)
-                .addCallAdapterFactory(
-                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -82,8 +76,6 @@ public class VideoAppServiceModule {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(VIDEO_APP_SERVICE_PROD_URL)
-                .addCallAdapterFactory(
-                        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

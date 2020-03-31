@@ -11,6 +11,8 @@
     <!--  Room Screen  -->
     <string name="room_screen_connection_failure_title">Connection Failure</string>
     <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
+    <string name="room_screen_token_retrieval_failure_message">Failed to retrieve the room token.</string>
+    <string name="room_screen_token_expired_message">Passcode expired. Please sign in with a new passcode.</string>
 
     <!--  Notifications  -->
     <string name="room_notification_channel_title">Video Call</string>
@@ -151,7 +153,6 @@
     <string name="sign_in_with_existing_account">Sign in with Existing Account</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="name">Name</string>
     <string name="bitrate">bps</string>
     <string name="recording_notice">Recording may be enabled for quality assurance.</string>
     <string name="audio_toggle">Audio toggle</string>

@@ -17,11 +17,12 @@
 package com.twilio.video.app;
 
 import com.twilio.video.app.auth.CommunityAuthModule;
-import com.twilio.video.app.data.CommunityDataModule;
+import com.twilio.video.app.data.AuthServiceModule;
+import com.twilio.video.app.security.SecurityModule;
 import com.twilio.video.app.ui.CommunityScreenSelectorModule;
 import com.twilio.video.app.ui.login.CommunityLoginActivityModule;
+import com.twilio.video.app.ui.room.CommunityRoomManagerModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
-import com.twilio.video.app.ui.room.RoomManagerModule;
 import com.twilio.video.app.ui.room.VideoServiceModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
 import com.twilio.video.app.ui.settings.SettingsFragmentModule;
@@ -35,7 +36,7 @@ import dagger.android.AndroidInjectionModule;
         AndroidInjectionModule.class,
         ApplicationModule.class,
         CommunityTreeModule.class,
-        CommunityDataModule.class,
+        AuthServiceModule.class,
         CommunityAuthModule.class,
         CommunityScreenSelectorModule.class,
         SplashActivityModule.class,
@@ -44,7 +45,8 @@ import dagger.android.AndroidInjectionModule;
         SettingsActivityModule.class,
         SettingsFragmentModule.class,
         VideoServiceModule.class,
-        RoomManagerModule.class
+        CommunityRoomManagerModule.class,
+        SecurityModule.class
     }
 )
 public interface VideoApplicationComponent {
