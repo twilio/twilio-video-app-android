@@ -184,10 +184,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         }
     }
 
-    public void showNetworkQualityLevel(Boolean showNetworkQualityLevel) {
-        networkQualityLevelImg.setVisibility(showNetworkQualityLevel ? VISIBLE : GONE);
-    }
-
     @IntDef({
         ParticipantView.State.VIDEO,
         ParticipantView.State.NO_VIDEO,

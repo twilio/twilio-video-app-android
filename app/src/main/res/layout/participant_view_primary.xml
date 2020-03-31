@@ -43,10 +43,10 @@
 
             <ImageView
                 android:id="@+id/participant_no_audio"
-                android:layout_width="15dp"
-                android:layout_height="16dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:contentDescription="@string/audio_toggle"
                 app:srcCompat="@drawable/ic_thumbnail_no_audio_pillbox"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,24 +55,26 @@
 
             <ImageView
                 android:id="@+id/dominant_speaker_img"
-                android:layout_width="15dp"
-                android:layout_height="16dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="4dp"
                 app:srcCompat="@drawable/ic_dominant_speaker_img"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/participant_video_identity"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+/>
 
             <ImageView
                 android:id="@+id/network_quality_level_img"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_margin="6dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
                 app:srcCompat="@drawable/network_quality_level_0"
                 android:contentDescription="@string/settings_screen_enable_network_quality_level_description"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/participant_video_identity"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

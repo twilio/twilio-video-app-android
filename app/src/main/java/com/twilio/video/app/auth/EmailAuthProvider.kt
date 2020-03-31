@@ -17,7 +17,7 @@
 package com.twilio.video.app.auth
 
 import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
-import com.twilio.video.app.auth.LoginResult.EmailLoginSuccessResult
+import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -34,7 +34,7 @@ class EmailAuthProvider @JvmOverloads constructor(
     }
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
-        return Observable.create<LoginResult> { observable ->
+        return Observable.create { observable ->
             disposables + loginEventObservable.subscribe({ loginEvent ->
                 if (loginEvent is EmailLoginEvent) {
                     loginEvent.run {

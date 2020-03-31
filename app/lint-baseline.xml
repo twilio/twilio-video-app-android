@@ -2,6 +2,19 @@
 <issues format="5" by="lint 3.5.0" client="gradle" variant="all" version="3.5.0">
 
     <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?attr/colorPrimary` with a theme that also paints a background (inferred theme is `@style/AppTheme_LoginScreen`)"
+        errorLine1="    android:background=&quot;?attr/colorPrimary&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        includedVariants="communityDebug"
+        excludedVariants="internalDebug,internalRelease,twilioRelease">
+        <location
+            file="src/community/res/layout/development_activity_login.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
         id="AnnotationProcessorOnCompilePath"
         message="Add annotation processor to processor path using `annotationProcessor` instead of `implementation`"
         errorLine1="    implementation &quot;com.jakewharton:butterknife:$butterknifeVersion&quot;"
@@ -798,6 +811,17 @@
         <location
             file="src/main/res/layout/participant_view_primary.xml"
             line="48"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginEnd=&quot;10dp&quot;` to better support right-to-left layouts"
+        errorLine1="                android:layout_marginRight=&quot;10dp&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/participant_view_primary.xml"
+            line="72"
             column="17"/>
     </issue>
 

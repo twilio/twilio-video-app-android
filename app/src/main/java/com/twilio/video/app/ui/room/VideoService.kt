@@ -51,14 +51,15 @@ class VideoService : LifecycleService() {
 
     private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
         nullableRoomEvent?.let { roomEvent ->
-            val room = roomEvent.room
-            if (roomEvent is RoomState) {
-                if (room.state == CONNECTED) {
-                    val roomNotification = RoomNotification(this@VideoService)
-                    startForeground(
-                            ONGOING_NOTIFICATION_ID,
-                            roomNotification.buildNotification(room.name))
-                } else if (room.state == DISCONNECTED) stopSelf()
+            roomEvent.room?.let { room ->
+                if (roomEvent is RoomState) {
+                    if (room.state == CONNECTED) {
+                        val roomNotification = RoomNotification(this@VideoService)
+                        startForeground(
+                                ONGOING_NOTIFICATION_ID,
+                                roomNotification.buildNotification(room.name))
+                    } else if (room.state == DISCONNECTED) stopSelf()
+                }
             }
         }
     }

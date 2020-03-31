@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.twilio.video.app.data.api
 
-package com.twilio.video.app.data;
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-import com.twilio.video.app.ApplicationScope;
-import com.twilio.video.app.data.api.TokenService;
-import dagger.Module;
-import dagger.Provides;
-
-@Module(includes = DataModule.class)
-public class CommunityDataModule {
-    @Provides
-    @ApplicationScope
-    TokenService providesTokenService() {
-        return new CommunityTokenService();
-    }
+interface VideoAppService {
+    @GET("api/v1/token")
+    suspend fun getToken(
+        @Query("identity") identity: String?,
+        @Query("roomName") roomName: String?,
+        @Query("appEnvironment") appEnvironment: String?,
+        @Query("topology") topology: String?,
+        @Query("recordParticipantsOnConnect") recordParticipantsOnConnect: Boolean
+    ): String
 }

@@ -27,9 +27,9 @@ import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.auth.LoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
-import com.twilio.video.app.auth.LoginResult.GoogleLoginIntentResult
-import com.twilio.video.app.auth.LoginResult.GoogleLoginSuccessResult
-import com.twilio.video.app.auth.LoginResult.EmailLoginSuccessResult
+import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
+import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
+import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.room.RoomActivity
@@ -129,8 +129,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     }
 
     private fun startLobbyActivity() {
-        val intent = Intent(this, RoomActivity::class.java).apply { data = intent.data }
-        startActivity(intent)
+        RoomActivity.startActivity(this, intent.data)
         finish()
     }
 
