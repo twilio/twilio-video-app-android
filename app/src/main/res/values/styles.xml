@@ -1,0 +1,82 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.SplashScreen" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+    <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:editTextColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/login_hint</item>
+    </style>
+    <style name="AppTheme.Settings" parent="AppTheme">
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="displayOptions">showHome|showTitle|homeAsUp</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+    <style name="AppTheme.Preference">
+        <item name="android:layout" tools:ignore="PrivateResource">@layout/preference_material</item>
+    </style>
+    <style name="AppTheme.Preference.DialogPreference">
+        <item name="positiveButtonText">@android:string/ok</item>
+        <item name="negativeButtonText">@android:string/cancel</item>
+    </style>
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+    </style>
+    <style name="AppTheme.Lobby" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/lobbyColorPrimary</item>
+        <item name="colorPrimaryDark">@color/lobbyColorPrimaryDark</item>
+        <item name="colorAccent">@color/lobbyColorAccent</item>
+
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="android:textColorHint">@color/lobbyHint</item>
+    </style>
+    <style name="AppTheme.Lobby.ClearableEditText" parent="Widget.AppCompat.EditText">
+        <item name="textColor">@android:color/white</item>
+        <item name="android:textCursorDrawable">@drawable/edit_text_cursor</item>
+    </style>
+
+    <style name="AppTheme.Lobby.BorderlessButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@drawable/join_button</item>
+    </style>
+
+    <style name="AppTheme.Lobby.PopupMenu" parent="Widget.AppCompat.Light.PopupMenu">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Lobby.Drawer" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="Stats.TextTitle" parent="AppTheme.Lobby.Drawer">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Stats.TextValue" parent="Stats.TextTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Stats.TextTrack" parent="AppTheme.Lobby.Drawer">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Authenticating" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
+
+</resources>

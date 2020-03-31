@@ -6,6 +6,7 @@ sdk/.settings
 sdk/bin
 output
 
+dist/
 target/
 docs/
 
@@ -56,12 +57,7 @@ sdk/libs/
 
 # Google Play Services
 **/google-services.json
-
-# Twilio Video Config
-**/twilio-video.json
-
-# Twilio Video App Config
-**/twilio-video-app.json
+!app/src/community/google-services.json
 
 # CI Secrets
 secrets.tar.gz
@@ -70,3 +66,7 @@ secrets/
 
 # CXX directories
 **/.cxx/
+
+# Test files
+captures/
+app/src/androidTest/assets/Credentials/TestCredentials.json

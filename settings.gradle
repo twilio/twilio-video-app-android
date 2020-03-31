@@ -1,4 +1,1 @@
-include ':library', ':env', ':token', ':apkscale', ':compatibility'
-
-include 'app'
-project(':app').projectDir = file('videoapp/app')
+include ':app'

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Video Community</string>
+
+    <!--  Login Screen  -->
+    <string name="login_screen_name">Your name</string>
+    <string name="login_screen_passcode">Passcode</string>
+    <string name="login_screen_error_title">Log In Error</string>
+    <string name="login_screen_invalid_passcode_error">Passcode incorrect.</string>
+    <string name="login_screen_expired_passcode_error">Passcode expired.</string>
+</resources>

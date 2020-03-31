@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General -->
+    <string name="web_app_domain">twilio-video-react.appspot.com</string>
+
+    <!--  Login Screen  -->
+    <string name="login_screen_auth_error_title">Login Error</string>
+    <string name="login_screen_auth_error_desc">There was an issue logging in.</string>
+
+    <!--  Room Screen  -->
+    <string name="room_screen_connection_failure_title">Connection Failure</string>
+    <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
+    <string name="room_screen_token_retrieval_failure_message">Failed to retrieve the room token.</string>
+    <string name="room_screen_token_expired_message">Passcode expired. Please sign in with a new passcode.</string>
+
+    <!--  Notifications  -->
+    <string name="room_notification_channel_title">Video Call</string>
+    <string name="room_notification_title">Ongoing video call in %s</string>
+    <string name="room_notification_message">Tap to return to the room.</string>
+
+    <!--  Settings Screen  -->
+    <string name="settings_screen_advanced">Advanced</string>
+    <string name="settings_screen_enable_stats">Enable Stats</string>
+    <string name="settings_screen_enable_network_quality_level">Enable Network Quality Level</string>
+    <string name="settings_screen_enable_insights">Enable Insights</string>
+    <string name="settings_screen_enable_automatic_track_subscription">Enable Automatic Track Subscription</string>
+    <string name="settings_screen_enable_dominant_speaker">Enable Dominant Speaker</string>
+    <string name="settings_screen_record_participants_on_connect">Record Participants on Connect</string>
+    <string name="settings_screen_enable_network_quality_level_description">Network Quality Level</string>
+    <string name="settings_screen_environment_string">Environment</string>
+    <string name="settings_screen_topology">Topology</string>
+    <string name="settings_screen_media">Media</string>
+    <string name="settings_screen_about">About</string>
+    <string name="settings_screen_video_codecs">Video Codec</string>
+    <string name="settings_screen_audio_codecs">Audio Codec</string>
+    <string name="settings_screen_max_video_bitrate">Video Bitrate (Kbps)</string>
+    <string name="settings_screen_max_audio_bitrate">Audio Bitrate (Kbps)</string>
+    <string name="settings_screen_vp8_simulcast">VP8 Simulcast</string>
+    <string name="settings_screen_aspect_ratio">Aspect Ratio</string>
+    <string name="settings_screen_fps">Frames per second</string>
+    <string name="settings_screen_identity">User Identity</string>
+    <string name="settings_screen_version">Version</string>
+    <string name="settings_screen_version_code">Version Code</string>
+    <string name="settings_screen_video_library_version">Video Library Version</string>
+    <string name="settings_screen_logout">Log Out</string>
+    <string name="settings_screen_video_dimensions">Video dimensions</string>
+    <string-array name="settings_screen_environment_array">
+        <item>Production</item>
+        <item>Staging</item>
+        <item>Development</item>
+    </string-array>
+
+    <string-array name="settings_screen_environment_array_values">
+        <item>production</item>
+        <item>stage</item>
+        <item>dev</item>
+    </string-array>
+
+    <string-array name="settings_screen_topology_array">
+        <item>group</item>
+        <item>group-small</item>
+        <item>peer-to-peer</item>
+    </string-array>
+    <string-array name="settings_screen_aspect_ratio_array">
+        <item>4:3</item>
+        <item>16:9</item>
+        <item>11:9</item>
+    </string-array>
+
+    <string-array name="settings_screen_aspect_ratio_array_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="settings_screen_video_dimensions_array">
+        <item>352x288</item>
+        <item>640x480</item>
+        <item>800x480</item>
+        <item>960x540</item>
+        <item>1280x720</item>
+        <item>1280x960</item>
+        <item>1440x1080</item>
+        <item>1920x1080</item>
+    </string-array>
+
+    <string name="stats_enable_in_settings">Enable in Settings</string>
+    <string name="enable_ice">Enable ICE Options</string>
+    <string name="ice_options">Enable ICE options</string>
+    <string name="app_name">Video</string>
+    <string name="client_name">Client Name</string>
+    <string name="login">LOG IN</string>
+    <string name="settings">Settings</string>
+    <string name="username">Username</string>
+    <string name="join_room">Join Room</string>
+    <string name="registering">Registering</string>
+    <string name="video_client_status">Video Client Status</string>
+    <string name="room_status">Room Status</string>
+    <string name="video_constraints">Video Constraints</string>
+    <string name="statistics">Statistics</string>
+    <string name="local">Local Media</string>
+    <string name="remote">Remote Media</string>
+    <string name="ice_transp_policy">Transportation policy</string>
+    <string name="stun_turn">STUN or TURN server</string>
+    <string name="add_server">Add</string>
+    <string name="ice_servers_dialog_title">ICE Options</string>
+    <string name="ice_servers_list_desc">Choose server(s)</string>
+    <string name="ice_options_button">Ice Options</string>
+    <string name="prefer_h264">Prefer H264</string>
+    <string name="auto_register">Automatically register when app launches</string>
+    <string name="auto_accept">Accept invites automatically</string>
+    <string name="use_headset">Start audio using headset</string>
+    <string name="error_initializing_conversations">Error initializing conversations sdk</string>
+    <string name="logout_when_conv_ends">Logout when conversation ends</string>
+    <string name="room_name">Room Name</string>
+    <string name="switch_camera">Switch Camera</string>
+    <string name="pause_audio">Pause audio</string>
+    <string name="resume_audio">Resume audio</string>
+    <string name="pause_video">Pause video</string>
+    <string name="resume_video">Resume video</string>
+    <string name="share_screen">Share screen</string>
+    <string name="stop_screen_share">Stop screen share</string>
+    <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
+    <string name="screen_capture_error">Screen capturer error occurred.</string>
+    <string name="general">General</string>
+    <string name="join">Join</string>
+    <string name="room">Room</string>
+    <string name="turn_speaker_on">Speaker ON</string>
+    <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
+    <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
+    <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
+    <string name="stats_track_sid">sid</string>
+    <string name="stats_codec">codec</string>
+    <string name="stats_packets">packets lost</string>
+    <string name="stats_bytes_sent">bytes sent</string>
+    <string name="stats_bytes_received">bytes received</string>
+    <string name="stats_gathering_disabled">Statistics Gathering Disabled</string>
+    <string name="stats_unavailable">Statistics Unavailable</string>
+    <string name="stats_description_join_room">Join a Room to View Statistics</string>
+    <string name="stats_description_media_not_shared">Media is Not Being Shared</string>
+    <string name="stats_rtt">round trip time</string>
+    <string name="stats_jitter">jitter</string>
+    <string name="stats_audio_level">audio level</string>
+    <string name="stats_dimensions">dimensions</string>
+    <string name="stats_framerate">framerate</string>
+    <string name="audio_track">Audio Track</string>
+    <string name="local_audio_track">Local Audio Track</string>
+    <string name="video_track">Video Track</string>
+    <string name="local_video_track">Local Video Track</string>
+    <string name="camera_video_track">Camera Video Track</string>
+    <string name="screen_video_track">Screen Video Track</string>
+    <string name="you">You</string>
+    <string name="sign_in_with_existing_account">Sign in with Existing Account</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="bitrate">bps</string>
+    <string name="recording_notice">Recording may be enabled for quality assurance.</string>
+    <string name="audio_toggle">Audio toggle</string>
+    <string name="video_logo">Video Logo</string>
+    <string name="stats_disabled">Stats disabled</string>
+    <string name="profile_picture">Profile picture</string>
+    <string name="number">Number</string>
+
+    <string-array name="ice_trans_policy_array">
+        <item>All</item>
+        <item>Relay</item>
+    </string-array>
+
+</resources>

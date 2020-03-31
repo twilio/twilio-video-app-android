@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/speaker_menu_item"
+          android:title="@string/turn_speaker_on"
+          android:icon="@drawable/ic_volume_up_white_24dp"
+          app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/switch_camera_menu_item"
+          android:title="@string/switch_camera"
+          android:icon="@drawable/ic_switch_camera_white_24dp"
+          app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/share_screen_menu_item"
+          android:title="@string/share_screen"
+          android:icon="@drawable/ic_screen_share_white_24dp"
+          android:visible="false"
+          app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/pause_audio_menu_item"
+          android:title="@string/pause_audio"
+          app:showAsAction="never"/>
+
+    <item android:id="@+id/pause_video_menu_item"
+          android:title="@string/pause_video"
+          app:showAsAction="never"/>
+
+    <item android:id="@+id/settings_menu_item"
+          android:title="@string/settings"
+          android:enabled="true"
+          app:showAsAction="never"/>
+</menu>

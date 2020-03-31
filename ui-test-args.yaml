@@ -1,0 +1,8 @@
+ui-tests:
+  timeout: 30m
+  type: instrumentation
+  app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
+  test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
+  device:
+    - {model: Nexus9, version: 24}
+    - {model: flame, version: 29}

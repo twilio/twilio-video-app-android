@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="AppTheme.Lobby" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/lobbyColorPrimary</item>
+        <item name="colorPrimaryDark">@color/lobbyColorPrimaryDark</item>
+        <item name="colorAccent">@color/lobbyColorAccent</item>
+
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="android:textColorHint">@color/lobbyHint</item>
+
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+</resources>
