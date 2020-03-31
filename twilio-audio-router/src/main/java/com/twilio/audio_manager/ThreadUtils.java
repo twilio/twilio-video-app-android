@@ -18,9 +18,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class ThreadUtils {
+class ThreadUtils {
     /** Utility class to be used for checking that a method is called on the correct thread. */
-    public static class ThreadChecker {
+    static class ThreadChecker {
         @Nullable private Thread thread = Thread.currentThread();
 
         public void checkIsOnValidThread() {
@@ -38,7 +38,7 @@ public class ThreadUtils {
     }
 
     /** Throws exception if called from other than main thread. */
-    public static void checkIsOnMainThread() {
+    static void checkIsOnMainThread() {
         if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
             throw new IllegalStateException("Not on main thread!");
         }
@@ -48,7 +48,7 @@ public class ThreadUtils {
      * Utility interface to be used with executeUninterruptibly() to wait for blocking operations to
      * complete without getting interrupted..
      */
-    public interface BlockingOperation {
+    interface BlockingOperation {
         void run() throws InterruptedException;
     }
 
@@ -59,7 +59,7 @@ public class ThreadUtils {
      * the blocking operation, this function will re-run the operation until completion, and only
      * then re-interrupt the thread.
      */
-    public static void executeUninterruptibly(BlockingOperation operation) {
+    private static void executeUninterruptibly(BlockingOperation operation) {
         boolean wasInterrupted = false;
         while (true) {
             try {
@@ -78,7 +78,7 @@ public class ThreadUtils {
         }
     }
 
-    public static boolean joinUninterruptibly(final Thread thread, long timeoutMs) {
+    static boolean joinUninterruptibly(final Thread thread, long timeoutMs) {
         final long startTimeMs = SystemClock.elapsedRealtime();
         long timeRemainingMs = timeoutMs;
         boolean wasInterrupted = false;
@@ -102,7 +102,7 @@ public class ThreadUtils {
         return !thread.isAlive();
     }
 
-    public static void joinUninterruptibly(final Thread thread) {
+    static void joinUninterruptibly(final Thread thread) {
         executeUninterruptibly(
                 new BlockingOperation() {
                     @Override
@@ -112,7 +112,7 @@ public class ThreadUtils {
                 });
     }
 
-    public static void awaitUninterruptibly(final CountDownLatch latch) {
+    static void awaitUninterruptibly(final CountDownLatch latch) {
         executeUninterruptibly(
                 new BlockingOperation() {
                     @Override
@@ -122,7 +122,7 @@ public class ThreadUtils {
                 });
     }
 
-    public static boolean awaitUninterruptibly(CountDownLatch barrier, long timeoutMs) {
+    static boolean awaitUninterruptibly(CountDownLatch barrier, long timeoutMs) {
         final long startTimeMs = SystemClock.elapsedRealtime();
         long timeRemainingMs = timeoutMs;
         boolean wasInterrupted = false;
@@ -148,8 +148,7 @@ public class ThreadUtils {
     }
 
     /** Post |callable| to |handler| and wait for the result. */
-    public static <V> V invokeAtFrontUninterruptibly(
-            final Handler handler, final Callable<V> callable) {
+    static <V> V invokeAtFrontUninterruptibly(final Handler handler, final Callable<V> callable) {
         if (handler.getLooper().getThread() == Thread.currentThread()) {
             try {
                 return callable.call();
@@ -194,7 +193,7 @@ public class ThreadUtils {
     }
 
     /** Post |runner| to |handler|, at the front, and wait for completion. */
-    public static void invokeAtFrontUninterruptibly(final Handler handler, final Runnable runner) {
+    static void invokeAtFrontUninterruptibly(final Handler handler, final Runnable runner) {
         invokeAtFrontUninterruptibly(
                 handler,
                 new Callable<Void>() {
