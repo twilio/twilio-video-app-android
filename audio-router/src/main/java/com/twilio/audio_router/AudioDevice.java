@@ -6,7 +6,7 @@ public class AudioDevice {
     public final @NonNull String name;
     public final @NonNull Type type;
 
-    public AudioDevice(@NonNull Type type, @NonNull String name) {
+    AudioDevice(@NonNull Type type, @NonNull String name) {
         this.type = type;
         this.name = name;
     }
