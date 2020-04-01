@@ -2,8 +2,15 @@ package com.twilio.audio_router;
 
 import androidx.annotation.NonNull;
 
+/**
+ * This class represents a single audio device that has been retrieved by the {@link
+ * AudioDeviceSelector}. It contains information about the audio device.
+ */
 public class AudioDevice {
+    /** The name of the audio device. */
     public final @NonNull String name;
+
+    /** The type of audio device defined in {@link Type}. */
     public final @NonNull Type type;
 
     AudioDevice(@NonNull Type type, @NonNull String name) {
@@ -11,7 +18,7 @@ public class AudioDevice {
         this.name = name;
     }
 
-    /** Audio device types */
+    /** A type of audio device. */
     public enum Type {
         SPEAKERPHONE,
         WIRED_HEADSET,
