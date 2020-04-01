@@ -1,4 +1,4 @@
-package com.twilio.audio_manager;
+package com.twilio.audio_router;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
