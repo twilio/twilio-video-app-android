@@ -21,12 +21,19 @@ public class AudioDevice {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof AudioDevice)) {
-            return false;
-        } else {
-            return name.equals(((AudioDevice) o).name) && type.equals(((AudioDevice) o).type);
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AudioDevice that = (AudioDevice) o;
+
+        if (!name.equals(that.name)) return false;
+        return type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
     }
 }
