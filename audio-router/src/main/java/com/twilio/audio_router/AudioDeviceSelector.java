@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This class enables developers to enumerate available audio devices and select which device audio
+ * should be routed to. All execution in this class is done on the main thread, but will be moved to
+ * a background thread in a future release.
+ */
 public class AudioDeviceSelector {
     private static final String TAG = "AudioDeviceSelector";
 
@@ -55,6 +60,11 @@ public class AudioDeviceSelector {
             new AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset");
     private @Nullable AudioDevice bluetoothAudioDevice;
 
+    /**
+     * Constructs a new AudioDeviceSelector instance.
+     *
+     * @param context the application context
+     */
     public AudioDeviceSelector(@NonNull Context context) {
         ThreadUtils.checkIsOnMainThread();
         this.context = context.getApplicationContext();
@@ -88,7 +98,13 @@ public class AudioDeviceSelector {
         state = State.STOPPED;
     }
 
-    /** Start listening for audio device changes */
+    /**
+     * Starts listening for audio device changes. <b>Note:</b> When audio device listening is no
+     * longer needed, {@link AudioDeviceSelector#stop()} should be called in order to prevent a
+     * memory leak.
+     *
+     * @param listener receives audio device change events
+     */
     public void start(@NonNull AudioDeviceChangeListener listener) {
         ThreadUtils.checkIsOnMainThread();
         this.audioDeviceChangeListener = listener;
@@ -119,7 +135,12 @@ public class AudioDeviceSelector {
         }
     }
 
-    /** Stop listening for audio device changes */
+    /**
+     * Stops listening for audio device changes if {@link
+     * AudioDeviceSelector#start(AudioDeviceChangeListener)} has already been invoked. {@link
+     * AudioDeviceSelector#deactivate()} will also get called if a device has been activated with
+     * {@link AudioDeviceSelector#activate()}.
+     */
     public void stop() {
         ThreadUtils.checkIsOnMainThread();
         switch (state) {
@@ -136,7 +157,12 @@ public class AudioDeviceSelector {
         }
     }
 
-    /** Request focus for the selected audio device */
+    /**
+     * Performs audio routing and unmuting on the selected device from {@link
+     * AudioDeviceSelector#selectDevice(AudioDevice)}. Audio focus is also acquired for the client
+     * application. <b>Note:</b> {@link AudioDeviceSelector#deactivate()} should be invoked to
+     * restore the prior audio state.
+     */
     public void activate() {
         ThreadUtils.checkIsOnMainThread();
         switch (state) {
@@ -184,7 +210,10 @@ public class AudioDeviceSelector {
         }
     }
 
-    /** Restore focus away from the selected audio device */
+    /**
+     * Restores the audio state prior to calling {@link AudioDeviceSelector#activate()} and removes
+     * audio focus from the client application.
+     */
     public void deactivate() {
         ThreadUtils.checkIsOnMainThread();
         switch (state) {
@@ -207,9 +236,10 @@ public class AudioDeviceSelector {
     }
 
     /**
-     * Select the desired {@link AudioDevice}. If the provided {@link AudioDevice} is not available
-     * no changes are made. If the provided {@link AudioDevice} is null an {@link AudioDevice} is
-     * chosen based on the following preference: Bluetooth, Wired Headset, Microphone, Speakerphone
+     * Selects the desired {@link AudioDevice}. If the provided {@link AudioDevice} is not
+     * available, no changes are made. If the provided {@link AudioDevice} is null, an {@link
+     * AudioDevice} is chosen based on the following preference: Bluetooth, Wired Headset,
+     * Microphone, Speakerphone.
      *
      * @param audioDevice The {@link AudioDevice} to use
      */
@@ -219,7 +249,12 @@ public class AudioDeviceSelector {
         enumerateDevices();
     }
 
-    /** @return The selected {@link AudioDevice} */
+    /**
+     * Retrieves the selected {@link AudioDevice} from {@link
+     * AudioDeviceSelector#selectDevice(AudioDevice)}
+     *
+     * @return the selected {@link AudioDevice}
+     */
     public @Nullable AudioDevice getSelectedAudioDevice() {
         ThreadUtils.checkIsOnMainThread();
         return selectedDevice != null
@@ -227,6 +262,11 @@ public class AudioDeviceSelector {
                 : null;
     }
 
+    /**
+     * Retrieves the current list of available {@link AudioDevice}s.
+     *
+     * @return the current list of {@link AudioDevice}s
+     */
     public @NonNull List<AudioDevice> getAudioDevices() {
         ThreadUtils.checkIsOnMainThread();
         return Collections.unmodifiableList(new ArrayList<>(availableAudioDevices));
