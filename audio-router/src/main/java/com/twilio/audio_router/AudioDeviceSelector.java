@@ -325,6 +325,7 @@ public class AudioDeviceSelector {
     }
 
     private void enumerateDevices() {
+        ThreadUtils.checkIsOnMainThread();
         availableAudioDevices.clear();
         if (bluetoothAudioDevice != null) {
             availableAudioDevices.add(bluetoothAudioDevice);
