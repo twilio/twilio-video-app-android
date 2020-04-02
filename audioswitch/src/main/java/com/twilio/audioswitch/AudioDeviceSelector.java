@@ -1,4 +1,4 @@
-package com.twilio.audio_router;
+package com.twilio.audioswitch;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * This class enables developers to enumerate available audio devices and select which device audio
- * should be routed to. The AudioDeviceSelector instance must be accessed from the main thread. 
+ * should be routed to. The AudioDeviceSelector instance must be accessed from the main thread.
  * Additionally, the AudioDeviceChangeListener will always callback on the main thread.
  */
 public class AudioDeviceSelector {

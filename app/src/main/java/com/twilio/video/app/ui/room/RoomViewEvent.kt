@@ -1,6 +1,6 @@
 package com.twilio.video.app.ui.room
 
-import com.twilio.audio_router.AudioDevice
+import com.twilio.audioswitch.AudioDevice
 
 sealed class RoomViewEvent {
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()

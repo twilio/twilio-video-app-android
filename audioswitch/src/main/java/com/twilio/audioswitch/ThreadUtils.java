@@ -1,4 +1,4 @@
-package com.twilio.audio_router;
+package com.twilio.audioswitch;
 
 /*
  *  Copyright 2015 The WebRTC project authors. All Rights Reserved.
