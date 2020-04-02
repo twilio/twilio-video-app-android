@@ -47,7 +47,7 @@ import dagger.android.AndroidInjectionModule;
         VideoServiceModule.class,
         CommunityRoomManagerModule.class,
         SecurityModule.class,
-        AudioRouterModule.class
+        AudioSwitchModule.class
     }
 )
 public interface VideoApplicationComponent {

@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module(includes = [ ApplicationModule::class ])
-class AudioRouterModule {
+class AudioSwitchModule {
 
     @Provides
     fun providesAudioDeviceSelector(application: Application): AudioDeviceSelector =
