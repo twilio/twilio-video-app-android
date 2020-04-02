@@ -42,10 +42,10 @@ The passcode will expire after one week. To generate a new passcode:
 
 #### Troubleshooting The Twilio CLI
 
-If any errors occur after running the [Twilio CLI commands](#deploy-twilio-access-token-server), then run the following commands:
+If any errors occur after running a [Twilio CLI RTC Plugin](https://github.com/twilio-labs/plugin-rtc) command, then try the following steps.
 
 1. Run `twilio plugins:update` to update the rtc plugin to the latest version.
-1. Run `twilio rtc:apps:video:delete` to delete any problematic authentication servers.
+1. Run `twilio rtc:apps:video:delete` to delete any existing authentication servers.
 1. Run `twilio rtc:apps:video:deploy --authentication passcode` to deploy a new authentication server.
 
 ### Build
