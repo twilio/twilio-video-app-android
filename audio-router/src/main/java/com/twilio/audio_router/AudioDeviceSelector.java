@@ -21,8 +21,8 @@ import java.util.List;
 
 /**
  * This class enables developers to enumerate available audio devices and select which device audio
- * should be routed to. All execution in this class is done on the main thread, but will be moved to
- * a background thread in a future release.
+ * should be routed to. The AudioDeviceSelector instance must be accessed from the main thread. 
+ * Additionally, the AudioDeviceChangeListener will always callback on the main thread.
  */
 public class AudioDeviceSelector {
     private static final String TAG = "AudioDeviceSelector";
