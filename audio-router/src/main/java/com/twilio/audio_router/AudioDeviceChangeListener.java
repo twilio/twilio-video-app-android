@@ -11,7 +11,7 @@ public interface AudioDeviceChangeListener {
      * Receives a list of the most recently available {@link AudioDevice}s. Also provides the
      * currently selected {@link AudioDevice} from {@link AudioDeviceSelector}.
      *
-     * @param audioDevices the list of {@link AudioDevice}s or {@code null} if none are available.
+     * @param audioDevices the list of {@link AudioDevice}s or an empty list if none are available.
      * @param selectedAudioDevice the currently selected device or {@code null} if none have been
      *     selected.
      */
