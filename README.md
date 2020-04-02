@@ -38,7 +38,19 @@ The app requires a back-end to generate [Twilio access tokens](https://www.twili
 The passcode will expire after one week. To generate a new passcode:
 
 1. Run `twilio rtc:apps:video:delete`.
-1. Run `twilio rtc:apps:video:deploy --authentication passcode`.
+2. Run `twilio rtc:apps:video:deploy --authentication passcode`.
+
+#### Troubleshooting The Twilio CLI
+
+If any errors occur after running the `twilio rtc:apps:video:deploy --authentication passcode` command, then run the following commands:
+
+```
+twilio plugins:update
+twilio rtc:apps:video:delete
+twilio rtc:apps:video:deploy --authentication passcode
+```
+
+The commands in the above snippet updates the rtc plugin to the latest version, deletes any problematic authentication servers, and deploys a new authentication server.
 
 ### Build
 
