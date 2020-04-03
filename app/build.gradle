@@ -92,6 +92,7 @@ android {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
             signingConfig signingConfigs.debug
+            multiDexKeepFile file('multidex-config.txt')
         }
     }
 
