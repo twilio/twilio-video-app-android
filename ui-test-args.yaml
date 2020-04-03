@@ -6,3 +6,5 @@ ui-tests:
   device:
     - {model: Nexus9, version: 24}
     - {model: flame, version: 29}
+    - {model: m0, version: 18}
+    - {model: g3, version: 19}
