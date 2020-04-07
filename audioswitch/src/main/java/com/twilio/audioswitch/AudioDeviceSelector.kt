@@ -43,7 +43,7 @@ class AudioDeviceSelector(context: Context) {
     private var savedIsMicrophoneMuted = false
     private var savedSpeakerphoneEnabled = false
     private enum class State {
-        STARTED, ACTIVE, STOPPED
+        STARTED, ACTIVATED, STOPPED
     }
     private val EARPIECE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
 
@@ -102,7 +102,7 @@ class AudioDeviceSelector(context: Context) {
                 }
                 state = State.STARTED
             }
-            State.STARTED, State.ACTIVE -> {
+            State.STARTED, State.ACTIVATED -> {
             }
         }
     }
@@ -115,7 +115,7 @@ class AudioDeviceSelector(context: Context) {
      */
     fun stop() {
         when (state) {
-            State.ACTIVE -> {
+            State.ACTIVATED -> {
                 deactivate()
                 context.unregisterReceiver(wiredHeadsetReceiver)
                 bluetoothController.stop()
@@ -149,9 +149,9 @@ class AudioDeviceSelector(context: Context) {
                 if (selectedDevice != null) {
                     activate(selectedDevice!!)
                 }
-                state = State.ACTIVE
+                state = State.ACTIVATED
             }
-            State.ACTIVE -> // Activate the newly selected device
+            State.ACTIVATED -> // Activate the newly selected device
                 if (selectedDevice != null) {
                     activate(selectedDevice!!)
                 }
@@ -182,7 +182,7 @@ class AudioDeviceSelector(context: Context) {
      */
     fun deactivate() {
         when (state) {
-            State.ACTIVE -> {
+            State.ACTIVATED -> {
                 bluetoothController.deactivate()
 
                 // Restore stored audio state
@@ -262,7 +262,7 @@ class AudioDeviceSelector(context: Context) {
             if (state == STATE_PLUGGED) {
                 wiredHeadsetAvailable = true
                 Log.d(TAG, "Wired Headset available")
-                if (this@AudioDeviceSelector.state == State.ACTIVE) {
+                if (this@AudioDeviceSelector.state == State.ACTIVATED) {
                     userSelectedDevice = WIRED_HEADSET_AUDIO_DEVICE
                 }
                 enumerateDevices()
@@ -301,7 +301,7 @@ class AudioDeviceSelector(context: Context) {
         }
 
         // Activate the device if in the active state
-        if (state == State.ACTIVE) {
+        if (state == State.ACTIVATED) {
             activate()
         }
         if (audioDeviceChangeListener != null) {
