@@ -13,12 +13,29 @@ import android.util.Log
 
 private const val TAG = "BluetoothController"
 
-internal class BluetoothController(private val context: Context) {
+internal class BluetoothController {
     internal var deviceListener: Listener? = null
 
-    private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+    private val context: Context
+    private val audioManager: AudioManager
+    private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothDevice: BluetoothDevice? = null
+
+    constructor(context: Context) {
+        this.context = context
+        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+    }
+
+    internal constructor(
+        context: Context,
+        audioManager: AudioManager,
+        bluetoothAdapter: BluetoothAdapter? = null
+    ) {
+        this.context = context
+        this.audioManager = audioManager
+        this.bluetoothAdapter = bluetoothAdapter
+    }
 
     internal interface Listener {
         fun onBluetoothConnected(bluetoothDevice: BluetoothDevice)
@@ -26,7 +43,7 @@ internal class BluetoothController(private val context: Context) {
     }
 
     fun start() {
-        if (bluetoothAdapter != null) {
+        bluetoothAdapter?.let { bluetoothAdapter ->
             // Use the profile proxy to detect a bluetooth device that is already connected
             bluetoothAdapter.getProfileProxy(
                     context,
