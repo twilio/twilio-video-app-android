@@ -13,7 +13,9 @@ import android.util.Log
 
 private const val TAG = "BluetoothController"
 
-internal class BluetoothController(private val context: Context, private val listener: Listener) {
+internal class BluetoothController(private val context: Context) {
+    internal var deviceListener: Listener? = null
+
     private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private var bluetoothDevice: BluetoothDevice? = null
@@ -34,14 +36,14 @@ internal class BluetoothController(private val context: Context, private val lis
                             for (device in bluetoothDeviceList) {
                                 Log.d(TAG, "Bluetooth " + device.name + " connected")
                                 bluetoothDevice = device
-                                listener.onBluetoothConnected(device)
+                                deviceListener?.onBluetoothConnected(device)
                             }
                         }
 
                         override fun onServiceDisconnected(profile: Int) {
                             Log.d(TAG, "Bluetooth disconnected")
                             bluetoothDevice = null
-                            listener.onBluetoothDisconnected()
+                            deviceListener?.onBluetoothDisconnected()
                         }
                     },
                     BluetoothProfile.HEADSET)
@@ -85,7 +87,7 @@ internal class BluetoothController(private val context: Context, private val lis
                                             connectedBluetoothDevice.name +
                                             " connected")
                             bluetoothDevice = connectedBluetoothDevice
-                            listener.onBluetoothConnected(bluetoothDevice!!)
+                            deviceListener?.onBluetoothConnected(bluetoothDevice!!)
                         }
                     }
                     BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
@@ -94,7 +96,7 @@ internal class BluetoothController(private val context: Context, private val lis
                             bluetoothDevice = null
                         }
                         Log.d(TAG, "Bluetooth disconnected")
-                        listener.onBluetoothDisconnected()
+                        deviceListener?.onBluetoothDisconnected()
                     }
                     AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
                         val state = intent.getIntExtra(

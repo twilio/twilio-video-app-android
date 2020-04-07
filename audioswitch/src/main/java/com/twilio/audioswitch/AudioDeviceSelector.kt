@@ -50,26 +50,29 @@ class AudioDeviceSelector(context: Context) {
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
-    private val bluetoothController: BluetoothController = BluetoothController(
-            context,
-            object : BluetoothController.Listener {
-                override fun onBluetoothConnected(
-                    bluetoothDevice: BluetoothDevice
-                ) {
-                    bluetoothAudioDevice = AudioDevice(
-                            AudioDevice.Type.BLUETOOTH,
-                            bluetoothDevice.name)
-                    if (state == State.ACTIVE) {
-                        userSelectedDevice = bluetoothAudioDevice
-                    }
-                    enumerateDevices()
+    private val bluetoothController: BluetoothController = BluetoothController(context).apply {
+        deviceListener = object : BluetoothController.Listener {
+            override fun onBluetoothConnected(
+                bluetoothDevice: BluetoothDevice
+            ) {
+                bluetoothAudioDevice = AudioDevice(
+                        AudioDevice.Type.BLUETOOTH,
+                        bluetoothDevice.name)
+                if (state == State.ACTIVATED) {
+                    userSelectedDevice = bluetoothAudioDevice
                 }
+                enumerateDevices()
+            }
 
-                override fun onBluetoothDisconnected() {
-                    bluetoothAudioDevice = null
-                    enumerateDevices()
-                }
-            })
+            override fun onBluetoothDisconnected() {
+                bluetoothAudioDevice = null
+                enumerateDevices()
+            }
+        }
+    }
+
+    internal constructor(context: Context, bluetoothController: BluetoothController) : this(context) {
+    }
 
     /**
      * Starts listening for audio device changes. **Note:** When audio device listening is no
