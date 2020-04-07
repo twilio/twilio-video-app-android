@@ -1395,7 +1395,7 @@ public class RoomActivity extends BaseActivity {
 
             ArrayList<String> audioDeviceNames = new ArrayList<>();
             for (AudioDevice a : audioDevices) {
-                audioDeviceNames.add(a.name);
+                audioDeviceNames.add(a.getName());
             }
 
             createAudioDeviceDialog(

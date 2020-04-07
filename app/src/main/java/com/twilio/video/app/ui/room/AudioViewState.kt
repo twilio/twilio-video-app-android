@@ -4,5 +4,5 @@ import com.twilio.audioswitch.AudioDevice
 
 data class AudioViewState(
     val selectedDevice: AudioDevice? = null,
-    val availableAudioDevices: List<AudioDevice> = emptyList()
+    val availableAudioDevices: List<AudioDevice>? = null
 )
