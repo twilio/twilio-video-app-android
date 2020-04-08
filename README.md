@@ -27,6 +27,8 @@ In order to run this application on an Android device or emulator, complete the 
 
 ### Deploy Twilio Access Token Server
 
+**NOTE:** The Twilio Function that provides access tokens via a passcode should *NOT* be used in a production environment. This token server supports seamlessly getting started with the collaboration app, and while convenient, the passcode is not secure enough for production environments. You should use an authentication provider to securely provide access tokens to your client applications. You can find more information about Programmable Video access tokens [in this tutorial](https://www.twilio.com/docs/video/tutorials/user-identity-access-tokens).
+
 The app requires a back-end to generate [Twilio access tokens](https://www.twilio.com/docs/video/tutorials/user-identity-access-tokens). Follow the instructions below to deploy a serverless back-end using [Twilio Functions](https://www.twilio.com/docs/runtime/functions).
 
 1. [Install Twilio CLI](https://www.twilio.com/docs/twilio-cli/quickstart).
@@ -35,10 +37,15 @@ The app requires a back-end to generate [Twilio access tokens](https://www.twili
 1. Run `twilio rtc:apps:video:deploy --authentication passcode`.
 1. The passcode that is output will be used later to [sign in to the app](#start-video-conference).
 
-The passcode will expire after one week. To generate a new passcode:
+The passcode will expire after one week. To generate a new passcode, run `twilio rtc:apps:video:deploy --authentication passcode --override`.
 
-1. Run `twilio rtc:apps:video:delete`.
-1. Run `twilio rtc:apps:video:deploy --authentication passcode`.
+#### Troubleshooting The Twilio CLI
+
+If any errors occur after running a [Twilio CLI RTC Plugin](https://github.com/twilio-labs/plugin-rtc) command, then try the following steps.
+
+1. Run `twilio plugins:update` to update the rtc plugin to the latest version.
+1. Run `twilio rtc:apps:video:delete` to delete any existing authentication servers.
+1. Run `twilio rtc:apps:video:deploy --authentication passcode` to deploy a new authentication server.
 
 ### Build
 
