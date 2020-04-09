@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.bluetooth
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -6,8 +6,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import com.twilio.audioswitch.bluetooth.BluetoothDeviceReceiver
-import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
+import com.twilio.audioswitch.LogWrapper
 
 private const val TAG = "BluetoothController"
 
@@ -40,13 +39,11 @@ internal class BluetoothController(
     }
 
     fun start() {
-        // Use the profile proxy to detect a bluetooth device that is already connected
         bluetoothAdapter.getProfileProxy(
                 context,
                 preConnectedDeviceListener,
                 BluetoothProfile.HEADSET)
 
-        // Register for bluetooth device connection and audio state changes
         context.run {
             registerReceiver(
                 bluetoothDeviceReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED))

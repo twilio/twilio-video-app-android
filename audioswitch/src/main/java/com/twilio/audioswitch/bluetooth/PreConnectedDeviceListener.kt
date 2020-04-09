@@ -2,7 +2,6 @@ package com.twilio.audioswitch.bluetooth
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
-import com.twilio.audioswitch.BluetoothController
 import com.twilio.audioswitch.LogWrapper
 
 private const val TAG = "PreConnectedDeviceListener"

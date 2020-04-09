@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import com.twilio.audioswitch.BluetoothController
 import com.twilio.audioswitch.LogWrapper
 
 private const val TAG = "BluetoothDeviceReceiver"
