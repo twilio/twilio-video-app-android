@@ -50,8 +50,10 @@ class AudioDeviceSelector(context: Context) {
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
-    private val bluetoothController: BluetoothController = BluetoothController(context).apply {
-        deviceListener = object : BluetoothController.Listener {
+    private val bluetoothController: BluetoothController? = BluetoothController.newInstance(
+            context,
+            LogWrapper(),
+        object : BluetoothController.Listener {
             override fun onBluetoothConnected(
                 bluetoothDevice: BluetoothDevice
             ) {
@@ -69,8 +71,7 @@ class AudioDeviceSelector(context: Context) {
                 enumerateDevices()
             }
         }
-    }
-
+    )
     internal constructor(context: Context, bluetoothController: BluetoothController) : this(context) {
     }
 
@@ -85,7 +86,7 @@ class AudioDeviceSelector(context: Context) {
         audioDeviceChangeListener = listener
         when (state) {
             STOPPED -> {
-                bluetoothController.start()
+                bluetoothController?.start()
                 context.registerReceiver(
                         wiredHeadsetReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
                 /*
@@ -118,12 +119,12 @@ class AudioDeviceSelector(context: Context) {
             State.ACTIVATED -> {
                 deactivate()
                 context.unregisterReceiver(wiredHeadsetReceiver)
-                bluetoothController.stop()
+                bluetoothController?.stop()
                 state = STOPPED
             }
             State.STARTED -> {
                 context.unregisterReceiver(wiredHeadsetReceiver)
-                bluetoothController.stop()
+                bluetoothController?.stop()
                 state = STOPPED
             }
             STOPPED -> {
@@ -163,15 +164,15 @@ class AudioDeviceSelector(context: Context) {
         when (audioDevice.type) {
             AudioDevice.Type.BLUETOOTH -> {
                 enableSpeakerphone(false)
-                bluetoothController.activate()
+                bluetoothController?.activate()
             }
             AudioDevice.Type.EARPIECE, AudioDevice.Type.WIRED_HEADSET -> {
                 enableSpeakerphone(false)
-                bluetoothController.deactivate()
+                bluetoothController?.deactivate()
             }
             AudioDevice.Type.SPEAKERPHONE -> {
                 enableSpeakerphone(true)
-                bluetoothController.deactivate()
+                bluetoothController?.deactivate()
             }
         }
     }
@@ -183,7 +184,7 @@ class AudioDeviceSelector(context: Context) {
     fun deactivate() {
         when (state) {
             State.ACTIVATED -> {
-                bluetoothController.deactivate()
+                bluetoothController?.deactivate()
 
                 // Restore stored audio state
                 audioManager.mode = savedAudioMode
