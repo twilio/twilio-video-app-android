@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
-import android.util.Log
 
 private const val TAG = "BluetoothController"
 
@@ -18,22 +17,25 @@ internal class BluetoothController {
 
     private val context: Context
     private val audioManager: AudioManager
+    private lateinit var logger: LogWrapper
     private var bluetoothAdapter: BluetoothAdapter? = null
-    private var bluetoothDevice: BluetoothDevice? = null
 
     constructor(context: Context) {
         this.context = context
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        logger = LogWrapper()
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     }
 
     internal constructor(
         context: Context,
         audioManager: AudioManager,
+        logger: LogWrapper,
         bluetoothAdapter: BluetoothAdapter? = null
     ) {
         this.context = context
         this.audioManager = audioManager
+        this.logger = logger
         this.bluetoothAdapter = bluetoothAdapter
     }
 
@@ -47,22 +49,7 @@ internal class BluetoothController {
             // Use the profile proxy to detect a bluetooth device that is already connected
             bluetoothAdapter.getProfileProxy(
                     context,
-                    object : BluetoothProfile.ServiceListener {
-                        override fun onServiceConnected(profile: Int, proxy: BluetoothProfile) {
-                            val bluetoothDeviceList = proxy.connectedDevices
-                            for (device in bluetoothDeviceList) {
-                                Log.d(TAG, "Bluetooth " + device.name + " connected")
-                                bluetoothDevice = device
-                                deviceListener?.onBluetoothConnected(device)
-                            }
-                        }
-
-                        override fun onServiceDisconnected(profile: Int) {
-                            Log.d(TAG, "Bluetooth disconnected")
-                            bluetoothDevice = null
-                            deviceListener?.onBluetoothDisconnected()
-                        }
-                    },
+                    bluetoothProfileListener,
                     BluetoothProfile.HEADSET)
 
             // Register for bluetooth device connection and audio state changes
@@ -77,6 +64,7 @@ internal class BluetoothController {
     }
 
     fun stop() {
+        // TODO call closeProfileProxy
         if (bluetoothAdapter != null) {
             context.unregisterReceiver(broadcastReceiver)
         }
@@ -90,6 +78,23 @@ internal class BluetoothController {
         audioManager.stopBluetoothSco()
     }
 
+    internal val bluetoothProfileListener = object : BluetoothProfile.ServiceListener {
+
+        override fun onServiceConnected(profile: Int, proxy: BluetoothProfile) {
+            proxy.connectedDevices.let { deviceList ->
+                deviceList.forEach { device ->
+                    logger.d(TAG, "Bluetooth " + device.name + " connected")
+                    deviceListener?.onBluetoothConnected(device)
+                }
+            }
+        }
+
+        override fun onServiceDisconnected(profile: Int) {
+            logger.d(TAG, "Bluetooth disconnected")
+            deviceListener?.onBluetoothDisconnected()
+        }
+    }
+
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -98,21 +103,17 @@ internal class BluetoothController {
                     BluetoothDevice.ACTION_ACL_CONNECTED -> {
                         val connectedBluetoothDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                         if (isHeadsetDevice(connectedBluetoothDevice)) {
-                            Log.d(
+                            logger.d(
                                     TAG,
                                     "Bluetooth " +
                                             connectedBluetoothDevice.name +
                                             " connected")
-                            bluetoothDevice = connectedBluetoothDevice
-                            deviceListener?.onBluetoothConnected(bluetoothDevice!!)
+                            deviceListener?.onBluetoothConnected(connectedBluetoothDevice)
                         }
                     }
                     BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
                         val disconnectedBluetoothDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                        if (disconnectedBluetoothDevice == bluetoothDevice) {
-                            bluetoothDevice = null
-                        }
-                        Log.d(TAG, "Bluetooth disconnected")
+                        logger.d(TAG, "Bluetooth disconnected")
                         deviceListener?.onBluetoothDisconnected()
                     }
                     AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED -> {
@@ -120,9 +121,9 @@ internal class BluetoothController {
                                 AudioManager.EXTRA_SCO_AUDIO_STATE,
                                 AudioManager.SCO_AUDIO_STATE_ERROR)
                         if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED) {
-                            Log.d(TAG, "Bluetooth Sco Audio connected")
+                            logger.d(TAG, "Bluetooth Sco Audio connected")
                         } else if (state == AudioManager.SCO_AUDIO_STATE_DISCONNECTED) {
-                            Log.d(TAG, "Bluetooth Sco Audio disconnected")
+                            logger.d(TAG, "Bluetooth Sco Audio disconnected")
                         }
                     }
                 }
