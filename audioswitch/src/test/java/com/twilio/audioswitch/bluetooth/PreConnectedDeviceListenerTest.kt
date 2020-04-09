@@ -13,7 +13,7 @@ import org.junit.Test
 
 class PreConnectedDeviceListenerTest {
 
-    private val deviceListener = mock<BluetoothController.Listener>()
+    private val deviceListener = mock<BluetoothDeviceConnectionListener>()
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private var preConnectedDeviceListener = PreConnectedDeviceListener(

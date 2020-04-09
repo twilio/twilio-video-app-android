@@ -23,7 +23,7 @@ internal class BluetoothController(
         fun newInstance(
             context: Context,
             logger: LogWrapper,
-            deviceListener: Listener
+            deviceListener: BluetoothDeviceConnectionListener
         ): BluetoothController? =
             BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
                 BluetoothController(context,
@@ -66,10 +66,5 @@ internal class BluetoothController(
 
     fun deactivate() {
         audioManager.stopBluetoothSco()
-    }
-
-    internal interface Listener {
-        fun onBluetoothConnected(bluetoothDevice: BluetoothDevice)
-        fun onBluetoothDisconnected()
     }
 }

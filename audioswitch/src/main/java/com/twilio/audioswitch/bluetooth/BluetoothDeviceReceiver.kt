@@ -11,7 +11,7 @@ import com.twilio.audioswitch.LogWrapper
 private const val TAG = "BluetoothDeviceReceiver"
 
 internal class BluetoothDeviceReceiver(
-    private val deviceListener: BluetoothController.Listener,
+    private val deviceListener: BluetoothDeviceConnectionListener,
     private val logger: LogWrapper
 ) : BroadcastReceiver() {
 

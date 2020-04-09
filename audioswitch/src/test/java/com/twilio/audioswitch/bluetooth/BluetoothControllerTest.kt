@@ -18,7 +18,7 @@ class BluetoothControllerTest {
     private val audioManager = mock<AudioManager>()
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
-    private val deviceListener = mock<BluetoothController.Listener>()
+    private val deviceListener = mock<BluetoothDeviceConnectionListener>()
     private val preConnectedDeviceListener = PreConnectedDeviceListener(deviceListener, logger, bluetoothAdapter)
     private val bluetoothDeviceReceiver = BluetoothDeviceReceiver(deviceListener, logger)
     private var bluetoothController = BluetoothController(

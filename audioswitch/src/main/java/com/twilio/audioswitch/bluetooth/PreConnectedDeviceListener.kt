@@ -7,7 +7,7 @@ import com.twilio.audioswitch.LogWrapper
 private const val TAG = "PreConnectedDeviceListener"
 
 internal class PreConnectedDeviceListener(
-    private val deviceListener: BluetoothController.Listener,
+    private val deviceListener: BluetoothDeviceConnectionListener,
     private val logger: LogWrapper,
     private val bluetoothAdapter: BluetoothAdapter
 ) : BluetoothProfile.ServiceListener {

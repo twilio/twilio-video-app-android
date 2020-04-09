@@ -15,6 +15,7 @@ import android.os.Handler
 import android.util.Log
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.bluetooth.BluetoothController
+import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
 import java.util.Collections
 import kotlin.collections.ArrayList
 
@@ -54,7 +55,7 @@ class AudioDeviceSelector(context: Context) {
     private val bluetoothController: BluetoothController? = BluetoothController.newInstance(
             context,
             LogWrapper(),
-        object : BluetoothController.Listener {
+        object : BluetoothDeviceConnectionListener {
             override fun onBluetoothConnected(
                 bluetoothDevice: BluetoothDevice
             ) {
