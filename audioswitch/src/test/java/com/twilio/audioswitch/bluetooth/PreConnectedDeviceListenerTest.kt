@@ -8,7 +8,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.LogWrapper
-import org.junit.Assert.fail
 import org.junit.Test
 
 class PreConnectedDeviceListenerTest {
@@ -50,21 +49,6 @@ class PreConnectedDeviceListenerTest {
     }
 
     @Test
-    fun `onServiceConnected should not throw an exception if the deviceListener is null`() {
-        val expectedDevice = mock<BluetoothDevice>()
-        val bluetoothDevices = listOf(expectedDevice)
-        val bluetoothProfile = mock<BluetoothProfile> {
-            whenever(mock.connectedDevices).thenReturn(bluetoothDevices)
-        }
-
-        try {
-            preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
-        } catch (e: Exception) {
-            fail(e.message)
-        }
-    }
-
-    @Test
     fun `onServiceConnected should not not notify the deviceListener if there are no connected bluetooth devices`() {
         val bluetoothProfile = mock<BluetoothProfile> {
             whenever(mock.connectedDevices).thenReturn(emptyList())
@@ -80,5 +64,15 @@ class PreConnectedDeviceListenerTest {
         preConnectedDeviceListener.onServiceDisconnected(0)
 
         verify(deviceListener).onBluetoothDisconnected()
+    }
+
+    @Test
+    fun `stop should close profile proxy`() {
+        val bluetoothProfile = mock<BluetoothProfile>()
+        preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
+
+        preConnectedDeviceListener.stop()
+
+        verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
     }
 }
