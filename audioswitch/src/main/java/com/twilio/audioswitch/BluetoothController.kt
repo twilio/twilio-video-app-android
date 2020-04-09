@@ -19,29 +19,26 @@ internal class BluetoothController {
     private val audioManager: AudioManager
     private lateinit var logger: LogWrapper
     private var bluetoothAdapter: BluetoothAdapter? = null
+    private var proxy: BluetoothProfile? = null
 
     constructor(context: Context) {
         this.context = context
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         logger = LogWrapper()
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (bluetoothAdapter == null) logger.d(TAG, "Bluetooth is not supported on this device")
     }
 
     internal constructor(
         context: Context,
         audioManager: AudioManager,
         logger: LogWrapper,
-        bluetoothAdapter: BluetoothAdapter? = null
+        bluetoothAdapter: BluetoothAdapter?
     ) {
         this.context = context
         this.audioManager = audioManager
         this.logger = logger
         this.bluetoothAdapter = bluetoothAdapter
-    }
-
-    internal interface Listener {
-        fun onBluetoothConnected(bluetoothDevice: BluetoothDevice)
-        fun onBluetoothDisconnected()
     }
 
     fun start() {
@@ -53,35 +50,43 @@ internal class BluetoothController {
                     BluetoothProfile.HEADSET)
 
             // Register for bluetooth device connection and audio state changes
-            context.registerReceiver(
+            context.run {
+                registerReceiver(
                     broadcastReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED))
-            context.registerReceiver(
+                registerReceiver(
                     broadcastReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED))
-            context.registerReceiver(
+                registerReceiver(
                     broadcastReceiver,
                     IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED))
+            }
         }
     }
 
     fun stop() {
-        // TODO call closeProfileProxy
-        if (bluetoothAdapter != null) {
+        bluetoothAdapter?.let { bluetoothAdapter ->
+            bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, proxy)
             context.unregisterReceiver(broadcastReceiver)
         }
     }
 
     fun activate() {
-        audioManager.startBluetoothSco()
+        bluetoothAdapter?.let { audioManager.startBluetoothSco() }
     }
 
     fun deactivate() {
-        audioManager.stopBluetoothSco()
+        bluetoothAdapter?.let { audioManager.stopBluetoothSco() }
+    }
+
+    internal interface Listener {
+        fun onBluetoothConnected(bluetoothDevice: BluetoothDevice)
+        fun onBluetoothDisconnected()
     }
 
     internal val bluetoothProfileListener = object : BluetoothProfile.ServiceListener {
 
-        override fun onServiceConnected(profile: Int, proxy: BluetoothProfile) {
-            proxy.connectedDevices.let { deviceList ->
+        override fun onServiceConnected(profile: Int, bluetoothProfile: BluetoothProfile) {
+            proxy = bluetoothProfile
+            bluetoothProfile.connectedDevices.let { deviceList ->
                 deviceList.forEach { device ->
                     logger.d(TAG, "Bluetooth " + device.name + " connected")
                     deviceListener?.onBluetoothConnected(device)
@@ -95,7 +100,7 @@ internal class BluetoothController {
         }
     }
 
-    private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    internal val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (action != null) {

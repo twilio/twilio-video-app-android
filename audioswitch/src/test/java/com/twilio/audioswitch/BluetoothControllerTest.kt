@@ -5,11 +5,12 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.media.AudioManager
-import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.fail
 import org.junit.Test
@@ -20,14 +21,107 @@ class BluetoothControllerTest {
     private val audioManager = mock<AudioManager>()
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
-    private val bluetoothController = BluetoothController(context, audioManager, logger, bluetoothAdapter)
+    private var bluetoothController = BluetoothController(context, audioManager, logger, bluetoothAdapter)
 
     @Test
-    fun `start should register the correct bluetooth receivers`() {
+    fun `start should register bluetooth listeners`() {
         bluetoothController.start()
 
-        verify(bluetoothAdapter).getProfileProxy(isA(), isA(), isA())
-        verify(context, times(3)).registerReceiver(isA(), isA())
+        verify(bluetoothAdapter).getProfileProxy(
+                context,
+                bluetoothController.bluetoothProfileListener,
+                BluetoothProfile.HEADSET)
+        verify(context, times(3)).registerReceiver(
+                eq(bluetoothController.broadcastReceiver), isA())
+    }
+
+    @Test
+    fun `start should not register bluetooth listeners if the bluetooth adapter is null`() {
+        bluetoothController = BluetoothController(context, audioManager, logger, null)
+
+        bluetoothController.start()
+
+        verifyZeroInteractions(context)
+    }
+
+    @Test
+    fun `start should not throw a NullPointerException if the bluetooth adapter is null`() {
+        bluetoothController = BluetoothController(context, audioManager, logger, null)
+
+        try {
+            bluetoothController.start()
+        } catch (e: Exception) {
+            fail(e.message)
+        }
+    }
+
+    @Test
+    fun `stop should close profile proxy`() {
+        val bluetoothProfile = mock<BluetoothProfile>()
+        bluetoothController.bluetoothProfileListener.onServiceConnected(0, bluetoothProfile)
+
+        bluetoothController.stop()
+
+        verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
+    }
+
+    @Test
+    fun `stop should not throw a NullPointerException if the bluetooth adapter is null`() {
+        bluetoothController = BluetoothController(context, audioManager, logger, null)
+
+        try {
+            bluetoothController.stop()
+        } catch (e: Exception) {
+            fail(e.message)
+        }
+    }
+
+    @Test
+    fun `stop should not unregister the BroadcastReceiver if the bluetooth adapter is null`() {
+        bluetoothController = BluetoothController(context, audioManager, logger, null)
+
+        bluetoothController.stop()
+
+        verifyZeroInteractions(context)
+    }
+
+    @Test
+    fun `stop should unregister the BroadcastReceiver`() {
+        bluetoothController.stop()
+
+        verify(context).unregisterReceiver(bluetoothController.broadcastReceiver)
+    }
+
+    @Test
+    fun `activate should start bluetooth device audio routing`() {
+        bluetoothController.activate()
+
+        verify(audioManager).startBluetoothSco()
+    }
+
+    @Test
+    fun `activate should not start bluetooth device audio routing if the bluetooth adapter is null`() {
+        bluetoothController = BluetoothController(context, audioManager, logger, null)
+
+        bluetoothController.activate()
+
+        verifyZeroInteractions(audioManager)
+    }
+
+    @Test
+    fun `deactivate should stop bluetooth device audio routing`() {
+        bluetoothController.deactivate()
+
+        verify(audioManager).stopBluetoothSco()
+    }
+
+    @Test
+    fun `deactivate should not stop bluetooth device audio routing if the bluetooth adapter is null`() {
+        bluetoothController = BluetoothController(context, audioManager, logger, null)
+
+        bluetoothController.deactivate()
+
+        verifyZeroInteractions(audioManager)
     }
 
     @Test
@@ -87,7 +181,7 @@ class BluetoothControllerTest {
 
         bluetoothController.bluetoothProfileListener.onServiceConnected(0, bluetoothProfile)
 
-        verify(deviceListener, times(0)).onBluetoothConnected(any())
+        verifyZeroInteractions(deviceListener)
     }
 
     @Test
@@ -107,30 +201,5 @@ class BluetoothControllerTest {
         } catch (e: Exception) {
             fail(e.message)
         }
-    }
-
-    @Test
-    fun `activate should start bluetooth device audio routing`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
-    fun `activate should not start bluetooth device audio routing if a device hasn't been selected`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
-    fun `deactivate should stop bluetooth device audio routing`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
-    fun `deactivate should not stop bluetooth device audio routing if a device hasn't been selected`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
-    fun `stop should remove all bluetooth listeners`() {
-        TODO("Not yet implemented")
     }
 }
