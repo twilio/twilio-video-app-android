@@ -5,7 +5,6 @@ package com.twilio.audioswitch
  * currently selected [AudioDevice] from [AudioDeviceSelector].
  *
  * @param audioDevices the list of [AudioDevice]s or null if none are available.
- * @param selectedAudioDevice the currently selected device or null if none have been
- * selected.
+ * @param selectedAudioDevice the currently selected device or null if no device has been selected.
  */
 typealias AudioDeviceChangeListener = (audioDevices: List<AudioDevice>?, selectedAudioDevice: AudioDevice?) -> Unit
