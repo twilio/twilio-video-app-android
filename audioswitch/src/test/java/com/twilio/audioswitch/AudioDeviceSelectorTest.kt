@@ -5,47 +5,52 @@ import org.junit.Test
 class AudioDeviceSelectorTest {
 
     @Test
-    fun `stop should throw an IllegalStateErxception if current state is stopped`() {
+    fun `stop should do nothing if the current state is stopped`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `activate should throw an IllegalStateException if current state is stopped`() {
+    fun `deactivate should do nothing if the current state is stopped`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `deactivate should throw an IllegalStateException if current state is stopped`() {
+    fun `activate should throw an IllegalStateException if the current state is stopped`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `selectDevice should throw an IllegalStateException if current state is stopped`() {
+    fun `selectDevice should throw an IllegalStateException if the current state is stopped`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `start should throw an IllegalStateException if current state is started`() {
+    fun `start should do nothing if the current state is started`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `deactivate should throw an IllegalStateException if current state is started`() {
+    fun `stop should transition to the stopped state if the current state is started`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `start should throw an IllegalStateException if current state is activated`() {
+    fun `deactivate should throw an IllegalStateException if the current state is started`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `activate should throw an IllegalStateException if current state is activated`() {
+    fun `activate should transition to the activated state if the current state is started`() {
         TODO("Not yet implemented")
     }
 
     @Test
-    fun `selectDevice should throw an IllegalStateException if current state is activated`() {
+    fun `activate should throw an IllegalStateException if the current state is activated`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `selectDevice should throw an IllegalStateException if the current state is activated`() {
         TODO("Not yet implemented")
     }
 }
