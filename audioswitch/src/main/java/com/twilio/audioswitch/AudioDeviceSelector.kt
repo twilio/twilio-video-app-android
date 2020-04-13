@@ -253,7 +253,8 @@ class AudioDeviceSelector(context: Context) {
          * required to be in this mode when playout and/or recording starts for
          * best possible VoIP performance. Some devices have difficulties with speaker mode
          * if this is not set.
-         */audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+         */
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
     }
 
     private inner class WiredHeadsetReceiver : BroadcastReceiver() {
