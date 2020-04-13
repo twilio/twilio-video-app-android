@@ -48,7 +48,6 @@ class AudioDeviceSelector(context: Context) {
         STARTED, ACTIVATED, STOPPED
     }
     private val EARPIECE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
-
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
@@ -109,8 +108,6 @@ class AudioDeviceSelector(context: Context) {
             }
         }
     }
-
-    fun blah(someInt: SomeInterface) {}
 
     /**
      * Stops listening for audio device changes if [ ][AudioDeviceSelector.start] has already been invoked. [ ][AudioDeviceSelector.deactivate] will also get called if a device has been activated with
@@ -360,9 +357,4 @@ class AudioDeviceSelector(context: Context) {
     private fun mute(mute: Boolean) {
         audioManager.isMicrophoneMute = mute
     }
-}
-
-interface SomeInterface {
-
-    fun singleAbstractMethod()
 }
