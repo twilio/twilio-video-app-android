@@ -20,7 +20,6 @@ private const val TAG = "AudioDeviceSelector"
  * should be routed to.
  */
 class AudioDeviceSelector internal constructor(
-    private val context: Context,
     private val logger: LogWrapper,
     private val audioManager: AudioManager,
     private val phoneAudioDeviceManager: PhoneAudioDeviceManager,
@@ -85,7 +84,6 @@ class AudioDeviceSelector internal constructor(
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             val logger = LogWrapper()
             return AudioDeviceSelector(
-                    context,
                     logger,
                     context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
                     PhoneAudioDeviceManager(context, logger, audioManager),
