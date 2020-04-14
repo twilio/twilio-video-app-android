@@ -45,7 +45,7 @@ class AudioDeviceSelector internal constructor(
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
-    private val bluetoothDeviceConnectionListener = object : BluetoothDeviceConnectionListener {
+    internal val bluetoothDeviceConnectionListener = object : BluetoothDeviceConnectionListener {
         override fun onBluetoothConnected(
             bluetoothDevice: BluetoothDevice
         ) {
