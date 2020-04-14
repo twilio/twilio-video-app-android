@@ -20,9 +20,8 @@ class BluetoothControllerTest {
     private val audioManager = mock<AudioManager>()
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
-    private val deviceListener = mock<BluetoothDeviceConnectionListener>()
-    private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter, deviceListener)
-    private val bluetoothDeviceReceiver = BluetoothHeadsetReceiver(context, logger, deviceListener)
+    private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
+    private val bluetoothDeviceReceiver = BluetoothHeadsetReceiver(context, logger)
     private var bluetoothController = BluetoothController(
             context,
             audioManager,
@@ -74,10 +73,5 @@ class BluetoothControllerTest {
         bluetoothController.deactivate()
 
         verify(audioManager).stopBluetoothSco()
-    }
-
-    @Test
-    fun `verify device listeners get set on start()`() {
-        TODO("Not yet implemented")
     }
 }

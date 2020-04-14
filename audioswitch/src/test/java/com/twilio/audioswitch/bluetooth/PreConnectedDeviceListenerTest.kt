@@ -8,6 +8,9 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.LogWrapper
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class PreConnectedDeviceListenerTest {
@@ -49,9 +52,23 @@ class PreConnectedDeviceListenerTest {
     }
 
     @Test
-    fun `onServiceConnected should not not notify the deviceListener if there are no connected bluetooth devices`() {
+    fun `onServiceConnected should not notify the deviceListener if there are no connected bluetooth devices`() {
         val bluetoothProfile = mock<BluetoothProfile> {
             whenever(mock.connectedDevices).thenReturn(emptyList())
+        }
+
+        preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
+
+        verifyZeroInteractions(deviceListener)
+    }
+
+    @Test
+    fun `onServiceConnected should not notify the deviceListener if the deviceListener is null`() {
+        preConnectedDeviceListener.deviceListener = null
+        val expectedDevice = mock<BluetoothDevice>()
+        val bluetoothDevices = listOf(expectedDevice)
+        val bluetoothProfile = mock<BluetoothProfile> {
+            whenever(mock.connectedDevices).thenReturn(bluetoothDevices)
         }
 
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
@@ -67,6 +84,14 @@ class PreConnectedDeviceListenerTest {
     }
 
     @Test
+    fun `onServiceDisconnected should not notify the deviceListener if deviceListener is null`() {
+        preConnectedDeviceListener.deviceListener = null
+        preConnectedDeviceListener.onServiceDisconnected(0)
+
+        verifyZeroInteractions(deviceListener)
+    }
+
+    @Test
     fun `stop should close profile proxy`() {
         val bluetoothProfile = mock<BluetoothProfile>()
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
@@ -77,7 +102,12 @@ class PreConnectedDeviceListenerTest {
     }
 
     @Test
-    fun `test null listener scenarios`() {
-        TODO("Not yet implemented")
+    fun `stop should unasign the deviceListener`() {
+        val bluetoothProfile = mock<BluetoothProfile>()
+        preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
+
+        preConnectedDeviceListener.stop()
+
+        assertThat(preConnectedDeviceListener.deviceListener, `is`(nullValue()))
     }
 }
