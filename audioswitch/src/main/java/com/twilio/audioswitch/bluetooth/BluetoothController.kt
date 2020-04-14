@@ -10,7 +10,7 @@ import com.twilio.audioswitch.LogWrapper
 
 private const val TAG = "BluetoothController"
 
-internal class BluetoothController(
+internal class BluetoothController internal constructor(
     private val context: Context,
     private val audioManager: AudioManager,
     private val bluetoothAdapter: BluetoothAdapter,
