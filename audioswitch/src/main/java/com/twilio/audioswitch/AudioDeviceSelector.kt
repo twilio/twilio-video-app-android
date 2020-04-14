@@ -5,14 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.media.AudioAttributes
-import android.media.AudioDeviceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import android.os.Handler
-import android.util.Log
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
@@ -27,11 +24,13 @@ private const val STATE_PLUGGED = 1
  * This class enables developers to enumerate available audio devices and select which device audio
  * should be routed to.
  */
-class AudioDeviceSelector(context: Context) {
-    private val context: Context = context.applicationContext
-    private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    private val hasEarpiece = hasEarpiece()
-    private val hasSpeakerphone = hasSpeakerphone()
+class AudioDeviceSelector internal constructor(
+    private val context: Context,
+    private val logger: LogWrapper,
+    private val audioManager: AudioManager,
+    private val phoneAudioDeviceManager: PhoneAudioDeviceManager
+) {
+
     private var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
@@ -53,7 +52,7 @@ class AudioDeviceSelector(context: Context) {
     private var bluetoothAudioDevice: AudioDevice? = null
     private val bluetoothController: BluetoothController? = BluetoothController.newInstance(
             context,
-            LogWrapper(),
+            logger,
         object : BluetoothDeviceConnectionListener {
             override fun onBluetoothConnected(
                 bluetoothDevice: BluetoothDevice
@@ -73,6 +72,19 @@ class AudioDeviceSelector(context: Context) {
             }
         }
     )
+
+    companion object {
+        fun newInstance(context: Context): AudioDeviceSelector {
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val logger = LogWrapper()
+            return AudioDeviceSelector(
+                    context,
+                    logger,
+                    context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
+                    PhoneAudioDeviceManager(context, logger, audioManager)
+            )
+        }
+    }
 
     /**
      * Starts listening for audio device changes. **Note:** When audio device listening is no
@@ -260,7 +272,7 @@ class AudioDeviceSelector(context: Context) {
             val state = intent.getIntExtra("state", STATE_UNPLUGGED)
             if (state == STATE_PLUGGED) {
                 wiredHeadsetAvailable = true
-                Log.d(TAG, "Wired Headset available")
+                logger.d(TAG, "Wired Headset available")
                 if (this@AudioDeviceSelector.state == State.ACTIVATED) {
                     userSelectedDevice = WIRED_HEADSET_AUDIO_DEVICE
                 }
@@ -278,10 +290,10 @@ class AudioDeviceSelector(context: Context) {
         if (wiredHeadsetAvailable) {
             availableAudioDevices.add(WIRED_HEADSET_AUDIO_DEVICE)
         }
-        if (hasEarpiece && !wiredHeadsetAvailable) {
+        if (phoneAudioDeviceManager.hasEarpiece() && !wiredHeadsetAvailable) {
             availableAudioDevices.add(EARPIECE_AUDIO_DEVICE)
         }
-        if (hasSpeakerphone) {
+        if (phoneAudioDeviceManager.hasSpeakerphone()) {
             availableAudioDevices.add(SPEAKERPHONE_AUDIO_DEVICE)
         }
 
@@ -321,32 +333,6 @@ class AudioDeviceSelector(context: Context) {
             }
         }
         return false
-    }
-
-    private fun hasEarpiece(): Boolean {
-        val hasEarpiece = context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
-        if (hasEarpiece) {
-            Log.d(TAG, "Earpiece available")
-        }
-        return hasEarpiece
-    }
-
-    private fun hasSpeakerphone(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                context.packageManager
-                        .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)) {
-            val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
-            for (device in devices) {
-                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
-                    Log.d(TAG, "Speakerphone available")
-                    return true
-                }
-            }
-            false
-        } else {
-            Log.d(TAG, "Speakerphone available")
-            true
-        }
     }
 
     private fun enableSpeakerphone(enable: Boolean) {
