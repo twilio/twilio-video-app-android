@@ -4,14 +4,9 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.media.AudioManager
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.twilio.audioswitch.LogWrapper
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class BluetoothControllerTest {
@@ -21,27 +16,25 @@ class BluetoothControllerTest {
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
-    private val bluetoothDeviceReceiver = BluetoothHeadsetReceiver(context, logger)
+    private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
     private var bluetoothController = BluetoothController(
             context,
             audioManager,
             bluetoothAdapter,
             preConnectedDeviceListener,
-            bluetoothDeviceReceiver)
+            bluetoothHeadsetReceiver)
 
     @Test
     fun `start should register bluetooth listeners`() {
         val deviceListener = mock<BluetoothDeviceConnectionListener>()
         bluetoothController.start(deviceListener)
 
-        assertThat(preConnectedDeviceListener.deviceListener, equalTo(deviceListener))
-        assertThat(bluetoothDeviceReceiver.deviceListener, equalTo(deviceListener))
-        verify(bluetoothAdapter).getProfileProxy(
+        assertBluetoothControllerStart(
                 context,
                 preConnectedDeviceListener,
-                BluetoothProfile.HEADSET)
-        verify(context, times(3)).registerReceiver(
-                eq(bluetoothDeviceReceiver), isA())
+                bluetoothHeadsetReceiver,
+                deviceListener,
+                bluetoothAdapter)
     }
 
     @Test
@@ -58,7 +51,7 @@ class BluetoothControllerTest {
     fun `stop should unregister the BroadcastReceiver`() {
         bluetoothController.stop()
 
-        verify(context).unregisterReceiver(bluetoothDeviceReceiver)
+        verify(context).unregisterReceiver(bluetoothHeadsetReceiver)
     }
 
     @Test
