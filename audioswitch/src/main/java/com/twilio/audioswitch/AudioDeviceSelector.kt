@@ -1,10 +1,7 @@
 package com.twilio.audioswitch
 
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -17,8 +14,6 @@ import java.util.Collections
 import kotlin.collections.ArrayList
 
 private const val TAG = "AudioDeviceSelector"
-private const val STATE_UNPLUGGED = 0
-private const val STATE_PLUGGED = 1
 
 /**
  * This class enables developers to enumerate available audio devices and select which device audio
@@ -28,20 +23,20 @@ class AudioDeviceSelector internal constructor(
     private val context: Context,
     private val logger: LogWrapper,
     private val audioManager: AudioManager,
-    private val phoneAudioDeviceManager: PhoneAudioDeviceManager
+    private val phoneAudioDeviceManager: PhoneAudioDeviceManager,
+    private val wiredHeadsetReceiver: WiredHeadsetReceiver
 ) {
 
     private var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
     private var state: State = STOPPED
-    private val wiredHeadsetReceiver = WiredHeadsetReceiver()
     private var wiredHeadsetAvailable = false
     private val availableAudioDevices = ArrayList<AudioDevice>()
     // Saved Audio Settings
     private var savedAudioMode = 0
-
     private var savedIsMicrophoneMuted = false
+
     private var savedSpeakerphoneEnabled = false
     private enum class State {
         STARTED, ACTIVATED, STOPPED
@@ -72,6 +67,21 @@ class AudioDeviceSelector internal constructor(
             }
         }
     )
+    private val wiredDeviceConnectionListener = object : WiredDeviceConnectionListener {
+        override fun onDeviceConnected() {
+            wiredHeadsetAvailable = true
+            logger.d(TAG, "Wired Headset available")
+            if (this@AudioDeviceSelector.state == State.ACTIVATED) {
+                userSelectedDevice = WIRED_HEADSET_AUDIO_DEVICE
+            }
+            enumerateDevices()
+        }
+
+        override fun onDeviceDisconnected() {
+            wiredHeadsetAvailable = false
+            enumerateDevices()
+        }
+    }
 
     companion object {
         fun newInstance(context: Context): AudioDeviceSelector {
@@ -81,9 +91,14 @@ class AudioDeviceSelector internal constructor(
                     context,
                     logger,
                     context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
-                    PhoneAudioDeviceManager(context, logger, audioManager)
+                    PhoneAudioDeviceManager(context, logger, audioManager),
+                    WiredHeadsetReceiver(context, logger)
             )
         }
+    }
+
+    init {
+        wiredHeadsetReceiver.wiredDeviceConnectionListener = wiredDeviceConnectionListener
     }
 
     /**
@@ -98,8 +113,7 @@ class AudioDeviceSelector internal constructor(
         when (state) {
             STOPPED -> {
                 bluetoothController?.start()
-                context.registerReceiver(
-                        wiredHeadsetReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
+                wiredHeadsetReceiver.start()
                 /*
                  * Enumerate devices when the wired headset receiver does not broadcast an action.
                  * The broadcast receiver will not broadcast an action when a wired headset is not
@@ -127,12 +141,12 @@ class AudioDeviceSelector internal constructor(
         when (state) {
             State.ACTIVATED -> {
                 deactivate()
-                context.unregisterReceiver(wiredHeadsetReceiver)
+                wiredHeadsetReceiver.stop()
                 bluetoothController?.stop()
                 state = STOPPED
             }
             State.STARTED -> {
-                context.unregisterReceiver(wiredHeadsetReceiver)
+                wiredHeadsetReceiver.stop()
                 bluetoothController?.stop()
                 state = STOPPED
             }
@@ -265,23 +279,6 @@ class AudioDeviceSelector internal constructor(
          * if this is not set.
          */
         audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-    }
-
-    private inner class WiredHeadsetReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val state = intent.getIntExtra("state", STATE_UNPLUGGED)
-            if (state == STATE_PLUGGED) {
-                wiredHeadsetAvailable = true
-                logger.d(TAG, "Wired Headset available")
-                if (this@AudioDeviceSelector.state == State.ACTIVATED) {
-                    userSelectedDevice = WIRED_HEADSET_AUDIO_DEVICE
-                }
-                enumerateDevices()
-            } else {
-                wiredHeadsetAvailable = false
-                enumerateDevices()
-            }
-        }
     }
 
     private fun enumerateDevices() {
