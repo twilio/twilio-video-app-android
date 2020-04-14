@@ -73,8 +73,6 @@ class AudioDeviceSelector(context: Context) {
             }
         }
     )
-    internal constructor(context: Context, bluetoothController: BluetoothController) : this(context) {
-    }
 
     /**
      * Starts listening for audio device changes. **Note:** When audio device listening is no
