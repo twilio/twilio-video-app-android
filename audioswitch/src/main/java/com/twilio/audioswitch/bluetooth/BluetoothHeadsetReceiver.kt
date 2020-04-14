@@ -18,9 +18,10 @@ import com.twilio.audioswitch.LogWrapper
 
 private const val TAG = "BluetoothDeviceReceiver"
 
-internal class BluetoothDeviceReceiver(
-    private val deviceListener: BluetoothDeviceConnectionListener,
-    private val logger: LogWrapper
+internal class BluetoothHeadsetReceiver(
+    private val context: Context,
+    private val logger: LogWrapper,
+    var deviceListener: BluetoothDeviceConnectionListener? = null
 ) : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -33,7 +34,7 @@ internal class BluetoothDeviceReceiver(
                                 "Bluetooth ACL device " +
                                         bluetoothDevice.name +
                                         " connected")
-                        deviceListener.onBluetoothConnected(bluetoothDevice)
+                        deviceListener?.onBluetoothConnected(bluetoothDevice)
                     }
                 }
                 ACTION_ACL_DISCONNECTED -> {
@@ -43,7 +44,7 @@ internal class BluetoothDeviceReceiver(
                                 "Bluetooth ACL device " +
                                         bluetoothDevice.name +
                                         " disconnected")
-                        deviceListener.onBluetoothDisconnected()
+                        deviceListener?.onBluetoothDisconnected()
                     }
                 }
                 ACTION_SCO_AUDIO_STATE_UPDATED -> {
@@ -64,6 +65,11 @@ internal class BluetoothDeviceReceiver(
                 else -> {}
             }
         }
+    }
+
+    fun stop() {
+        deviceListener = null
+        context.unregisterReceiver(this)
     }
 
     private fun Intent.getHeadsetDevice(): BluetoothDevice? =

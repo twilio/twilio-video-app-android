@@ -7,9 +7,9 @@ import com.twilio.audioswitch.LogWrapper
 private const val TAG = "PreConnectedDeviceListener"
 
 internal class PreConnectedDeviceListener(
-    private val deviceListener: BluetoothDeviceConnectionListener,
     private val logger: LogWrapper,
-    private val bluetoothAdapter: BluetoothAdapter
+    private val bluetoothAdapter: BluetoothAdapter,
+    var deviceListener: BluetoothDeviceConnectionListener? = null
 ) : BluetoothProfile.ServiceListener {
 
     private var proxy: BluetoothProfile? = null
@@ -19,17 +19,18 @@ internal class PreConnectedDeviceListener(
         bluetoothProfile.connectedDevices.let { deviceList ->
             deviceList.forEach { device ->
                 logger.d(TAG, "Bluetooth " + device.name + " connected")
-                deviceListener.onBluetoothConnected(device)
+                deviceListener?.onBluetoothConnected(device)
             }
         }
     }
 
     override fun onServiceDisconnected(profile: Int) {
         logger.d(TAG, "Bluetooth disconnected")
-        deviceListener.onBluetoothDisconnected()
+        deviceListener?.onBluetoothDisconnected()
     }
 
     fun stop() {
+        deviceListener = null
         bluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, proxy)
     }
 }

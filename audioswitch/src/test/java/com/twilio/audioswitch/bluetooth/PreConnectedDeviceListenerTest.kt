@@ -16,9 +16,9 @@ class PreConnectedDeviceListenerTest {
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private var preConnectedDeviceListener = PreConnectedDeviceListener(
-            deviceListener,
             logger,
-            bluetoothAdapter)
+            bluetoothAdapter,
+            deviceListener)
 
     @Test
     fun `onServiceConnected should notify the deviceListener`() {
@@ -74,5 +74,10 @@ class PreConnectedDeviceListenerTest {
         preConnectedDeviceListener.stop()
 
         verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
+    }
+
+    @Test
+    fun `test null listener scenarios`() {
+        TODO("Not yet implemented")
     }
 }

@@ -24,7 +24,8 @@ class AudioDeviceSelector internal constructor(
     private val logger: LogWrapper,
     private val audioManager: AudioManager,
     private val phoneAudioDeviceManager: PhoneAudioDeviceManager,
-    private val wiredHeadsetReceiver: WiredHeadsetReceiver
+    private val wiredHeadsetReceiver: WiredHeadsetReceiver,
+    private val bluetoothController: BluetoothController?
 ) {
 
     private var audioDeviceChangeListener: AudioDeviceChangeListener? = null
@@ -45,28 +46,24 @@ class AudioDeviceSelector internal constructor(
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
-    private val bluetoothController: BluetoothController? = BluetoothController.newInstance(
-            context,
-            logger,
-        object : BluetoothDeviceConnectionListener {
-            override fun onBluetoothConnected(
-                bluetoothDevice: BluetoothDevice
-            ) {
-                bluetoothAudioDevice = AudioDevice(
-                        AudioDevice.Type.BLUETOOTH,
-                        bluetoothDevice.name)
-                if (state == State.ACTIVATED) {
-                    userSelectedDevice = bluetoothAudioDevice
-                }
-                enumerateDevices()
+    private val bluetoothDeviceConnectionListener = object : BluetoothDeviceConnectionListener {
+        override fun onBluetoothConnected(
+            bluetoothDevice: BluetoothDevice
+        ) {
+            bluetoothAudioDevice = AudioDevice(
+                    AudioDevice.Type.BLUETOOTH,
+                    bluetoothDevice.name)
+            if (state == State.ACTIVATED) {
+                userSelectedDevice = bluetoothAudioDevice
             }
-
-            override fun onBluetoothDisconnected() {
-                bluetoothAudioDevice = null
-                enumerateDevices()
-            }
+            enumerateDevices()
         }
-    )
+
+        override fun onBluetoothDisconnected() {
+            bluetoothAudioDevice = null
+            enumerateDevices()
+        }
+    }
     private val wiredDeviceConnectionListener = object : WiredDeviceConnectionListener {
         override fun onDeviceConnected() {
             wiredHeadsetAvailable = true
@@ -92,7 +89,8 @@ class AudioDeviceSelector internal constructor(
                     logger,
                     context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
                     PhoneAudioDeviceManager(context, logger, audioManager),
-                    WiredHeadsetReceiver(context, logger)
+                    WiredHeadsetReceiver(context, logger),
+                    BluetoothController.newInstance(context, logger)
             )
         }
     }
@@ -112,7 +110,7 @@ class AudioDeviceSelector internal constructor(
         audioDeviceChangeListener = listener
         when (state) {
             STOPPED -> {
-                bluetoothController?.start()
+                bluetoothController?.start(bluetoothDeviceConnectionListener)
                 wiredHeadsetReceiver.start()
                 /*
                  * Enumerate devices when the wired headset receiver does not broadcast an action.

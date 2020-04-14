@@ -10,6 +10,8 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.twilio.audioswitch.LogWrapper
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class BluetoothControllerTest {
@@ -19,8 +21,8 @@ class BluetoothControllerTest {
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private val deviceListener = mock<BluetoothDeviceConnectionListener>()
-    private val preConnectedDeviceListener = PreConnectedDeviceListener(deviceListener, logger, bluetoothAdapter)
-    private val bluetoothDeviceReceiver = BluetoothDeviceReceiver(deviceListener, logger)
+    private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter, deviceListener)
+    private val bluetoothDeviceReceiver = BluetoothHeadsetReceiver(context, logger, deviceListener)
     private var bluetoothController = BluetoothController(
             context,
             audioManager,
@@ -30,8 +32,11 @@ class BluetoothControllerTest {
 
     @Test
     fun `start should register bluetooth listeners`() {
-        bluetoothController.start()
+        val deviceListener = mock<BluetoothDeviceConnectionListener>()
+        bluetoothController.start(deviceListener)
 
+        assertThat(preConnectedDeviceListener.deviceListener, equalTo(deviceListener))
+        assertThat(bluetoothDeviceReceiver.deviceListener, equalTo(deviceListener))
         verify(bluetoothAdapter).getProfileProxy(
                 context,
                 preConnectedDeviceListener,
@@ -69,5 +74,10 @@ class BluetoothControllerTest {
         bluetoothController.deactivate()
 
         verify(audioManager).stopBluetoothSco()
+    }
+
+    @Test
+    fun `verify device listeners get set on start()`() {
+        TODO("Not yet implemented")
     }
 }

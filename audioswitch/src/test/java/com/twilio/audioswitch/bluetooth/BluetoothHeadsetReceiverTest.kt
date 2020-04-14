@@ -2,6 +2,7 @@ package com.twilio.audioswitch.bluetooth
 
 import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
+import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.AudioManager.SCO_AUDIO_STATE_CONNECTED
@@ -19,11 +20,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(JUnitParamsRunner::class)
-class BluetoothDeviceReceiverTest {
+class BluetoothHeadsetReceiverTest {
 
+    private val context = mock<Context>()
     private val deviceListener = mock<BluetoothDeviceConnectionListener>()
     private val logger = mock<LogWrapper>()
-    private var bluetoothDeviceReceiver = BluetoothDeviceReceiver(deviceListener, logger)
+    private var bluetoothDeviceReceiver = BluetoothHeadsetReceiver(context, logger, deviceListener)
 
     fun parameters(): Array<Array<out Any?>> {
         val handsFreeDevice = mock<BluetoothClass> {
@@ -144,5 +146,10 @@ class BluetoothDeviceReceiverTest {
         bluetoothDeviceReceiver.onReceive(mock(), mock())
 
         verifyZeroInteractions(deviceListener)
+    }
+
+    @Test
+    fun `test null listener scenarios`() {
+        TODO("Not yet implemented")
     }
 }
