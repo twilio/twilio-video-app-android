@@ -6,8 +6,8 @@ import android.content.Intent
 import android.content.IntentFilter
 
 private const val TAG = "WiredHeadsetReceiver"
-private const val STATE_UNPLUGGED = 0
-private const val STATE_PLUGGED = 1
+internal const val STATE_UNPLUGGED = 0
+internal const val STATE_PLUGGED = 1
 
 internal class WiredHeadsetReceiver(
     private val context: Context,
