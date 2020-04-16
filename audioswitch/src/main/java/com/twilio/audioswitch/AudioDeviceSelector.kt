@@ -93,10 +93,6 @@ class AudioDeviceSelector internal constructor(
         }
     }
 
-    init {
-        wiredHeadsetReceiver.wiredDeviceConnectionListener = wiredDeviceConnectionListener
-    }
-
     /**
      * Starts listening for audio device changes. **Note:** When audio device listening is no
      * longer needed, [AudioDeviceSelector.stop] should be called in order to prevent a
@@ -109,7 +105,7 @@ class AudioDeviceSelector internal constructor(
         when (state) {
             STOPPED -> {
                 bluetoothController?.start(bluetoothDeviceConnectionListener)
-                wiredHeadsetReceiver.start()
+                wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
                 /*
                  * Enumerate devices when the wired headset receiver does not broadcast an action.
                  * The broadcast receiver will not broadcast an action when a wired headset is not

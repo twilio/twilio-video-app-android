@@ -11,9 +11,10 @@ internal const val STATE_PLUGGED = 1
 
 internal class WiredHeadsetReceiver(
     private val context: Context,
-    private val logger: LogWrapper,
-    var wiredDeviceConnectionListener: WiredDeviceConnectionListener? = null
+    private val logger: LogWrapper
 ) : BroadcastReceiver() {
+
+    internal var deviceListener: WiredDeviceConnectionListener? = null
 
     override fun onReceive(context: Context, intent: Intent) {
         intent.getIntExtra("state", STATE_UNPLUGGED).let { state ->
@@ -21,21 +22,23 @@ internal class WiredHeadsetReceiver(
                 intent.getStringExtra("name").let { name ->
                     logger.d(TAG, "Wired headset device ${name ?: ""} connected")
                 }
-                wiredDeviceConnectionListener?.onDeviceConnected()
+                deviceListener?.onDeviceConnected()
             } else {
                 intent.getStringExtra("name").let { name ->
                     logger.d(TAG, "Wired headset device ${name ?: ""} disconnected")
                 }
-                wiredDeviceConnectionListener?.onDeviceDisconnected()
+                deviceListener?.onDeviceDisconnected()
             }
         }
     }
 
-    fun start() {
+    fun start(deviceListener: WiredDeviceConnectionListener) {
+        this.deviceListener = deviceListener
         context.registerReceiver(this, IntentFilter(Intent.ACTION_HEADSET_PLUG))
     }
 
     fun stop() {
+        deviceListener = null
         context.unregisterReceiver(this)
     }
 }

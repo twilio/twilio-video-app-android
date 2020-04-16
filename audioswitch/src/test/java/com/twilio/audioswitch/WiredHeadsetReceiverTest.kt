@@ -7,9 +7,12 @@ import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
+import org.junit.Assert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
-import kotlin.NullPointerException
 
 class WiredHeadsetReceiverTest {
 
@@ -18,8 +21,7 @@ class WiredHeadsetReceiverTest {
     private val wiredDeviceConnectionListener = mock<WiredDeviceConnectionListener>()
     private val wiredHeadsetReceiver = WiredHeadsetReceiver(
             context,
-            logger,
-            wiredDeviceConnectionListener)
+            logger)
 
     @Test
     fun `onReceive should notify listener when a wired headset has been plugged in`() {
@@ -27,6 +29,7 @@ class WiredHeadsetReceiverTest {
             whenever(mock.getIntExtra("state", STATE_UNPLUGGED))
                     .thenReturn(STATE_PLUGGED)
         }
+        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
 
         wiredHeadsetReceiver.onReceive(context, intent)
 
@@ -35,7 +38,7 @@ class WiredHeadsetReceiverTest {
 
     @Test
     fun `onReceive should not notify listener when a wired headset has been plugged in but the listener is null`() {
-        wiredHeadsetReceiver.wiredDeviceConnectionListener = null
+        wiredHeadsetReceiver.deviceListener = null
         val intent = mock<Intent> {
             whenever(mock.getIntExtra("state", STATE_UNPLUGGED))
                     .thenReturn(STATE_PLUGGED)
@@ -54,6 +57,7 @@ class WiredHeadsetReceiverTest {
             whenever(mock.getIntExtra("state", STATE_UNPLUGGED))
                     .thenReturn(STATE_UNPLUGGED)
         }
+        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
 
         wiredHeadsetReceiver.onReceive(context, intent)
 
@@ -62,7 +66,7 @@ class WiredHeadsetReceiverTest {
 
     @Test
     fun `onReceive should not notify listener when a wired headset has been unplugged but the listener is null`() {
-        wiredHeadsetReceiver.wiredDeviceConnectionListener = null
+        wiredHeadsetReceiver.deviceListener = null
         val intent = mock<Intent> {
             whenever(mock.getIntExtra("state", STATE_UNPLUGGED))
                     .thenReturn(STATE_UNPLUGGED)
@@ -76,14 +80,32 @@ class WiredHeadsetReceiverTest {
     }
 
     @Test
+    fun `start should register the device listener`() {
+        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
+
+        assertThat(wiredHeadsetReceiver.deviceListener, equalTo(wiredDeviceConnectionListener))
+    }
+
+    @Test
     fun `start should register the broadcast receiver`() {
-        wiredHeadsetReceiver.start()
+        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
 
         verify(context).registerReceiver(eq(wiredHeadsetReceiver), isA())
     }
 
     @Test
+    fun `stop should unassign the device listener`() {
+        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
+
+        wiredHeadsetReceiver.stop()
+
+        assertThat(wiredHeadsetReceiver.deviceListener, `is`(nullValue()))
+    }
+
+    @Test
     fun `stop should unregister the broadcast receiver`() {
+        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
+
         wiredHeadsetReceiver.stop()
 
         verify(context).unregisterReceiver(wiredHeadsetReceiver)
