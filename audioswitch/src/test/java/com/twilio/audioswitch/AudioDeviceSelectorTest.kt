@@ -4,10 +4,13 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.media.AudioManager
 import com.nhaarman.mockitokotlin2.mock
+import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
 import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
 import com.twilio.audioswitch.bluetooth.assertBluetoothControllerStart
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class AudioDeviceSelectorTest {
@@ -43,7 +46,8 @@ class AudioDeviceSelectorTest {
                 audioDeviceSelector.bluetoothDeviceConnectionListener,
                 bluetoothAdapter)
 
-        TODO("assert that the WiredHeadsetReceiver has been started and the state gets transitioned to started")
+        assertThat(audioDeviceSelector.state, equalTo(STARTED))
+        // TODO("Assert enumerate devices has been invoked")
     }
 
     @Test

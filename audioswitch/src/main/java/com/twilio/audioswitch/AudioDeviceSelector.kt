@@ -6,7 +6,6 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
-import android.os.Handler
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
@@ -30,21 +29,21 @@ class AudioDeviceSelector internal constructor(
     private var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
-    private var state: State = STOPPED
     private var wiredHeadsetAvailable = false
     private val availableAudioDevices = ArrayList<AudioDevice>()
     // Saved Audio Settings
     private var savedAudioMode = 0
     private var savedIsMicrophoneMuted = false
-
     private var savedSpeakerphoneEnabled = false
-    private enum class State {
-        STARTED, ACTIVATED, STOPPED
-    }
+
     private val EARPIECE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
+    internal var state: State = STOPPED
+    internal enum class State {
+        STARTED, ACTIVATED, STOPPED
+    }
     internal val bluetoothDeviceConnectionListener = object : BluetoothDeviceConnectionListener {
         override fun onBluetoothConnected(
             bluetoothDevice: BluetoothDevice
@@ -106,21 +105,11 @@ class AudioDeviceSelector internal constructor(
             STOPPED -> {
                 bluetoothController?.start(bluetoothDeviceConnectionListener)
                 wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
-                /*
-                 * Enumerate devices when the wired headset receiver does not broadcast an action.
-                 * The broadcast receiver will not broadcast an action when a wired headset is not
-                 * initially plugged in. This task is intentionally run immediately after the wired
-                 * headset broadcast receiver task runs.
-                 */
-                val handler = Handler()
-                handler.post {
-                    if (!wiredHeadsetAvailable) {
-                        enumerateDevices()
-                    }
-                }
+                enumerateDevices()
                 state = State.STARTED
             }
             State.STARTED, State.ACTIVATED -> {
+                logger.d(TAG, "Redundant start() invocation while already in the started or activated state")
             }
         }
     }
