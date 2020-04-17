@@ -2,8 +2,11 @@ package com.twilio.audioswitch
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.AudioManager
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
@@ -15,7 +18,12 @@ import org.junit.Test
 
 class AudioDeviceSelectorTest {
 
-    private val context = mock<Context>()
+    private val packageManager = mock<PackageManager> {
+        whenever(mock.hasSystemFeature(any())).thenReturn(true)
+    }
+    private val context = mock<Context> {
+        whenever(mock.packageManager).thenReturn(packageManager)
+    }
     private val logger = mock<LogWrapper>()
     private val audioManager = mock<AudioManager>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
