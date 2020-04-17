@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import android.util.Log
 
 private const val TAG = "PhoneAudioDeviceManager"
 
@@ -30,13 +29,13 @@ internal class PhoneAudioDeviceManager(
             val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
             for (device in devices) {
                 if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
-                    Log.d(TAG, "Speakerphone available")
+                    logger.d(TAG, "Speakerphone available")
                     return true
                 }
             }
             false
         } else {
-            Log.d(TAG, "Speakerphone available")
+            logger.d(TAG, "Speakerphone available")
             true
         }
     }
