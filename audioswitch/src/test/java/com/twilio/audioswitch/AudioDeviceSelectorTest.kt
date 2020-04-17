@@ -47,7 +47,21 @@ class AudioDeviceSelectorTest {
                 bluetoothAdapter)
 
         assertThat(audioDeviceSelector.state, equalTo(STARTED))
-        // TODO("Assert enumerate devices has been invoked")
+    }
+
+    @Test
+    fun `start should cache the default audio devices and the default selected audio device`() {
+        val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
+        audioDeviceSelector.start(audioDeviceChangeListener)
+
+        val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
+        val speakerphone = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
+        audioDeviceSelector.availableAudioDevices.let { audioDevices ->
+            assertThat(audioDevices.size, equalTo(2))
+            assertThat(audioDevices[0], equalTo(earpiece))
+            assertThat(audioDevices[1], equalTo(speakerphone))
+        }
+        assertThat(audioDeviceSelector.selectedAudioDevice, equalTo(earpiece))
     }
 
     @Test

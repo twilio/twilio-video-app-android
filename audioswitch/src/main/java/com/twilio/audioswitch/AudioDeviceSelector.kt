@@ -9,7 +9,6 @@ import android.os.Build
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
-import java.util.Collections
 import kotlin.collections.ArrayList
 
 private const val TAG = "AudioDeviceSelector"
@@ -30,7 +29,7 @@ class AudioDeviceSelector internal constructor(
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
     private var wiredHeadsetAvailable = false
-    private val availableAudioDevices = ArrayList<AudioDevice>()
+    private val mutableAudioDevices = ArrayList<AudioDevice>()
     // Saved Audio Settings
     private var savedAudioMode = 0
     private var savedIsMicrophoneMuted = false
@@ -229,10 +228,7 @@ class AudioDeviceSelector internal constructor(
      *
      * @return the current list of [AudioDevice]s
      */
-    val audioDevices: List<AudioDevice>
-        get() {
-            return Collections.unmodifiableList(ArrayList(availableAudioDevices))
-        }
+    val availableAudioDevices: List<AudioDevice> = mutableAudioDevices
 
     private fun setAudioFocus() {
         // Request audio focus before making any device switch.
@@ -263,28 +259,28 @@ class AudioDeviceSelector internal constructor(
     }
 
     private fun enumerateDevices() {
-        availableAudioDevices.clear()
-        bluetoothAudioDevice?.let { availableAudioDevices.add(it) }
+        mutableAudioDevices.clear()
+        bluetoothAudioDevice?.let { mutableAudioDevices.add(it) }
         if (wiredHeadsetAvailable) {
-            availableAudioDevices.add(WIRED_HEADSET_AUDIO_DEVICE)
+            mutableAudioDevices.add(WIRED_HEADSET_AUDIO_DEVICE)
         }
         if (phoneAudioDeviceManager.hasEarpiece() && !wiredHeadsetAvailable) {
-            availableAudioDevices.add(EARPIECE_AUDIO_DEVICE)
+            mutableAudioDevices.add(EARPIECE_AUDIO_DEVICE)
         }
         if (phoneAudioDeviceManager.hasSpeakerphone()) {
-            availableAudioDevices.add(SPEAKERPHONE_AUDIO_DEVICE)
+            mutableAudioDevices.add(SPEAKERPHONE_AUDIO_DEVICE)
         }
 
         // Check whether the user selected device is still present
-        if (!userSelectedDevicePresent(availableAudioDevices)) {
+        if (!userSelectedDevicePresent(mutableAudioDevices)) {
             userSelectedDevice = null
         }
 
         // Select the audio device
-        selectedDevice = if (userSelectedDevice != null && userSelectedDevicePresent(availableAudioDevices)) {
+        selectedDevice = if (userSelectedDevice != null && userSelectedDevicePresent(mutableAudioDevices)) {
             userSelectedDevice
-        } else if (availableAudioDevices.size > 0) {
-            availableAudioDevices[0]
+        } else if (mutableAudioDevices.size > 0) {
+            mutableAudioDevices[0]
         } else {
             null
         }
@@ -296,10 +292,10 @@ class AudioDeviceSelector internal constructor(
         if (audioDeviceChangeListener != null) {
             if (selectedDevice != null) {
                 audioDeviceChangeListener!!.invoke(
-                        availableAudioDevices,
+                        mutableAudioDevices,
                         AudioDevice(selectedDevice!!.type, selectedDevice!!.name))
             } else {
-                audioDeviceChangeListener!!.invoke(availableAudioDevices, null)
+                audioDeviceChangeListener!!.invoke(mutableAudioDevices, null)
             }
         }
     }
