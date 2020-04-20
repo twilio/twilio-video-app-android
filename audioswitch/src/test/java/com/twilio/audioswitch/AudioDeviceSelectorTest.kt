@@ -113,11 +113,6 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `TODO test all permutations of possible audio devices and their priorities`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
     fun `stop should do nothing if the current state is stopped`() {
         TODO("Not yet implemented")
     }
@@ -179,6 +174,11 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `stop should unassign the audio device change listener`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `TODO test all permutations of possible audio devices and their priorities`() {
         TODO("Not yet implemented")
     }
 }

@@ -6,6 +6,8 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
+import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
+import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
@@ -50,7 +52,7 @@ class AudioDeviceSelector internal constructor(
             bluetoothAudioDevice = AudioDevice(
                     AudioDevice.Type.BLUETOOTH,
                     bluetoothDevice.name)
-            if (state == State.ACTIVATED) {
+            if (state == ACTIVATED) {
                 userSelectedDevice = bluetoothAudioDevice
             }
             enumerateDevices()
@@ -65,7 +67,7 @@ class AudioDeviceSelector internal constructor(
         override fun onDeviceConnected() {
             wiredHeadsetAvailable = true
             logger.d(TAG, "Wired Headset available")
-            if (this@AudioDeviceSelector.state == State.ACTIVATED) {
+            if (this@AudioDeviceSelector.state == ACTIVATED) {
                 userSelectedDevice = WIRED_HEADSET_AUDIO_DEVICE
             }
             enumerateDevices()
@@ -105,7 +107,7 @@ class AudioDeviceSelector internal constructor(
                 bluetoothController?.start(bluetoothDeviceConnectionListener)
                 wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
                 enumerateDevices()
-                state = State.STARTED
+                state = STARTED
             }
             else -> {
                 logger.d(TAG, "Redundant start() invocation while already in the started or activated state")
@@ -119,18 +121,19 @@ class AudioDeviceSelector internal constructor(
      */
     fun stop() {
         when (state) {
-            State.ACTIVATED -> {
+            ACTIVATED -> {
                 deactivate()
                 wiredHeadsetReceiver.stop()
                 bluetoothController?.stop()
                 state = STOPPED
             }
-            State.STARTED -> {
+            STARTED -> {
                 wiredHeadsetReceiver.stop()
                 bluetoothController?.stop()
                 state = STOPPED
             }
             STOPPED -> {
+                logger.d(TAG, "Redundant stop() invocation while already in the stopped state")
             }
         }
     }
@@ -142,7 +145,7 @@ class AudioDeviceSelector internal constructor(
      */
     fun activate() {
         when (state) {
-            State.STARTED -> {
+            STARTED -> {
                 savedAudioMode = audioManager.mode
                 savedIsMicrophoneMuted = audioManager.isMicrophoneMute
                 savedSpeakerphoneEnabled = audioManager.isSpeakerphoneOn
@@ -153,9 +156,9 @@ class AudioDeviceSelector internal constructor(
                 if (selectedDevice != null) {
                     activate(selectedDevice!!)
                 }
-                state = State.ACTIVATED
+                state = ACTIVATED
             }
-            State.ACTIVATED -> // Activate the newly selected device
+            ACTIVATED -> // Activate the newly selected device
                 if (selectedDevice != null) {
                     activate(selectedDevice!!)
                 }
@@ -186,7 +189,7 @@ class AudioDeviceSelector internal constructor(
      */
     fun deactivate() {
         when (state) {
-            State.ACTIVATED -> {
+            ACTIVATED -> {
                 bluetoothController?.deactivate()
 
                 // Restore stored audio state
@@ -194,9 +197,9 @@ class AudioDeviceSelector internal constructor(
                 mute(savedIsMicrophoneMuted)
                 enableSpeakerphone(savedSpeakerphoneEnabled)
                 audioManager.abandonAudioFocus(null)
-                state = State.STARTED
+                state = STARTED
             }
-            State.STARTED, STOPPED -> {
+            STARTED, STOPPED -> {
             }
         }
     }
@@ -286,7 +289,7 @@ class AudioDeviceSelector internal constructor(
         }
 
         // Activate the device if in the active state
-        if (state == State.ACTIVATED) {
+        if (state == ACTIVATED) {
             activate()
         }
         audioDeviceChangeListener?.let { listener ->
