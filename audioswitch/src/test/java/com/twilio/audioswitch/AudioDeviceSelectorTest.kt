@@ -5,12 +5,16 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
 import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
+import com.twilio.audioswitch.bluetooth.assertBluetoothControllerNotStarted
 import com.twilio.audioswitch.bluetooth.assertBluetoothControllerStart
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -18,6 +22,8 @@ import org.junit.Test
 
 class AudioDeviceSelectorTest {
 
+    private val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
+    private val speakerphone = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
     private val packageManager = mock<PackageManager> {
         whenever(mock.hasSystemFeature(any())).thenReturn(true)
     }
@@ -27,13 +33,15 @@ class AudioDeviceSelectorTest {
     private val logger = mock<LogWrapper>()
     private val audioManager = mock<AudioManager>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
+    private val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
     private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
     private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
-    private val audioDeviceSelector = AudioDeviceSelector(
+    private val wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
+    private var audioDeviceSelector = AudioDeviceSelector(
             logger,
             audioManager,
             PhoneAudioDeviceManager(context, logger, audioManager),
-            WiredHeadsetReceiver(context, logger),
+            wiredHeadsetReceiver,
             BluetoothController(
                     context,
                     audioManager,
@@ -43,8 +51,7 @@ class AudioDeviceSelectorTest {
     )
 
     @Test
-    fun `start should transition to the started state if the current state is stopped`() {
-        val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
+    fun `start should start the bluetooth and wired headset listeners`() {
         audioDeviceSelector.start(audioDeviceChangeListener)
 
         assertBluetoothControllerStart(
@@ -54,16 +61,21 @@ class AudioDeviceSelectorTest {
                 audioDeviceSelector.bluetoothDeviceConnectionListener,
                 bluetoothAdapter)
 
+        assertThat(wiredHeadsetReceiver.deviceListener, equalTo(audioDeviceSelector.wiredDeviceConnectionListener))
+        verify(context).registerReceiver(eq(wiredHeadsetReceiver), isA())
+    }
+
+    @Test
+    fun `start should transition to the started state if the current state is stopped`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+
         assertThat(audioDeviceSelector.state, equalTo(STARTED))
     }
 
     @Test
     fun `start should cache the default audio devices and the default selected audio device`() {
-        val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
         audioDeviceSelector.start(audioDeviceChangeListener)
 
-        val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
-        val speakerphone = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
         audioDeviceSelector.availableAudioDevices.let { audioDevices ->
             assertThat(audioDevices.size, equalTo(2))
             assertThat(audioDevices[0], equalTo(earpiece))
@@ -73,7 +85,35 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
+    fun `start should invoke the audio device change listener with the default audio devices`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+
+        verify(audioDeviceChangeListener).invoke(
+                listOf(earpiece, speakerphone),
+                earpiece)
+    }
+
+    @Test
     fun `start should not start the BluetoothController if it is null`() {
+        audioDeviceSelector = AudioDeviceSelector(
+                logger,
+                audioManager,
+                PhoneAudioDeviceManager(context, logger, audioManager),
+                wiredHeadsetReceiver,
+                bluetoothController = null
+        )
+
+        audioDeviceSelector.start(audioDeviceChangeListener)
+
+        assertBluetoothControllerNotStarted(
+                context,
+                preConnectedDeviceListener,
+                bluetoothHeadsetReceiver,
+                bluetoothAdapter)
+    }
+
+    @Test
+    fun `TODO test all permutations of possible audio devices and their priorities`() {
         TODO("Not yet implemented")
     }
 
@@ -134,6 +174,11 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `stop should transition to the stopped state if the current state is activated`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `stop should unassign the audio device change listener`() {
         TODO("Not yet implemented")
     }
 }

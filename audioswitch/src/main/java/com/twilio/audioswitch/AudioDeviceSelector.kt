@@ -61,7 +61,7 @@ class AudioDeviceSelector internal constructor(
             enumerateDevices()
         }
     }
-    private val wiredDeviceConnectionListener = object : WiredDeviceConnectionListener {
+    internal val wiredDeviceConnectionListener = object : WiredDeviceConnectionListener {
         override fun onDeviceConnected() {
             wiredHeadsetAvailable = true
             logger.d(TAG, "Wired Headset available")
@@ -107,7 +107,7 @@ class AudioDeviceSelector internal constructor(
                 enumerateDevices()
                 state = State.STARTED
             }
-            State.STARTED, State.ACTIVATED -> {
+            else -> {
                 logger.d(TAG, "Redundant start() invocation while already in the started or activated state")
             }
         }
@@ -289,13 +289,13 @@ class AudioDeviceSelector internal constructor(
         if (state == State.ACTIVATED) {
             activate()
         }
-        if (audioDeviceChangeListener != null) {
-            if (selectedDevice != null) {
-                audioDeviceChangeListener!!.invoke(
+        audioDeviceChangeListener?.let { listener ->
+            selectedDevice?.let { selectedDevice ->
+                listener.invoke(
                         mutableAudioDevices,
-                        AudioDevice(selectedDevice!!.type, selectedDevice!!.name))
-            } else {
-                audioDeviceChangeListener!!.invoke(mutableAudioDevices, null)
+                        AudioDevice(selectedDevice.type, selectedDevice.name))
+            } ?: run {
+                listener.invoke(mutableAudioDevices, null)
             }
         }
     }
