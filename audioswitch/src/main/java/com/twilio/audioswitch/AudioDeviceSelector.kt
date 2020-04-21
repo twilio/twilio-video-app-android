@@ -153,10 +153,7 @@ class AudioDeviceSelector internal constructor(
                 selectedDevice?.let { activate(it) }
                 state = ACTIVATED
             }
-            ACTIVATED -> // Activate the newly selected device
-                if (selectedDevice != null) {
-                    activate(selectedDevice!!)
-                }
+            ACTIVATED -> selectedDevice?.let { activate(it) }
             STOPPED -> throw IllegalStateException()
         }
     }
@@ -213,10 +210,7 @@ class AudioDeviceSelector internal constructor(
      *
      * @return the selected [AudioDevice]
      */
-    val selectedAudioDevice: AudioDevice?
-        get() {
-            return if (selectedDevice != null) AudioDevice(selectedDevice!!.type, selectedDevice!!.name) else null
-        }
+    val selectedAudioDevice: AudioDevice? = selectedDevice
 
     /**
      * Retrieves the current list of available [AudioDevice]s.
