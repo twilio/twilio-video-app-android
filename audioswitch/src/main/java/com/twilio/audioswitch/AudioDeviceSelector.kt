@@ -3,6 +3,10 @@ package com.twilio.audioswitch
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.media.AudioManager
+import com.twilio.audioswitch.AudioDevice.Type.BLUETOOTH
+import com.twilio.audioswitch.AudioDevice.Type.EARPIECE
+import com.twilio.audioswitch.AudioDevice.Type.SPEAKERPHONE
+import com.twilio.audioswitch.AudioDevice.Type.WIRED_HEADSET
 import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
@@ -31,9 +35,9 @@ class AudioDeviceSelector internal constructor(
     private var wiredHeadsetAvailable = false
     private val mutableAudioDevices = ArrayList<AudioDevice>()
 
-    private val EARPIECE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
-    private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
-    private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.WIRED_HEADSET, "Wired Headset")
+    private val EARPIECE_AUDIO_DEVICE = AudioDevice(EARPIECE, "Earpiece")
+    private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(SPEAKERPHONE, "Speakerphone")
+    private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
     internal var state: State = STOPPED
     internal enum class State {
@@ -44,7 +48,7 @@ class AudioDeviceSelector internal constructor(
             bluetoothDevice: BluetoothDevice
         ) {
             bluetoothAudioDevice = AudioDevice(
-                    AudioDevice.Type.BLUETOOTH,
+                    BLUETOOTH,
                     bluetoothDevice.name)
             if (state == ACTIVATED) {
                 userSelectedDevice = bluetoothAudioDevice
@@ -146,9 +150,7 @@ class AudioDeviceSelector internal constructor(
                 // Always set mute to false for WebRTC
                 audioDeviceManager.mute(false)
                 audioDeviceManager.setAudioFocus()
-                if (selectedDevice != null) {
-                    activate(selectedDevice!!)
-                }
+                selectedDevice?.let { activate(it) }
                 state = ACTIVATED
             }
             ACTIVATED -> // Activate the newly selected device
@@ -161,15 +163,15 @@ class AudioDeviceSelector internal constructor(
 
     private fun activate(audioDevice: AudioDevice) {
         when (audioDevice.type) {
-            AudioDevice.Type.BLUETOOTH -> {
+            BLUETOOTH -> {
                 audioDeviceManager.enableSpeakerphone(false)
                 bluetoothController?.activate()
             }
-            AudioDevice.Type.EARPIECE, AudioDevice.Type.WIRED_HEADSET -> {
+            EARPIECE, WIRED_HEADSET -> {
                 audioDeviceManager.enableSpeakerphone(false)
                 bluetoothController?.deactivate()
             }
-            AudioDevice.Type.SPEAKERPHONE -> {
+            SPEAKERPHONE -> {
                 audioDeviceManager.enableSpeakerphone(true)
                 bluetoothController?.deactivate()
             }

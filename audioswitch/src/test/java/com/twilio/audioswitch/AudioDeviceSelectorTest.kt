@@ -1,6 +1,7 @@
 package com.twilio.audioswitch
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
@@ -15,6 +16,8 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.audioswitch.AudioDevice.Type.EARPIECE
+import com.twilio.audioswitch.AudioDevice.Type.SPEAKERPHONE
 import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
@@ -33,8 +36,8 @@ import org.junit.Test
 
 class AudioDeviceSelectorTest {
 
-    private val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
-    private val speakerphone = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
+    private val earpiece = AudioDevice(EARPIECE, "Earpiece")
+    private val speakerphone = AudioDevice(SPEAKERPHONE, "Speakerphone")
     private val packageManager = mock<PackageManager> {
         whenever(mock.hasSystemFeature(any())).thenReturn(true)
     }
@@ -295,7 +298,49 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `activate should do nothing if the current state is is activated`() {
+    fun `activate should enable audio routing to the earpiece`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+
+        verify(audioManager).isSpeakerphoneOn = false
+        verify(audioManager).stopBluetoothSco()
+    }
+
+    @Test
+    fun `activate should enable audio routing to the speakerphone device`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.selectDevice(speakerphone)
+        audioDeviceSelector.activate()
+
+        verify(audioManager).isSpeakerphoneOn = true
+        verify(audioManager).stopBluetoothSco()
+    }
+
+    @Test
+    fun `activate should enable audio routing to the bluetooth device`() {
+        val bluetoothDevice = mock<BluetoothDevice> {
+            whenever(mock.name).thenReturn("Bluetooth")
+        }
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.bluetoothDeviceConnectionListener.onBluetoothConnected(bluetoothDevice)
+        audioDeviceSelector.activate()
+
+        verify(audioManager).isSpeakerphoneOn = false
+        verify(audioManager).startBluetoothSco()
+    }
+
+    @Test
+    fun `activate should enable audio routing to the wired headset device`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.wiredDeviceConnectionListener.onDeviceConnected()
+        audioDeviceSelector.activate()
+
+        verify(audioManager).isSpeakerphoneOn = false
+        verify(audioManager).stopBluetoothSco()
+    }
+
+    @Test
+    fun `activate should do nothing if the current state is activated`() {
         TODO("Not yet implemented")
     }
 
@@ -311,7 +356,6 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `deactivate should do nothing if the current state is stopped`() {
-        TODO("Not yet implemented")
         TODO("Assert cached audio state from activate() -> deactivate")
     }
 
