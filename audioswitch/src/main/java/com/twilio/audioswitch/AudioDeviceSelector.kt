@@ -27,7 +27,7 @@ class AudioDeviceSelector internal constructor(
     private val bluetoothController: BluetoothController?
 ) {
 
-    private var audioDeviceChangeListener: AudioDeviceChangeListener? = null
+    internal var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
     private var wiredHeadsetAvailable = false
@@ -123,14 +123,10 @@ class AudioDeviceSelector internal constructor(
         when (state) {
             ACTIVATED -> {
                 deactivate()
-                bluetoothController?.stop()
-                wiredHeadsetReceiver.stop()
-                state = STOPPED
+                closeListeners()
             }
             STARTED -> {
-                bluetoothController?.stop()
-                wiredHeadsetReceiver.stop()
-                state = STOPPED
+                closeListeners()
             }
             STOPPED -> {
                 logger.d(TAG, "Redundant stop() invocation while already in the stopped state")
@@ -318,5 +314,12 @@ class AudioDeviceSelector internal constructor(
 
     private fun mute(mute: Boolean) {
         audioManager.isMicrophoneMute = mute
+    }
+
+    private fun closeListeners() {
+        bluetoothController?.stop()
+        wiredHeadsetReceiver.stop()
+        audioDeviceChangeListener = null
+        state = STOPPED
     }
 }
