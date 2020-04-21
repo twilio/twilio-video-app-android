@@ -78,7 +78,11 @@ class AudioDeviceSelector internal constructor(
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             val logger = LogWrapper()
             val audioDeviceManager =
-                    AudioDeviceManager(context, logger, audioManager, BuildWrapper())
+                    AudioDeviceManager(context,
+                            logger,
+                            audioManager,
+                            BuildWrapper(),
+                            AudioFocusRequestWrapper())
             return AudioDeviceSelector(
                     logger,
                     audioDeviceManager,

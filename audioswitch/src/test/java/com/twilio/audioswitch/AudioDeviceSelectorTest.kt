@@ -52,7 +52,12 @@ class AudioDeviceSelectorTest {
     private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
     private val wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
     private val buildWrapper = mock<BuildWrapper>()
-    private val audioDeviceManager = AudioDeviceManager(context, logger, audioManager, buildWrapper)
+    private val audioFocusRequest = mock<AudioFocusRequestWrapper>()
+    private val audioDeviceManager = AudioDeviceManager(context,
+            logger,
+            audioManager,
+            buildWrapper,
+            audioFocusRequest)
     private var audioDeviceSelector = AudioDeviceSelector(
             logger,
             audioDeviceManager,

@@ -3,9 +3,7 @@ package com.twilio.audioswitch
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
-import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import com.twilio.audioswitch.android.BuildWrapper
@@ -17,7 +15,8 @@ internal class AudioDeviceManager(
     private val context: Context,
     private val logger: LogWrapper,
     private val audioManager: AudioManager,
-    private val build: BuildWrapper
+    private val build: BuildWrapper,
+    private val audioFocusRequest: AudioFocusRequestWrapper
 ) {
 
     private var savedAudioMode = 0
@@ -55,16 +54,7 @@ internal class AudioDeviceManager(
     fun setAudioFocus() {
         // Request audio focus before making any device switch.
         if (build.getVersion() >= Build.VERSION_CODES.O) {
-            val playbackAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .build()
-            val focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                    .setAudioAttributes(playbackAttributes)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener { i: Int -> }
-                    .build()
-            audioManager.requestAudioFocus(focusRequest)
+            audioManager.requestAudioFocus(audioFocusRequest.buildRequest())
         } else {
             audioManager.requestAudioFocus(
                     { focusChange: Int -> },
