@@ -125,6 +125,19 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
+    fun `start should do nothing if the current state is activated`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+        audioDeviceSelector.start(audioDeviceChangeListener)
+
+        try {
+            audioDeviceSelector.start(audioDeviceChangeListener)
+        } catch (e: Exception) {
+            fail("Exception should not have been thrown")
+        }
+    }
+
+    @Test
     fun `stop should do nothing if the current state is stopped`() {
         TODO("Not yet implemented")
     }
@@ -166,11 +179,6 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `selectDevice should do nothing if the current state is activated`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
-    fun `start should do nothing if the current state is activated`() {
         TODO("Not yet implemented")
     }
 
