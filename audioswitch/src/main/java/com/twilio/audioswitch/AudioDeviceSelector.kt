@@ -9,6 +9,7 @@ import android.os.Build
 import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
+import com.twilio.audioswitch.android.BuildWrapper
 import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
@@ -25,7 +26,8 @@ class AudioDeviceSelector internal constructor(
     private val audioManager: AudioManager,
     private val phoneAudioDeviceManager: PhoneAudioDeviceManager,
     private val wiredHeadsetReceiver: WiredHeadsetReceiver,
-    private val bluetoothController: BluetoothController?
+    private val bluetoothController: BluetoothController?,
+    private val build: BuildWrapper
 ) {
 
     internal var audioDeviceChangeListener: AudioDeviceChangeListener? = null
@@ -89,7 +91,8 @@ class AudioDeviceSelector internal constructor(
                     context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
                     PhoneAudioDeviceManager(context, logger, audioManager),
                     WiredHeadsetReceiver(context, logger),
-                    BluetoothController.newInstance(context, logger)
+                    BluetoothController.newInstance(context, logger),
+                    BuildWrapper()
             )
         }
     }
@@ -232,7 +235,7 @@ class AudioDeviceSelector internal constructor(
 
     private fun setAudioFocus() {
         // Request audio focus before making any device switch.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (build.getVersion() >= Build.VERSION_CODES.O) {
             val playbackAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)

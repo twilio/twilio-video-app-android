@@ -16,6 +16,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
+import com.twilio.audioswitch.android.BuildWrapper
 import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothControllerAssertions
@@ -49,6 +50,7 @@ class AudioDeviceSelectorTest {
     private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
     private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
     private val wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
+    val buildWrapper = mock<BuildWrapper>()
     private var audioDeviceSelector = AudioDeviceSelector(
             logger,
             audioManager,
@@ -59,7 +61,8 @@ class AudioDeviceSelectorTest {
                     audioManager,
                     bluetoothAdapter,
                     preConnectedDeviceListener,
-                    bluetoothHeadsetReceiver)
+                    bluetoothHeadsetReceiver),
+            buildWrapper
     )
     private val bluetoothControllerAssertions = BluetoothControllerAssertions()
 
@@ -113,7 +116,8 @@ class AudioDeviceSelectorTest {
                 audioManager,
                 PhoneAudioDeviceManager(context, logger, audioManager),
                 wiredHeadsetReceiver,
-                bluetoothController = null
+                bluetoothController = null,
+                build = buildWrapper
         )
 
         audioDeviceSelector.start(audioDeviceChangeListener)
@@ -218,7 +222,8 @@ class AudioDeviceSelectorTest {
                 audioManager,
                 PhoneAudioDeviceManager(context, logger, audioManager),
                 wiredHeadsetReceiver,
-                bluetoothController = null
+                bluetoothController = null,
+                build = buildWrapper
         )
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.stop()
@@ -234,7 +239,8 @@ class AudioDeviceSelectorTest {
                 audioManager,
                 PhoneAudioDeviceManager(context, logger, audioManager),
                 wiredHeadsetReceiver,
-                bluetoothController = null
+                bluetoothController = null,
+                build = buildWrapper
         )
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.activate()
