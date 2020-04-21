@@ -9,7 +9,9 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
@@ -204,8 +206,36 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `TODO stop bluetooth controller NPE tests`() {
-        TODO("Not yet implemented")
+    fun `start should not stop the BluetoothController if it is null if transitioning from the started state`() {
+        audioDeviceSelector = AudioDeviceSelector(
+                logger,
+                audioManager,
+                PhoneAudioDeviceManager(context, logger, audioManager),
+                wiredHeadsetReceiver,
+                bluetoothController = null
+        )
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.stop()
+
+        verifyZeroInteractions(bluetoothAdapter)
+        verify(context, times(0)).unregisterReceiver(bluetoothHeadsetReceiver)
+    }
+
+    @Test
+    fun `start should not stop the BluetoothController if it is null if transitioning from the activated state`() {
+        audioDeviceSelector = AudioDeviceSelector(
+                logger,
+                audioManager,
+                PhoneAudioDeviceManager(context, logger, audioManager),
+                wiredHeadsetReceiver,
+                bluetoothController = null
+        )
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+        audioDeviceSelector.stop()
+
+        verifyZeroInteractions(bluetoothAdapter)
+        verify(context, times(0)).unregisterReceiver(bluetoothHeadsetReceiver)
     }
 
     @Test
