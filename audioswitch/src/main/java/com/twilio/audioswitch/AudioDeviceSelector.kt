@@ -123,13 +123,13 @@ class AudioDeviceSelector internal constructor(
         when (state) {
             ACTIVATED -> {
                 deactivate()
-                wiredHeadsetReceiver.stop()
                 bluetoothController?.stop()
+                wiredHeadsetReceiver.stop()
                 state = STOPPED
             }
             STARTED -> {
-                wiredHeadsetReceiver.stop()
                 bluetoothController?.stop()
+                wiredHeadsetReceiver.stop()
                 state = STOPPED
             }
             STOPPED -> {
