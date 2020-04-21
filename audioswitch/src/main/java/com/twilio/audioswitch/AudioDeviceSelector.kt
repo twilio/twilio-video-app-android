@@ -2,10 +2,7 @@ package com.twilio.audioswitch
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.os.Build
 import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
@@ -23,11 +20,9 @@ private const val TAG = "AudioDeviceSelector"
  */
 class AudioDeviceSelector internal constructor(
     private val logger: LogWrapper,
-    private val audioManager: AudioManager,
-    private val phoneAudioDeviceManager: PhoneAudioDeviceManager,
+    private val audioDeviceManager: AudioDeviceManager,
     private val wiredHeadsetReceiver: WiredHeadsetReceiver,
-    private val bluetoothController: BluetoothController?,
-    private val build: BuildWrapper
+    private val bluetoothController: BluetoothController?
 ) {
 
     internal var audioDeviceChangeListener: AudioDeviceChangeListener? = null
@@ -35,10 +30,6 @@ class AudioDeviceSelector internal constructor(
     private var userSelectedDevice: AudioDevice? = null
     private var wiredHeadsetAvailable = false
     private val mutableAudioDevices = ArrayList<AudioDevice>()
-    // Saved Audio Settings
-    private var savedAudioMode = 0
-    private var savedIsMicrophoneMuted = false
-    private var savedSpeakerphoneEnabled = false
 
     private val EARPIECE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
     private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(AudioDevice.Type.SPEAKERPHONE, "Speakerphone")
@@ -86,13 +77,13 @@ class AudioDeviceSelector internal constructor(
         fun newInstance(context: Context): AudioDeviceSelector {
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             val logger = LogWrapper()
+            val audioDeviceManager =
+                    AudioDeviceManager(context, logger, audioManager, BuildWrapper())
             return AudioDeviceSelector(
                     logger,
-                    context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
-                    PhoneAudioDeviceManager(context, logger, audioManager),
+                    audioDeviceManager,
                     WiredHeadsetReceiver(context, logger),
-                    BluetoothController.newInstance(context, logger),
-                    BuildWrapper()
+                    BluetoothController.newInstance(context, logger, audioDeviceManager)
             )
         }
     }
@@ -146,13 +137,11 @@ class AudioDeviceSelector internal constructor(
     fun activate() {
         when (state) {
             STARTED -> {
-                savedAudioMode = audioManager.mode
-                savedIsMicrophoneMuted = audioManager.isMicrophoneMute
-                savedSpeakerphoneEnabled = audioManager.isSpeakerphoneOn
+                audioDeviceManager.cacheAudioState()
 
                 // Always set mute to false for WebRTC
-                mute(false)
-                setAudioFocus()
+                audioDeviceManager.mute(false)
+                audioDeviceManager.setAudioFocus()
                 if (selectedDevice != null) {
                     activate(selectedDevice!!)
                 }
@@ -169,15 +158,15 @@ class AudioDeviceSelector internal constructor(
     private fun activate(audioDevice: AudioDevice) {
         when (audioDevice.type) {
             AudioDevice.Type.BLUETOOTH -> {
-                enableSpeakerphone(false)
+                audioDeviceManager.enableSpeakerphone(false)
                 bluetoothController?.activate()
             }
             AudioDevice.Type.EARPIECE, AudioDevice.Type.WIRED_HEADSET -> {
-                enableSpeakerphone(false)
+                audioDeviceManager.enableSpeakerphone(false)
                 bluetoothController?.deactivate()
             }
             AudioDevice.Type.SPEAKERPHONE -> {
-                enableSpeakerphone(true)
+                audioDeviceManager.enableSpeakerphone(true)
                 bluetoothController?.deactivate()
             }
         }
@@ -193,10 +182,7 @@ class AudioDeviceSelector internal constructor(
                 bluetoothController?.deactivate()
 
                 // Restore stored audio state
-                audioManager.mode = savedAudioMode
-                mute(savedIsMicrophoneMuted)
-                enableSpeakerphone(savedSpeakerphoneEnabled)
-                audioManager.abandonAudioFocus(null)
+                audioDeviceManager.restoreAudioState()
                 state = STARTED
             }
             STARTED, STOPPED -> {
@@ -233,44 +219,16 @@ class AudioDeviceSelector internal constructor(
      */
     val availableAudioDevices: List<AudioDevice> = mutableAudioDevices
 
-    private fun setAudioFocus() {
-        // Request audio focus before making any device switch.
-        if (build.getVersion() >= Build.VERSION_CODES.O) {
-            val playbackAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .build()
-            val focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-                    .setAudioAttributes(playbackAttributes)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener { i: Int -> }
-                    .build()
-            audioManager.requestAudioFocus(focusRequest)
-        } else {
-            audioManager.requestAudioFocus(
-                    { focusChange: Int -> },
-                    AudioManager.STREAM_VOICE_CALL,
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
-        }
-        /*
-         * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-         * required to be in this mode when playout and/or recording starts for
-         * best possible VoIP performance. Some devices have difficulties with speaker mode
-         * if this is not set.
-         */
-        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-    }
-
     private fun enumerateDevices() {
         mutableAudioDevices.clear()
         bluetoothAudioDevice?.let { mutableAudioDevices.add(it) }
         if (wiredHeadsetAvailable) {
             mutableAudioDevices.add(WIRED_HEADSET_AUDIO_DEVICE)
         }
-        if (phoneAudioDeviceManager.hasEarpiece() && !wiredHeadsetAvailable) {
+        if (audioDeviceManager.hasEarpiece() && !wiredHeadsetAvailable) {
             mutableAudioDevices.add(EARPIECE_AUDIO_DEVICE)
         }
-        if (phoneAudioDeviceManager.hasSpeakerphone()) {
+        if (audioDeviceManager.hasSpeakerphone()) {
             mutableAudioDevices.add(SPEAKERPHONE_AUDIO_DEVICE)
         }
 
@@ -310,14 +268,6 @@ class AudioDeviceSelector internal constructor(
             }
         }
         return false
-    }
-
-    private fun enableSpeakerphone(enable: Boolean) {
-        audioManager.isSpeakerphoneOn = enable
-    }
-
-    private fun mute(mute: Boolean) {
-        audioManager.isMicrophoneMute = mute
     }
 
     private fun closeListeners() {

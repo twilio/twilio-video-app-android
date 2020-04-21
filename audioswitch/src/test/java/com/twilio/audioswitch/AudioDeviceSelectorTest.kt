@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.os.Build
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
@@ -50,19 +51,18 @@ class AudioDeviceSelectorTest {
     private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
     private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
     private val wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
-    val buildWrapper = mock<BuildWrapper>()
+    private val buildWrapper = mock<BuildWrapper>()
+    private val audioDeviceManager = AudioDeviceManager(context, logger, audioManager, buildWrapper)
     private var audioDeviceSelector = AudioDeviceSelector(
             logger,
-            audioManager,
-            PhoneAudioDeviceManager(context, logger, audioManager),
+            audioDeviceManager,
             wiredHeadsetReceiver,
             BluetoothController(
                     context,
-                    audioManager,
+                    audioDeviceManager,
                     bluetoothAdapter,
                     preConnectedDeviceListener,
-                    bluetoothHeadsetReceiver),
-            buildWrapper
+                    bluetoothHeadsetReceiver)
     )
     private val bluetoothControllerAssertions = BluetoothControllerAssertions()
 
@@ -113,11 +113,9 @@ class AudioDeviceSelectorTest {
     fun `start should not start the BluetoothController if it is null`() {
         audioDeviceSelector = AudioDeviceSelector(
                 logger,
-                audioManager,
-                PhoneAudioDeviceManager(context, logger, audioManager),
+                audioDeviceManager,
                 wiredHeadsetReceiver,
-                bluetoothController = null,
-                build = buildWrapper
+                bluetoothController = null
         )
 
         audioDeviceSelector.start(audioDeviceChangeListener)
@@ -219,11 +217,9 @@ class AudioDeviceSelectorTest {
     fun `stop should not stop the BluetoothController if it is null and if transitioning from the started state`() {
         audioDeviceSelector = AudioDeviceSelector(
                 logger,
-                audioManager,
-                PhoneAudioDeviceManager(context, logger, audioManager),
+                audioDeviceManager,
                 wiredHeadsetReceiver,
-                bluetoothController = null,
-                build = buildWrapper
+                bluetoothController = null
         )
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.stop()
@@ -236,11 +232,9 @@ class AudioDeviceSelectorTest {
     fun `stop should not stop the BluetoothController if it is null and if transitioning from the activated state`() {
         audioDeviceSelector = AudioDeviceSelector(
                 logger,
-                audioManager,
-                PhoneAudioDeviceManager(context, logger, audioManager),
+                audioDeviceManager,
                 wiredHeadsetReceiver,
-                bluetoothController = null,
-                build = buildWrapper
+                bluetoothController = null
         )
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.activate()
@@ -259,11 +253,23 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `activate should set audio focus using Android O method if api version is at least 26`() {
+    fun `activate should set audio focus using Android O method if api version is 26`() {
+        whenever(buildWrapper.getVersion()).thenReturn(Build.VERSION_CODES.O)
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.activate()
 
         assertThat(audioDeviceSelector.state, equalTo(ACTIVATED))
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `activate should set audio focus using Android O method if api version is 27`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `activate should set audio focus using pre Android O method if api version is 25`() {
+        TODO("Not yet implemented")
     }
 
     @Test

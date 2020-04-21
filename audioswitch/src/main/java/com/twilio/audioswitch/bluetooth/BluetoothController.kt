@@ -6,13 +6,14 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
+import com.twilio.audioswitch.AudioDeviceManager
 import com.twilio.audioswitch.android.LogWrapper
 
 private const val TAG = "BluetoothController"
 
 internal class BluetoothController internal constructor(
     private val context: Context,
-    private val audioManager: AudioManager,
+    private val audioDeviceManager: AudioDeviceManager,
     private val bluetoothAdapter: BluetoothAdapter,
     private val preConnectedDeviceListener: PreConnectedDeviceListener,
     private val bluetoothHeadsetReceiver: BluetoothHeadsetReceiver
@@ -22,11 +23,12 @@ internal class BluetoothController internal constructor(
 
         fun newInstance(
             context: Context,
-            logger: LogWrapper
+            logger: LogWrapper,
+            audioDeviceManager: AudioDeviceManager
         ): BluetoothController? =
             BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
                 BluetoothController(context,
-                        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
+                        audioDeviceManager,
                         bluetoothAdapter,
                         PreConnectedDeviceListener(logger, bluetoothAdapter),
                         BluetoothHeadsetReceiver(context, logger)
@@ -63,10 +65,10 @@ internal class BluetoothController internal constructor(
     }
 
     fun activate() {
-        audioManager.startBluetoothSco()
+        audioDeviceManager.enableBluetoothSco(true)
     }
 
     fun deactivate() {
-        audioManager.stopBluetoothSco()
+        audioDeviceManager.enableBluetoothSco(false)
     }
 }
