@@ -94,20 +94,12 @@ class WiredHeadsetReceiverTest {
     }
 
     @Test
-    fun `stop should unassign the device listener`() {
+    fun `stop should close resources successfully`() {
         wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
 
         wiredHeadsetReceiver.stop()
 
         assertThat(wiredHeadsetReceiver.deviceListener, `is`(nullValue()))
-    }
-
-    @Test
-    fun `stop should unregister the broadcast receiver`() {
-        wiredHeadsetReceiver.start(wiredDeviceConnectionListener)
-
-        wiredHeadsetReceiver.stop()
-
         verify(context).unregisterReceiver(wiredHeadsetReceiver)
     }
 }

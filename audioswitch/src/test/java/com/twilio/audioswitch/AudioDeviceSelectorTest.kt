@@ -17,7 +17,9 @@ import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothControllerAssertions
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
 import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
@@ -155,9 +157,13 @@ class AudioDeviceSelectorTest {
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.stop()
 
+        // Verify bluetooth behavior
         verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
         verify(context).unregisterReceiver(bluetoothHeadsetReceiver)
-        TODO("Finish test")
+
+        // Verify wired headset behavior
+        assertThat(wiredHeadsetReceiver.deviceListener, `is`(nullValue()))
+        verify(context).unregisterReceiver(wiredHeadsetReceiver)
     }
 
     @Test
