@@ -57,7 +57,7 @@ internal class AudioDeviceManager(
             audioManager.requestAudioFocus(audioFocusRequest.buildRequest())
         } else {
             audioManager.requestAudioFocus(
-                    { focusChange: Int -> },
+                    {},
                     AudioManager.STREAM_VOICE_CALL,
                     AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
         }

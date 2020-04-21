@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import com.nhaarman.mockitokotlin2.any
@@ -45,6 +46,7 @@ class AudioDeviceSelectorTest {
         whenever(mock.mode).thenReturn(AudioManager.MODE_NORMAL)
         whenever(mock.isMicrophoneMute).thenReturn(true)
         whenever(mock.isSpeakerphoneOn).thenReturn(true)
+        whenever(mock.getDevices(AudioManager.GET_DEVICES_OUTPUTS)).thenReturn(emptyArray())
     }
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
@@ -260,21 +262,36 @@ class AudioDeviceSelectorTest {
     @Test
     fun `activate should set audio focus using Android O method if api version is 26`() {
         whenever(buildWrapper.getVersion()).thenReturn(Build.VERSION_CODES.O)
+        val audioFocusRequest = mock<AudioFocusRequest>()
+        whenever(this.audioFocusRequest.buildRequest()).thenReturn(audioFocusRequest)
         audioDeviceSelector.start(audioDeviceChangeListener)
         audioDeviceSelector.activate()
 
-        assertThat(audioDeviceSelector.state, equalTo(ACTIVATED))
-        TODO("Not yet implemented")
+        verify(audioManager).requestAudioFocus(audioFocusRequest)
     }
 
     @Test
     fun `activate should set audio focus using Android O method if api version is 27`() {
-        TODO("Not yet implemented")
+        whenever(buildWrapper.getVersion()).thenReturn(Build.VERSION_CODES.O_MR1)
+        val audioFocusRequest = mock<AudioFocusRequest>()
+        whenever(this.audioFocusRequest.buildRequest()).thenReturn(audioFocusRequest)
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+
+        verify(audioManager).requestAudioFocus(audioFocusRequest)
     }
 
     @Test
     fun `activate should set audio focus using pre Android O method if api version is 25`() {
-        TODO("Not yet implemented")
+        whenever(buildWrapper.getVersion()).thenReturn(Build.VERSION_CODES.N_MR1)
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+
+        verify(audioManager).requestAudioFocus(
+                isA(),
+                eq(AudioManager.STREAM_VOICE_CALL),
+                eq(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+        )
     }
 
     @Test
