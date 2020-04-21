@@ -1,6 +1,7 @@
 package com.twilio.audioswitch
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioManager
@@ -140,7 +141,23 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `stop should transition to the stopped state if the current state is started`() {
-        TODO("Not yet implemented")
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.stop()
+
+        assertThat(audioDeviceSelector.state, equalTo(STOPPED))
+    }
+
+    @Test
+    fun `stop should stop the bluetooth and wired headset listeners`() {
+        val bluetoothProfile = mock<BluetoothProfile>()
+        preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
+
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.stop()
+
+        verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
+        verify(context).unregisterReceiver(bluetoothHeadsetReceiver)
+        TODO("Finish test")
     }
 
     @Test

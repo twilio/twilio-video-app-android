@@ -46,6 +46,4 @@ internal class BluetoothControllerAssertions {
         verify(context, times(0)).registerReceiver(
                 eq(bluetoothDeviceReceiver), isA())
     }
-
-//    fun assertBluetoothControllerStopSuccessfullyClosesResources
 }

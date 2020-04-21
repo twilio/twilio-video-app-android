@@ -39,19 +39,13 @@ class BluetoothControllerTest {
     }
 
     @Test
-    fun `stop should close profile proxy`() {
+    fun `stop should successfully close resources`() {
         val bluetoothProfile = mock<BluetoothProfile>()
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
 
         bluetoothController.stop()
 
         verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
-    }
-
-    @Test
-    fun `stop should unregister the BroadcastReceiver`() {
-        bluetoothController.stop()
-
         verify(context).unregisterReceiver(bluetoothHeadsetReceiver)
     }
 
