@@ -32,6 +32,7 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
+import org.junit.Ignore
 import org.junit.Test
 
 class AudioDeviceSelectorTest {
@@ -198,6 +199,7 @@ class AudioDeviceSelectorTest {
         assertThat(audioDeviceSelector.state, equalTo(STOPPED))
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `stop should stop the bluetooth and wired headset listeners if the current state is activated`() {
         TODO("Implement after deactivate tests are complete")
@@ -339,41 +341,49 @@ class AudioDeviceSelectorTest {
         verify(audioManager).stopBluetoothSco()
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `activate should do nothing if the current state is activated`() {
         TODO("Not yet implemented")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `activate should throw an IllegalStateException if the current state is stopped`() {
         TODO("Not yet implemented")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `deactivate should transition to the started state if the current state is activated`() {
         TODO("Not yet implemented")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `deactivate should do nothing if the current state is stopped`() {
         TODO("Assert cached audio state from activate() -> deactivate")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `deactivate should throw an IllegalStateException if the current state is started`() {
         TODO("Not yet implemented")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `selectDevice should throw an IllegalStateException if the current state is stopped`() {
         TODO("Not yet implemented")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `selectDevice should do nothing if the current state is activated`() {
         TODO("Not yet implemented")
     }
 
+    @Ignore("Finish as part of https://issues.corp.twilio.com/browse/AHOYAPPS-588")
     @Test
     fun `TODO test all permutations of possible audio devices and their priorities`() {
         TODO("Not yet implemented")
