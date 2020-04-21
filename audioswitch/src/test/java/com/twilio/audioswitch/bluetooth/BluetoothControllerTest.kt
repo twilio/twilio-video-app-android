@@ -23,13 +23,14 @@ class BluetoothControllerTest {
             bluetoothAdapter,
             preConnectedDeviceListener,
             bluetoothHeadsetReceiver)
+    private val bluetoothControllerAssertions = BluetoothControllerAssertions()
 
     @Test
     fun `start should register bluetooth listeners`() {
         val deviceListener = mock<BluetoothDeviceConnectionListener>()
         bluetoothController.start(deviceListener)
 
-        assertBluetoothControllerStart(
+        bluetoothControllerAssertions.assertStart(
                 context,
                 preConnectedDeviceListener,
                 bluetoothHeadsetReceiver,

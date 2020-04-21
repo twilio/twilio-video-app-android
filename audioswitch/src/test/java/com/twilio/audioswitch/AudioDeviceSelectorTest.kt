@@ -11,11 +11,11 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
+import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.bluetooth.BluetoothController
+import com.twilio.audioswitch.bluetooth.BluetoothControllerAssertions
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
 import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
-import com.twilio.audioswitch.bluetooth.assertBluetoothControllerNotStarted
-import com.twilio.audioswitch.bluetooth.assertBluetoothControllerStart
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
@@ -50,12 +50,13 @@ class AudioDeviceSelectorTest {
                     preConnectedDeviceListener,
                     bluetoothHeadsetReceiver)
     )
+    private val bluetoothControllerAssertions = BluetoothControllerAssertions()
 
     @Test
     fun `start should start the bluetooth and wired headset listeners`() {
         audioDeviceSelector.start(audioDeviceChangeListener)
 
-        assertBluetoothControllerStart(
+        bluetoothControllerAssertions.assertStart(
                 context,
                 preConnectedDeviceListener,
                 bluetoothHeadsetReceiver,
@@ -106,7 +107,7 @@ class AudioDeviceSelectorTest {
 
         audioDeviceSelector.start(audioDeviceChangeListener)
 
-        assertBluetoothControllerNotStarted(
+        bluetoothControllerAssertions.assertNotStarted(
                 context,
                 preConnectedDeviceListener,
                 bluetoothHeadsetReceiver,
