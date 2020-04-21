@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
+import com.twilio.audioswitch.android.LogWrapper
 
 private const val TAG = "PhoneAudioDeviceManager"
 

@@ -9,6 +9,7 @@ import android.os.Build
 import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
+import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
 import kotlin.collections.ArrayList

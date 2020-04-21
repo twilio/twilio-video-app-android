@@ -6,7 +6,7 @@ import android.content.Context
 import android.media.AudioManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import com.twilio.audioswitch.LogWrapper
+import com.twilio.audioswitch.android.LogWrapper
 import org.junit.Test
 
 class BluetoothControllerTest {

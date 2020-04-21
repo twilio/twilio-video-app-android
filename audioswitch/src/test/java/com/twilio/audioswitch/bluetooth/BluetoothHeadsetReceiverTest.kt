@@ -13,7 +13,7 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
-import com.twilio.audioswitch.LogWrapper
+import com.twilio.audioswitch.android.LogWrapper
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import org.hamcrest.CoreMatchers.`is`

@@ -13,8 +13,10 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
+import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothControllerAssertions
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
@@ -37,7 +39,11 @@ class AudioDeviceSelectorTest {
         whenever(mock.packageManager).thenReturn(packageManager)
     }
     private val logger = mock<LogWrapper>()
-    private val audioManager = mock<AudioManager>()
+    private val audioManager = mock<AudioManager> {
+        whenever(mock.mode).thenReturn(AudioManager.MODE_NORMAL)
+        whenever(mock.isMicrophoneMute).thenReturn(true)
+        whenever(mock.isSpeakerphoneOn).thenReturn(true)
+    }
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
     private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
@@ -206,7 +212,7 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `start should not stop the BluetoothController if it is null if transitioning from the started state`() {
+    fun `stop should not stop the BluetoothController if it is null and if transitioning from the started state`() {
         audioDeviceSelector = AudioDeviceSelector(
                 logger,
                 audioManager,
@@ -222,7 +228,7 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `start should not stop the BluetoothController if it is null if transitioning from the activated state`() {
+    fun `stop should not stop the BluetoothController if it is null and if transitioning from the activated state`() {
         audioDeviceSelector = AudioDeviceSelector(
                 logger,
                 audioManager,
@@ -240,7 +246,18 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `activate should transition to the activated state if the current state is started`() {
-        TODO("Not yet implemented")
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+
+        assertThat(audioDeviceSelector.state, equalTo(ACTIVATED))
+    }
+
+    @Test
+    fun `activate should set audio focus using Android O method if api version is at least 26`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+
+        assertThat(audioDeviceSelector.state, equalTo(ACTIVATED))
     }
 
     @Test
@@ -261,6 +278,7 @@ class AudioDeviceSelectorTest {
     @Test
     fun `deactivate should do nothing if the current state is stopped`() {
         TODO("Not yet implemented")
+        TODO("Assert cached audio state from activate() -> deactivate")
     }
 
     @Test

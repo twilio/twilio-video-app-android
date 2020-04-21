@@ -14,7 +14,7 @@ import android.media.AudioManager.EXTRA_SCO_AUDIO_STATE
 import android.media.AudioManager.SCO_AUDIO_STATE_CONNECTED
 import android.media.AudioManager.SCO_AUDIO_STATE_DISCONNECTED
 import android.media.AudioManager.SCO_AUDIO_STATE_ERROR
-import com.twilio.audioswitch.LogWrapper
+import com.twilio.audioswitch.android.LogWrapper
 
 private const val TAG = "BluetoothDeviceReceiver"
 
