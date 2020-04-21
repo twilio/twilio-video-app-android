@@ -150,7 +150,7 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
-    fun `stop should stop the bluetooth and wired headset listeners`() {
+    fun `stop should stop the bluetooth and wired headset listeners if the current state is started`() {
         val bluetoothProfile = mock<BluetoothProfile>()
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
 
@@ -168,7 +168,32 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `stop should transition to the stopped state if the current state is activated`() {
-        TODO("Not yet implemented")
+        val bluetoothProfile = mock<BluetoothProfile>()
+        preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
+
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+        audioDeviceSelector.stop()
+
+        assertThat(audioDeviceSelector.state, equalTo(STOPPED))
+    }
+
+    @Test
+    fun `stop should stop the bluetooth and wired headset listeners if the current state is activated`() {
+        val bluetoothProfile = mock<BluetoothProfile>()
+        preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
+
+        audioDeviceSelector.start(audioDeviceChangeListener)
+        audioDeviceSelector.activate()
+        audioDeviceSelector.stop()
+
+        // Verify bluetooth behavior
+        verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
+        verify(context).unregisterReceiver(bluetoothHeadsetReceiver)
+
+        // Verify wired headset behavior
+        assertThat(wiredHeadsetReceiver.deviceListener, `is`(nullValue()))
+        verify(context).unregisterReceiver(wiredHeadsetReceiver)
     }
 
     @Test
@@ -178,6 +203,11 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `stop should unassign the audio device change listener`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `TODO stop bluetooth controller NPE tests`() {
         TODO("Not yet implemented")
     }
 
