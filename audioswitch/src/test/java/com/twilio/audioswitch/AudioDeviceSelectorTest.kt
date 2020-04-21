@@ -18,6 +18,7 @@ import com.twilio.audioswitch.bluetooth.assertBluetoothControllerNotStarted
 import com.twilio.audioswitch.bluetooth.assertBluetoothControllerStart
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.fail
 import org.junit.Test
 
 class AudioDeviceSelectorTest {
@@ -113,6 +114,17 @@ class AudioDeviceSelectorTest {
     }
 
     @Test
+    fun `start should do nothing if the current state is started`() {
+        audioDeviceSelector.start(audioDeviceChangeListener)
+
+        try {
+            audioDeviceSelector.start(audioDeviceChangeListener)
+        } catch (e: Exception) {
+            fail("Exception should not have been thrown")
+        }
+    }
+
+    @Test
     fun `stop should do nothing if the current state is stopped`() {
         TODO("Not yet implemented")
     }
@@ -129,11 +141,6 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `selectDevice should throw an IllegalStateException if the current state is stopped`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
-    fun `start should do nothing if the current state is started`() {
         TODO("Not yet implemented")
     }
 
