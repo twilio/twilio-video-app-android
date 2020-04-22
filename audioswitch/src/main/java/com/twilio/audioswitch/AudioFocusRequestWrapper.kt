@@ -5,7 +5,7 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 
-class AudioFocusRequestWrapper {
+internal class AudioFocusRequestWrapper {
 
     @SuppressLint("NewApi")
     fun buildRequest(): AudioFocusRequest {
