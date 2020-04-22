@@ -1,7 +1,7 @@
 package com.twilio.video.app
 
 import android.app.Application
-import com.twilio.audioswitch.AudioDeviceSelector
+import com.twilio.audioswitch.selection.AudioDeviceSelector
 import dagger.Module
 import dagger.Provides
 
