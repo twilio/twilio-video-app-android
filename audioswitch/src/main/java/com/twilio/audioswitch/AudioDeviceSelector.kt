@@ -20,7 +20,9 @@ private const val TAG = "AudioDeviceSelector"
 
 /**
  * This class enables developers to enumerate available audio devices and select which device audio
- * should be routed to.
+ * should be routed to. It is strongly recommended that instances of this class are created and
+ * accessed from a single application thread. Accessing an instance from multiple threads may cause
+ * synchronization problems.
  */
 class AudioDeviceSelector internal constructor(
     private val logger: LogWrapper,
