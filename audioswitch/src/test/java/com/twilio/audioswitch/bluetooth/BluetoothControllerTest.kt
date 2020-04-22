@@ -12,7 +12,7 @@ import com.twilio.audioswitch.android.BuildWrapper
 import com.twilio.audioswitch.android.LogWrapper
 import org.junit.Test
 
-class BluetoothCaontrollerTest {
+class BluetoothControllerTest {
 
     private val context = mock<Context>()
     private val audioManager = mock<AudioManager>()
