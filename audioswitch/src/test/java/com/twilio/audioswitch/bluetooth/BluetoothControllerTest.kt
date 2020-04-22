@@ -4,12 +4,12 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.media.AudioManager
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import com.twilio.audioswitch.LogWrapper
+import com.twilio.audioswitch.AudioDeviceManager
+import com.twilio.audioswitch.AudioFocusRequestWrapper
+import com.twilio.audioswitch.android.BuildWrapper
+import com.twilio.audioswitch.android.LogWrapper
 import org.junit.Test
 
 class BluetoothControllerTest {
@@ -18,43 +18,45 @@ class BluetoothControllerTest {
     private val audioManager = mock<AudioManager>()
     private val logger = mock<LogWrapper>()
     private val bluetoothAdapter = mock<BluetoothAdapter>()
-    private val deviceListener = mock<BluetoothDeviceConnectionListener>()
-    private val preConnectedDeviceListener = PreConnectedDeviceListener(deviceListener, logger, bluetoothAdapter)
-    private val bluetoothDeviceReceiver = BluetoothDeviceReceiver(deviceListener, logger)
+    private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
+    private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
+    private val buildWrapper = mock<BuildWrapper>()
+    private val audioFocusRequest = mock<AudioFocusRequestWrapper>()
+    private val audioDeviceManager = AudioDeviceManager(context,
+            logger,
+            audioManager,
+            buildWrapper,
+            audioFocusRequest)
     private var bluetoothController = BluetoothController(
             context,
-            audioManager,
+            audioDeviceManager,
             bluetoothAdapter,
             preConnectedDeviceListener,
-            bluetoothDeviceReceiver)
+            bluetoothHeadsetReceiver)
+    private val bluetoothControllerAssertions = BluetoothControllerAssertions()
 
     @Test
     fun `start should register bluetooth listeners`() {
-        bluetoothController.start()
+        val deviceListener = mock<BluetoothDeviceConnectionListener>()
+        bluetoothController.start(deviceListener)
 
-        verify(bluetoothAdapter).getProfileProxy(
+        bluetoothControllerAssertions.assertStart(
                 context,
                 preConnectedDeviceListener,
-                BluetoothProfile.HEADSET)
-        verify(context, times(3)).registerReceiver(
-                eq(bluetoothDeviceReceiver), isA())
+                bluetoothHeadsetReceiver,
+                deviceListener,
+                bluetoothAdapter)
     }
 
     @Test
-    fun `stop should close profile proxy`() {
+    fun `stop should successfully close resources`() {
         val bluetoothProfile = mock<BluetoothProfile>()
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
 
         bluetoothController.stop()
 
         verify(bluetoothAdapter).closeProfileProxy(BluetoothProfile.HEADSET, bluetoothProfile)
-    }
-
-    @Test
-    fun `stop should unregister the BroadcastReceiver`() {
-        bluetoothController.stop()
-
-        verify(context).unregisterReceiver(bluetoothDeviceReceiver)
+        verify(context).unregisterReceiver(bluetoothHeadsetReceiver)
     }
 
     @Test

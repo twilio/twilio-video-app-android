@@ -10,5 +10,5 @@ class AudioSwitchModule {
 
     @Provides
     fun providesAudioDeviceSelector(application: Application): AudioDeviceSelector =
-            AudioDeviceSelector(application.applicationContext)
+            AudioDeviceSelector(application)
 }

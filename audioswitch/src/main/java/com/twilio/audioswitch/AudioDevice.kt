@@ -1,7 +1,8 @@
 package com.twilio.audioswitch
 
 /**
- * This class represents a single audio device that has been retrieved by the [ ]. It contains information about the audio device.
+ * This class represents a single audio device that has been retrieved by the [AudioDeviceSelector].
+ * It contains information about the audio device.
  */
 data class AudioDevice internal constructor(
     /** The type of audio device defined in [Type].  */

@@ -153,6 +153,20 @@ jobs:
           command: ./gradlew app:testCommunityDebugUnitTest
       - save-cache: *save-cache-gradle
 
+  switch-unit-tests:
+    <<: *build-defaults
+    resource_class: large
+    steps:
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - restore-cache: *restore-cache-gradle
+      - run: *get-secrets
+      - run:
+          name: AudioSwitch Library Unit Tests
+          command: ./gradlew audioSwitch:testDebugUnitTest
+      - save-cache: *save-cache-gradle
+
   ui-tests:
     <<: *ui-test-defaults
     steps:
@@ -224,6 +238,12 @@ workflows:
             - lint
             - check-format
       - community-unit-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - switch-unit-tests: # TODO Move to AudioSwitch pipeline as part of https://issues.corp.twilio.com/browse/AHOYAPPS-505
           <<: *build-test-filter
           requires:
             - build-app

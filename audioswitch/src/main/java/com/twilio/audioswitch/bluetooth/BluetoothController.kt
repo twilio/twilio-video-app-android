@@ -6,16 +6,17 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import com.twilio.audioswitch.LogWrapper
+import com.twilio.audioswitch.AudioDeviceManager
+import com.twilio.audioswitch.android.LogWrapper
 
 private const val TAG = "BluetoothController"
 
-internal class BluetoothController(
+internal class BluetoothController internal constructor(
     private val context: Context,
-    private val audioManager: AudioManager,
+    private val audioDeviceManager: AudioDeviceManager,
     private val bluetoothAdapter: BluetoothAdapter,
     private val preConnectedDeviceListener: PreConnectedDeviceListener,
-    private val bluetoothDeviceReceiver: BluetoothDeviceReceiver
+    private val bluetoothHeadsetReceiver: BluetoothHeadsetReceiver
 ) {
 
     companion object {
@@ -23,14 +24,14 @@ internal class BluetoothController(
         fun newInstance(
             context: Context,
             logger: LogWrapper,
-            deviceListener: BluetoothDeviceConnectionListener
+            audioDeviceManager: AudioDeviceManager
         ): BluetoothController? =
             BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
                 BluetoothController(context,
-                        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
+                        audioDeviceManager,
                         bluetoothAdapter,
-                        PreConnectedDeviceListener(deviceListener, logger, bluetoothAdapter),
-                        BluetoothDeviceReceiver(deviceListener, logger)
+                        PreConnectedDeviceListener(logger, bluetoothAdapter),
+                        BluetoothHeadsetReceiver(context, logger)
                 )
             } ?: run {
                 logger.d(TAG, "Bluetooth is not supported on this device")
@@ -38,7 +39,10 @@ internal class BluetoothController(
             }
     }
 
-    fun start() {
+    fun start(deviceListener: BluetoothDeviceConnectionListener) {
+        preConnectedDeviceListener.deviceListener = deviceListener
+        bluetoothHeadsetReceiver.deviceListener = deviceListener
+
         bluetoothAdapter.getProfileProxy(
                 context,
                 preConnectedDeviceListener,
@@ -46,25 +50,25 @@ internal class BluetoothController(
 
         context.run {
             registerReceiver(
-                bluetoothDeviceReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED))
+                bluetoothHeadsetReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED))
             registerReceiver(
-                bluetoothDeviceReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED))
+                bluetoothHeadsetReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED))
             registerReceiver(
-                bluetoothDeviceReceiver,
+                bluetoothHeadsetReceiver,
                 IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED))
         }
     }
 
     fun stop() {
         preConnectedDeviceListener.stop()
-        context.unregisterReceiver(bluetoothDeviceReceiver)
+        bluetoothHeadsetReceiver.stop()
     }
 
     fun activate() {
-        audioManager.startBluetoothSco()
+        audioDeviceManager.enableBluetoothSco(true)
     }
 
     fun deactivate() {
-        audioManager.stopBluetoothSco()
+        audioDeviceManager.enableBluetoothSco(false)
     }
 }
