@@ -1,19 +1,21 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.selection
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.media.AudioManager
-import com.twilio.audioswitch.AudioDevice.Type.BLUETOOTH
-import com.twilio.audioswitch.AudioDevice.Type.EARPIECE
-import com.twilio.audioswitch.AudioDevice.Type.SPEAKERPHONE
-import com.twilio.audioswitch.AudioDevice.Type.WIRED_HEADSET
-import com.twilio.audioswitch.AudioDeviceSelector.State.ACTIVATED
-import com.twilio.audioswitch.AudioDeviceSelector.State.STARTED
-import com.twilio.audioswitch.AudioDeviceSelector.State.STOPPED
+import com.twilio.audioswitch.selection.AudioDevice.Type.BLUETOOTH
+import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
+import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
+import com.twilio.audioswitch.selection.AudioDevice.Type.WIRED_HEADSET
+import com.twilio.audioswitch.selection.AudioDeviceSelector.State.ACTIVATED
+import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STARTED
+import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STOPPED
 import com.twilio.audioswitch.android.BuildWrapper
 import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
+import com.twilio.audioswitch.wired.WiredDeviceConnectionListener
+import com.twilio.audioswitch.wired.WiredHeadsetReceiver
 import kotlin.collections.ArrayList
 
 private const val TAG = "AudioDeviceSelector"

@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.selection
 
 /** A listener that receives the most recently available [AudioDevice]s.
  * Receives a list of the most recently available [AudioDevice]s. Also provides the

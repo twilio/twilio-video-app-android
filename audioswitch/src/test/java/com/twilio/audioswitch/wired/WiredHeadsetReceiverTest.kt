@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.wired
 
 import android.content.Context
 import android.content.Intent
