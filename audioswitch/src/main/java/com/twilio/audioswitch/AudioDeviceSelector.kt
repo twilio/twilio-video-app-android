@@ -80,6 +80,12 @@ class AudioDeviceSelector internal constructor(
     }
 
     companion object {
+
+        /**
+         * Constructs a new AudioDeviceSelector instance.
+         *
+         * @param context the application context
+         */
         fun newInstance(context: Context): AudioDeviceSelector {
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             val logger = LogWrapper()
@@ -121,8 +127,9 @@ class AudioDeviceSelector internal constructor(
     }
 
     /**
-     * Stops listening for audio device changes if [ ][AudioDeviceSelector.start] has already been invoked. [ ][AudioDeviceSelector.deactivate] will also get called if a device has been activated with
-     * [AudioDeviceSelector.activate].
+     * Stops listening for audio device changes if [AudioDeviceSelector.start] has already been
+     * invoked. [AudioDeviceSelector.deactivate] will also get called if a device has been activated
+     * with [AudioDeviceSelector.activate].
      */
     fun stop() {
         when (state) {
@@ -140,9 +147,10 @@ class AudioDeviceSelector internal constructor(
     }
 
     /**
-     * Performs audio routing and unmuting on the selected device from [ ][AudioDeviceSelector.selectDevice]. Audio focus is also acquired for the client
-     * application. **Note:** [AudioDeviceSelector.deactivate] should be invoked to
-     * restore the prior audio state.
+     * Performs audio routing and unmuting on the selected device from
+     * [AudioDeviceSelector.selectDevice]. Audio focus is also acquired for the client application.
+     * **Note:** [AudioDeviceSelector.deactivate] should be invoked to restore the prior audio
+     * state.
      */
     fun activate() {
         when (state) {
@@ -197,8 +205,8 @@ class AudioDeviceSelector internal constructor(
 
     /**
      * Selects the desired [AudioDevice]. If the provided [AudioDevice] is not
-     * available, no changes are made. If the provided [AudioDevice] is null, an [ ] is chosen based on the following preference: Bluetooth, Wired Headset,
-     * Microphone, Speakerphone.
+     * available, no changes are made. If the provided [AudioDevice] is null, an [AudioDevice] is
+     * chosen based on the following preference: Bluetooth, Wired Headset, Microphone, Speakerphone.
      *
      * @param audioDevice The [AudioDevice] to use
      */
@@ -208,7 +216,7 @@ class AudioDeviceSelector internal constructor(
     }
 
     /**
-     * Retrieves the selected [AudioDevice] from [ ][AudioDeviceSelector.selectDevice]
+     * Retrieves the selected [AudioDevice] from [AudioDeviceSelector.selectDevice].
      *
      * @return the selected [AudioDevice]
      */
