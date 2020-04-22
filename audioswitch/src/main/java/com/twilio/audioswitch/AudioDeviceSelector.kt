@@ -210,7 +210,7 @@ class AudioDeviceSelector internal constructor(
      *
      * @return the selected [AudioDevice]
      */
-    val selectedAudioDevice: AudioDevice? = selectedDevice
+    val selectedAudioDevice: AudioDevice? get() = selectedDevice
 
     /**
      * Retrieves the current list of available [AudioDevice]s.
