@@ -24,13 +24,44 @@ private const val TAG = "AudioDeviceSelector"
  * accessed from a single application thread. Accessing an instance from multiple threads may cause
  * synchronization problems.
  */
-class AudioDeviceSelector internal constructor(
-    private val logger: LogWrapper,
-    private val audioDeviceManager: AudioDeviceManager,
-    private val wiredHeadsetReceiver: WiredHeadsetReceiver,
-    private val bluetoothController: BluetoothController?
-) {
+class AudioDeviceSelector {
 
+    /**
+     * Constructs a new AudioDeviceSelector instance.
+     *
+     * @param context the application context
+     */
+    constructor(context: Context) {
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val logger = LogWrapper()
+        val audioDeviceManager =
+                AudioDeviceManager(context,
+                        logger,
+                        audioManager,
+                        BuildWrapper(),
+                        AudioFocusRequestWrapper())
+        this.logger = logger
+        this.audioDeviceManager = audioDeviceManager
+        this.wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
+        this.bluetoothController = BluetoothController.newInstance(context, logger, audioDeviceManager)
+    }
+
+    internal constructor(
+        logger: LogWrapper,
+        audioDeviceManager: AudioDeviceManager,
+        wiredHeadsetReceiver: WiredHeadsetReceiver,
+        bluetoothController: BluetoothController?
+    ) {
+        this.logger = logger
+        this.audioDeviceManager = audioDeviceManager
+        this.wiredHeadsetReceiver = wiredHeadsetReceiver
+        this.bluetoothController = bluetoothController
+    }
+
+    private var logger: LogWrapper = LogWrapper()
+    private val audioDeviceManager: AudioDeviceManager
+    private val wiredHeadsetReceiver: WiredHeadsetReceiver
+    private val bluetoothController: BluetoothController?
     internal var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
@@ -76,31 +107,6 @@ class AudioDeviceSelector internal constructor(
         override fun onDeviceDisconnected() {
             wiredHeadsetAvailable = false
             enumerateDevices()
-        }
-    }
-
-    companion object {
-
-        /**
-         * Constructs a new AudioDeviceSelector instance.
-         *
-         * @param context the application context
-         */
-        fun newInstance(context: Context): AudioDeviceSelector {
-            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            val logger = LogWrapper()
-            val audioDeviceManager =
-                    AudioDeviceManager(context,
-                            logger,
-                            audioManager,
-                            BuildWrapper(),
-                            AudioFocusRequestWrapper())
-            return AudioDeviceSelector(
-                    logger,
-                    audioDeviceManager,
-                    WiredHeadsetReceiver(context, logger),
-                    BluetoothController.newInstance(context, logger, audioDeviceManager)
-            )
         }
     }
 
