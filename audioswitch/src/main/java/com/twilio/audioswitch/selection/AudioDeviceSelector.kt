@@ -218,7 +218,7 @@ class AudioDeviceSelector {
      *
      * @param audioDevice The [AudioDevice] to use
      */
-    fun selectDevice(audioDevice: AudioDevice?) {
+    fun selectDevice(audioDevice: AudioDevice) {
         userSelectedDevice = audioDevice
         enumerateDevices()
     }
