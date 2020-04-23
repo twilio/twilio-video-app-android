@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.wired
 
 internal interface WiredDeviceConnectionListener {
     fun onDeviceConnected()

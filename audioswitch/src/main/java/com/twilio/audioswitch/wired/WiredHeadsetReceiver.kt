@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.wired
 
 import android.content.BroadcastReceiver
 import android.content.Context

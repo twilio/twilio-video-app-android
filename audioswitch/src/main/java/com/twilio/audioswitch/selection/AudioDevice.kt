@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.selection
 
 /**
  * This class represents a single audio device that has been retrieved by the [AudioDeviceSelector].

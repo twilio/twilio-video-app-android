@@ -6,8 +6,8 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import com.twilio.audioswitch.AudioDeviceManager
 import com.twilio.audioswitch.android.LogWrapper
+import com.twilio.audioswitch.selection.AudioDeviceManager
 
 private const val TAG = "BluetoothController"
 

@@ -1,4 +1,4 @@
-package com.twilio.audioswitch
+package com.twilio.audioswitch.selection
 
 import android.annotation.SuppressLint
 import android.content.Context
