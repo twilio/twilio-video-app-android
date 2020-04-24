@@ -182,6 +182,21 @@ jobs:
             gcloud firebase test android run --no-record-video --project video-app-79418
             ui-test-args.yaml:ui-tests
 
+  switch-ui-tests:
+    <<: *ui-test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+      # Execute tests
+      - run:
+          name: UI Tests
+          command: >
+            gcloud firebase test android run --no-record-video --project video-app-79418
+            ui-test-args.yaml:switch-ui-tests
+
   build-release-app:
     <<: *build-defaults
     resource_class: large
@@ -250,6 +265,12 @@ workflows:
             - lint
             - check-format
       - ui-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - switch-ui-tests:
           <<: *build-test-filter
           requires:
             - build-app
