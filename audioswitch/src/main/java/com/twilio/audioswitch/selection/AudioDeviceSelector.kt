@@ -130,9 +130,9 @@ class AudioDeviceSelector {
      * longer needed, [AudioDeviceSelector.stop] should be called in order to prevent a
      * memory leak.
      *
-     * @param listener optional, receives audio device change events
+     * @param listener receives audio device change events
      */
-    fun start(listener: AudioDeviceChangeListener? = null) {
+    fun start(listener: AudioDeviceChangeListener) {
         audioDeviceChangeListener = listener
         when (state) {
             STOPPED -> {

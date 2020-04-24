@@ -22,7 +22,7 @@ class AutomaticDeviceSelectionTest {
     fun `it_should_select_the_bluetooth_audio_device_by_default`() {
         val (audioDeviceSelector, bluetoothHeadsetReceiver) = setupFakeAudioDeviceSelector(context)
 
-        audioDeviceSelector.start()
+        audioDeviceSelector.start { _, _ -> }
         simulateBluetoothConnection(context, bluetoothHeadsetReceiver)
 
         val earpiece = AudioDevice(AudioDevice.Type.BLUETOOTH, "Fake Bluetooth")
@@ -33,7 +33,7 @@ class AutomaticDeviceSelectionTest {
     @Test
     fun `it_should_select_the_earpiece_audio_device_by_default`() {
         val audioDeviceSelector = AudioDeviceSelector(context)
-        audioDeviceSelector.start()
+        audioDeviceSelector.start { _, _ -> }
 
         val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
         assertThat(audioDeviceSelector.selectedAudioDevice, equalTo(earpiece))
