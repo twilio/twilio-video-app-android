@@ -1,5 +1,6 @@
 package com.twilio.audioswitch.selection
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.media.AudioManager
 import com.twilio.audioswitch.android.BluetoothDeviceWrapper
@@ -8,6 +9,8 @@ import com.twilio.audioswitch.android.BuildWrapper
 import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
+import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
+import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
 import com.twilio.audioswitch.selection.AudioDevice.Type.BLUETOOTH
 import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
 import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
@@ -45,11 +48,17 @@ class AudioDeviceSelector {
         this.logger = logger
         this.audioDeviceManager = audioDeviceManager
         this.wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
-        this.bluetoothController = BluetoothController.newInstance(
-                context,
-                logger,
-                audioDeviceManager,
-                BluetoothIntentProcessorImpl())
+        this.bluetoothController = BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
+            BluetoothController(context,
+                    audioDeviceManager,
+                    bluetoothAdapter,
+                    PreConnectedDeviceListener(logger, bluetoothAdapter),
+                    BluetoothHeadsetReceiver(context, logger, BluetoothIntentProcessorImpl())
+            )
+        } ?: run {
+            logger.d(TAG, "Bluetooth is not supported on this device")
+            null
+        }
     }
 
     internal constructor(

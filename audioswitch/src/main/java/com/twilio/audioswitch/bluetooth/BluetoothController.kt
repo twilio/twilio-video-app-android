@@ -6,8 +6,6 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import com.twilio.audioswitch.android.BluetoothIntentProcessor
-import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.selection.AudioDeviceManager
 
 private const val TAG = "BluetoothController"
@@ -19,28 +17,6 @@ internal class BluetoothController internal constructor(
     private val preConnectedDeviceListener: PreConnectedDeviceListener,
     private val bluetoothHeadsetReceiver: BluetoothHeadsetReceiver
 ) {
-
-    companion object {
-
-        fun newInstance(
-            context: Context,
-            logger: LogWrapper,
-            audioDeviceManager: AudioDeviceManager,
-            bluetoothIntentProcessor: BluetoothIntentProcessor,
-            bluetoothHeadsetReceiver: BluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger, bluetoothIntentProcessor)
-        ): BluetoothController? =
-            BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
-                BluetoothController(context,
-                        audioDeviceManager,
-                        bluetoothAdapter,
-                        PreConnectedDeviceListener(logger, bluetoothAdapter),
-                        bluetoothHeadsetReceiver
-                )
-            } ?: run {
-                logger.d(TAG, "Bluetooth is not supported on this device")
-                null
-            }
-    }
 
     fun start(deviceListener: BluetoothDeviceConnectionListener) {
         preConnectedDeviceListener.deviceListener = deviceListener
