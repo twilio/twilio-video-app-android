@@ -23,7 +23,7 @@ class UserDeviceSelectionTest {
 
     @Test
     fun `it_should_select_the_earpiece_audio_device_when_the_user_selects_it`() {
-        audioDeviceSelector.start { _, _ -> }
+        audioDeviceSelector.start()
         val earpiece = audioDeviceSelector.availableAudioDevices
                 .find { it.type == EARPIECE }
         assertThat(earpiece, `is`(notNullValue()))
@@ -35,7 +35,7 @@ class UserDeviceSelectionTest {
 
     @Test
     fun `it_should_select_the_speakerphone_audio_device_when_the_user_selects_it`() {
-        audioDeviceSelector.start { _, _ -> }
+        audioDeviceSelector.start()
         val speakerphone = audioDeviceSelector.availableAudioDevices
                 .find { it.type == SPEAKERPHONE }
         assertThat(speakerphone, `is`(notNullValue()))
@@ -48,7 +48,7 @@ class UserDeviceSelectionTest {
     @Test
     fun `it_should_select_the_bluetooth_audio_device_when_the_user_selects_it`() {
         val (audioDeviceSelector, bluetoothHeadsetReceiver) = setupFakeAudioDeviceSelector(context)
-        audioDeviceSelector.start { _, _ -> }
+        audioDeviceSelector.start()
         simulateBluetoothConnection(context, bluetoothHeadsetReceiver)
         val bluetoothDevice = audioDeviceSelector.availableAudioDevices
                 .find { it.type == BLUETOOTH }
