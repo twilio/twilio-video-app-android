@@ -29,17 +29,17 @@ internal class BluetoothController internal constructor(
             bluetoothIntentProcessor: BluetoothIntentProcessor,
             bluetoothHeadsetReceiver: BluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger, bluetoothIntentProcessor)
         ): BluetoothController? =
-                BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
-                    BluetoothController(context,
-                            audioDeviceManager,
-                            bluetoothAdapter,
-                            PreConnectedDeviceListener(logger, bluetoothAdapter),
-                            bluetoothHeadsetReceiver
-                    )
-                } ?: run {
-                    logger.d(TAG, "Bluetooth is not supported on this device")
-                    null
-                }
+            BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
+                BluetoothController(context,
+                        audioDeviceManager,
+                        bluetoothAdapter,
+                        PreConnectedDeviceListener(logger, bluetoothAdapter),
+                        bluetoothHeadsetReceiver
+                )
+            } ?: run {
+                logger.d(TAG, "Bluetooth is not supported on this device")
+                null
+            }
     }
 
     fun start(deviceListener: BluetoothDeviceConnectionListener) {
