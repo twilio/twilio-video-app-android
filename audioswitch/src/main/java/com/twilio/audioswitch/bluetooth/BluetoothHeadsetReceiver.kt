@@ -64,8 +64,7 @@ internal class BluetoothHeadsetReceiver(
                         }
                     }
                 }
-                else -> {
-                }
+                else -> {}
             }
         }
     }
