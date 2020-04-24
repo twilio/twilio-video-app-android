@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
-import com.twilio.audioswitch.android.BluetoothIntentProcessorImpl
 import com.twilio.audioswitch.android.BuildWrapper
 import com.twilio.audioswitch.android.FakeBluetoothIntentProcessor
 import com.twilio.audioswitch.android.LogWrapper
@@ -36,8 +35,7 @@ internal fun setupFakeAudioDeviceSelector(context: Context):
                 audioDeviceManager,
                 bluetoothAdapter,
                 PreConnectedDeviceListener(logger, bluetoothAdapter),
-                BluetoothHeadsetReceiver(context, logger, BluetoothIntentProcessorImpl())
-        )
+                bluetoothHeadsetReceiver)
     } ?: run {
         null
     }

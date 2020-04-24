@@ -1,5 +1,6 @@
 package com.twilio.audioswitch
 
+import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -15,8 +16,8 @@ import org.junit.runner.RunWith
 class AutomaticDeviceSelectionTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private var audioDeviceSelector = AudioDeviceSelector(context)
 
+    @UiThreadTest
     @Test
     fun `it_should_select_the_bluetooth_audio_device_by_default`() {
         val (audioDeviceSelector, bluetoothHeadsetReceiver) = setupFakeAudioDeviceSelector(context)
@@ -28,9 +29,10 @@ class AutomaticDeviceSelectionTest {
         assertThat(audioDeviceSelector.selectedAudioDevice, equalTo(earpiece))
     }
 
+    @UiThreadTest
     @Test
     fun `it_should_select_the_earpiece_audio_device_by_default`() {
-
+        val audioDeviceSelector = AudioDeviceSelector(context)
         audioDeviceSelector.start()
 
         val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
