@@ -1,7 +1,6 @@
 package com.twilio.audioswitch.selection
 
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
@@ -16,6 +15,7 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.audioswitch.android.BluetoothDeviceWrapper
 import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
 import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.ACTIVATED
@@ -56,7 +56,7 @@ class AudioDeviceSelectorTest {
     private val bluetoothAdapter = mock<BluetoothAdapter>()
     private val audioDeviceChangeListener = mock<AudioDeviceChangeListener>()
     private val preConnectedDeviceListener = PreConnectedDeviceListener(logger, bluetoothAdapter)
-    private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger)
+    private val bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger, mock())
     private val wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
     private val buildWrapper = mock<BuildWrapper>()
     private val audioFocusRequest = mock<AudioFocusRequestWrapper>()
@@ -321,7 +321,7 @@ class AudioDeviceSelectorTest {
 
     @Test
     fun `activate should enable audio routing to the bluetooth device`() {
-        val bluetoothDevice = mock<BluetoothDevice> {
+        val bluetoothDevice = mock<BluetoothDeviceWrapper> {
             whenever(mock.name).thenReturn("Bluetooth")
         }
         audioDeviceSelector.start(audioDeviceChangeListener)

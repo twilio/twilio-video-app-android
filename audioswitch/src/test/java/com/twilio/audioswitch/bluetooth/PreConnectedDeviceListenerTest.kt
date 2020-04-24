@@ -3,7 +3,9 @@ package com.twilio.audioswitch.bluetooth
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
+import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
@@ -25,7 +27,9 @@ class PreConnectedDeviceListenerTest {
 
     @Test
     fun `onServiceConnected should notify the deviceListener`() {
-        val expectedDevice = mock<BluetoothDevice>()
+        val expectedDevice = mock<BluetoothDevice> {
+            whenever(mock.name).thenReturn("Test")
+        }
         val bluetoothDevices = listOf(expectedDevice)
         val bluetoothProfile = mock<BluetoothProfile> {
             whenever(mock.connectedDevices).thenReturn(bluetoothDevices)
@@ -33,22 +37,22 @@ class PreConnectedDeviceListenerTest {
 
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
 
-        deviceListener.onBluetoothConnected(expectedDevice)
+        deviceListener.onBluetoothConnected(isA())
     }
 
     @Test
     fun `onServiceConnected should notify the deviceListener with multiple devices`() {
-        val expectedDevice1 = mock<BluetoothDevice>()
-        val expectedDevice2 = mock<BluetoothDevice>()
-        val bluetoothDevices = listOf(expectedDevice1, expectedDevice2)
+        val expectedDevice = mock<BluetoothDevice> {
+            whenever(mock.name).thenReturn("Test")
+        }
+        val bluetoothDevices = listOf(expectedDevice, expectedDevice)
         val bluetoothProfile = mock<BluetoothProfile> {
             whenever(mock.connectedDevices).thenReturn(bluetoothDevices)
         }
 
         preConnectedDeviceListener.onServiceConnected(0, bluetoothProfile)
 
-        verify(deviceListener).onBluetoothConnected(expectedDevice1)
-        verify(deviceListener).onBluetoothConnected(expectedDevice2)
+        verify(deviceListener, times(2)).onBluetoothConnected(isA())
     }
 
     @Test

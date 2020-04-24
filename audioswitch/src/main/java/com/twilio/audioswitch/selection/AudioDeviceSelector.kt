@@ -1,8 +1,13 @@
 package com.twilio.audioswitch.selection
 
-import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.media.AudioManager
+import com.twilio.audioswitch.android.BluetoothDeviceWrapper
+import com.twilio.audioswitch.android.BluetoothIntentProcessorImpl
+import com.twilio.audioswitch.android.BuildWrapper
+import com.twilio.audioswitch.android.LogWrapper
+import com.twilio.audioswitch.bluetooth.BluetoothController
+import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
 import com.twilio.audioswitch.selection.AudioDevice.Type.BLUETOOTH
 import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
 import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
@@ -10,13 +15,8 @@ import com.twilio.audioswitch.selection.AudioDevice.Type.WIRED_HEADSET
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STOPPED
-import com.twilio.audioswitch.android.BuildWrapper
-import com.twilio.audioswitch.android.LogWrapper
-import com.twilio.audioswitch.bluetooth.BluetoothController
-import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
 import com.twilio.audioswitch.wired.WiredDeviceConnectionListener
 import com.twilio.audioswitch.wired.WiredHeadsetReceiver
-import kotlin.collections.ArrayList
 
 private const val TAG = "AudioDeviceSelector"
 
@@ -45,7 +45,11 @@ class AudioDeviceSelector {
         this.logger = logger
         this.audioDeviceManager = audioDeviceManager
         this.wiredHeadsetReceiver = WiredHeadsetReceiver(context, logger)
-        this.bluetoothController = BluetoothController.newInstance(context, logger, audioDeviceManager)
+        this.bluetoothController = BluetoothController.newInstance(
+                context,
+                logger,
+                audioDeviceManager,
+                BluetoothIntentProcessorImpl())
     }
 
     internal constructor(
@@ -63,7 +67,7 @@ class AudioDeviceSelector {
     private var logger: LogWrapper = LogWrapper()
     private val audioDeviceManager: AudioDeviceManager
     private val wiredHeadsetReceiver: WiredHeadsetReceiver
-    private val bluetoothController: BluetoothController?
+    internal val bluetoothController: BluetoothController?
     internal var audioDeviceChangeListener: AudioDeviceChangeListener? = null
     private var selectedDevice: AudioDevice? = null
     private var userSelectedDevice: AudioDevice? = null
@@ -80,11 +84,11 @@ class AudioDeviceSelector {
     }
     internal val bluetoothDeviceConnectionListener = object : BluetoothDeviceConnectionListener {
         override fun onBluetoothConnected(
-            bluetoothDevice: BluetoothDevice
+            bluetoothDeviceWrapper: BluetoothDeviceWrapper
         ) {
             bluetoothAudioDevice = AudioDevice(
                     BLUETOOTH,
-                    bluetoothDevice.name)
+                    bluetoothDeviceWrapper.name)
             if (state == ACTIVATED) {
                 userSelectedDevice = bluetoothAudioDevice
             }
