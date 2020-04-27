@@ -11,10 +11,10 @@ import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothDeviceConnectionListener
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
 import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
-import com.twilio.audioswitch.selection.AudioDevice.Type.BLUETOOTH
-import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
-import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
-import com.twilio.audioswitch.selection.AudioDevice.Type.WIRED_HEADSET
+import com.twilio.audioswitch.selection.AudioDevice.BluetoothHeadset
+import com.twilio.audioswitch.selection.AudioDevice.Earpiece
+import com.twilio.audioswitch.selection.AudioDevice.Speakerphone
+import com.twilio.audioswitch.selection.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STOPPED
@@ -83,9 +83,6 @@ class AudioDeviceSelector {
     private var wiredHeadsetAvailable = false
     private val mutableAudioDevices = ArrayList<AudioDevice>()
 
-    private val EARPIECE_AUDIO_DEVICE = AudioDevice(EARPIECE, "Earpiece")
-    private val SPEAKERPHONE_AUDIO_DEVICE = AudioDevice(SPEAKERPHONE, "Speakerphone")
-    private val WIRED_HEADSET_AUDIO_DEVICE = AudioDevice(WIRED_HEADSET, "Wired Headset")
     private var bluetoothAudioDevice: AudioDevice? = null
     internal var state: State = STOPPED
     internal enum class State {
@@ -95,9 +92,7 @@ class AudioDeviceSelector {
         override fun onBluetoothConnected(
             bluetoothDeviceWrapper: BluetoothDeviceWrapper
         ) {
-            bluetoothAudioDevice = AudioDevice(
-                    BLUETOOTH,
-                    bluetoothDeviceWrapper.name)
+            bluetoothAudioDevice = BluetoothHeadset(bluetoothDeviceWrapper.name)
             if (state == ACTIVATED) {
                 userSelectedDevice = bluetoothAudioDevice
             }
@@ -114,7 +109,7 @@ class AudioDeviceSelector {
             wiredHeadsetAvailable = true
             logger.d(TAG, "Wired Headset available")
             if (this@AudioDeviceSelector.state == ACTIVATED) {
-                userSelectedDevice = WIRED_HEADSET_AUDIO_DEVICE
+                userSelectedDevice = WiredHeadset
             }
             enumerateDevices()
         }
@@ -190,16 +185,16 @@ class AudioDeviceSelector {
     }
 
     private fun activate(audioDevice: AudioDevice) {
-        when (audioDevice.type) {
-            BLUETOOTH -> {
+        when (audioDevice) {
+            is BluetoothHeadset -> {
                 audioDeviceManager.enableSpeakerphone(false)
                 bluetoothController?.activate()
             }
-            EARPIECE, WIRED_HEADSET -> {
+            Earpiece, WiredHeadset -> {
                 audioDeviceManager.enableSpeakerphone(false)
                 bluetoothController?.deactivate()
             }
-            SPEAKERPHONE -> {
+            Speakerphone -> {
                 audioDeviceManager.enableSpeakerphone(true)
                 bluetoothController?.deactivate()
             }
@@ -254,13 +249,13 @@ class AudioDeviceSelector {
         mutableAudioDevices.clear()
         bluetoothAudioDevice?.let { mutableAudioDevices.add(it) }
         if (wiredHeadsetAvailable) {
-            mutableAudioDevices.add(WIRED_HEADSET_AUDIO_DEVICE)
+            mutableAudioDevices.add(WiredHeadset)
         }
         if (audioDeviceManager.hasEarpiece() && !wiredHeadsetAvailable) {
-            mutableAudioDevices.add(EARPIECE_AUDIO_DEVICE)
+            mutableAudioDevices.add(Earpiece)
         }
         if (audioDeviceManager.hasSpeakerphone()) {
-            mutableAudioDevices.add(SPEAKERPHONE_AUDIO_DEVICE)
+            mutableAudioDevices.add(Speakerphone)
         }
 
         // Check whether the user selected device is still present
@@ -285,7 +280,7 @@ class AudioDeviceSelector {
             selectedDevice?.let { selectedDevice ->
                 listener.invoke(
                         mutableAudioDevices,
-                        AudioDevice(selectedDevice.type, selectedDevice.name))
+                        selectedDevice)
             } ?: run {
                 listener.invoke(mutableAudioDevices, null)
             }
