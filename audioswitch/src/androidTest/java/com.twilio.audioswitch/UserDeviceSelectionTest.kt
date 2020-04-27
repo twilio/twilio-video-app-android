@@ -4,9 +4,9 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.twilio.audioswitch.selection.AudioDevice.Type.BLUETOOTH
-import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
-import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
+import com.twilio.audioswitch.selection.AudioDevice.BluetoothHeadset
+import com.twilio.audioswitch.selection.AudioDevice.Earpiece
+import com.twilio.audioswitch.selection.AudioDevice.Speakerphone
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
@@ -27,7 +27,7 @@ class UserDeviceSelectionTest {
         val audioDeviceSelector = AudioDeviceSelector(context)
         audioDeviceSelector.start { _, _ -> }
         val earpiece = audioDeviceSelector.availableAudioDevices
-                .find { it.type == EARPIECE }
+                .find { it is Earpiece }
         assertThat(earpiece, `is`(notNullValue()))
 
         audioDeviceSelector.selectDevice(earpiece!!)
@@ -41,7 +41,7 @@ class UserDeviceSelectionTest {
         val audioDeviceSelector = AudioDeviceSelector(context)
         audioDeviceSelector.start { _, _ -> }
         val speakerphone = audioDeviceSelector.availableAudioDevices
-                .find { it.type == SPEAKERPHONE }
+                .find { it is Speakerphone }
         assertThat(speakerphone, `is`(notNullValue()))
 
         audioDeviceSelector.selectDevice(speakerphone!!)
@@ -56,7 +56,7 @@ class UserDeviceSelectionTest {
         audioDeviceSelector.start { _, _ -> }
         simulateBluetoothConnection(context, bluetoothHeadsetReceiver)
         val bluetoothDevice = audioDeviceSelector.availableAudioDevices
-                .find { it.type == BLUETOOTH }
+                .find { it is BluetoothHeadset }
         assertThat(bluetoothDevice, `is`(notNullValue()))
 
         audioDeviceSelector.selectDevice(bluetoothDevice!!)

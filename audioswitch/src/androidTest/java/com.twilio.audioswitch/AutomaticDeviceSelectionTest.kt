@@ -4,10 +4,12 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.twilio.audioswitch.selection.AudioDevice
+import com.twilio.audioswitch.selection.AudioDevice.BluetoothHeadset
+import com.twilio.audioswitch.selection.AudioDevice.Earpiece
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -25,8 +27,8 @@ class AutomaticDeviceSelectionTest {
         audioDeviceSelector.start { _, _ -> }
         simulateBluetoothConnection(context, bluetoothHeadsetReceiver)
 
-        val earpiece = AudioDevice(AudioDevice.Type.BLUETOOTH, "Fake Bluetooth")
-        assertThat(audioDeviceSelector.selectedAudioDevice, equalTo(earpiece))
+        val bluetoothHeadset = BluetoothHeadset("Fake Bluetooth")
+        assertEquals(bluetoothHeadset, audioDeviceSelector.selectedAudioDevice)
     }
 
     @UiThreadTest
@@ -35,7 +37,6 @@ class AutomaticDeviceSelectionTest {
         val audioDeviceSelector = AudioDeviceSelector(context)
         audioDeviceSelector.start { _, _ -> }
 
-        val earpiece = AudioDevice(AudioDevice.Type.EARPIECE, "Earpiece")
-        assertThat(audioDeviceSelector.selectedAudioDevice, equalTo(earpiece))
+        assertThat(audioDeviceSelector.selectedAudioDevice is Earpiece, equalTo(true))
     }
 }
