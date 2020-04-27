@@ -82,7 +82,7 @@ internal class BluetoothHeadsetReceiver(
     private fun isHeadsetDevice(deviceWrapper: BluetoothDeviceWrapper): Boolean =
             deviceWrapper.deviceClass?.let { deviceClass ->
                 deviceClass == AUDIO_VIDEO_HANDSFREE ||
-                        deviceClass == AUDIO_VIDEO_WEARABLE_HEADSET ||
-                        deviceClass == AUDIO_VIDEO_CAR_AUDIO
+                deviceClass == AUDIO_VIDEO_WEARABLE_HEADSET ||
+                deviceClass == AUDIO_VIDEO_CAR_AUDIO
             } ?: false
 }
