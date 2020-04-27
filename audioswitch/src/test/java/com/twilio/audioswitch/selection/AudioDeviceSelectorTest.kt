@@ -16,8 +16,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.audioswitch.android.BluetoothDeviceWrapper
-import com.twilio.audioswitch.selection.AudioDevice.Type.EARPIECE
-import com.twilio.audioswitch.selection.AudioDevice.Type.SPEAKERPHONE
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.ACTIVATED
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STARTED
 import com.twilio.audioswitch.selection.AudioDeviceSelector.State.STOPPED
@@ -27,6 +25,8 @@ import com.twilio.audioswitch.bluetooth.BluetoothController
 import com.twilio.audioswitch.bluetooth.BluetoothControllerAssertions
 import com.twilio.audioswitch.bluetooth.BluetoothHeadsetReceiver
 import com.twilio.audioswitch.bluetooth.PreConnectedDeviceListener
+import com.twilio.audioswitch.selection.AudioDevice.Earpiece
+import com.twilio.audioswitch.selection.AudioDevice.Speakerphone
 import com.twilio.audioswitch.wired.WiredHeadsetReceiver
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
@@ -38,8 +38,6 @@ import org.junit.Test
 
 class AudioDeviceSelectorTest {
 
-    private val earpiece = AudioDevice(EARPIECE, "Earpiece")
-    private val speakerphone = AudioDevice(SPEAKERPHONE, "Speakerphone")
     private val packageManager = mock<PackageManager> {
         whenever(mock.hasSystemFeature(any())).thenReturn(true)
     }
@@ -106,10 +104,10 @@ class AudioDeviceSelectorTest {
 
         audioDeviceSelector.availableAudioDevices.let { audioDevices ->
             assertThat(audioDevices.size, equalTo(2))
-            assertThat(audioDevices[0], equalTo(earpiece))
-            assertThat(audioDevices[1], equalTo(speakerphone))
+            assertThat(audioDevices[0] is Earpiece, equalTo(true))
+            assertThat(audioDevices[1] is Speakerphone, equalTo(true))
         }
-        assertThat(audioDeviceSelector.selectedAudioDevice, equalTo(earpiece))
+        assertThat(audioDeviceSelector.selectedAudioDevice is Earpiece, equalTo(true))
     }
 
     @Test
@@ -117,8 +115,8 @@ class AudioDeviceSelectorTest {
         audioDeviceSelector.start(audioDeviceChangeListener)
 
         verify(audioDeviceChangeListener).invoke(
-                listOf(earpiece, speakerphone),
-                earpiece)
+                listOf(Earpiece, Speakerphone),
+                Earpiece)
     }
 
     @Test
@@ -312,7 +310,7 @@ class AudioDeviceSelectorTest {
     @Test
     fun `activate should enable audio routing to the speakerphone device`() {
         audioDeviceSelector.start(audioDeviceChangeListener)
-        audioDeviceSelector.selectDevice(speakerphone)
+        audioDeviceSelector.selectDevice(Speakerphone)
         audioDeviceSelector.activate()
 
         verify(audioManager).isSpeakerphoneOn = true
