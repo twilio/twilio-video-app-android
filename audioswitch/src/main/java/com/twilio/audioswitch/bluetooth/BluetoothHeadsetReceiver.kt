@@ -3,7 +3,6 @@ package com.twilio.audioswitch.bluetooth
 import android.bluetooth.BluetoothClass.Device.AUDIO_VIDEO_CAR_AUDIO
 import android.bluetooth.BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE
 import android.bluetooth.BluetoothClass.Device.AUDIO_VIDEO_WEARABLE_HEADSET
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED
 import android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED
 import android.content.BroadcastReceiver
@@ -14,6 +13,8 @@ import android.media.AudioManager.EXTRA_SCO_AUDIO_STATE
 import android.media.AudioManager.SCO_AUDIO_STATE_CONNECTED
 import android.media.AudioManager.SCO_AUDIO_STATE_DISCONNECTED
 import android.media.AudioManager.SCO_AUDIO_STATE_ERROR
+import com.twilio.audioswitch.android.BluetoothDeviceWrapper
+import com.twilio.audioswitch.android.BluetoothIntentProcessor
 import com.twilio.audioswitch.android.LogWrapper
 
 private const val TAG = "BluetoothDeviceReceiver"
@@ -21,6 +22,7 @@ private const val TAG = "BluetoothDeviceReceiver"
 internal class BluetoothHeadsetReceiver(
     private val context: Context,
     private val logger: LogWrapper,
+    private val bluetoothIntentProcessor: BluetoothIntentProcessor,
     var deviceListener: BluetoothDeviceConnectionListener? = null
 ) : BroadcastReceiver() {
 
@@ -72,16 +74,15 @@ internal class BluetoothHeadsetReceiver(
         context.unregisterReceiver(this)
     }
 
-    private fun Intent.getHeadsetDevice(): BluetoothDevice? =
-        getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                ?.let { device -> if (isHeadsetDevice(device)) device else null }
+    private fun Intent.getHeadsetDevice(): BluetoothDeviceWrapper? =
+            bluetoothIntentProcessor.getBluetoothDevice(this)?.let { device ->
+                if (isHeadsetDevice(device)) device else null
+            }
 
-    private fun isHeadsetDevice(device: BluetoothDevice): Boolean =
-        device.bluetoothClass?.let { bluetoothClass ->
-            bluetoothClass.deviceClass.let { deviceClass ->
+    private fun isHeadsetDevice(deviceWrapper: BluetoothDeviceWrapper): Boolean =
+            deviceWrapper.deviceClass?.let { deviceClass ->
                 deviceClass == AUDIO_VIDEO_HANDSFREE ||
                 deviceClass == AUDIO_VIDEO_WEARABLE_HEADSET ||
                 deviceClass == AUDIO_VIDEO_CAR_AUDIO
-            }
-        } ?: false
+            } ?: false
 }

@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.IntentFilter
 import android.media.AudioManager
-import com.twilio.audioswitch.android.LogWrapper
 import com.twilio.audioswitch.selection.AudioDeviceManager
 
 private const val TAG = "BluetoothController"
@@ -19,26 +18,6 @@ internal class BluetoothController internal constructor(
     private val bluetoothHeadsetReceiver: BluetoothHeadsetReceiver
 ) {
 
-    companion object {
-
-        fun newInstance(
-            context: Context,
-            logger: LogWrapper,
-            audioDeviceManager: AudioDeviceManager
-        ): BluetoothController? =
-            BluetoothAdapter.getDefaultAdapter()?.let { bluetoothAdapter ->
-                BluetoothController(context,
-                        audioDeviceManager,
-                        bluetoothAdapter,
-                        PreConnectedDeviceListener(logger, bluetoothAdapter),
-                        BluetoothHeadsetReceiver(context, logger)
-                )
-            } ?: run {
-                logger.d(TAG, "Bluetooth is not supported on this device")
-                null
-            }
-    }
-
     fun start(deviceListener: BluetoothDeviceConnectionListener) {
         preConnectedDeviceListener.deviceListener = deviceListener
         bluetoothHeadsetReceiver.deviceListener = deviceListener
@@ -50,12 +29,12 @@ internal class BluetoothController internal constructor(
 
         context.run {
             registerReceiver(
-                bluetoothHeadsetReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED))
+                    bluetoothHeadsetReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED))
             registerReceiver(
-                bluetoothHeadsetReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED))
+                    bluetoothHeadsetReceiver, IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED))
             registerReceiver(
-                bluetoothHeadsetReceiver,
-                IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED))
+                    bluetoothHeadsetReceiver,
+                    IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED))
         }
     }
 

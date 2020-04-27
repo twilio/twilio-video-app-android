@@ -2,6 +2,7 @@ package com.twilio.audioswitch.bluetooth
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
+import com.twilio.audioswitch.android.BluetoothDeviceWrapperImpl
 import com.twilio.audioswitch.android.LogWrapper
 
 private const val TAG = "PreConnectedDeviceListener"
@@ -19,7 +20,7 @@ internal class PreConnectedDeviceListener(
         bluetoothProfile.connectedDevices.let { deviceList ->
             deviceList.forEach { device ->
                 logger.d(TAG, "Bluetooth " + device.name + " connected")
-                deviceListener?.onBluetoothConnected(device)
+                deviceListener?.onBluetoothConnected(BluetoothDeviceWrapperImpl(device))
             }
         }
     }

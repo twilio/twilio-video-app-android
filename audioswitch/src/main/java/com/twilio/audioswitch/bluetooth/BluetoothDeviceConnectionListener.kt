@@ -1,8 +1,8 @@
 package com.twilio.audioswitch.bluetooth
 
-import android.bluetooth.BluetoothDevice
+import com.twilio.audioswitch.android.BluetoothDeviceWrapper
 
 internal interface BluetoothDeviceConnectionListener {
-    fun onBluetoothConnected(bluetoothDevice: BluetoothDevice)
+    fun onBluetoothConnected(bluetoothDeviceWrapper: BluetoothDeviceWrapper)
     fun onBluetoothDisconnected()
 }

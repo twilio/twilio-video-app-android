@@ -1,6 +1,7 @@
 package com.twilio.audioswitch.bluetooth
 
 import android.bluetooth.BluetoothClass
+import android.bluetooth.BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
@@ -8,11 +9,13 @@ import android.media.AudioManager
 import android.media.AudioManager.SCO_AUDIO_STATE_CONNECTED
 import android.media.AudioManager.SCO_AUDIO_STATE_DISCONNECTED
 import android.media.AudioManager.SCO_AUDIO_STATE_ERROR
+import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.audioswitch.android.BluetoothIntentProcessorImpl
 import com.twilio.audioswitch.android.LogWrapper
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
@@ -28,11 +31,18 @@ class BluetoothHeadsetReceiverTest {
     private val context = mock<Context>()
     private val deviceListener = mock<BluetoothDeviceConnectionListener>()
     private val logger = mock<LogWrapper>()
-    private var bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger, deviceListener)
+    private var bluetoothHeadsetReceiver = BluetoothHeadsetReceiver(context, logger, BluetoothIntentProcessorImpl(), deviceListener)
+    private val bluetoothClass = mock<BluetoothClass> {
+        whenever(mock.deviceClass).thenReturn(AUDIO_VIDEO_HANDSFREE)
+    }
+    private val bluetoothDevice = mock<BluetoothDevice> {
+        whenever(mock.name).thenReturn("Test")
+        whenever(mock.bluetoothClass).thenReturn(bluetoothClass)
+    }
 
     fun parameters(): Array<Array<out Any?>> {
         val handsFreeDevice = mock<BluetoothClass> {
-            whenever(mock.deviceClass).thenReturn(BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE)
+            whenever(mock.deviceClass).thenReturn(AUDIO_VIDEO_HANDSFREE)
         }
         val audioVideoHeadsetDevice = mock<BluetoothClass> {
             whenever(mock.deviceClass).thenReturn(BluetoothClass.Device.AUDIO_VIDEO_WEARABLE_HEADSET)
@@ -58,9 +68,7 @@ class BluetoothHeadsetReceiverTest {
         deviceClass: BluetoothClass?,
         isNewDeviceConnected: Boolean
     ) {
-        val bluetoothDevice = mock<BluetoothDevice> {
-            whenever(mock.bluetoothClass).thenReturn(deviceClass)
-        }
+        whenever(bluetoothDevice.bluetoothClass).thenReturn(deviceClass)
         val intent = mock<Intent> {
             whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_CONNECTED)
             whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
@@ -70,40 +78,7 @@ class BluetoothHeadsetReceiverTest {
         bluetoothHeadsetReceiver.onReceive(mock(), intent)
 
         val invocationCount = if (isNewDeviceConnected) 1 else 0
-        verify(deviceListener, times(invocationCount)).onBluetoothConnected(bluetoothDevice)
-    }
-
-    @Test
-    fun `onReceive should not register a new device when an ACL connected event is received with a null bluetooth device`() {
-        val intent = mock<Intent> {
-            whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_CONNECTED)
-            whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
-                    .thenReturn(mock())
-        }
-
-        bluetoothHeadsetReceiver.onReceive(mock(), intent)
-
-        verifyZeroInteractions(deviceListener)
-    }
-
-    @Test
-    fun `onReceive should not register a new device when the deviceListener is null`() {
-        bluetoothHeadsetReceiver.deviceListener = null
-        val bluetoothClass = mock<BluetoothClass> {
-            whenever(mock.deviceClass).thenReturn(BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE)
-        }
-        val bluetoothDevice = mock<BluetoothDevice> {
-            whenever(mock.bluetoothClass).thenReturn(bluetoothClass)
-        }
-        val intent = mock<Intent> {
-            whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_CONNECTED)
-            whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
-                    .thenReturn(bluetoothDevice)
-        }
-
-        bluetoothHeadsetReceiver.onReceive(mock(), intent)
-
-        verifyZeroInteractions(deviceListener)
+        verify(deviceListener, times(invocationCount)).onBluetoothConnected(isA())
     }
 
     @Parameters(method = "parameters")
@@ -112,9 +87,7 @@ class BluetoothHeadsetReceiverTest {
         deviceClass: BluetoothClass?,
         isDeviceDisconnected: Boolean
     ) {
-        val bluetoothDevice = mock<BluetoothDevice> {
-            whenever(mock.bluetoothClass).thenReturn(deviceClass)
-        }
+        whenever(bluetoothDevice.bluetoothClass).thenReturn(deviceClass)
         val intent = mock<Intent> {
             whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_DISCONNECTED)
             whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
@@ -125,6 +98,34 @@ class BluetoothHeadsetReceiverTest {
 
         val invocationCount = if (isDeviceDisconnected) 1 else 0
         verify(deviceListener, times(invocationCount)).onBluetoothDisconnected()
+    }
+
+    @Test
+    fun `onReceive should not register a new device when an ACL connected event is received with a null bluetooth device`() {
+        whenever(bluetoothDevice.bluetoothClass).thenReturn(null)
+        val intent = mock<Intent> {
+            whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_CONNECTED)
+            whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
+                    .thenReturn(bluetoothDevice)
+        }
+
+        bluetoothHeadsetReceiver.onReceive(mock(), intent)
+
+        verifyZeroInteractions(deviceListener)
+    }
+
+    @Test
+    fun `onReceive should not register a new device when the deviceListener is null`() {
+        bluetoothHeadsetReceiver.deviceListener = null
+        val intent = mock<Intent> {
+            whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_CONNECTED)
+            whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
+                    .thenReturn(bluetoothDevice)
+        }
+
+        bluetoothHeadsetReceiver.onReceive(mock(), intent)
+
+        verifyZeroInteractions(deviceListener)
     }
 
     @Test
@@ -140,23 +141,9 @@ class BluetoothHeadsetReceiverTest {
         verifyZeroInteractions(deviceListener)
     }
 
-    fun scoParameters(): Array<Array<Int>> {
-        return arrayOf(
-            arrayOf(SCO_AUDIO_STATE_CONNECTED),
-            arrayOf(SCO_AUDIO_STATE_DISCONNECTED),
-            arrayOf(SCO_AUDIO_STATE_ERROR)
-        )
-    }
-
     @Test
     fun `onReceive should not disconnect a device when the deviceListener is null`() {
         bluetoothHeadsetReceiver.deviceListener = null
-        val bluetoothClass = mock<BluetoothClass> {
-            whenever(mock.deviceClass).thenReturn(BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE)
-        }
-        val bluetoothDevice = mock<BluetoothDevice> {
-            whenever(mock.bluetoothClass).thenReturn(bluetoothClass)
-        }
         val intent = mock<Intent> {
             whenever(mock.action).thenReturn(BluetoothDevice.ACTION_ACL_DISCONNECTED)
             whenever(mock.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE))
@@ -166,6 +153,14 @@ class BluetoothHeadsetReceiverTest {
         bluetoothHeadsetReceiver.onReceive(mock(), intent)
 
         verifyZeroInteractions(deviceListener)
+    }
+
+    fun scoParameters(): Array<Array<Int>> {
+        return arrayOf(
+                arrayOf(SCO_AUDIO_STATE_CONNECTED),
+                arrayOf(SCO_AUDIO_STATE_DISCONNECTED),
+                arrayOf(SCO_AUDIO_STATE_ERROR)
+        )
     }
 
     @Parameters(method = "scoParameters")

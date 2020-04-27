@@ -11,7 +11,8 @@ android {
         versionCode 1
         versionName "0.1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -22,6 +23,10 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     buildTypes {
@@ -38,5 +43,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
+    def androidXTest = '1.2.0'
+    androidTestImplementation "androidx.test:runner:$androidXTest"
+    androidTestImplementation "androidx.test:rules:$androidXTest"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
 }
