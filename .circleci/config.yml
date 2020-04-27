@@ -123,6 +123,7 @@ jobs:
           root: .
           paths:
             - app/build
+            - audioswitch/build
       - save-cache: *save-cache-gradle
 
   unit-tests:
