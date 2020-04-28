@@ -6,16 +6,3 @@ ui-tests:
   device:
     - {model: lucye, version: 24}
     - {model: blueline, version: 29}
-
-switch-ui-tests:
-  timeout: 30m
-  type: instrumentation
-  app: audioswitch/ftl/app-debug.apk
-  test: audioswitch/build/outputs/apk/androidTest/debug/audioswitch-debug-androidTest.apk
-  device:
-    - {model: a5y17lte, version: 24}
-    - {model: G8142, version: 25}
-    - {model: c5proltechn, version: 26}
-    - {model: crownqlteue, version: 27}
-    - {model: crownlteks, version: 28}
-    - {model: blueline, version: 29}
