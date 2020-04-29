@@ -125,8 +125,7 @@ android {
         def names = variant.flavors*.name
 
         // Ignore twilio debug and community release builds
-        if ((names.contains("twilio") && variant.buildType.name == "debug") ||
-                (names.contains("community") && variant.buildType.name == "release")) {
+        if ((names.contains("twilio") && variant.buildType.name == "debug")) {
             setIgnore(true)
         }
     }
