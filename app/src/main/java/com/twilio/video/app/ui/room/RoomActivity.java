@@ -97,6 +97,7 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
+import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
 import com.twilio.video.app.ui.room.RoomEvent.Connecting;
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
@@ -106,6 +107,7 @@ import com.twilio.video.app.ui.room.RoomEvent.RoomState;
 import com.twilio.video.app.ui.room.RoomEvent.TokenError;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
+import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
@@ -421,7 +423,7 @@ public class RoomActivity extends BaseActivity {
 
         requestPermissions();
         roomViewModel.getRoomEvents().observe(this, this::bindRoomEvents);
-        roomViewModel.getAudioViewState().observe(this, this::bindAudioViewState);
+        roomViewModel.getRoomViewState().observe(this, this::bindRoomViewState);
 
         return true;
     }
@@ -1211,7 +1213,7 @@ public class RoomActivity extends BaseActivity {
     private void initializeRoom() {
         if (room != null) {
 
-            localParticipant = room.getLocalParticipant();
+            setupLocalParticipant(room);
 
             publishLocalTracks();
 
@@ -1221,11 +1223,20 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
+    private void setupLocalParticipant(Room room) {
+        localParticipant = room.getLocalParticipant();
+        if (localParticipant != null) {
+            localParticipantSid = localParticipant.getSid();
+        }
+    }
+
     private void publishLocalTracks() {
         if (localParticipant != null) {
             if (cameraVideoTrack != null) {
                 Timber.d("Camera track: %s", cameraVideoTrack);
                 localParticipant.publishTrack(cameraVideoTrack);
+                roomViewModel.processInput(
+                        new LocalVideoTrackPublished(localParticipant, cameraVideoTrack));
             }
 
             if (localAudioTrack != null) {
@@ -1235,24 +1246,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void addParticipantViews() {
-        if (room != null && localParticipant != null) {
-            localParticipantSid = localParticipant.getSid();
-            // remove primary view
-            participantController.removePrimary();
-
-            // add local thumb and "click" on it to make primary
-            participantController.addThumb(
-                    localParticipantSid,
-                    getString(R.string.you),
-                    cameraVideoTrack,
-                    localAudioTrack == null,
-                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
-
-            localParticipant.setListener(
-                    new LocalParticipantListener(
-                            participantController.getThumb(localParticipantSid, cameraVideoTrack)));
-            participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
-
+        if (room != null) {
             // add existing room participants thumbs
             boolean isFirstParticipant = true;
             for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
@@ -1379,12 +1373,37 @@ public class RoomActivity extends BaseActivity {
         roomViewModel.processInput(viewEvent);
     }
 
-    private void bindAudioViewState(AudioViewState audioViewState) {
-        deviceMenuItem.setVisible(!audioViewState.getAvailableAudioDevices().isEmpty());
+    private void bindRoomViewState(RoomViewState roomViewState) {
+        deviceMenuItem.setVisible(!roomViewState.getAvailableAudioDevices().isEmpty());
+        ParticipantViewState localParticipantState = roomViewState.getLocalParticipantState();
+        if (roomViewState.getLocalParticipantState() != null)
+            addParticipantThumb(localParticipantState);
+    }
+
+    private void addParticipantThumb(ParticipantViewState participantViewState) {
+        // remove primary view
+        participantController.removePrimary();
+
+        participantController.addThumb(
+                participantViewState.getSid(),
+                participantViewState.getIdentity(),
+                participantViewState.getVideoTrack(),
+                false,
+                false);
+
+        participantController
+                .getThumb(participantViewState.getSid(), participantViewState.getVideoTrack())
+                .callOnClick();
+
+        if (participantViewState.isLocalParticipant()) {
+            localParticipant.setListener(
+                    new LocalParticipantListener(
+                            participantController.getThumb(localParticipantSid, cameraVideoTrack)));
+        }
     }
 
     private void displayAudioDeviceList() {
-        AudioViewState viewState = roomViewModel.getAudioViewState().getValue();
+        RoomViewState viewState = roomViewModel.getRoomViewState().getValue();
         AudioDevice selectedDevice = viewState.getSelectedDevice();
         List<AudioDevice> audioDevices = viewState.getAvailableAudioDevices();
 
