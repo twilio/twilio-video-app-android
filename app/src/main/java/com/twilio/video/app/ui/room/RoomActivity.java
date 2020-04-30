@@ -1330,37 +1330,7 @@ public class RoomActivity extends BaseActivity {
                 if (roomEvent instanceof DominantSpeakerChanged) {
                     RemoteParticipant remoteParticipant =
                             ((DominantSpeakerChanged) roomEvent).getRemoteParticipant();
-
-                    if (remoteParticipant == null) {
-                        participantController.setDominantSpeaker(null);
-                        return;
-                    }
-                    VideoTrack videoTrack =
-                            (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                    ? remoteParticipant
-                                            .getRemoteVideoTracks()
-                                            .get(0)
-                                            .getRemoteVideoTrack()
-                                    : null;
-                    if (videoTrack != null) {
-                        ParticipantView participantView =
-                                participantController.getThumb(
-                                        remoteParticipant.getSid(), videoTrack);
-                        if (participantView != null) {
-                            participantController.setDominantSpeaker(participantView);
-                        } else {
-                            remoteParticipant.getIdentity();
-                            ParticipantPrimaryView primaryParticipantView =
-                                    participantController.getPrimaryView();
-                            if (primaryParticipantView.identity.equals(
-                                    remoteParticipant.getIdentity())) {
-                                participantController.setDominantSpeaker(
-                                        participantController.getPrimaryView());
-                            } else {
-                                participantController.setDominantSpeaker(null);
-                            }
-                        }
-                    }
+                    changeDominantSpeaker(remoteParticipant);
                 }
             } else {
                 if (roomEvent instanceof TokenError) {
@@ -1369,6 +1339,34 @@ public class RoomActivity extends BaseActivity {
                 }
             }
             updateUi(room, roomEvent);
+        }
+    }
+
+    private void changeDominantSpeaker(RemoteParticipant dominantSpeaker) {
+        if (dominantSpeaker == null) {
+            participantController.setDominantSpeaker(null);
+            return;
+        }
+        VideoTrack videoTrack =
+                (dominantSpeaker.getRemoteVideoTracks().size() > 0)
+                        ? dominantSpeaker.getRemoteVideoTracks().get(0).getRemoteVideoTrack()
+                        : null;
+        if (videoTrack != null) {
+            ParticipantView participantView =
+                    participantController.getThumb(dominantSpeaker.getSid(), videoTrack);
+            if (participantView != null) {
+                participantController.setDominantSpeaker(participantView);
+            } else {
+                dominantSpeaker.getIdentity();
+                ParticipantPrimaryView primaryParticipantView =
+                        participantController.getPrimaryView();
+                if (primaryParticipantView.identity.equals(dominantSpeaker.getIdentity())) {
+                    participantController.setDominantSpeaker(
+                            participantController.getPrimaryView());
+                } else {
+                    participantController.setDominantSpeaker(null);
+                }
+            }
         }
     }
 
