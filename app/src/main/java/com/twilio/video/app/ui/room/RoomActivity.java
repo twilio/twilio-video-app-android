@@ -100,9 +100,6 @@ import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
 import com.twilio.video.app.ui.room.RoomEvent.Connecting;
-import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
 import com.twilio.video.app.ui.room.RoomEvent.RoomState;
 import com.twilio.video.app.ui.room.RoomEvent.TokenError;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
@@ -402,7 +399,6 @@ public class RoomActivity extends BaseActivity {
     @Override
     protected void onStop() {
         removeCameraTrack();
-        removeAllParticipants();
         super.onStop();
     }
 
@@ -1258,7 +1254,6 @@ public class RoomActivity extends BaseActivity {
                             initializeRoom();
                             break;
                         case DISCONNECTED:
-                            removeAllParticipants();
                             localParticipant = null;
                             room = null;
                             localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
@@ -1274,29 +1269,7 @@ public class RoomActivity extends BaseActivity {
                             .setMessage(getString(R.string.room_screen_connection_failure_message))
                             .setNeutralButton("OK", null)
                             .show();
-                    removeAllParticipants();
                     toggleAudioDevice(false);
-                }
-                if (roomEvent instanceof ParticipantConnected) {
-                    boolean renderAsPrimary = room.getRemoteParticipants().size() == 1;
-                    addParticipant(
-                            ((ParticipantConnected) roomEvent).getRemoteParticipant(),
-                            renderAsPrimary);
-
-                    updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
-                }
-                if (roomEvent instanceof ParticipantDisconnected) {
-                    RemoteParticipant remoteParticipant =
-                            ((ParticipantDisconnected) roomEvent).getRemoteParticipant();
-                    networkQualityLevels.remove(remoteParticipant.getSid());
-                    removeParticipant(remoteParticipant);
-
-                    updateStatsUI(sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false));
-                }
-                if (roomEvent instanceof DominantSpeakerChanged) {
-                    RemoteParticipant remoteParticipant =
-                            ((DominantSpeakerChanged) roomEvent).getRemoteParticipant();
-                    changeDominantSpeaker(remoteParticipant);
                 }
             } else {
                 if (roomEvent instanceof TokenError) {
@@ -1353,6 +1326,7 @@ public class RoomActivity extends BaseActivity {
     private void renderThumbnails(RoomViewState roomViewState) {
         List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
         if (thumbnails != null) {
+            participantController.removeAllThumbs();
             for (ParticipantViewState thumbnail : roomViewState.getParticipantThumbnails()) {
                 addParticipantThumb(thumbnail);
             }
