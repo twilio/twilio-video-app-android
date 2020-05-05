@@ -18,6 +18,7 @@ package com.twilio.video.app.ui.room;
 
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.twilio.video.VideoTrack;
 import java.util.ArrayList;
@@ -55,10 +56,6 @@ class ParticipantController {
         addThumb(sid, identity, null, true, false);
     }
 
-    void addThumb(Item item) {
-        addThumb(item.sid, item.identity, item.videoTrack, item.muted, item.mirror);
-    }
-
     private void addThumb(String sid, String identity, VideoTrack videoTrack) {
         addThumb(sid, identity, videoTrack, true, false);
     }
@@ -72,12 +69,23 @@ class ParticipantController {
      * @param muted participant audio state.
      */
     void addThumb(
-            String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
+            String sid,
+            String identity,
+            @NonNull VideoTrack videoTrack,
+            boolean muted,
+            boolean mirror) {
 
-        Item item = new Item(sid, identity, videoTrack, muted, mirror);
-        ParticipantView view = createThumb(item);
-        thumbs.put(item, view);
-        thumbsViewContainer.addView(view);
+        if (videoTrack != null) {
+            String trackName = videoTrack.getName();
+            if (trackName != null && getThumb(sid, trackName) != null) {
+                updateThumb(sid, videoTrack, mirror);
+            } else {
+                Item item = new Item(sid, trackName, identity, videoTrack, muted, mirror);
+                ParticipantView view = createThumb(item);
+                thumbs.put(item, view);
+                thumbsViewContainer.addView(view);
+            }
+        }
     }
 
     /**
@@ -105,7 +113,7 @@ class ParticipantController {
     void updateThumb(String sid, VideoTrack oldVideo, VideoTrack newVideo) {
         Item target = findItem(sid, oldVideo);
         if (target != null) {
-            ParticipantView view = getThumb(sid, oldVideo);
+            ParticipantView view = getThumb(sid, oldVideo.getName());
 
             removeRender(target.videoTrack, view);
 
@@ -130,7 +138,7 @@ class ParticipantController {
     void updateThumb(String sid, VideoTrack videoTrack, @ParticipantView.State int state) {
         Item target = findItem(sid, videoTrack);
         if (target != null) {
-            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid, videoTrack);
+            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid, videoTrack.getName());
 
             view.setState(state);
             switch (state) {
@@ -155,7 +163,7 @@ class ParticipantController {
     void updateThumb(String sid, VideoTrack videoTrack, boolean mirror) {
         Item target = findItem(sid, videoTrack);
         if (target != null) {
-            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid, videoTrack);
+            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid, videoTrack.getName());
 
             target.mirror = mirror;
             view.setMirror(target.mirror);
@@ -207,7 +215,7 @@ class ParticipantController {
     void removeThumb(String sid, VideoTrack videoTrack) {
         Item target = findItem(sid, videoTrack);
         if (target != null) {
-            ParticipantView view = getThumb(sid, videoTrack);
+            ParticipantView view = getThumb(sid, videoTrack.getName());
 
             removeRender(target.videoTrack, view);
 
@@ -261,14 +269,13 @@ class ParticipantController {
      * Get participant video track thumb instance.
      *
      * @param sid unique participant identifier.
-     * @param videoTrack target video track.
+     * @param trackName the name of the track.
      * @return participant thumb instance.
      */
-    ParticipantView getThumb(String sid, VideoTrack videoTrack) {
+    ParticipantView getThumb(String sid, String trackName) {
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey() != null
-                    && entry.getKey().sid.equals(sid)
-                    && entry.getKey().videoTrack == videoTrack) {
+            Item key = entry.getKey();
+            if (key != null && key.sid.equals(sid) && key.trackName.equals(trackName)) {
                 return entry.getValue();
             }
         }
@@ -303,7 +310,7 @@ class ParticipantController {
             String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
 
         Item old = primaryItem;
-        Item newItem = new Item(sid, identity, videoTrack, muted, mirror);
+        Item newItem = new Item(sid, identity, videoTrack.getName(), videoTrack, muted, mirror);
 
         // clean old primary video renderings
         if (old != null) {
@@ -370,7 +377,7 @@ class ParticipantController {
     }
 
     private boolean hasThumb(String sid, VideoTrack videoTrack) {
-        return getThumb(sid, videoTrack) != null;
+        return getThumb(sid, videoTrack.getName()) != null;
     }
 
     private Item findItem(String sid, VideoTrack videoTrack) {
@@ -427,6 +434,9 @@ class ParticipantController {
         /** RemoteParticipant unique identifier. */
         String sid;
 
+        /** The name of the video track. * */
+        String trackName;
+
         /** RemoteParticipant name. */
         String identity;
 
@@ -439,9 +449,15 @@ class ParticipantController {
         /** Video track mirroring enabled/disabled. */
         boolean mirror;
 
-        Item(String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
-
+        Item(
+                String sid,
+                String trackName,
+                String identity,
+                VideoTrack videoTrack,
+                boolean muted,
+                boolean mirror) {
             this.sid = sid;
+            this.trackName = trackName;
             this.identity = identity;
             this.videoTrack = videoTrack;
             this.muted = muted;

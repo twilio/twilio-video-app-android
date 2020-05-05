@@ -10,9 +10,11 @@ import com.twilio.audioswitch.selection.AudioDevice
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalVideoTrack
+import com.twilio.video.Room
+import com.twilio.video.Room.State.CONNECTED
 import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.app.participant.ParticipantManager
-import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
@@ -73,26 +75,35 @@ class RoomViewModel(
             is RoomState -> {
                 roomEvent.room?.let { room ->
                     when (room.state) {
+                        CONNECTED -> {
+                            checkRemoteParticipants(room)
+                        }
                         DISCONNECTED -> {
                             participantManager.clearParticipants()
-                            updateState { it.copy(localParticipantState = null) }
+                            updateState { it.copy(participantThumbnails = null) }
                         }
                         else -> {}
                     }
                 }
             }
+            is NewRemoteVideoTrack -> {
+                participantManager.updateParticipants(roomEvent.remoteParticipant)
+                updateState { it.copy(participantThumbnails = participantManager.participants) }
+            }
         }
         return roomEvent
     }
 
+    private fun checkRemoteParticipants(room: Room) {
+        room.remoteParticipants.let { participants ->
+            participants.forEach { participantManager.updateParticipants(it) }
+            updateState { it.copy(participantThumbnails = participantManager.participants) }
+        }
+    }
+
     private fun addLocalParticipantView(localParticipant: LocalParticipant, localVideoTrack: LocalVideoTrack) {
-        val localParticipantView = ParticipantViewState(
-                localParticipant.sid,
-                "You",
-                localVideoTrack,
-                isLocalParticipant = true)
-        participantManager.updateParticipants(localParticipantView)
-        updateState { it.copy(localParticipantState = localParticipantView) }
+        participantManager.updateParticipants(localParticipant, localVideoTrack)
+        updateState { it.copy(participantThumbnails = participantManager.participants) }
     }
 
     private fun selectAudioDevice(device: AudioDevice) {

@@ -27,9 +27,11 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.sdk.RemoteParticipantListener
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
@@ -125,9 +127,15 @@ class RoomManager(
         }
     }
 
+    fun newRemoteVideoTrack(remoteParticipant: RemoteParticipant) {
+        Timber.i("RemoteParticipant video track published connected -> remoteParticipant: %s",
+                remoteParticipant.sid)
+        mutableViewEvents.value = NewRemoteVideoTrack(remoteParticipant = remoteParticipant)
+    }
+
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
         Timber.e(e, "Failed to retrieve token")
-        mutableViewEvents.postValue(TokenError(error))
+        mutableViewEvents.postValue(TokenError(serviceError = error))
     }
 
     private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
@@ -180,8 +188,10 @@ class RoomManager(
                     room.sid)
 
             startService(context)
+            room.remoteParticipants.forEach {
+                it.setListener(RemoteParticipantListener(this@RoomManager))
+            }
 
-            // Reset the speakerphone
             mutableViewEvents.value = RoomState(room)
         }
 

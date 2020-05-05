@@ -328,8 +328,6 @@ public class RoomActivity extends BaseActivity {
         publishLocalTracks();
 
         updateStats();
-
-        addParticipantViews();
     }
 
     @Override
@@ -999,6 +997,7 @@ public class RoomActivity extends BaseActivity {
                     new ParticipantController.Item(
                             remoteParticipant.getSid(),
                             remoteParticipant.getIdentity(),
+                            remoteVideoTrack.getName(),
                             remoteVideoTrack,
                             muted,
                             false));
@@ -1016,7 +1015,7 @@ public class RoomActivity extends BaseActivity {
             RemoteParticipantListener listener =
                     new RemoteParticipantListener(
                             participantController.getThumb(
-                                    remoteParticipant.getSid(), remoteVideoTrack),
+                                    remoteParticipant.getSid(), remoteVideoTrack.getName()),
                             remoteParticipant.getSid());
             remoteParticipant.setListener(listener);
         }
@@ -1057,7 +1056,8 @@ public class RoomActivity extends BaseActivity {
                             old.sid, old.identity, old.videoTrack, old.muted, old.mirror);
                     RemoteParticipantListener listener =
                             new RemoteParticipantListener(
-                                    participantController.getThumb(old.sid, old.videoTrack),
+                                    participantController.getThumb(
+                                            old.sid, old.videoTrack.getName()),
                                     remoteParticipant.getSid());
                     remoteParticipant.setListener(listener);
                 }
@@ -1119,7 +1119,9 @@ public class RoomActivity extends BaseActivity {
         if (participantController.getPrimaryItem().sid.equals(remoteParticipant.getSid())) {
 
             // render local video if primary remoteParticipant has gone
-            participantController.getThumb(localParticipantSid, cameraVideoTrack).callOnClick();
+            participantController
+                    .getThumb(localParticipantSid, cameraVideoTrack.getName())
+                    .callOnClick();
         }
 
         participantController.removeThumbs(remoteParticipant.getSid());
@@ -1218,8 +1220,6 @@ public class RoomActivity extends BaseActivity {
             publishLocalTracks();
 
             updateStats();
-
-            addParticipantViews();
         }
     }
 
@@ -1241,34 +1241,6 @@ public class RoomActivity extends BaseActivity {
 
             if (localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
-            }
-        }
-    }
-
-    private void addParticipantViews() {
-        if (room != null) {
-            // add existing room participants thumbs
-            boolean isFirstParticipant = true;
-            for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
-                addParticipant(remoteParticipant, isFirstParticipant);
-                isFirstParticipant = false;
-                if (room.getDominantSpeaker() != null) {
-                    if (room.getDominantSpeaker().getSid().equals(remoteParticipant.getSid())) {
-                        VideoTrack videoTrack =
-                                (remoteParticipant.getRemoteVideoTracks().size() > 0)
-                                        ? remoteParticipant
-                                                .getRemoteVideoTracks()
-                                                .get(0)
-                                                .getRemoteVideoTrack()
-                                        : null;
-                        if (videoTrack != null) {
-                            ParticipantView participantView =
-                                    participantController.getThumb(
-                                            remoteParticipant.getSid(), videoTrack);
-                            participantController.setDominantSpeaker(participantView);
-                        }
-                    }
-                }
             }
         }
     }
@@ -1347,7 +1319,7 @@ public class RoomActivity extends BaseActivity {
                         : null;
         if (videoTrack != null) {
             ParticipantView participantView =
-                    participantController.getThumb(dominantSpeaker.getSid(), videoTrack);
+                    participantController.getThumb(dominantSpeaker.getSid(), videoTrack.getName());
             if (participantView != null) {
                 participantController.setDominantSpeaker(participantView);
             } else {
@@ -1375,15 +1347,19 @@ public class RoomActivity extends BaseActivity {
 
     private void bindRoomViewState(RoomViewState roomViewState) {
         deviceMenuItem.setVisible(!roomViewState.getAvailableAudioDevices().isEmpty());
-        ParticipantViewState localParticipantState = roomViewState.getLocalParticipantState();
-        if (roomViewState.getLocalParticipantState() != null)
-            addParticipantThumb(localParticipantState);
+        renderThumbnails(roomViewState);
+    }
+
+    private void renderThumbnails(RoomViewState roomViewState) {
+        List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
+        if (thumbnails != null) {
+            for (ParticipantViewState thumbnail : roomViewState.getParticipantThumbnails()) {
+                addParticipantThumb(thumbnail);
+            }
+        }
     }
 
     private void addParticipantThumb(ParticipantViewState participantViewState) {
-        // remove primary view
-        participantController.removePrimary();
-
         participantController.addThumb(
                 participantViewState.getSid(),
                 participantViewState.getIdentity(),
@@ -1391,14 +1367,11 @@ public class RoomActivity extends BaseActivity {
                 false,
                 false);
 
-        participantController
-                .getThumb(participantViewState.getSid(), participantViewState.getVideoTrack())
-                .callOnClick();
-
         if (participantViewState.isLocalParticipant()) {
             localParticipant.setListener(
                     new LocalParticipantListener(
-                            participantController.getThumb(localParticipantSid, cameraVideoTrack)));
+                            participantController.getThumb(
+                                    localParticipantSid, cameraVideoTrack.getName())));
         }
     }
 

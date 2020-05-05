@@ -4,7 +4,7 @@ import com.twilio.audioswitch.selection.AudioDevice
 import com.twilio.video.app.participant.ParticipantViewState
 
 data class RoomViewState(
-    val localParticipantState: ParticipantViewState? = null,
+    val participantThumbnails: List<ParticipantViewState>? = null,
     val selectedDevice: AudioDevice? = null,
     val availableAudioDevices: List<AudioDevice>? = null
 )
