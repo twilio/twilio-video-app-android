@@ -73,7 +73,7 @@ class RoomViewModel(
     private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
         when (roomEvent) {
             is RoomState -> {
-                roomEvent.room?.let { room ->
+                roomEvent.room.let { room ->
                     when (room.state) {
                         CONNECTED -> {
                             checkRemoteParticipants(room)
