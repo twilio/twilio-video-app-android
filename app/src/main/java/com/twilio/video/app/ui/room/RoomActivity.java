@@ -951,73 +951,6 @@ public class RoomActivity extends BaseActivity {
     }
 
     /**
-     * Provides remoteParticipant a listener for media events and add thumb.
-     *
-     * @param remoteParticipant newly joined room remoteParticipant
-     */
-    private void addParticipant(RemoteParticipant remoteParticipant, boolean renderAsPrimary) {
-        boolean muted =
-                remoteParticipant.getRemoteAudioTracks().size() <= 0
-                        || !remoteParticipant.getRemoteAudioTracks().get(0).isTrackEnabled();
-        List<RemoteVideoTrackPublication> remoteVideoTrackPublications =
-                remoteParticipant.getRemoteVideoTracks();
-
-        if (remoteVideoTrackPublications.isEmpty()) {
-            /*
-             * Add placeholder UI by passing null video track for a participant that is not
-             * sharing any video tracks.
-             */
-            addParticipantVideoTrack(remoteParticipant, muted, null, renderAsPrimary);
-        } else {
-            for (RemoteVideoTrackPublication remoteVideoTrackPublication :
-                    remoteVideoTrackPublications) {
-                addParticipantVideoTrack(
-                        remoteParticipant,
-                        muted,
-                        remoteVideoTrackPublication.getRemoteVideoTrack(),
-                        renderAsPrimary);
-                renderAsPrimary = false;
-            }
-        }
-    }
-
-    private void addParticipantVideoTrack(
-            RemoteParticipant remoteParticipant,
-            boolean muted,
-            RemoteVideoTrack remoteVideoTrack,
-            boolean renderAsPrimary) {
-        if (renderAsPrimary) {
-            ParticipantPrimaryView primaryView = participantController.getPrimaryView();
-
-            renderItemAsPrimary(
-                    new ParticipantController.Item(
-                            remoteParticipant.getSid(),
-                            remoteParticipant.getIdentity(),
-                            remoteVideoTrack.getName(),
-                            remoteVideoTrack,
-                            muted,
-                            false));
-            RemoteParticipantListener listener =
-                    new RemoteParticipantListener(primaryView, remoteParticipant.getSid());
-            remoteParticipant.setListener(listener);
-        } else {
-            participantController.addThumb(
-                    remoteParticipant.getSid(),
-                    remoteParticipant.getIdentity(),
-                    remoteVideoTrack,
-                    muted,
-                    false);
-
-            RemoteParticipantListener listener =
-                    new RemoteParticipantListener(
-                            participantController.getThumb(
-                                    remoteParticipant.getSid(), remoteVideoTrack.getName()),
-                            remoteParticipant.getSid());
-            remoteParticipant.setListener(listener);
-        }
-    }
-
-    /**
      * Sets new item to render as primary view and moves existing primary view item to thumbs view.
      *
      * @param item New item to be rendered in primary view
@@ -1602,23 +1535,6 @@ public class RoomActivity extends BaseActivity {
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled(),
                     remoteVideoTrackPublication.isTrackSubscribed());
-
-            ParticipantController.Item primary = participantController.getPrimaryItem();
-
-            if (primary != null
-                    && primary.sid.equals(remoteParticipant.getSid())
-                    && primary.videoTrack == null) {
-                // no thumb needed - render as primary
-                primary.videoTrack = remoteVideoTrack;
-                participantController.renderAsPrimary(primary);
-            } else {
-                // not a primary remoteParticipant requires thumb
-                participantController.addOrUpdateThumb(
-                        remoteParticipant.getSid(),
-                        remoteParticipant.getIdentity(),
-                        null,
-                        remoteVideoTrack);
-            }
         }
 
         @Override
@@ -1646,39 +1562,6 @@ public class RoomActivity extends BaseActivity {
                     remoteParticipant.getIdentity(),
                     remoteVideoTrackPublication.getTrackSid(),
                     remoteVideoTrackPublication.isTrackEnabled());
-
-            ParticipantController.Item primary = participantController.getPrimaryItem();
-
-            if (primary != null
-                    && primary.sid.equals(remoteParticipant.getSid())
-                    && primary.videoTrack == remoteVideoTrack) {
-
-                // Remove primary video track
-                primary.videoTrack = null;
-
-                // Try to find another video track to render as primary
-                List<RemoteVideoTrackPublication> remoteVideoTracks =
-                        remoteParticipant.getRemoteVideoTracks();
-                for (RemoteVideoTrackPublication newRemoteVideoTrackPublication :
-                        remoteVideoTracks) {
-                    RemoteVideoTrack newRemoteVideoTrack =
-                            newRemoteVideoTrackPublication.getRemoteVideoTrack();
-                    if (newRemoteVideoTrack != remoteVideoTrack) {
-                        participantController.removeThumb(
-                                remoteParticipant.getSid(), newRemoteVideoTrack);
-                        primary.videoTrack = newRemoteVideoTrack;
-                        break;
-                    }
-                }
-                participantController.renderAsPrimary(primary);
-            } else {
-
-                // remove thumb or leave empty video thumb
-                participantController.removeOrEmptyThumb(
-                        remoteParticipant.getSid(),
-                        remoteParticipant.getIdentity(),
-                        remoteVideoTrack);
-            }
         }
 
         @Override

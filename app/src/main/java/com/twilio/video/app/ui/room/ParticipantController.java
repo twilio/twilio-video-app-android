@@ -185,23 +185,6 @@ class ParticipantController {
         }
     }
 
-    /**
-     * Add new participant thumb or update old instance.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param oldVideo video track to replace.
-     * @param newVideo new video track to insert.
-     */
-    void addOrUpdateThumb(String sid, String identity, VideoTrack oldVideo, VideoTrack newVideo) {
-
-        if (hasThumb(sid, oldVideo)) {
-            updateThumb(sid, oldVideo, newVideo);
-        } else {
-            addThumb(sid, identity, newVideo);
-        }
-    }
-
     void removeThumb(Item item) {
         removeThumb(item.sid, item.videoTrack);
     }
