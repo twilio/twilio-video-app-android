@@ -33,7 +33,7 @@ class RoomViewModel(
     private val mutableAudioViewState = MutableLiveData(RoomViewState())
 
     // TODO Build single ViewState for UI to consume instead of having multiple event streams
-    val roomEvents: LiveData<RoomEvent?> = Transformations.map(roomManager.viewEvents, ::mapRoomEvents)
+    val roomEvents: LiveData<RoomEvent?> = Transformations.map(roomManager.viewEvents, ::observeRoomEvents)
     val roomViewState: LiveData<RoomViewState?> = mutableAudioViewState
 
     init {
@@ -70,7 +70,7 @@ class RoomViewModel(
         }
     }
 
-    private fun mapRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
+    private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
         when (roomEvent) {
             is RoomState -> {
                 roomEvent.room?.let { room ->
