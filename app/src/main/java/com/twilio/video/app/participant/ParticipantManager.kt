@@ -5,20 +5,29 @@ import timber.log.Timber
 class ParticipantManager {
 
     private val mutableParticipants = mutableListOf<ParticipantViewState>()
-    val participants: List<ParticipantViewState> get() = mutableParticipants.toList()
+    val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants.toList()
+    var primaryParticipant: ParticipantViewState? = null
+        private set
 
     fun updateParticipant(participantViewState: ParticipantViewState) {
         removeParticipant(participantViewState)
         mutableParticipants.add(participantViewState)
-        Timber.d("Participant views: $participants")
+        updatePrimaryParticipant()
+        Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
     fun removeParticipant(participantViewState: ParticipantViewState) {
         mutableParticipants.find { it.sid == participantViewState.sid }?.let { existingParticipant ->
             mutableParticipants.remove(existingParticipant)
-            Timber.d("Participant views: $participants")
+            updatePrimaryParticipant()
+            Timber.d("Participant thumbnails: $participantThumbnails")
         }
     }
 
     fun clearParticipants() = mutableParticipants.clear()
+
+    private fun updatePrimaryParticipant() {
+        primaryParticipant = mutableParticipants.find { !it.isLocalParticipant }
+        Timber.d("Primary Participant: $primaryParticipant")
+    }
 }

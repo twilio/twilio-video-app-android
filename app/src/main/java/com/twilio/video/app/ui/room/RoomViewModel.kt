@@ -6,7 +6,6 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.twilio.audioswitch.selection.AudioDevice
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.Room
 import com.twilio.video.Room.State.CONNECTED
@@ -55,7 +54,7 @@ class RoomViewModel(
     fun processInput(viewEvent: RoomViewEvent) {
         when (viewEvent) {
             is SelectAudioDevice -> {
-                selectAudioDevice(viewEvent.device)
+                audioDeviceSelector.selectDevice(viewEvent.device)
             }
             ActivateAudioDevice -> { audioDeviceSelector.activate() }
             DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
@@ -94,7 +93,7 @@ class RoomViewModel(
             is ParticipantDisconnected -> {
                 roomEvent.participantViewState?.let { participantViewState ->
                     participantManager.removeParticipant(participantViewState)
-                    updateState { it.copy(participantThumbnails = participantManager.participants) }
+                    updateParticipantViewState()
                 }
             }
         }
@@ -104,17 +103,18 @@ class RoomViewModel(
     private fun checkRemoteParticipants(room: Room) {
         room.remoteParticipants.let { participants ->
             participants.forEach { participantManager.updateParticipant(buildParticipantViewState(it)) }
-            updateState { it.copy(participantThumbnails = participantManager.participants) }
+            updateParticipantViewState()
         }
     }
 
     private fun addParticipantView(participantViewState: ParticipantViewState) {
         participantManager.updateParticipant(participantViewState)
-        updateState { it.copy(participantThumbnails = participantManager.participants) }
+        updateParticipantViewState()
     }
 
-    private fun selectAudioDevice(device: AudioDevice) {
-        audioDeviceSelector.selectDevice(device)
+    private fun updateParticipantViewState() {
+        updateState { it.copy(participantThumbnails = participantManager.participantThumbnails) }
+        updateState { it.copy(primaryParticipant = participantManager.primaryParticipant) }
     }
 
     private fun connect(

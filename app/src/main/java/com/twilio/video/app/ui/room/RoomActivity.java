@@ -1217,7 +1217,21 @@ public class RoomActivity extends BaseActivity {
 
     private void bindRoomViewState(RoomViewState roomViewState) {
         deviceMenuItem.setVisible(!roomViewState.getAvailableAudioDevices().isEmpty());
+        renderPrimaryView(roomViewState.getPrimaryParticipant());
         renderThumbnails(roomViewState);
+    }
+
+    private void renderPrimaryView(ParticipantViewState primaryParticipant) {
+        if (primaryParticipant != null) {
+            participantController.renderAsPrimary(
+                    primaryParticipant.getSid(),
+                    primaryParticipant.getIdentity(),
+                    primaryParticipant.getVideoTrack(),
+                    primaryParticipant.getMuted(),
+                    primaryParticipant.getMirror());
+        } else {
+            renderLocalParticipantStub();
+        }
     }
 
     private void renderThumbnails(RoomViewState roomViewState) {

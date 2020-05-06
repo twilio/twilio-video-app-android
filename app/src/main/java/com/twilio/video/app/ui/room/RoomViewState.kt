@@ -5,6 +5,7 @@ import com.twilio.video.app.participant.ParticipantViewState
 
 data class RoomViewState(
     val participantThumbnails: List<ParticipantViewState>? = null,
+    val primaryParticipant: ParticipantViewState? = null,
     val selectedDevice: AudioDevice? = null,
     val availableAudioDevices: List<AudioDevice>? = null
 )
