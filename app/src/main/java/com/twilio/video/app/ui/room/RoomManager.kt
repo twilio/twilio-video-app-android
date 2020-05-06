@@ -28,6 +28,7 @@ import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RemoteParticipantListener
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
@@ -218,19 +219,31 @@ class RoomManager(
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            mutableViewEvents.value = ParticipantConnected(room, remoteParticipant)
+            remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
+            mutableViewEvents.value = ParticipantConnected(room,
+                    buildParticipantViewState(remoteParticipant))
         }
 
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            mutableViewEvents.value = ParticipantDisconnected(room, remoteParticipant)
+            mutableViewEvents.value = ParticipantDisconnected(room,
+                    buildParticipantViewState(remoteParticipant))
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
-            mutableViewEvents.value = DominantSpeakerChanged(room, remoteParticipant)
+            remoteParticipant?.let {
+                val participantViewState = ParticipantViewState(
+                        remoteParticipant.sid,
+                        remoteParticipant.identity,
+                        remoteParticipant.remoteVideoTracks.firstOrNull()?.remoteVideoTrack,
+                        isDominantSpeaker = true
+                )
+                mutableViewEvents.value = DominantSpeakerChanged(room,
+                        participantViewState)
+            }
         }
 
         override fun onRecordingStarted(room: Room) {}

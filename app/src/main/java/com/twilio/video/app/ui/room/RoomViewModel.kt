@@ -14,7 +14,10 @@ import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
@@ -63,7 +66,7 @@ class RoomViewModel(
                         viewEvent.isNetworkQualityEnabled)
             }
             is LocalVideoTrackPublished -> {
-                addLocalParticipantView(viewEvent.participantViewState)
+                addParticipantView(viewEvent.participantViewState)
             }
             Disconnect -> { disconnect() }
         }
@@ -85,9 +88,14 @@ class RoomViewModel(
                     }
                 }
             }
-            is NewRemoteVideoTrack -> {
-                participantManager.updateParticipant(roomEvent.participantViewState)
-                updateState { it.copy(participantThumbnails = participantManager.participants) }
+            is NewRemoteVideoTrack, is ParticipantConnected, is DominantSpeakerChanged -> {
+                roomEvent.participantViewState?.let { addParticipantView(it) }
+            }
+            is ParticipantDisconnected -> {
+                roomEvent.participantViewState?.let { participantViewState ->
+                    participantManager.removeParticipant(participantViewState)
+                    updateState { it.copy(participantThumbnails = participantManager.participants) }
+                }
             }
         }
         return roomEvent
@@ -100,7 +108,7 @@ class RoomViewModel(
         }
     }
 
-    private fun addLocalParticipantView(participantViewState: ParticipantViewState) {
+    private fun addParticipantView(participantViewState: ParticipantViewState) {
         participantManager.updateParticipant(participantViewState)
         updateState { it.copy(participantThumbnails = participantManager.participants) }
     }

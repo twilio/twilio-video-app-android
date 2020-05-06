@@ -8,11 +8,16 @@ class ParticipantManager {
     val participants: List<ParticipantViewState> get() = mutableParticipants.toList()
 
     fun updateParticipant(participantViewState: ParticipantViewState) {
-        mutableParticipants.find { it.sid == participantViewState.sid }?.let { existingParticipant ->
-            mutableParticipants.remove(existingParticipant)
-        }
+        removeParticipant(participantViewState)
         mutableParticipants.add(participantViewState)
         Timber.d("Participant views: $participants")
+    }
+
+    fun removeParticipant(participantViewState: ParticipantViewState) {
+        mutableParticipants.find { it.sid == participantViewState.sid }?.let { existingParticipant ->
+            mutableParticipants.remove(existingParticipant)
+            Timber.d("Participant views: $participants")
+        }
     }
 
     fun clearParticipants() = mutableParticipants.clear()
