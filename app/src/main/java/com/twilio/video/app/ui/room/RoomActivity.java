@@ -586,7 +586,7 @@ public class RoomActivity extends BaseActivity {
         if (room != null && room.getState() == CONNECTED) {
 
             // update local participant thumb
-            participantController.updateThumb(localParticipantSid, oldVideo, cameraVideoTrack);
+            participantController.updateThumb(localParticipantSid, cameraVideoTrack);
 
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
 
@@ -603,7 +603,7 @@ public class RoomActivity extends BaseActivity {
 
                 // update thumb state
                 participantController.updateThumb(
-                        localParticipantSid, cameraVideoTrack, ParticipantView.State.SELECTED);
+                        localParticipantSid, ParticipantView.State.SELECTED);
             }
 
         } else {
@@ -870,7 +870,7 @@ public class RoomActivity extends BaseActivity {
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
                 participantController.updatePrimaryThumb(mirror);
             } else {
-                participantController.updateThumb(localParticipantSid, cameraVideoTrack, mirror);
+                participantController.updateThumb(localParticipantSid, mirror);
             }
         }
     }
@@ -973,8 +973,8 @@ public class RoomActivity extends BaseActivity {
                         old.videoTrack == null
                                 ? ParticipantView.State.NO_VIDEO
                                 : ParticipantView.State.VIDEO;
-                participantController.updateThumb(old.sid, old.videoTrack, state);
-                participantController.updateThumb(old.sid, old.videoTrack, old.mirror);
+                participantController.updateThumb(old.sid, state);
+                participantController.updateThumb(old.sid, old.mirror);
 
             } else {
 
@@ -985,8 +985,7 @@ public class RoomActivity extends BaseActivity {
                             old.sid, old.identity, old.videoTrack, old.muted, old.mirror);
                     RemoteParticipantListener listener =
                             new RemoteParticipantListener(
-                                    participantController.getThumb(
-                                            old.sid, old.videoTrack.getName()),
+                                    participantController.getThumb(old.sid),
                                     remoteParticipant.getSid());
                     remoteParticipant.setListener(listener);
                 }
@@ -1007,8 +1006,7 @@ public class RoomActivity extends BaseActivity {
         if (item.sid.equals(localParticipantSid)) {
 
             // toggle local participant state and hide his badge
-            participantController.updateThumb(
-                    item.sid, item.videoTrack, ParticipantView.State.SELECTED);
+            participantController.updateThumb(item.sid, ParticipantView.State.SELECTED);
             participantController.getPrimaryView().showIdentityBadge(false);
         } else {
 
@@ -1290,8 +1288,7 @@ public class RoomActivity extends BaseActivity {
         if (participantViewState.isLocalParticipant()) {
             localParticipant.setListener(
                     new LocalParticipantListener(
-                            participantController.getThumb(
-                                    localParticipantSid, cameraVideoTrack.getName())));
+                            participantController.getThumb(localParticipantSid)));
         }
     }
 
