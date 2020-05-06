@@ -7,17 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
-import com.twilio.video.Room
-import com.twilio.video.Room.State.CONNECTED
-import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
-import com.twilio.video.app.participant.buildParticipantViewState
-import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.RoomState
+import com.twilio.video.app.ui.room.RoomState.Connected
+import com.twilio.video.app.ui.room.RoomState.Disconnected
+import com.twilio.video.app.ui.room.RoomState.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomState.NewRemoteVideoTrack
+import com.twilio.video.app.ui.room.RoomState.ParticipantConnected
+import com.twilio.video.app.ui.room.RoomState.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
@@ -25,17 +22,17 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import kotlinx.coroutines.launch
+
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
     private val participantManager: ParticipantManager = ParticipantManager()
 ) : ViewModel() {
 
-    private val mutableAudioViewState = MutableLiveData(RoomViewState())
-
-    // TODO Build single ViewState for UI to consume instead of having multiple event streams
-    val roomEvents: LiveData<RoomEvent?> = Transformations.map(roomManager.viewEvents, ::observeRoomEvents)
-    val roomViewState: LiveData<RoomViewState?> = mutableAudioViewState
+    // TODO Use another type of observable here like a Coroutine flow
+    val roomEvents: LiveData<RoomState?> = Transformations.map(roomManager.viewEvents, ::observeRoomEvents)
+    private val mutableRoomViewState = MutableLiveData(RoomViewState())
+    val roomViewState: LiveData<RoomViewState?> = mutableRoomViewState
 
     init {
         audioDeviceSelector.start { audioDevices, selectedDevice ->
@@ -67,44 +64,35 @@ class RoomViewModel(
             is LocalVideoTrackPublished -> {
                 addParticipantView(viewEvent.participantViewState)
             }
-            Disconnect -> { disconnect() }
+            Disconnect -> roomManager.disconnect()
         }
     }
 
-    private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
-        when (roomEvent) {
-            is RoomState -> {
-                roomEvent.room?.let { room ->
-                    when (room.state) {
-                        CONNECTED -> {
-                            checkRemoteParticipants(room)
-                        }
-                        DISCONNECTED -> {
-                            participantManager.clearParticipants()
-                            updateState { it.copy(participantThumbnails = null) }
-                        }
-                        else -> {}
-                    }
-                }
+    private fun observeRoomEvents(roomState: RoomState?): RoomState? {
+        when (roomState) {
+            is Connected -> {
+                updateState { it.copy(roomName = roomState.roomName) }
+                checkRemoteParticipants(roomState.remoteParticipants)
             }
-            is NewRemoteVideoTrack, is ParticipantConnected, is DominantSpeakerChanged -> {
-                roomEvent.participantViewState?.let { addParticipantView(it) }
+            is Disconnected -> {
+                participantManager.clearParticipants()
+                updateState { it.copy(participantThumbnails = null) }
             }
+            is NewRemoteVideoTrack -> addParticipantView(roomState.participant)
+            is ParticipantConnected -> addParticipantView(roomState.participant)
+            is DominantSpeakerChanged -> addParticipantView(roomState.participant)
             is ParticipantDisconnected -> {
-                roomEvent.participantViewState?.let { participantViewState ->
-                    participantManager.removeParticipant(participantViewState)
-                    updateParticipantViewState()
-                }
+                participantManager.removeParticipant(roomState.participant)
+                updateParticipantViewState()
             }
         }
-        return roomEvent
+        updateState { it.copy(roomState = roomState) }
+        return roomState
     }
 
-    private fun checkRemoteParticipants(room: Room) {
-        room.remoteParticipants.let { participants ->
-            participants.forEach { participantManager.updateParticipant(buildParticipantViewState(it)) }
+    private fun checkRemoteParticipants(remoteParticipants: List<ParticipantViewState>) {
+            remoteParticipants.forEach { participantManager.updateParticipant(it) }
             updateParticipantViewState()
-        }
     }
 
     private fun addParticipantView(participantViewState: ParticipantViewState) {
@@ -129,18 +117,14 @@ class RoomViewModel(
                     isNetworkQualityEnabled)
         }
 
-    private fun disconnect() {
-        roomManager.disconnect()
-    }
-
     private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
         withState { currentState ->
-            mutableAudioViewState.value = action(currentState)
+            mutableRoomViewState.value = action(currentState)
         }
     }
 
     private fun <R> withState(action: (currentState: RoomViewState) -> R): R {
-        val oldState = mutableAudioViewState.value
+        val oldState = mutableRoomViewState.value
         oldState?.let {
             return action(oldState)
         } ?: throw IllegalStateException("ViewState can never be null")
