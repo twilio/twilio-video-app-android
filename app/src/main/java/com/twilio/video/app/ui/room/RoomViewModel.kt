@@ -120,19 +120,6 @@ class RoomViewModel(
                     isNetworkQualityEnabled)
         }
 
-    private fun updateState(action: (oldState: RoomViewState) -> RoomViewState) {
-        withState { currentState ->
-            mutableRoomViewState.value = action(currentState)
-        }
-    }
-
-    private fun <R> withState(action: (currentState: RoomViewState) -> R): R {
-        val oldState = mutableRoomViewState.value
-        oldState?.let {
-            return action(oldState)
-        } ?: throw IllegalStateException("ViewState can never be null")
-    }
-
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
         private val audioDeviceSelector: AudioDeviceSelector
