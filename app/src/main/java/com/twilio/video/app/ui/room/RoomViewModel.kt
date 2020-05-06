@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDevice
 import com.twilio.audioswitch.selection.AudioDeviceSelector
-import com.twilio.video.LocalParticipant
-import com.twilio.video.LocalVideoTrack
 import com.twilio.video.Room
 import com.twilio.video.Room.State.CONNECTED
 import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.app.participant.ParticipantManager
+import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
@@ -23,7 +23,6 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import kotlinx.coroutines.launch
-
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
@@ -64,7 +63,7 @@ class RoomViewModel(
                         viewEvent.isNetworkQualityEnabled)
             }
             is LocalVideoTrackPublished -> {
-                addLocalParticipantView(viewEvent.localParticipant, viewEvent.localVideoTrack)
+                addLocalParticipantView(viewEvent.participantViewState)
             }
             Disconnect -> { disconnect() }
         }
@@ -73,7 +72,7 @@ class RoomViewModel(
     private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
         when (roomEvent) {
             is RoomState -> {
-                roomEvent.room.let { room ->
+                roomEvent.room?.let { room ->
                     when (room.state) {
                         CONNECTED -> {
                             checkRemoteParticipants(room)
@@ -87,7 +86,7 @@ class RoomViewModel(
                 }
             }
             is NewRemoteVideoTrack -> {
-                participantManager.updateParticipants(roomEvent.remoteParticipant)
+                participantManager.updateParticipants(roomEvent.participantViewState)
                 updateState { it.copy(participantThumbnails = participantManager.participants) }
             }
         }
@@ -96,13 +95,13 @@ class RoomViewModel(
 
     private fun checkRemoteParticipants(room: Room) {
         room.remoteParticipants.let { participants ->
-            participants.forEach { participantManager.updateParticipants(it) }
+            participants.forEach { participantManager.updateParticipants(buildParticipantViewState(it)) }
             updateState { it.copy(participantThumbnails = participantManager.participants) }
         }
     }
 
-    private fun addLocalParticipantView(localParticipant: LocalParticipant, localVideoTrack: LocalVideoTrack) {
-        participantManager.updateParticipants(localParticipant, localVideoTrack)
+    private fun addLocalParticipantView(participantViewState: ParticipantViewState) {
+        participantManager.updateParticipants(participantViewState)
         updateState { it.copy(participantThumbnails = participantManager.participants) }
     }
 

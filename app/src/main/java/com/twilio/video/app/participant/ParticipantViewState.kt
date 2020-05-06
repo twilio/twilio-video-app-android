@@ -1,5 +1,6 @@
 package com.twilio.video.app.participant
 
+import com.twilio.video.RemoteParticipant
 import com.twilio.video.VideoTrack
 
 data class ParticipantViewState(
@@ -13,3 +14,10 @@ data class ParticipantViewState(
     val isDominantSpeaker: Boolean = false,
     val isLocalParticipant: Boolean = false
 )
+
+fun buildParticipantViewState(remoteParticipant: RemoteParticipant) =
+    ParticipantViewState(
+            remoteParticipant.sid,
+            remoteParticipant.identity,
+            remoteParticipant.remoteVideoTracks.firstOrNull()?.remoteVideoTrack
+    )

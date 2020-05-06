@@ -27,6 +27,7 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RemoteParticipantListener
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
@@ -127,10 +128,10 @@ class RoomManager(
         }
     }
 
-    fun newRemoteVideoTrack(remoteParticipant: RemoteParticipant) {
+    fun newRemoteVideoTrack(participantViewState: ParticipantViewState) {
         Timber.i("RemoteParticipant video track published connected -> remoteParticipant: %s",
-                remoteParticipant.sid)
-        mutableViewEvents.value = NewRemoteVideoTrack(remoteParticipant = remoteParticipant)
+                participantViewState.sid)
+        mutableViewEvents.value = NewRemoteVideoTrack(participantViewState)
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {

@@ -1,8 +1,7 @@
 package com.twilio.video.app.ui.room
 
 import com.twilio.audioswitch.selection.AudioDevice
-import com.twilio.video.LocalParticipant
-import com.twilio.video.LocalVideoTrack
+import com.twilio.video.app.participant.ParticipantViewState
 
 sealed class RoomViewEvent {
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()
@@ -13,9 +12,6 @@ sealed class RoomViewEvent {
         val roomName: String,
         val isNetworkQualityEnabled: Boolean
     ) : RoomViewEvent()
-    data class LocalVideoTrackPublished(
-        val localParticipant: LocalParticipant,
-        val localVideoTrack: LocalVideoTrack
-    ) : RoomViewEvent()
+    data class LocalVideoTrackPublished(val participantViewState: ParticipantViewState) : RoomViewEvent()
     object Disconnect : RoomViewEvent()
 }

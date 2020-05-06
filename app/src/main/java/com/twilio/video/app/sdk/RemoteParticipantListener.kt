@@ -8,12 +8,13 @@ import com.twilio.video.RemoteParticipant
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.RemoteVideoTrackPublication
 import com.twilio.video.TwilioException
+import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.ui.room.RoomManager
 
 class RemoteParticipantListener(private val roomManager: RoomManager) : RemoteParticipant.Listener {
 
     override fun onVideoTrackSubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
-        roomManager.newRemoteVideoTrack(remoteParticipant)
+        roomManager.newRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
     }
 
     override fun onDataTrackPublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}

@@ -1165,13 +1165,26 @@ public class RoomActivity extends BaseActivity {
                 Timber.d("Camera track: %s", cameraVideoTrack);
                 localParticipant.publishTrack(cameraVideoTrack);
                 roomViewModel.processInput(
-                        new LocalVideoTrackPublished(localParticipant, cameraVideoTrack));
+                        new LocalVideoTrackPublished(buildParticipantViewState()));
             }
 
             if (localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
             }
         }
+    }
+
+    private ParticipantViewState buildParticipantViewState() {
+        return new ParticipantViewState(
+                localParticipant.getSid(),
+                getString(R.string.you),
+                cameraVideoTrack,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
     }
 
     private void bindRoomEvents(RoomEvent roomEvent) {
