@@ -1036,25 +1036,6 @@ public class RoomActivity extends BaseActivity {
     }
 
     /**
-     * Remove single remoteParticipant thumbs and all it associated thumbs. If rendered as primary
-     * remoteParticipant, primary view switches to local video track.
-     *
-     * @param remoteParticipant recently disconnected remoteParticipant.¬
-     */
-    private void removeParticipant(RemoteParticipant remoteParticipant) {
-
-        if (participantController.getPrimaryItem().sid.equals(remoteParticipant.getSid())) {
-
-            // render local video if primary remoteParticipant has gone
-            participantController
-                    .getThumb(localParticipantSid, cameraVideoTrack.getName())
-                    .callOnClick();
-        }
-
-        participantController.removeThumbs(remoteParticipant.getSid());
-    }
-
-    /**
      * Remove the video track and mark the track to be restored when going to the settings screen or
      * going to the background
      */
@@ -1222,34 +1203,6 @@ public class RoomActivity extends BaseActivity {
                 }
             }
             updateUi(room, roomEvent);
-        }
-    }
-
-    private void changeDominantSpeaker(RemoteParticipant dominantSpeaker) {
-        if (dominantSpeaker == null) {
-            participantController.setDominantSpeaker(null);
-            return;
-        }
-        VideoTrack videoTrack =
-                (dominantSpeaker.getRemoteVideoTracks().size() > 0)
-                        ? dominantSpeaker.getRemoteVideoTracks().get(0).getRemoteVideoTrack()
-                        : null;
-        if (videoTrack != null) {
-            ParticipantView participantView =
-                    participantController.getThumb(dominantSpeaker.getSid(), videoTrack.getName());
-            if (participantView != null) {
-                participantController.setDominantSpeaker(participantView);
-            } else {
-                dominantSpeaker.getIdentity();
-                ParticipantPrimaryView primaryParticipantView =
-                        participantController.getPrimaryView();
-                if (primaryParticipantView.identity.equals(dominantSpeaker.getIdentity())) {
-                    participantController.setDominantSpeaker(
-                            participantController.getPrimaryView());
-                } else {
-                    participantController.setDominantSpeaker(null);
-                }
-            }
         }
     }
 
