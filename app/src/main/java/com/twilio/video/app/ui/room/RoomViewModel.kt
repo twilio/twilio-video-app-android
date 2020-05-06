@@ -9,12 +9,13 @@ import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
-import com.twilio.video.app.ui.room.RoomState.Connected
-import com.twilio.video.app.ui.room.RoomState.Disconnected
-import com.twilio.video.app.ui.room.RoomState.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomState.NewRemoteVideoTrack
-import com.twilio.video.app.ui.room.RoomState.ParticipantConnected
-import com.twilio.video.app.ui.room.RoomState.ParticipantDisconnected
+import com.twilio.video.app.udf.BaseViewModel
+import com.twilio.video.app.ui.room.RoomEvent.Connected
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
@@ -22,15 +23,16 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
     private val participantManager: ParticipantManager = ParticipantManager()
-) : ViewModel() {
+) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>() {
 
     // TODO Use another type of observable here like a Coroutine flow
-    val roomEvents: LiveData<RoomState?> = Transformations.map(roomManager.viewEvents, ::observeRoomEvents)
+    val roomEvents: LiveData<RoomEvent?> = Transformations.map(roomManager.viewEvents, ::observeRoomEvents)
     private val mutableRoomViewState = MutableLiveData(RoomViewState())
     val roomViewState: LiveData<RoomViewState?> = mutableRoomViewState
 
@@ -68,26 +70,26 @@ class RoomViewModel(
         }
     }
 
-    private fun observeRoomEvents(roomState: RoomState?): RoomState? {
-        when (roomState) {
+    private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
+        when (roomEvent) {
             is Connected -> {
-                updateState { it.copy(roomName = roomState.roomName) }
-                checkRemoteParticipants(roomState.remoteParticipants)
+                updateState { it.copy(room = roomEvent.room, roomName = roomEvent.roomName) }
+                checkRemoteParticipants(roomEvent.remoteParticipants)
             }
             is Disconnected -> {
                 participantManager.clearParticipants()
                 updateState { it.copy(participantThumbnails = null) }
             }
-            is NewRemoteVideoTrack -> addParticipantView(roomState.participant)
-            is ParticipantConnected -> addParticipantView(roomState.participant)
-            is DominantSpeakerChanged -> addParticipantView(roomState.participant)
+            is NewRemoteVideoTrack -> addParticipantView(roomEvent.participant)
+            is ParticipantConnected -> addParticipantView(roomEvent.participant)
+            is DominantSpeakerChanged -> addParticipantView(roomEvent.participant)
             is ParticipantDisconnected -> {
-                participantManager.removeParticipant(roomState.participant)
+                participantManager.removeParticipant(roomEvent.participant)
                 updateParticipantViewState()
             }
         }
-        updateState { it.copy(roomState = roomState) }
-        return roomState
+        updateState { it.copy(roomEvent = roomEvent) }
+        return roomEvent
     }
 
     private fun checkRemoteParticipants(remoteParticipants: List<ParticipantViewState>) {

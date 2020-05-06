@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
-import com.twilio.video.app.ui.room.RoomState.Disconnected
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
@@ -60,8 +60,8 @@ class VideoService : LifecycleService() {
         } }
     }
 
-    private fun bindRoomEvents(nullableRoomState: RoomState?) {
-        nullableRoomState?.let { roomEvent ->
+    private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
+        nullableRoomEvent?.let { roomEvent ->
             when (roomEvent) {
                 is Disconnected -> stopSelf()
                 else -> {}

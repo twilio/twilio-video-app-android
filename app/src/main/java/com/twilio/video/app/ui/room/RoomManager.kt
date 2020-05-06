@@ -30,15 +30,15 @@ import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RemoteParticipantListener
-import com.twilio.video.app.ui.room.RoomState.ConnectFailure
-import com.twilio.video.app.ui.room.RoomState.Connected
-import com.twilio.video.app.ui.room.RoomState.Connecting
-import com.twilio.video.app.ui.room.RoomState.Disconnected
-import com.twilio.video.app.ui.room.RoomState.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomState.NewRemoteVideoTrack
-import com.twilio.video.app.ui.room.RoomState.ParticipantConnected
-import com.twilio.video.app.ui.room.RoomState.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomState.TokenError
+import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
+import com.twilio.video.app.ui.room.RoomEvent.Connected
+import com.twilio.video.app.ui.room.RoomEvent.Connecting
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import com.twilio.video.app.util.EnvUtil
@@ -55,9 +55,9 @@ class RoomManager(
 ) {
 
     var room: Room? = null
-    private val mutableViewEvents: MutableLiveData<RoomState?> = MutableLiveData()
+    private val mutableViewEvents: MutableLiveData<RoomEvent?> = MutableLiveData()
 
-    val viewEvents: LiveData<RoomState?> = mutableViewEvents
+    val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
 
     private val roomListener = RoomListener()
 
@@ -198,7 +198,7 @@ class RoomManager(
                 remoteParticipants.add(buildParticipantViewState(it))
             }
 
-            mutableViewEvents.value = Connected(remoteParticipants)
+            mutableViewEvents.value = Connected(remoteParticipants, room, room.name)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
