@@ -51,6 +51,7 @@ class RoomViewModel(
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
+        Timber.d("View Event: $viewEvent")
         when (viewEvent) {
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
