@@ -98,15 +98,11 @@ import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
-import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure;
-import com.twilio.video.app.ui.room.RoomEvent.Connected;
-import com.twilio.video.app.ui.room.RoomEvent.Connecting;
-import com.twilio.video.app.ui.room.RoomEvent.Disconnected;
-import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged;
-import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack;
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected;
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected;
-import com.twilio.video.app.ui.room.RoomEvent.TokenError;
+import com.twilio.video.app.udf.ViewEffect;
+import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
+import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished;
@@ -422,7 +418,8 @@ public class RoomActivity extends BaseActivity {
 
         requestPermissions();
         roomViewModel.getRoomEvents().observe(this, (Observer) o -> {});
-        roomViewModel.getRoomViewState().observe(this, this::bindRoomViewState);
+        roomViewModel.getViewState().observe(this, this::bindRoomViewState);
+        roomViewModel.getViewEffects().observe(this, this::bindRoomViewEffects);
 
         return true;
     }
@@ -769,7 +766,7 @@ public class RoomActivity extends BaseActivity {
         primaryVideoView.showIdentityBadge(false);
     }
 
-    private void updateUi(RoomViewState roomViewState) {
+    private void updateLayout(RoomViewState roomViewState) {
         int disconnectButtonState = View.GONE;
         int joinRoomLayoutState = View.VISIBLE;
         int joinStatusLayoutState = View.GONE;
@@ -785,39 +782,36 @@ public class RoomActivity extends BaseActivity {
         String joinStatus = "";
         int recordingWarningVisibility = View.GONE;
 
-        RoomEvent roomEvent = roomViewState.getRoomEvent();
-        if (roomEvent != null) {
-            if (roomEvent instanceof Connecting) {
-                disconnectButtonState = View.VISIBLE;
-                joinRoomLayoutState = View.GONE;
-                joinStatusLayoutState = View.VISIBLE;
-                recordingWarningVisibility = View.VISIBLE;
-                settingsMenuItemState = false;
+        if (roomViewState.isConnectingLayoutVisible()) {
+            disconnectButtonState = View.VISIBLE;
+            joinRoomLayoutState = View.GONE;
+            joinStatusLayoutState = View.VISIBLE;
+            recordingWarningVisibility = View.VISIBLE;
+            settingsMenuItemState = false;
 
-                connectButtonEnabled = false;
+            connectButtonEnabled = false;
 
-                if (roomEditable != null) {
-                    roomName = roomEditable.toString();
-                }
-                joinStatus = "Joining...";
+            if (roomEditable != null) {
+                roomName = roomEditable.toString();
             }
-            if (isConnectedState(roomEvent)) {
-                disconnectButtonState = View.VISIBLE;
-                joinRoomLayoutState = View.GONE;
-                joinStatusLayoutState = View.GONE;
-                settingsMenuItemState = false;
-                screenCaptureMenuItemState = true;
+            joinStatus = "Joining...";
+        }
+        if (roomViewState.isConnectedLayoutVisible()) {
+            disconnectButtonState = View.VISIBLE;
+            joinRoomLayoutState = View.GONE;
+            joinStatusLayoutState = View.GONE;
+            settingsMenuItemState = false;
+            screenCaptureMenuItemState = true;
 
-                connectButtonEnabled = false;
+            connectButtonEnabled = false;
 
-                roomName = roomViewState.getRoomName();
-                toolbarTitle = roomName;
-                joinStatus = "";
-            }
-            if (roomEvent instanceof Disconnected) {
-                connectButtonEnabled = true;
-                screenCaptureMenuItemState = false;
-            }
+            roomName = roomViewState.getTitle();
+            toolbarTitle = roomName;
+            joinStatus = "";
+        }
+        if (roomViewState.isLobbyLayoutVisible()) {
+            connectButtonEnabled = true;
+            screenCaptureMenuItemState = false;
         }
 
         // Check mute state
@@ -852,14 +846,6 @@ public class RoomActivity extends BaseActivity {
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             screenCaptureMenuItem.setVisible(screenCaptureMenuItemState);
         }
-    }
-
-    private boolean isConnectedState(RoomEvent roomEvent) {
-        return roomEvent instanceof Connected
-                || roomEvent instanceof ParticipantConnected
-                || roomEvent instanceof ParticipantDisconnected
-                || roomEvent instanceof NewRemoteVideoTrack
-                || roomEvent instanceof DominantSpeakerChanged;
     }
 
     private void setTitle(String toolbarTitle) {
@@ -1190,19 +1176,19 @@ public class RoomActivity extends BaseActivity {
         deviceMenuItem.setVisible(!roomViewState.getAvailableAudioDevices().isEmpty());
         renderPrimaryView(roomViewState.getPrimaryParticipant());
         renderThumbnails(roomViewState);
-        handleRoomEvent(roomViewState);
+        updateLayout(roomViewState);
     }
 
-    private void handleRoomEvent(RoomViewState roomViewState) {
-        RoomEvent roomEvent = roomViewState.getRoomEvent();
-        if (roomEvent != null) {
+    private void bindRoomViewEffects(ViewEffect<RoomViewEffect> roomViewEffectWrapper) {
+        RoomViewEffect roomViewEffect = roomViewEffectWrapper.getContentIfNotHandled();
+        if (roomViewEffect != null) {
+            Timber.d("RoomViewEffect: %s", roomViewEffect);
             requestPermissions();
-            if (roomEvent instanceof Connected) {
-                room = ((Connected) roomEvent).getRoom();
+            if (roomViewEffect instanceof Connected) {
                 toggleAudioDevice(true);
                 initializeRoom();
             }
-            if (roomEvent instanceof Disconnected) {
+            if (roomViewEffect instanceof Disconnected) {
                 localParticipant = null;
                 room = null;
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
@@ -1210,7 +1196,7 @@ public class RoomActivity extends BaseActivity {
                 toggleAudioDevice(false);
                 networkQualityLevels.clear();
             }
-            if (roomEvent instanceof ConnectFailure) {
+            if (roomViewEffect instanceof ShowConnectFailureDialog) {
                 new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
                         .setTitle(getString(R.string.room_screen_connection_failure_title))
                         .setMessage(getString(R.string.room_screen_connection_failure_message))
@@ -1218,12 +1204,11 @@ public class RoomActivity extends BaseActivity {
                         .show();
                 toggleAudioDevice(false);
             }
-            if (roomEvent instanceof TokenError) {
-                AuthServiceError error = ((TokenError) roomEvent).getServiceError();
+            if (roomViewEffect instanceof ShowTokenErrorDialog) {
+                AuthServiceError error = ((ShowTokenErrorDialog) roomViewEffect).getServiceError();
                 handleTokenError(error);
             }
         }
-        updateUi(roomViewState);
     }
 
     private void renderPrimaryView(ParticipantViewState primaryParticipant) {
@@ -1265,7 +1250,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void displayAudioDeviceList() {
-        RoomViewState viewState = roomViewModel.getRoomViewState().getValue();
+        RoomViewState viewState = roomViewModel.getViewState().getValue();
         AudioDevice selectedDevice = viewState.getSelectedDevice();
         List<AudioDevice> audioDevices = viewState.getAvailableAudioDevices();
 
