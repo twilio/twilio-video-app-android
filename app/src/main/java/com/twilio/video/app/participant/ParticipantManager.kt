@@ -7,7 +7,7 @@ class ParticipantManager {
     private val mutableParticipants = mutableListOf<ParticipantViewState>()
     val participants: List<ParticipantViewState> get() = mutableParticipants.toList()
 
-    fun updateParticipants(participantViewState: ParticipantViewState) {
+    fun updateParticipant(participantViewState: ParticipantViewState) {
         mutableParticipants.find { it.sid == participantViewState.sid }?.let { existingParticipant ->
             mutableParticipants.remove(existingParticipant)
         }

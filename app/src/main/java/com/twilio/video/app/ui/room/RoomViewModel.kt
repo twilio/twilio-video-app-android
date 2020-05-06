@@ -86,7 +86,7 @@ class RoomViewModel(
                 }
             }
             is NewRemoteVideoTrack -> {
-                participantManager.updateParticipants(roomEvent.participantViewState)
+                participantManager.updateParticipant(roomEvent.participantViewState)
                 updateState { it.copy(participantThumbnails = participantManager.participants) }
             }
         }
@@ -95,13 +95,13 @@ class RoomViewModel(
 
     private fun checkRemoteParticipants(room: Room) {
         room.remoteParticipants.let { participants ->
-            participants.forEach { participantManager.updateParticipants(buildParticipantViewState(it)) }
+            participants.forEach { participantManager.updateParticipant(buildParticipantViewState(it)) }
             updateState { it.copy(participantThumbnails = participantManager.participants) }
         }
     }
 
     private fun addLocalParticipantView(participantViewState: ParticipantViewState) {
-        participantManager.updateParticipants(participantViewState)
+        participantManager.updateParticipant(participantViewState)
         updateState { it.copy(participantThumbnails = participantManager.participants) }
     }
 
