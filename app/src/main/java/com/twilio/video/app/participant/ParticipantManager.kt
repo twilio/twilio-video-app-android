@@ -24,7 +24,10 @@ class ParticipantManager {
         }
     }
 
-    fun clearParticipants() = mutableParticipants.clear()
+    fun clearParticipants() {
+        mutableParticipants.clear()
+        primaryParticipant = null
+    }
 
     private fun updatePrimaryParticipant() {
         primaryParticipant = mutableParticipants.find { !it.isLocalParticipant }

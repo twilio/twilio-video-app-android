@@ -1122,8 +1122,8 @@ public class RoomActivity extends BaseActivity {
 
     private void renderThumbnails(RoomViewState roomViewState) {
         List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
+        participantController.removeAllThumbs();
         if (thumbnails != null) {
-            participantController.removeAllThumbs();
             for (ParticipantViewState thumbnail : roomViewState.getParticipantThumbnails()) {
                 addParticipantThumb(thumbnail);
             }

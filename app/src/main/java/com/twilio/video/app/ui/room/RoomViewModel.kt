@@ -86,7 +86,7 @@ class RoomViewModel(
             is Disconnected -> {
                 showLobbyViewState()
                 participantManager.clearParticipants()
-                updateState { it.copy(participantThumbnails = null) }
+                updateState { it.copy(participantThumbnails = null, primaryParticipant = null) }
             }
             is UpdateRemoteVideoTrack -> addParticipantView(roomEvent.participant)
             is ParticipantConnected -> addParticipantView(roomEvent.participant)
