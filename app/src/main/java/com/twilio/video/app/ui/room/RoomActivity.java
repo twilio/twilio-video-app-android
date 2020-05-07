@@ -579,7 +579,9 @@ public class RoomActivity extends BaseActivity {
         if (room != null && room.getState() == CONNECTED) {
 
             // update local participant thumb
-            participantController.updateThumb(localParticipantSid, cameraVideoTrack);
+            participantController.updateThumb(
+                    buildLocalParticipantViewState(
+                            localParticipant, getString(R.string.you), cameraVideoTrack));
 
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
 
@@ -857,7 +859,8 @@ public class RoomActivity extends BaseActivity {
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
                 participantController.updatePrimaryThumb(mirror);
             } else {
-                participantController.updateThumb(localParticipantSid, mirror, null);
+                participantController.updateThumb(
+                        buildLocalParticipantViewState(localParticipant, "", null));
             }
         }
     }
@@ -1026,6 +1029,7 @@ public class RoomActivity extends BaseActivity {
         localParticipant = room.getLocalParticipant();
         if (localParticipant != null) {
             localParticipantSid = localParticipant.getSid();
+            localParticipant.setListener(new LocalParticipantListener());
         }
     }
 
@@ -1113,34 +1117,7 @@ public class RoomActivity extends BaseActivity {
 
     private void renderThumbnails(RoomViewState roomViewState) {
         List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
-        participantController.removeAllThumbs();
-        if (thumbnails != null) {
-            for (ParticipantViewState thumbnail : roomViewState.getParticipantThumbnails()) {
-                if (thumbnail.isLocalParticipant()) addLocalParticipantThumb(thumbnail);
-                else addParticipantThumb(thumbnail);
-            }
-        }
-    }
-
-    // TODO Remove once LocalParticipant is decoupled from UI
-    private void addLocalParticipantThumb(ParticipantViewState participantViewState) {
-        boolean doesThumbExist =
-                participantController.getThumb(participantViewState.getSid()) != null;
-        if (localParticipant != null && !doesThumbExist) {
-            localParticipant.setListener(new LocalParticipantListener());
-        }
-
-        addParticipantThumb(participantViewState);
-    }
-
-    private void addParticipantThumb(ParticipantViewState participantViewState) {
-        participantController.addThumb(
-                participantViewState.getSid(),
-                participantViewState.getIdentity(),
-                participantViewState.getVideoTrack(),
-                false,
-                false,
-                participantViewState.getNetworkQualityLevel());
+        ParticipantControllerExtensionsKt.updateThumbnails(participantController, thumbnails);
     }
 
     private void displayAudioDeviceList() {
@@ -1238,7 +1215,7 @@ public class RoomActivity extends BaseActivity {
         public void onNetworkQualityLevelChanged(
                 @NonNull LocalParticipant localParticipant,
                 @NonNull NetworkQualityLevel networkQualityLevel) {
-            addParticipantThumb(
+            participantController.updateThumb(
                     buildLocalParticipantViewState(
                             localParticipant, getString(R.string.you), cameraVideoTrack));
         }

@@ -23,10 +23,13 @@ import androidx.annotation.Nullable;
 import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
+import com.twilio.video.app.participant.ParticipantViewState;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+// TODO Replace with RecyclerView / DiffUtil implementation
 /** ParticipantController is main controlling party for rendering participants. */
 class ParticipantController {
 
@@ -43,7 +46,7 @@ class ParticipantController {
     private ViewGroup thumbsViewContainer;
 
     /** Relationship collection - item (data) -> thumb. */
-    private Map<Item, ParticipantView> thumbs = new HashMap<>();
+    ConcurrentMap<Item, ParticipantView> thumbs = new ConcurrentHashMap<>();
 
     /** Each participant thumb click listener. */
     private ItemClickListener listener;
@@ -54,31 +57,17 @@ class ParticipantController {
         this.primaryView = primaryVideoView;
     }
 
-    /**
-     * Create new participant thumb from data.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param videoTrack participant video to display or NULL for empty thumbs.
-     * @param muted participant audio state.
-     * @param networkQualityLevel the level of the network quality for the par
-     */
-    void addThumb(
-            String sid,
-            String identity,
-            VideoTrack videoTrack,
-            boolean muted,
-            boolean mirror,
-            NetworkQualityLevel networkQualityLevel) {
-
-        if (getThumb(sid) != null) {
-            updateThumb(sid, mirror, networkQualityLevel);
-        } else {
-            Item item = new Item(sid, identity, videoTrack, muted, mirror);
-            ParticipantView view = createThumb(item);
-            thumbs.put(item, view);
-            thumbsViewContainer.addView(view);
-        }
+    void addThumb(ParticipantViewState participantViewState) {
+        Item item =
+                new Item(
+                        participantViewState.getSid(),
+                        participantViewState.getIdentity(),
+                        participantViewState.getVideoTrack(),
+                        participantViewState.getMuted(),
+                        participantViewState.getMirror());
+        ParticipantView view = createThumb(item);
+        thumbs.put(item, view);
+        thumbsViewContainer.addView(view);
     }
 
     /**
@@ -96,20 +85,14 @@ class ParticipantController {
         }
     }
 
-    /**
-     * Update participant thumb with video track.
-     *
-     * @param sid unique participant identifier.
-     * @param newVideo new video track to insert.
-     */
-    void updateThumb(String sid, VideoTrack newVideo) {
-        Item target = findItem(sid);
+    void updateThumb(ParticipantViewState participantViewState) {
+        Item target = findItem(participantViewState.getSid());
         if (target != null) {
-            ParticipantView view = getThumb(sid);
+            ParticipantView view = getThumb(participantViewState.getSid());
 
             removeRender(target.videoTrack, view);
 
-            target.videoTrack = newVideo;
+            target.videoTrack = participantViewState.getVideoTrack();
 
             if (target.videoTrack != null) {
                 view.setState(ParticipantView.State.VIDEO);
@@ -117,6 +100,9 @@ class ParticipantController {
             } else {
                 view.setState(ParticipantView.State.NO_VIDEO);
             }
+
+            setNetworkQualityLevelImage(
+                    view.networkQualityLevelImg, participantViewState.getNetworkQualityLevel());
         }
     }
 
@@ -141,24 +127,6 @@ class ParticipantController {
                     target.videoTrack.addRenderer(view);
                     break;
             }
-        }
-    }
-
-    /**
-     * Update participant video track thumb with mirroring.
-     *
-     * @param sid unique participant identifier.
-     * @param mirror enable/disable mirror.
-     * @param networkQualityLevel the level of the network quality for the participant.
-     */
-    void updateThumb(String sid, boolean mirror, NetworkQualityLevel networkQualityLevel) {
-        Item target = findItem(sid);
-        if (target != null) {
-            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid);
-            setNetworkQualityLevelImage(view.networkQualityLevelImg, networkQualityLevel);
-
-            target.mirror = mirror;
-            view.setMirror(target.mirror);
         }
     }
 

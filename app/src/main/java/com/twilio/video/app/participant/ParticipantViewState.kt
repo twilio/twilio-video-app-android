@@ -30,8 +30,8 @@ fun buildParticipantViewState(remoteParticipant: RemoteParticipant) =
 
 fun buildLocalParticipantViewState(
     localParticipant: LocalParticipant,
-    identity: String,
-    videoTrack: LocalVideoTrack
+    identity: String? = null,
+    videoTrack: LocalVideoTrack? = null
 ) =
         ParticipantViewState(
                 localParticipant.sid,
