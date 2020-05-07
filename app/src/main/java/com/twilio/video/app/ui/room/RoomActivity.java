@@ -21,6 +21,7 @@ import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
+import static com.twilio.video.app.participant.ParticipantViewStateKt.buildLocalParticipantViewState;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -46,7 +47,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -857,7 +857,7 @@ public class RoomActivity extends BaseActivity {
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
                 participantController.updatePrimaryThumb(mirror);
             } else {
-                participantController.updateThumb(localParticipantSid, mirror);
+                participantController.updateThumb(localParticipantSid, mirror, null);
             }
         }
     }
@@ -1035,26 +1035,17 @@ public class RoomActivity extends BaseActivity {
                 Timber.d("Camera track: %s", cameraVideoTrack);
                 localParticipant.publishTrack(cameraVideoTrack);
                 roomViewModel.processInput(
-                        new LocalVideoTrackPublished(buildParticipantViewState()));
+                        new LocalVideoTrackPublished(
+                                buildLocalParticipantViewState(
+                                        localParticipant,
+                                        getString(R.string.you),
+                                        cameraVideoTrack)));
             }
 
             if (localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
             }
         }
-    }
-
-    private ParticipantViewState buildParticipantViewState() {
-        return new ParticipantViewState(
-                localParticipant.getSid(),
-                getString(R.string.you),
-                cameraVideoTrack,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true);
     }
 
     private void toggleAudioDevice(boolean enableAudioDevice) {
@@ -1125,9 +1116,21 @@ public class RoomActivity extends BaseActivity {
         participantController.removeAllThumbs();
         if (thumbnails != null) {
             for (ParticipantViewState thumbnail : roomViewState.getParticipantThumbnails()) {
-                addParticipantThumb(thumbnail);
+                if (thumbnail.isLocalParticipant()) addLocalParticipantThumb(thumbnail);
+                else addParticipantThumb(thumbnail);
             }
         }
+    }
+
+    // TODO Remove once LocalParticipant is decoupled from UI
+    private void addLocalParticipantThumb(ParticipantViewState participantViewState) {
+        boolean doesThumbExist =
+                participantController.getThumb(participantViewState.getSid()) != null;
+        if (localParticipant != null && !doesThumbExist) {
+            localParticipant.setListener(new LocalParticipantListener());
+        }
+
+        addParticipantThumb(participantViewState);
     }
 
     private void addParticipantThumb(ParticipantViewState participantViewState) {
@@ -1136,15 +1139,8 @@ public class RoomActivity extends BaseActivity {
                 participantViewState.getIdentity(),
                 participantViewState.getVideoTrack(),
                 false,
-                false);
-
-        if (participantViewState.isLocalParticipant()) {
-            ParticipantView localParticipantThumb =
-                    participantController.getThumb(localParticipantSid);
-            if (localParticipantThumb != null) {
-                localParticipant.setListener(new LocalParticipantListener(localParticipantThumb));
-            }
-        }
+                false,
+                participantViewState.getNetworkQualityLevel());
     }
 
     private void displayAudioDeviceList() {
@@ -1205,12 +1201,6 @@ public class RoomActivity extends BaseActivity {
 
     private class LocalParticipantListener implements LocalParticipant.Listener {
 
-        private ImageView networkQualityImage;
-
-        LocalParticipantListener(ParticipantView primaryView) {
-            networkQualityImage = primaryView.networkQualityLevelImg;
-        }
-
         @Override
         public void onAudioTrackPublished(
                 @NonNull LocalParticipant localParticipant,
@@ -1248,35 +1238,9 @@ public class RoomActivity extends BaseActivity {
         public void onNetworkQualityLevelChanged(
                 @NonNull LocalParticipant localParticipant,
                 @NonNull NetworkQualityLevel networkQualityLevel) {
-            setNetworkQualityLevelImage(
-                    networkQualityImage, networkQualityLevel, localParticipant.getSid());
-        }
-    }
-
-    private void setNetworkQualityLevelImage(
-            ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel, String sid) {
-
-        networkQualityLevels.put(sid, networkQualityLevel);
-        if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN) {
-            networkQualityImage.setVisibility(View.GONE);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
+            addParticipantThumb(
+                    buildLocalParticipantViewState(
+                            localParticipant, getString(R.string.you), cameraVideoTrack));
         }
     }
 

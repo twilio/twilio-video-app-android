@@ -18,8 +18,11 @@ package com.twilio.video.app.ui.room;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import androidx.annotation.Nullable;
+import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.VideoTrack;
+import com.twilio.video.app.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,14 +54,6 @@ class ParticipantController {
         this.primaryView = primaryVideoView;
     }
 
-    private void addThumb(String sid, String identity) {
-        addThumb(sid, identity, null, true, false);
-    }
-
-    private void addThumb(String sid, String identity, VideoTrack videoTrack) {
-        addThumb(sid, identity, videoTrack, true, false);
-    }
-
     /**
      * Create new participant thumb from data.
      *
@@ -66,12 +61,18 @@ class ParticipantController {
      * @param identity participant name to display.
      * @param videoTrack participant video to display or NULL for empty thumbs.
      * @param muted participant audio state.
+     * @param networkQualityLevel the level of the network quality for the par
      */
     void addThumb(
-            String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
+            String sid,
+            String identity,
+            VideoTrack videoTrack,
+            boolean muted,
+            boolean mirror,
+            NetworkQualityLevel networkQualityLevel) {
 
         if (getThumb(sid) != null) {
-            updateThumb(sid, mirror);
+            updateThumb(sid, mirror, networkQualityLevel);
         } else {
             Item item = new Item(sid, identity, videoTrack, muted, mirror);
             ParticipantView view = createThumb(item);
@@ -148,11 +149,13 @@ class ParticipantController {
      *
      * @param sid unique participant identifier.
      * @param mirror enable/disable mirror.
+     * @param networkQualityLevel the level of the network quality for the participant.
      */
-    void updateThumb(String sid, boolean mirror) {
+    void updateThumb(String sid, boolean mirror, NetworkQualityLevel networkQualityLevel) {
         Item target = findItem(sid);
         if (target != null) {
             ParticipantThumbView view = (ParticipantThumbView) getThumb(sid);
+            setNetworkQualityLevelImage(view.networkQualityLevelImg, networkQualityLevel);
 
             target.mirror = mirror;
             view.setMirror(target.mirror);
@@ -217,24 +220,6 @@ class ParticipantController {
             thumbs.remove(deleteKey);
         }
     }
-
-    /**
-     * Remove participant thumb or leave empty (no video) thumb if nothing left.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     */
-    void removeOrEmptyThumb(String sid, String identity) {
-        int thumbsCount = getThumbs(sid).size();
-        if (thumbsCount > 1 || (thumbsCount == 1 && primaryItem.sid.equals(sid))) {
-            removeThumb(sid);
-        } else if (thumbsCount == 0) {
-            addThumb(sid, identity);
-        } else {
-            updateThumb(sid, null);
-        }
-    }
-
     /**
      * Get participant video track thumb instance.
      *
@@ -337,6 +322,33 @@ class ParticipantController {
         }
     }
 
+    private void setNetworkQualityLevelImage(
+            ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel) {
+
+        if (networkQualityLevel == null
+                || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN) {
+            networkQualityImage.setVisibility(View.GONE);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
+        }
+    }
+
     private void clearDominantSpeaker() {
         getPrimaryView().dominantSpeakerImg.setVisibility(View.GONE);
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
@@ -375,16 +387,6 @@ class ParticipantController {
         }
 
         return view;
-    }
-
-    private ArrayList<ParticipantView> getThumbs(String sid) {
-        ArrayList<ParticipantView> views = new ArrayList<>();
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid)) {
-                views.add(entry.getValue());
-            }
-        }
-        return views;
     }
 
     private void removeRender(VideoTrack videoTrack, ParticipantView view) {

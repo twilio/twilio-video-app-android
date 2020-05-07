@@ -1,5 +1,6 @@
 package com.twilio.video.app.sdk
 
+import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.RemoteAudioTrack
 import com.twilio.video.RemoteAudioTrackPublication
 import com.twilio.video.RemoteDataTrack
@@ -23,6 +24,12 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
     override fun onVideoTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
         Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
+        roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
+    }
+
+    override fun onNetworkQualityLevelChanged(remoteParticipant: RemoteParticipant, networkQualityLevel: NetworkQualityLevel) {
+        Timber.i("RemoteParticipant NetworkQualityLevel changed for RemoteParticipant sid: %s, NetworkQualityLevel: %s",
+                remoteParticipant.sid, networkQualityLevel)
         roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
     }
 
