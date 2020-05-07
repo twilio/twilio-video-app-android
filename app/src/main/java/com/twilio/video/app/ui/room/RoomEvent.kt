@@ -17,6 +17,6 @@ sealed class RoomEvent {
     data class TokenError(val serviceError: AuthServiceError? = null) : RoomEvent()
     data class ParticipantConnected(val participant: ParticipantViewState) : RoomEvent()
     data class ParticipantDisconnected(val participant: ParticipantViewState) : RoomEvent()
-    data class AddRemoteVideoTrack(val participant: ParticipantViewState) : RoomEvent()
+    data class UpdateRemoteVideoTrack(val participant: ParticipantViewState) : RoomEvent()
     data class DominantSpeakerChanged(val participant: ParticipantViewState) : RoomEvent()
 }

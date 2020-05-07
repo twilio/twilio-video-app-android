@@ -10,11 +10,20 @@ import com.twilio.video.RemoteVideoTrackPublication
 import com.twilio.video.TwilioException
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.ui.room.RoomManager
+import timber.log.Timber
 
 class RemoteParticipantListener(private val roomManager: RoomManager) : RemoteParticipant.Listener {
 
     override fun onVideoTrackSubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
-        roomManager.addRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
+        Timber.i("New RemoteParticipant RemoteVideoTrack published for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
+                remoteParticipant.sid, remoteVideoTrack.sid)
+        roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
+    }
+
+    override fun onVideoTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
+        Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
+                remoteParticipant.sid, remoteVideoTrack.sid)
+        roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
     }
 
     override fun onDataTrackPublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
@@ -28,8 +37,6 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
     override fun onVideoTrackEnabled(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication) {}
 
     override fun onVideoTrackDisabled(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication) {}
-
-    override fun onVideoTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {}
 
     override fun onDataTrackSubscriptionFailed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, twilioException: TwilioException) {}
 

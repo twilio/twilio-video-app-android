@@ -15,7 +15,7 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.AddRemoteVideoTrack
+import com.twilio.video.app.ui.room.RoomEvent.UpdateRemoteVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
@@ -88,7 +88,7 @@ class RoomViewModel(
                 participantManager.clearParticipants()
                 updateState { it.copy(participantThumbnails = null) }
             }
-            is AddRemoteVideoTrack -> addParticipantView(roomEvent.participant)
+            is UpdateRemoteVideoTrack -> addParticipantView(roomEvent.participant)
             is ParticipantConnected -> addParticipantView(roomEvent.participant)
             is DominantSpeakerChanged -> addParticipantView(roomEvent.participant)
             is ParticipantDisconnected -> {

@@ -35,7 +35,7 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.AddRemoteVideoTrack
+import com.twilio.video.app.ui.room.RoomEvent.UpdateRemoteVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
@@ -130,10 +130,8 @@ class RoomManager(
         }
     }
 
-    fun addRemoteVideoTrack(participantViewState: ParticipantViewState) {
-        Timber.i("RemoteParticipant video track published connected -> remoteParticipant: %s",
-                participantViewState.sid)
-        mutableViewEvents.value = NewRemoteVideoTrack(participantViewState)
+    fun updateRemoteVideoTrack(participantViewState: ParticipantViewState) {
+        mutableViewEvents.value = UpdateRemoteVideoTrack(participantViewState)
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
