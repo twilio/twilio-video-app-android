@@ -1139,9 +1139,11 @@ public class RoomActivity extends BaseActivity {
                 false);
 
         if (participantViewState.isLocalParticipant()) {
-            localParticipant.setListener(
-                    new LocalParticipantListener(
-                            participantController.getThumb(localParticipantSid)));
+            ParticipantView localParticipantThumb =
+                    participantController.getThumb(localParticipantSid);
+            if (localParticipantThumb != null) {
+                localParticipant.setListener(new LocalParticipantListener(localParticipantThumb));
+            }
         }
     }
 
