@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.room
 
+import com.twilio.video.Room
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.participant.ParticipantViewState
 
@@ -8,6 +9,7 @@ sealed class RoomEvent {
     object Connecting : RoomEvent()
     data class Connected(
         val remoteParticipants: List<ParticipantViewState>,
+        val room: Room,
         val roomName: String
     ) : RoomEvent()
     object Disconnected : RoomEvent()

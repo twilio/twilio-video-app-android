@@ -1080,6 +1080,7 @@ public class RoomActivity extends BaseActivity {
             Timber.d("RoomViewEffect: %s", roomViewEffect);
             requestPermissions();
             if (roomViewEffect instanceof Connected) {
+                room = ((Connected) roomViewEffect).getRoom();
                 toggleAudioDevice(true);
                 initializeRoom();
             }

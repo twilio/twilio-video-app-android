@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
+import com.twilio.video.Room
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.udf.BaseViewModel
@@ -79,7 +80,7 @@ class RoomViewModel(
                 showConnectingViewState()
             }
             is Connected -> {
-                showConnectedViewState(roomEvent.roomName)
+                showConnectedViewState(roomEvent.room, roomEvent.roomName)
                 checkRemoteParticipants(roomEvent.remoteParticipants)
             }
             is Disconnected -> {
@@ -118,8 +119,8 @@ class RoomViewModel(
         ) }
     }
 
-    private fun showConnectedViewState(roomName: String) {
-        viewEffect { RoomViewEffect.Connected }
+    private fun showConnectedViewState(room: Room, roomName: String) {
+        viewEffect { RoomViewEffect.Connected(room) }
         updateState { it.copy(
                 title = roomName,
                 isLobbyLayoutVisible = false,
