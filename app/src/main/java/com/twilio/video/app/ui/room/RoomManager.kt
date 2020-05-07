@@ -198,7 +198,7 @@ class RoomManager(
                 remoteParticipants.add(buildParticipantViewState(it))
             }
 
-            mutableViewEvents.value = Connected(remoteParticipants, room, room.name)
+            mutableViewEvents.value = Connected(remoteParticipants, room.name)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {

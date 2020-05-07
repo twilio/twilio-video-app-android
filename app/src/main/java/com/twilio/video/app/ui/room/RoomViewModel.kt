@@ -79,7 +79,7 @@ class RoomViewModel(
                 showConnectingViewState()
             }
             is Connected -> {
-                showConnectedViewState()
+                showConnectedViewState(roomEvent.roomName)
                 checkRemoteParticipants(roomEvent.remoteParticipants)
             }
             is Disconnected -> {
@@ -118,9 +118,10 @@ class RoomViewModel(
         ) }
     }
 
-    private fun showConnectedViewState() {
+    private fun showConnectedViewState(roomName: String) {
         viewEffect { RoomViewEffect.Connected }
         updateState { it.copy(
+                title = roomName,
                 isLobbyLayoutVisible = false,
                 isConnectingLayoutVisible = false,
                 isConnectedLayoutVisible = true
