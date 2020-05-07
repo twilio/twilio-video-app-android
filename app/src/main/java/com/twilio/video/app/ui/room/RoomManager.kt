@@ -130,7 +130,7 @@ class RoomManager(
         }
     }
 
-    fun newRemoteVideoTrack(participantViewState: ParticipantViewState) {
+    fun addRemoteVideoTrack(participantViewState: ParticipantViewState) {
         Timber.i("RemoteParticipant video track published connected -> remoteParticipant: %s",
                 participantViewState.sid)
         mutableViewEvents.value = NewRemoteVideoTrack(participantViewState)
