@@ -18,6 +18,7 @@ package com.twilio.video.app;
 
 import com.twilio.video.app.auth.CommunityAuthModule;
 import com.twilio.video.app.data.AuthServiceModule;
+import com.twilio.video.app.participant.ParticipantModule;
 import com.twilio.video.app.security.SecurityModule;
 import com.twilio.video.app.ui.CommunityScreenSelectorModule;
 import com.twilio.video.app.ui.login.CommunityLoginActivityModule;
