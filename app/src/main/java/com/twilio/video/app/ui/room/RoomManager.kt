@@ -31,6 +31,7 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RemoteParticipantListener
+import com.twilio.video.app.sdk.getFirstVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
@@ -244,7 +245,7 @@ class RoomManager(
                 val participantViewState = ParticipantViewState(
                         remoteParticipant.sid,
                         remoteParticipant.identity,
-                        remoteParticipant.remoteVideoTracks.firstOrNull()?.remoteVideoTrack,
+                        remoteParticipant.getFirstVideoTrack(),
                         isDominantSpeaker = true
                 )
                 mutableViewEvents.value = DominantSpeakerChanged(participantViewState)
