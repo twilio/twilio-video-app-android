@@ -131,25 +131,6 @@ class ParticipantController {
     }
 
     /**
-     * Update all participant thumbs with audio state.
-     *
-     * @param sid unique participant identifier.
-     * @param muted new audio state.
-     */
-    void updateThumbs(String sid, boolean muted) {
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid)) {
-                entry.getKey().muted = muted;
-                entry.getValue().setMuted(muted);
-            }
-        }
-    }
-
-    void removeThumb(Item item) {
-        removeThumb(item.sid);
-    }
-
-    /**
      * Remove participant video track thumb.
      *
      * @param sid unique participant identifier.
@@ -166,28 +147,6 @@ class ParticipantController {
         }
     }
 
-    /**
-     * Remove all participant thumbs.
-     *
-     * @param sid unique participant identifier.
-     */
-    void removeThumbs(String sid) {
-        ArrayList<Item> deleteKeys = new ArrayList<>();
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid)) {
-                deleteKeys.add(entry.getKey());
-                thumbsViewContainer.removeView(entry.getValue());
-                VideoTrack remoteVideoTrack = entry.getKey().videoTrack;
-                if (remoteVideoTrack != null) {
-                    remoteVideoTrack.removeRenderer(entry.getValue());
-                }
-            }
-        }
-
-        for (Item deleteKey : deleteKeys) {
-            thumbs.remove(deleteKey);
-        }
-    }
     /**
      * Get participant video track thumb instance.
      *
@@ -212,10 +171,6 @@ class ParticipantController {
             }
         }
         thumbs.clear();
-    }
-
-    void renderAsPrimary(Item item) {
-        renderAsPrimary(item.sid, item.identity, item.videoTrack, item.muted, item.mirror);
     }
 
     /**
@@ -251,14 +206,6 @@ class ParticipantController {
         } else {
             primaryView.setState(ParticipantView.State.NO_VIDEO);
         }
-    }
-
-    /** Remove primary participant. */
-    void removePrimary() {
-        removeRender(primaryItem.videoTrack, primaryView);
-        // TODO: temp state
-        primaryView.setState(ParticipantView.State.NO_VIDEO);
-        primaryItem = null;
     }
 
     /**
