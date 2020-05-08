@@ -55,29 +55,45 @@ class RemoteParticipantListener(
         Timber.i("RemoteParticipant AudioTrack subscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteAudioTrack.sid)
 
-        participantManager.getParticipant(remoteParticipant.sid)?.copy(
-                muted = false
-        )?.let {
-            roomManager.updateParticipant(it)
-        }
+        muteParticipant(remoteParticipant, false)
     }
 
     override fun onAudioTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {
         Timber.i("RemoteParticipant AudioTrack unsubscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteAudioTrack.sid)
 
-        participantManager.getParticipant(remoteParticipant.sid)?.copy(
-                muted = true
-        )?.let {
-            roomManager.updateParticipant(it)
-        }
+        muteParticipant(remoteParticipant, true)
+    }
+
+    override fun onAudioTrackPublished(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
+        Timber.i("RemoteParticipant AudioTrack published for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
+                remoteParticipant.sid, remoteParticipant.sid)
+
+        muteParticipant(remoteParticipant, false)
+    }
+
+    override fun onAudioTrackUnpublished(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
+        Timber.i("RemoteParticipant AudioTrack unpublished for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
+                remoteParticipant.sid, remoteParticipant.sid)
+
+        muteParticipant(remoteParticipant, true)
+    }
+
+    override fun onAudioTrackEnabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
+        Timber.i("RemoteParticipant AudioTrack enabled for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
+                remoteParticipant.sid, remoteParticipant.sid)
+
+        muteParticipant(remoteParticipant, false)
+    }
+
+    override fun onAudioTrackDisabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
+        Timber.i("RemoteParticipant AudioTrack disabled for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
+                remoteParticipant.sid, remoteParticipant.sid)
+
+        muteParticipant(remoteParticipant, true)
     }
 
     override fun onDataTrackPublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
-
-    override fun onAudioTrackEnabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {}
-
-    override fun onAudioTrackPublished(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {}
 
     override fun onVideoTrackPublished(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication) {}
 
@@ -87,19 +103,23 @@ class RemoteParticipantListener(
 
     override fun onDataTrackSubscriptionFailed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, twilioException: TwilioException) {}
 
-    override fun onAudioTrackDisabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {}
-
     override fun onDataTrackSubscribed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, remoteDataTrack: RemoteDataTrack) {}
 
     override fun onVideoTrackSubscriptionFailed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, twilioException: TwilioException) {}
 
     override fun onAudioTrackSubscriptionFailed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, twilioException: TwilioException) {}
 
-    override fun onAudioTrackUnpublished(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {}
-
     override fun onVideoTrackUnpublished(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication) {}
 
     override fun onDataTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, remoteDataTrack: RemoteDataTrack) {}
 
     override fun onDataTrackUnpublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
+
+    private fun muteParticipant(remoteParticipant: RemoteParticipant, mute: Boolean) {
+        participantManager.getParticipant(remoteParticipant.sid)?.copy(
+                muted = mute
+        )?.let {
+            roomManager.updateParticipant(it)
+        }
+    }
 }
