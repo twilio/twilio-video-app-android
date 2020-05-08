@@ -5,18 +5,19 @@ import android.content.Intent
 import android.os.Build
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
-import com.twilio.video.Room.State.CONNECTED
-import com.twilio.video.Room.State.DISCONNECTED
-import com.twilio.video.app.ui.room.RoomEvent.RoomState
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
+
 class VideoService : LifecycleService() {
 
     companion object {
-        fun startService(context: Context) {
+        fun startService(context: Context, roomName: String) {
             Intent(context, VideoService::class.java).let { intent ->
+                intent.putExtra(ROOM_NAME_EXTRA, roomName)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)
                 } else {
@@ -40,6 +41,7 @@ class VideoService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        setupForegroundService(intent)
         Timber.d("VideoService created")
         return START_NOT_STICKY
     }
@@ -49,17 +51,20 @@ class VideoService : LifecycleService() {
         Timber.d("VideoService destroyed")
     }
 
+    private fun setupForegroundService(intent: Intent?) {
+        intent?.let { it.getStringExtra(ROOM_NAME_EXTRA)?.let { roomName ->
+            val roomNotification = RoomNotification(this@VideoService)
+            startForeground(
+                    ONGOING_NOTIFICATION_ID,
+                    roomNotification.buildNotification(roomName))
+        } }
+    }
+
     private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
         nullableRoomEvent?.let { roomEvent ->
-            roomEvent.room?.let { room ->
-                if (roomEvent is RoomState) {
-                    if (room.state == CONNECTED) {
-                        val roomNotification = RoomNotification(this@VideoService)
-                        startForeground(
-                                ONGOING_NOTIFICATION_ID,
-                                roomNotification.buildNotification(room.name))
-                    } else if (room.state == DISCONNECTED) stopSelf()
-                }
+            when (roomEvent) {
+                is Disconnected -> stopSelf()
+                else -> {}
             }
         }
     }

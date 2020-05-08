@@ -27,12 +27,17 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.participant.buildParticipantViewState
+import com.twilio.video.app.sdk.RemoteParticipantListener
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
+import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
+import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.RoomState
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
@@ -125,9 +130,15 @@ class RoomManager(
         }
     }
 
+    fun newRemoteVideoTrack(participantViewState: ParticipantViewState) {
+        Timber.i("RemoteParticipant video track published connected -> remoteParticipant: %s",
+                participantViewState.sid)
+        mutableViewEvents.value = NewRemoteVideoTrack(participantViewState)
+    }
+
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
         Timber.e(e, "Failed to retrieve token")
-        mutableViewEvents.postValue(TokenError(error))
+        mutableViewEvents.postValue(TokenError(serviceError = error))
     }
 
     private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
@@ -179,10 +190,15 @@ class RoomManager(
             Timber.i("onConnected -> room sid: %s",
                     room.sid)
 
-            startService(context)
+            startService(context, room.name)
 
-            // Reset the speakerphone
-            mutableViewEvents.value = RoomState(room)
+            val remoteParticipants = mutableListOf<ParticipantViewState>()
+            room.remoteParticipants.forEach {
+                it.setListener(RemoteParticipantListener(this@RoomManager))
+                remoteParticipants.add(buildParticipantViewState(it))
+            }
+
+            mutableViewEvents.value = Connected(remoteParticipants, room, room.name)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
@@ -191,7 +207,7 @@ class RoomManager(
 
             stopService(context)
 
-            mutableViewEvents.value = RoomState(room)
+            mutableViewEvents.value = Disconnected
         }
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {
@@ -201,25 +217,36 @@ class RoomManager(
                     room.state,
                     twilioException.code,
                     twilioException.message)
-            mutableViewEvents.value = ConnectFailure(room)
+            mutableViewEvents.value = ConnectFailure
         }
 
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            mutableViewEvents.value = ParticipantConnected(room, remoteParticipant)
+            remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
+            mutableViewEvents.value = ParticipantConnected(
+                    buildParticipantViewState(remoteParticipant))
         }
 
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            mutableViewEvents.value = ParticipantDisconnected(room, remoteParticipant)
+            mutableViewEvents.value = ParticipantDisconnected(
+                    buildParticipantViewState(remoteParticipant))
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
-            mutableViewEvents.value = DominantSpeakerChanged(room, remoteParticipant)
+            remoteParticipant?.let {
+                val participantViewState = ParticipantViewState(
+                        remoteParticipant.sid,
+                        remoteParticipant.identity,
+                        remoteParticipant.remoteVideoTracks.firstOrNull()?.remoteVideoTrack,
+                        isDominantSpeaker = true
+                )
+                mutableViewEvents.value = DominantSpeakerChanged(participantViewState)
+            }
         }
 
         override fun onRecordingStarted(room: Room) {}
