@@ -24,10 +24,10 @@ import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.participant.ParticipantViewState;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import timber.log.Timber;
 
 // TODO Replace with RecyclerView / DiffUtil implementation
 /** ParticipantController is main controlling party for rendering participants. */
@@ -86,6 +86,7 @@ class ParticipantController {
     }
 
     void updateThumb(ParticipantViewState participantViewState) {
+        Timber.d("updateThumb: %s", participantViewState);
         Item target = findItem(participantViewState.getSid());
         if (target != null) {
             ParticipantView view = getThumb(participantViewState.getSid());
@@ -93,6 +94,7 @@ class ParticipantController {
             removeRender(target.videoTrack, view);
 
             target.videoTrack = participantViewState.getVideoTrack();
+            view.setMuted(participantViewState.getMuted());
 
             if (target.videoTrack != null) {
                 view.setState(ParticipantView.State.VIDEO);

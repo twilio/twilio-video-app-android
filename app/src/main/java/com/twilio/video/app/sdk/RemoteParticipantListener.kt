@@ -18,19 +18,33 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
     override fun onVideoTrackSubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
         Timber.i("New RemoteParticipant RemoteVideoTrack published for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
-        roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
+        roomManager.updateParticipant(buildParticipantViewState(remoteParticipant))
     }
 
     override fun onVideoTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
         Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
-        roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
+        roomManager.updateParticipant(buildParticipantViewState(remoteParticipant))
     }
 
     override fun onNetworkQualityLevelChanged(remoteParticipant: RemoteParticipant, networkQualityLevel: NetworkQualityLevel) {
         Timber.i("RemoteParticipant NetworkQualityLevel changed for RemoteParticipant sid: %s, NetworkQualityLevel: %s",
                 remoteParticipant.sid, networkQualityLevel)
-        roomManager.updateRemoteVideoTrack(buildParticipantViewState(remoteParticipant))
+        roomManager.updateParticipant(buildParticipantViewState(remoteParticipant))
+    }
+
+    override fun onAudioTrackSubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {
+        Timber.i("RemoteParticipant AudioTrack subscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
+                remoteParticipant.sid, remoteAudioTrack.sid)
+
+        roomManager.updateParticipant(buildParticipantViewState(remoteParticipant))
+    }
+
+    override fun onAudioTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {
+        Timber.i("RemoteParticipant AudioTrack unsubscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
+                remoteParticipant.sid, remoteAudioTrack.sid)
+
+        roomManager.updateParticipant(buildParticipantViewState(remoteParticipant, true))
     }
 
     override fun onDataTrackPublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
@@ -50,10 +64,6 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
     override fun onAudioTrackDisabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {}
 
     override fun onDataTrackSubscribed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, remoteDataTrack: RemoteDataTrack) {}
-
-    override fun onAudioTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {}
-
-    override fun onAudioTrackSubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {}
 
     override fun onVideoTrackSubscriptionFailed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, twilioException: TwilioException) {}
 
