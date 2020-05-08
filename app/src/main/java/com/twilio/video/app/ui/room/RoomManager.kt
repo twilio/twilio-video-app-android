@@ -31,12 +31,10 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RemoteParticipantListener
-import com.twilio.video.app.sdk.getFirstVideoTrack
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
-import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
@@ -234,22 +232,15 @@ class RoomManager(
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            mutableViewEvents.value = ParticipantDisconnected(
-                    buildParticipantViewState(remoteParticipant))
+
+            participantManager.getParticipant(remoteParticipant.sid)?.copy()?.let {
+                mutableViewEvents.value = ParticipantDisconnected(it)
+            }
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
-            remoteParticipant?.let {
-                val participantViewState = ParticipantViewState(
-                        remoteParticipant.sid,
-                        remoteParticipant.identity,
-                        remoteParticipant.getFirstVideoTrack(),
-                        isDominantSpeaker = true
-                )
-                mutableViewEvents.value = DominantSpeakerChanged(participantViewState)
-            }
         }
 
         override fun onRecordingStarted(room: Room) {}

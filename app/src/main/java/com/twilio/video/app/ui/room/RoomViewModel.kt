@@ -75,6 +75,7 @@ class RoomViewModel(
     }
 
     private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
+        Timber.d("observeRoomEvents: %s", roomEvent)
         when (roomEvent) {
             is Connecting -> {
                 showConnectingViewState()

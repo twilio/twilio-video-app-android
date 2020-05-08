@@ -22,7 +22,7 @@ class RemoteParticipantListener(
         Timber.i("New RemoteParticipant RemoteVideoTrack published for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        getCachedParticipant(remoteParticipant)?.copy(
+        participantManager.getParticipant(remoteParticipant.sid)?.copy(
             videoTrack = remoteParticipant.getFirstVideoTrack()
         )?.let {
             roomManager.updateParticipant(it)
@@ -33,7 +33,7 @@ class RemoteParticipantListener(
         Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        getCachedParticipant(remoteParticipant)?.copy(
+        participantManager.getParticipant(remoteParticipant.sid)?.copy(
             videoTrack = null
         )?.let {
             roomManager.updateParticipant(it)
@@ -44,7 +44,7 @@ class RemoteParticipantListener(
         Timber.i("RemoteParticipant NetworkQualityLevel changed for RemoteParticipant sid: %s, NetworkQualityLevel: %s",
                 remoteParticipant.sid, networkQualityLevel)
 
-        getCachedParticipant(remoteParticipant)?.copy(
+        participantManager.getParticipant(remoteParticipant.sid)?.copy(
                 networkQualityLevel = networkQualityLevel
         )?.let {
             roomManager.updateParticipant(it)
@@ -55,7 +55,7 @@ class RemoteParticipantListener(
         Timber.i("RemoteParticipant AudioTrack subscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteAudioTrack.sid)
 
-        getCachedParticipant(remoteParticipant)?.copy(
+        participantManager.getParticipant(remoteParticipant.sid)?.copy(
                 muted = false
         )?.let {
             roomManager.updateParticipant(it)
@@ -66,7 +66,7 @@ class RemoteParticipantListener(
         Timber.i("RemoteParticipant AudioTrack unsubscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteAudioTrack.sid)
 
-        getCachedParticipant(remoteParticipant)?.copy(
+        participantManager.getParticipant(remoteParticipant.sid)?.copy(
                 muted = true
         )?.let {
             roomManager.updateParticipant(it)
@@ -102,7 +102,4 @@ class RemoteParticipantListener(
     override fun onDataTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, remoteDataTrack: RemoteDataTrack) {}
 
     override fun onDataTrackUnpublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
-
-    private fun getCachedParticipant(remoteParticipant: RemoteParticipant) =
-            participantManager.getParticipant(remoteParticipant.sid)
 }
