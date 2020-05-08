@@ -17,12 +17,14 @@ class ParticipantManager {
     }
 
     fun removeParticipant(participantViewState: ParticipantViewState) {
-        mutableParticipants.find { it.sid == participantViewState.sid }?.let { existingParticipant ->
+        getParticipant(participantViewState.sid)?.let { existingParticipant ->
             mutableParticipants.remove(existingParticipant)
             updatePrimaryParticipant()
             Timber.d("Participant thumbnails: $participantThumbnails")
         }
     }
+
+    fun getParticipant(sid: String): ParticipantViewState? = mutableParticipants.find { it.sid == sid }
 
     fun clearParticipants() {
         mutableParticipants.clear()

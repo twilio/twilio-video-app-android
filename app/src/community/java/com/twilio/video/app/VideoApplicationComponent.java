@@ -45,6 +45,7 @@ import dagger.android.AndroidInjectionModule;
         SettingsActivityModule.class,
         SettingsFragmentModule.class,
         VideoServiceModule.class,
+        ParticipantModule.class,
         CommunityRoomManagerModule.class,
         SecurityModule.class,
         AudioSwitchModule.class

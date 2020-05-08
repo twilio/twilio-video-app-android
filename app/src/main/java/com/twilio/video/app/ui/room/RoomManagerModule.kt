@@ -7,13 +7,16 @@ import com.twilio.video.app.ApplicationScope
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.VideoAppServiceModule
+import com.twilio.video.app.participant.ParticipantManager
+import com.twilio.video.app.participant.ParticipantModule
 import dagger.Module
 import dagger.Provides
 
 @Module(includes = [
     ApplicationModule::class,
     DataModule::class,
-    VideoAppServiceModule::class])
+    VideoAppServiceModule::class,
+    ParticipantModule::class])
 class RoomManagerModule {
 
     @Provides
@@ -21,8 +24,9 @@ class RoomManagerModule {
     fun providesRoomManager(
         application: Application,
         sharedPreferences: SharedPreferences,
-        tokenService: TokenService
+        tokenService: TokenService,
+        participantManager: ParticipantManager
     ): RoomManager {
-        return RoomManager(application, sharedPreferences, tokenService)
+        return RoomManager(application, sharedPreferences, tokenService, participantManager)
     }
 }

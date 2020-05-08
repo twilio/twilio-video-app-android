@@ -8,8 +8,8 @@ import com.twilio.video.RemoteParticipant
 import com.twilio.video.VideoTrack
 
 data class ParticipantViewState(
-    val sid: String? = null,
-    val identity: String? = null,
+    val sid: String,
+    val identity: String,
     val videoTrack: VideoTrack? = null,
     val muted: Boolean = false,
     val mirror: Boolean = false,
@@ -31,7 +31,7 @@ fun buildParticipantViewState(remoteParticipant: RemoteParticipant, muted: Boole
 
 fun buildLocalParticipantViewState(
     localParticipant: LocalParticipant,
-    identity: String? = null,
+    identity: String,
     videoTrack: LocalVideoTrack? = null
 ) =
         ParticipantViewState(

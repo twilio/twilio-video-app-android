@@ -33,7 +33,7 @@ import timber.log.Timber
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
-    private val participantManager: ParticipantManager = ParticipantManager()
+    private val participantManager: ParticipantManager
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
 
     // TODO Use another type of observable here like a Coroutine flow
@@ -158,11 +158,12 @@ class RoomViewModel(
 
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioDeviceSelector
+        private val audioDeviceSelector: AudioDeviceSelector,
+        private val participantManager: ParticipantManager
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector) as T
+            return RoomViewModel(roomManager, audioDeviceSelector, participantManager) as T
         }
     }
 }

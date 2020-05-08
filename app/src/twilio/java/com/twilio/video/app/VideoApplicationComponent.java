@@ -30,6 +30,7 @@ import dagger.android.AndroidInjectionModule;
         SettingsActivityModule.class,
         SettingsFragmentModule.class,
         VideoServiceModule.class,
+        ParticipantModule.class,
         RoomManagerModule.class,
         AudioSwitchModule.class
     }

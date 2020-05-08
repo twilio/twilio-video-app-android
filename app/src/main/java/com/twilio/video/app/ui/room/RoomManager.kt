@@ -27,6 +27,7 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RemoteParticipantListener
@@ -51,6 +52,7 @@ class RoomManager(
     private val context: Context,
     private val sharedPreferences: SharedPreferences,
     private val tokenService: TokenService,
+    private val participantManager: ParticipantManager,
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
@@ -192,7 +194,8 @@ class RoomManager(
 
             val remoteParticipants = mutableListOf<ParticipantViewState>()
             room.remoteParticipants.forEach {
-                it.setListener(RemoteParticipantListener(this@RoomManager))
+                it.setListener(RemoteParticipantListener(this@RoomManager,
+                        participantManager))
                 remoteParticipants.add(buildParticipantViewState(it))
             }
 
@@ -221,7 +224,8 @@ class RoomManager(
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
+            remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager,
+                participantManager))
             mutableViewEvents.value = ParticipantConnected(
                     buildParticipantViewState(remoteParticipant))
         }
