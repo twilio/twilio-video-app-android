@@ -10,7 +10,7 @@ class ParticipantManager {
         private set
 
     fun updateParticipant(participantViewState: ParticipantViewState) {
-        Timber.d("Updating participant: %s", participantViewState.identity)
+        Timber.d("Updating participant: %s", participantViewState)
         removeParticipant(participantViewState, false)
         mutableParticipants.add(participantViewState)
         updatePrimaryParticipant()

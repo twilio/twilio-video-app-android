@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
-import com.twilio.video.Room
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.udf.BaseViewModel
@@ -15,12 +14,12 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
-import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
+import com.twilio.video.app.ui.room.RoomEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
@@ -67,9 +66,7 @@ class RoomViewModel(
                         viewEvent.roomName,
                         viewEvent.isNetworkQualityEnabled)
             }
-            is LocalVideoTrackPublished -> {
-                addParticipantView(viewEvent.participantViewState)
-            }
+            is LocalVideoTrackPublished -> updateLocalVideoTrack(viewEvent)
             Disconnect -> roomManager.disconnect()
         }
     }
@@ -81,8 +78,9 @@ class RoomViewModel(
                 showConnectingViewState()
             }
             is Connected -> {
-                showConnectedViewState(roomEvent.room, roomEvent.roomName)
-                checkRemoteParticipants(roomEvent.remoteParticipants)
+                showConnectedViewState(roomEvent.roomName)
+                checkRemoteParticipants(roomEvent.participants)
+                viewEffect { RoomViewEffect.Connected(roomEvent.room) }
             }
             is Disconnected -> {
                 showLobbyViewState()
@@ -100,6 +98,14 @@ class RoomViewModel(
             is TokenError -> viewEffect { ShowTokenErrorDialog(roomEvent.serviceError) }
         }
         return roomEvent
+    }
+
+    private fun updateLocalVideoTrack(viewEvent: LocalVideoTrackPublished) {
+        participantManager.getParticipant(viewEvent.sid)?.copy(
+                videoTrack = viewEvent.localVideoTrack
+        )?.let {
+            participantManager.updateParticipant(it)
+        } ?: Timber.d("Could not find a matching participant")
     }
 
     private fun showLobbyViewState() {
@@ -120,8 +126,7 @@ class RoomViewModel(
         ) }
     }
 
-    private fun showConnectedViewState(room: Room, roomName: String) {
-        viewEffect { RoomViewEffect.Connected(room) }
+    private fun showConnectedViewState(roomName: String) {
         updateState { it.copy(
                 title = roomName,
                 isLobbyLayoutVisible = false,

@@ -8,7 +8,7 @@ sealed class RoomEvent {
 
     object Connecting : RoomEvent()
     data class Connected(
-        val remoteParticipants: List<ParticipantViewState>,
+        val participants: List<ParticipantViewState>,
         val room: Room,
         val roomName: String
     ) : RoomEvent()

@@ -68,17 +68,12 @@ import com.twilio.audioswitch.selection.AudioDeviceSelector;
 import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
-import com.twilio.video.LocalAudioTrackPublication;
-import com.twilio.video.LocalDataTrack;
-import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.LocalVideoTrackPublication;
 import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.Room;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
-import com.twilio.video.TwilioException;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoTrack;
@@ -1033,7 +1028,6 @@ public class RoomActivity extends BaseActivity {
         localParticipant = room.getLocalParticipant();
         if (localParticipant != null) {
             localParticipantSid = localParticipant.getSid();
-            localParticipant.setListener(new LocalParticipantListener());
         }
     }
 
@@ -1043,11 +1037,7 @@ public class RoomActivity extends BaseActivity {
                 Timber.d("Camera track: %s", cameraVideoTrack);
                 localParticipant.publishTrack(cameraVideoTrack);
                 roomViewModel.processInput(
-                        new LocalVideoTrackPublished(
-                                buildLocalParticipantViewState(
-                                        localParticipant,
-                                        getString(R.string.you),
-                                        cameraVideoTrack)));
+                        new LocalVideoTrackPublished(localParticipant.getSid(), cameraVideoTrack));
             }
 
             if (localAudioTrack != null) {
@@ -1178,51 +1168,6 @@ public class RoomActivity extends BaseActivity {
                 .setMessage(getString(errorMessage))
                 .setNeutralButton("OK", null)
                 .show();
-    }
-
-    private class LocalParticipantListener implements LocalParticipant.Listener {
-
-        @Override
-        public void onAudioTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalAudioTrackPublication localAudioTrackPublication) {}
-
-        @Override
-        public void onAudioTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalAudioTrack localAudioTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onVideoTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalVideoTrackPublication localVideoTrackPublication) {}
-
-        @Override
-        public void onVideoTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalVideoTrack localVideoTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onDataTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalDataTrackPublication localDataTrackPublication) {}
-
-        @Override
-        public void onDataTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalDataTrack localDataTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onNetworkQualityLevelChanged(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull NetworkQualityLevel networkQualityLevel) {
-            participantController.updateThumb(
-                    buildLocalParticipantViewState(
-                            localParticipant, getString(R.string.you), cameraVideoTrack));
-        }
     }
 
     private boolean didAcceptPermissions() {

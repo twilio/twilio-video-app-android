@@ -29,7 +29,9 @@ import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
+import com.twilio.video.app.sdk.LocalParticipantListener
 import com.twilio.video.app.sdk.RemoteParticipantListener
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
@@ -191,14 +193,7 @@ class RoomManager(
 
             startService(context, room.name)
 
-            val remoteParticipants = mutableListOf<ParticipantViewState>()
-            room.remoteParticipants.forEach {
-                it.setListener(RemoteParticipantListener(this@RoomManager,
-                        participantManager))
-                remoteParticipants.add(buildParticipantViewState(it))
-            }
-
-            mutableViewEvents.value = Connected(remoteParticipants, room, room.name)
+            setupParticipants(room)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
@@ -254,5 +249,27 @@ class RoomManager(
         }
 
         override fun onRecordingStopped(room: Room) {}
+
+        private fun setupParticipants(room: Room) {
+            room.localParticipant?.let { localParticipant ->
+                val participants = mutableListOf<ParticipantViewState>()
+
+                val localParticipantViewState = buildLocalParticipantViewState(
+                        localParticipant,
+                        "You"
+                )
+                participants.add(localParticipantViewState)
+                localParticipant.setListener(LocalParticipantListener(
+                        this@RoomManager, participantManager))
+
+                room.remoteParticipants.forEach {
+                    it.setListener(RemoteParticipantListener(this@RoomManager,
+                            participantManager))
+                    participants.add(buildParticipantViewState(it))
+                }
+
+                mutableViewEvents.value = Connected(participants, room, room.name)
+            }
+        }
     }
 }
