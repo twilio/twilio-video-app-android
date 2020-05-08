@@ -32,6 +32,16 @@ class ParticipantManager {
 
     fun getParticipant(sid: String): ParticipantViewState? = mutableParticipants.find { it.sid == sid }
 
+    fun changeDominantSpeaker(newDominantSpeakerSid: String) {
+        mutableParticipants.find { it.isDominantSpeaker }?.copy(
+                isDominantSpeaker = false)?.let { oldDominantSpeaker ->
+            updateParticipant(oldDominantSpeaker)
+        }
+
+        getParticipant(newDominantSpeakerSid)?.copy(
+                isDominantSpeaker = true)?.let { updateParticipant(it) }
+    }
+
     fun clearParticipants() {
         mutableParticipants.clear()
         primaryParticipant = null

@@ -151,6 +151,10 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         audioToggle.setVisibility(muted ? VISIBLE : GONE);
     }
 
+    public void showDominantSpeaker(boolean show) {
+        dominantSpeakerImg.setVisibility(show ? VISIBLE : GONE);
+    }
+
     @Override
     public void renderFrame(@NonNull I420Frame frame) {
         videoView.renderFrame(frame);

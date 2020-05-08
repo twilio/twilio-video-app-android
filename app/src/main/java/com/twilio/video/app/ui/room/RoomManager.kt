@@ -37,6 +37,7 @@ import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
@@ -236,6 +237,8 @@ class RoomManager(
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
+
+            remoteParticipant?.let { mutableViewEvents.value = DominantSpeakerChanged(it.sid) }
         }
 
         override fun onRecordingStarted(room: Room) {}

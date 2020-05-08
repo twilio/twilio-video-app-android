@@ -89,7 +89,9 @@ class RoomViewModel(
             }
             is UpdateParticipant -> addParticipantView(roomEvent.participant)
             is ParticipantConnected -> addParticipantView(roomEvent.participant)
-            is DominantSpeakerChanged -> addParticipantView(roomEvent.participant)
+            is DominantSpeakerChanged -> {
+                participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
+            }
             is ParticipantDisconnected -> {
                 participantManager.removeParticipant(roomEvent.participant)
                 updateParticipantViewState()

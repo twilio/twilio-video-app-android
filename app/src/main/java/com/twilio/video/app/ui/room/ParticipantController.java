@@ -92,9 +92,9 @@ class ParticipantController {
             ParticipantView view = getThumb(participantViewState.getSid());
 
             removeRender(target.videoTrack, view);
-
             target.videoTrack = participantViewState.getVideoTrack();
             view.setMuted(participantViewState.getMuted());
+            view.showDominantSpeaker(participantViewState.isDominantSpeaker());
 
             if (target.videoTrack != null) {
                 view.setState(ParticipantView.State.VIDEO);
