@@ -18,5 +18,5 @@ sealed class RoomEvent {
     data class ParticipantConnected(val participant: ParticipantViewState) : RoomEvent()
     data class ParticipantDisconnected(val participant: ParticipantViewState) : RoomEvent()
     data class UpdateParticipant(val participant: ParticipantViewState) : RoomEvent()
-    data class DominantSpeakerChanged(val newDominantSpeakerSid: String) : RoomEvent()
+    data class DominantSpeakerChanged(val newDominantSpeakerSid: String?) : RoomEvent()
 }

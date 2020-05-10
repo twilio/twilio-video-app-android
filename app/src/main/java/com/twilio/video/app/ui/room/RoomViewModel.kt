@@ -84,7 +84,6 @@ class RoomViewModel(
             }
             is Disconnected -> {
                 showLobbyViewState()
-                participantManager.clearParticipants()
                 updateState { it.copy(participantThumbnails = null, primaryParticipant = null) }
             }
             is UpdateParticipant -> addParticipantView(roomEvent.participant)
@@ -96,8 +95,14 @@ class RoomViewModel(
                 participantManager.removeParticipant(roomEvent.participant)
                 updateParticipantViewState()
             }
-            is ConnectFailure -> viewEffect { ShowConnectFailureDialog }
-            is TokenError -> viewEffect { ShowTokenErrorDialog(roomEvent.serviceError) }
+            is ConnectFailure -> viewEffect {
+                showLobbyViewState()
+                ShowConnectFailureDialog
+            }
+            is TokenError -> viewEffect {
+                showLobbyViewState()
+                ShowTokenErrorDialog(roomEvent.serviceError)
+            }
         }
         return roomEvent
     }
@@ -117,6 +122,7 @@ class RoomViewModel(
                 isConnectingLayoutVisible = false,
                 isConnectedLayoutVisible = false
         ) }
+        participantManager.clearParticipants()
     }
 
     private fun showConnectingViewState() {

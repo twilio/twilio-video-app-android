@@ -238,7 +238,7 @@ class RoomManager(
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
 
-            remoteParticipant?.let { mutableViewEvents.value = DominantSpeakerChanged(it.sid) }
+            mutableViewEvents.value = DominantSpeakerChanged(remoteParticipant?.sid)
         }
 
         override fun onRecordingStarted(room: Room) {}
