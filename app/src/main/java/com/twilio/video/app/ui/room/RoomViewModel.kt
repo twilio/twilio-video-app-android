@@ -14,10 +14,10 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
-import com.twilio.video.app.ui.room.RoomEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
