@@ -87,7 +87,6 @@
         android:layout_margin="6dp"
         android:contentDescription="@string/audio_toggle"
         app:srcCompat="@drawable/ic_thumbnail_no_audio"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -99,7 +98,8 @@
         app:srcCompat="@drawable/network_quality_level_5"
         android:contentDescription="@string/settings_screen_enable_network_quality_level_description"
         android:visibility="gone"
+
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
