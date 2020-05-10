@@ -3,7 +3,6 @@ package com.twilio.video.app;
 import com.twilio.video.app.auth.AuthModule;
 import com.twilio.video.app.data.DataModule;
 import com.twilio.video.app.data.api.VideoAppServiceModule;
-import com.twilio.video.app.participant.ParticipantModule;
 import com.twilio.video.app.ui.ScreenSelectorModule;
 import com.twilio.video.app.ui.login.LoginActivityModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
@@ -31,7 +30,6 @@ import dagger.android.AndroidInjectionModule;
         SettingsActivityModule.class,
         SettingsFragmentModule.class,
         VideoServiceModule.class,
-        ParticipantModule.class,
         RoomManagerModule.class,
         AudioSwitchModule.class
     }

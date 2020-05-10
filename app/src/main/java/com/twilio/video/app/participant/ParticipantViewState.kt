@@ -4,7 +4,7 @@ import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
-import com.twilio.video.RemoteParticipant
+import com.twilio.video.Participant
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.sdk.getFirstVideoTrack
 
@@ -12,8 +12,8 @@ data class ParticipantViewState(
     val sid: String,
     val identity: String,
     val videoTrack: VideoTrack? = null,
-    val muted: Boolean = false,
-    val mirror: Boolean = false,
+    val isMuted: Boolean = false,
+    val isMirrored: Boolean = false,
     val isPinned: Boolean = false,
     val isScreenSharing: Boolean = false,
     val isDominantSpeaker: Boolean = false,
@@ -21,13 +21,13 @@ data class ParticipantViewState(
     val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN
 )
 
-fun buildParticipantViewState(remoteParticipant: RemoteParticipant) =
+fun buildParticipantViewState(remoteParticipant: Participant) =
     ParticipantViewState(
             remoteParticipant.sid,
             remoteParticipant.identity,
             remoteParticipant.getFirstVideoTrack(),
             networkQualityLevel = remoteParticipant.networkQualityLevel,
-            muted = remoteParticipant.remoteAudioTracks.firstOrNull() == null
+            isMuted = remoteParticipant.audioTracks.firstOrNull() == null
     )
 
 fun buildLocalParticipantViewState(

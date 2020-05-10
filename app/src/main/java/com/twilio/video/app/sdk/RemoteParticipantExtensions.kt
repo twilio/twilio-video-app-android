@@ -1,7 +1,7 @@
 package com.twilio.video.app.sdk
 
-import com.twilio.video.RemoteParticipant
-import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.Participant
+import com.twilio.video.VideoTrack
 
-fun RemoteParticipant.getFirstVideoTrack(): RemoteVideoTrack? =
-        remoteVideoTracks.firstOrNull()?.remoteVideoTrack
+fun Participant.getFirstVideoTrack(): VideoTrack? =
+        videoTracks.firstOrNull()?.videoTrack

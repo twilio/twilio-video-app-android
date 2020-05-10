@@ -9,20 +9,17 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.LocalVideoTrackPublication
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.TwilioException
-import com.twilio.video.app.participant.ParticipantManager
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
 import com.twilio.video.app.ui.room.RoomManager
+import timber.log.Timber
 
-class LocalParticipantListener(
-    private val roomManager: RoomManager,
-    private val participantManager: ParticipantManager
-) : LocalParticipant.Listener {
+class LocalParticipantListener(private val roomManager: RoomManager) : LocalParticipant.Listener {
 
     override fun onNetworkQualityLevelChanged(localParticipant: LocalParticipant, networkQualityLevel: NetworkQualityLevel) {
-        participantManager.getParticipant(localParticipant.sid)?.copy(
-                networkQualityLevel = networkQualityLevel
-        )?.let {
-            roomManager.updateParticipant(it)
-        }
+        Timber.i("LocalParticipant NetworkQualityLevel changed for LocalParticipant sid: %s, NetworkQualityLevel: %s",
+                localParticipant.sid, networkQualityLevel)
+
+        roomManager.sendParticipantEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
     }
 
     override fun onVideoTrackPublicationFailed(localParticipant: LocalParticipant, localVideoTrack: LocalVideoTrack, twilioException: TwilioException) {}

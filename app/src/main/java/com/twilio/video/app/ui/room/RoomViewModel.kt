@@ -6,17 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
+import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
-import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.udf.BaseViewModel
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.UpdateParticipant
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
@@ -32,7 +36,7 @@ import timber.log.Timber
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
-    private val participantManager: ParticipantManager
+    private val participantManager: ParticipantManager = ParticipantManager()
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
 
     // TODO Use another type of observable here like a Coroutine flow
@@ -79,21 +83,15 @@ class RoomViewModel(
             }
             is Connected -> {
                 showConnectedViewState(roomEvent.roomName)
-                checkRemoteParticipants(roomEvent.participants)
+                checkParticipants(roomEvent.participants)
                 viewEffect { RoomViewEffect.Connected(roomEvent.room) }
             }
             is Disconnected -> {
                 showLobbyViewState()
                 updateState { it.copy(participantThumbnails = null, primaryParticipant = null) }
             }
-            is UpdateParticipant -> addParticipantView(roomEvent.participant)
-            is ParticipantConnected -> addParticipantView(roomEvent.participant)
             is DominantSpeakerChanged -> {
                 participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
-            }
-            is ParticipantDisconnected -> {
-                participantManager.removeParticipant(roomEvent.participant)
-                updateParticipantViewState()
             }
             is ConnectFailure -> viewEffect {
                 showLobbyViewState()
@@ -103,8 +101,40 @@ class RoomViewModel(
                 showLobbyViewState()
                 ShowTokenErrorDialog(roomEvent.serviceError)
             }
+            is ParticipantEvent -> handleParticipantEvent(roomEvent)
         }
         return roomEvent
+    }
+
+    private fun handleParticipantEvent(participantEvent: ParticipantEvent) {
+        when (participantEvent) {
+            is ParticipantConnected -> updateParticipant(participantEvent.participant)
+            is VideoTrackUpdated -> {
+                participantManager.updateParticipantVideoTrack(participantEvent.sid,
+                        participantEvent.videoTrack)
+                updateParticipantViewState()
+            }
+            is MuteParticipant -> {
+                participantManager.muteParticipant(participantEvent.sid,
+                        participantEvent.mute)
+                updateParticipantViewState()
+            }
+            is NetworkQualityLevelChange -> {
+                participantManager.updateNetworkQuality(participantEvent.sid,
+                        participantEvent.networkQualityLevel)
+                updateParticipantViewState()
+            }
+            is ParticipantDisconnected -> {
+                participantManager.removeParticipant(participantEvent.sid)
+                updateParticipantViewState()
+            }
+        }
+    }
+
+    private fun updateParticipant(participant: Participant) {
+        val participantViewState = buildParticipantViewState(participant)
+        participantManager.updateParticipant(participantViewState)
+        updateParticipantViewState()
     }
 
     private fun updateLocalVideoTrack(viewEvent: LocalVideoTrackPublished) {
@@ -143,13 +173,11 @@ class RoomViewModel(
         ) }
     }
 
-    private fun checkRemoteParticipants(remoteParticipants: List<ParticipantViewState>) {
-            remoteParticipants.forEach { participantManager.updateParticipant(it) }
-            updateParticipantViewState()
-    }
-
-    private fun addParticipantView(participantViewState: ParticipantViewState) {
-        participantManager.updateParticipant(participantViewState)
+    private fun checkParticipants(participants: List<Participant>) {
+        participants.forEach { participant ->
+            val participantViewState = buildParticipantViewState(participant)
+            participantManager.updateParticipant(participantViewState)
+        }
         updateParticipantViewState()
     }
 
@@ -172,12 +200,11 @@ class RoomViewModel(
 
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioDeviceSelector,
-        private val participantManager: ParticipantManager
+        private val audioDeviceSelector: AudioDeviceSelector
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector, participantManager) as T
+            return RoomViewModel(roomManager, audioDeviceSelector) as T
         }
     }
 }

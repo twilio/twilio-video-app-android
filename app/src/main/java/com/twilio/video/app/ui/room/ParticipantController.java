@@ -63,8 +63,8 @@ class ParticipantController {
                         participantViewState.getSid(),
                         participantViewState.getIdentity(),
                         participantViewState.getVideoTrack(),
-                        participantViewState.getMuted(),
-                        participantViewState.getMirror());
+                        participantViewState.isMuted(),
+                        participantViewState.isMirrored());
         ParticipantView view = createThumb(item);
         thumbs.put(item, view);
         thumbsViewContainer.addView(view);
@@ -93,7 +93,7 @@ class ParticipantController {
 
             removeRender(target.videoTrack, view);
             target.videoTrack = participantViewState.getVideoTrack();
-            view.setMuted(participantViewState.getMuted());
+            view.setMuted(participantViewState.isMuted());
             view.showDominantSpeaker(participantViewState.isDominantSpeaker());
 
             if (target.videoTrack != null) {

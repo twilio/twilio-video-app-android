@@ -1,5 +1,7 @@
 package com.twilio.video.app.participant
 
+import com.twilio.video.NetworkQualityLevel
+import com.twilio.video.VideoTrack
 import timber.log.Timber
 
 class ParticipantManager {
@@ -11,24 +13,38 @@ class ParticipantManager {
 
     fun updateParticipant(participantViewState: ParticipantViewState) {
         Timber.d("Updating participant: %s", participantViewState)
-        removeParticipant(participantViewState, false)
+        removeParticipant(participantViewState.sid, false)
         mutableParticipants.add(participantViewState)
         updatePrimaryParticipant()
         Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
-    fun removeParticipant(
-        participantViewState: ParticipantViewState,
-        updatePrimaryParticipant: Boolean = true
-    ) {
-
-        Timber.d("Removing participant: %s", participantViewState.identity)
-        mutableParticipants.removeAll { it.sid == participantViewState.sid }
+    fun removeParticipant(sid: String, updatePrimaryParticipant: Boolean = true) {
+        Timber.d("Removing participant: %s", sid)
+        mutableParticipants.removeAll { it.sid == sid }
         if (updatePrimaryParticipant) updatePrimaryParticipant()
         Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
     fun getParticipant(sid: String): ParticipantViewState? = mutableParticipants.find { it.sid == sid }
+
+    fun updateNetworkQuality(sid: String, networkQualityLevel: NetworkQualityLevel) {
+        getParticipant(sid)?.copy(networkQualityLevel = networkQualityLevel)?.let {
+            updateParticipant(it)
+        }
+    }
+
+    fun updateParticipantVideoTrack(sid: String, videoTrack: VideoTrack?) {
+        getParticipant(sid)?.copy(videoTrack = videoTrack)?.let {
+            updateParticipant(it)
+        }
+    }
+
+    fun muteParticipant(sid: String, mute: Boolean) {
+        getParticipant(sid)?.copy(isMuted = mute)?.let {
+            updateParticipant(it)
+        }
+    }
 
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
         newDominantSpeakerSid?.let {

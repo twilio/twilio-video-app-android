@@ -14,6 +14,7 @@ import com.twilio.video.IsacCodec
 import com.twilio.video.NetworkQualityConfiguration
 import com.twilio.video.NetworkQualityVerbosity
 import com.twilio.video.OpusCodec
+import com.twilio.video.Participant
 import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
 import com.twilio.video.RemoteParticipant
@@ -27,10 +28,6 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
-import com.twilio.video.app.participant.ParticipantManager
-import com.twilio.video.app.participant.ParticipantViewState
-import com.twilio.video.app.participant.buildLocalParticipantViewState
-import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.LocalParticipantListener
 import com.twilio.video.app.sdk.RemoteParticipantListener
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
@@ -38,9 +35,9 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.UpdateParticipant
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
@@ -54,7 +51,6 @@ class RoomManager(
     private val context: Context,
     private val sharedPreferences: SharedPreferences,
     private val tokenService: TokenService,
-    private val participantManager: ParticipantManager,
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
@@ -134,8 +130,8 @@ class RoomManager(
         }
     }
 
-    fun updateParticipant(participantViewState: ParticipantViewState) {
-        mutableViewEvents.value = UpdateParticipant(participantViewState)
+    fun sendParticipantEvent(participantEvent: ParticipantEvent) {
+        mutableViewEvents.value = participantEvent
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
@@ -219,19 +215,16 @@ class RoomManager(
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager,
-                participantManager))
-            mutableViewEvents.value = ParticipantConnected(
-                    buildParticipantViewState(remoteParticipant))
+
+            remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
+            sendParticipantEvent(ParticipantConnected(remoteParticipant))
         }
 
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
 
-            participantManager.getParticipant(remoteParticipant.sid)?.copy()?.let {
-                mutableViewEvents.value = ParticipantDisconnected(it)
-            }
+            sendParticipantEvent(ParticipantDisconnected(remoteParticipant.sid))
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
@@ -255,20 +248,13 @@ class RoomManager(
 
         private fun setupParticipants(room: Room) {
             room.localParticipant?.let { localParticipant ->
-                val participants = mutableListOf<ParticipantViewState>()
-
-                val localParticipantViewState = buildLocalParticipantViewState(
-                        localParticipant,
-                        "You"
-                )
-                participants.add(localParticipantViewState)
-                localParticipant.setListener(LocalParticipantListener(
-                        this@RoomManager, participantManager))
+                val participants = mutableListOf<Participant>()
+                participants.add(localParticipant)
+                localParticipant.setListener(LocalParticipantListener(this@RoomManager))
 
                 room.remoteParticipants.forEach {
-                    it.setListener(RemoteParticipantListener(this@RoomManager,
-                            participantManager))
-                    participants.add(buildParticipantViewState(it))
+                    it.setListener(RemoteParticipantListener(this@RoomManager))
+                    participants.add(it)
                 }
 
                 mutableViewEvents.value = Connected(participants, room, room.name)

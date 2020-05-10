@@ -84,7 +84,6 @@ import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
-import com.twilio.video.app.participant.ParticipantManager;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.udf.ViewEffect;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
@@ -247,8 +246,6 @@ public class RoomActivity extends BaseActivity {
 
     @Inject RoomManager roomManager;
 
-    @Inject ParticipantManager participantManager;
-
     @Inject AudioDeviceSelector audioDeviceSelector;
 
     /** Coordinates participant thumbs and primary participant rendering. */
@@ -273,8 +270,7 @@ public class RoomActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RoomViewModelFactory factory =
-                new RoomViewModelFactory(roomManager, audioDeviceSelector, participantManager);
+        RoomViewModelFactory factory = new RoomViewModelFactory(roomManager, audioDeviceSelector);
         roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
@@ -1102,8 +1098,8 @@ public class RoomActivity extends BaseActivity {
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
                     primaryParticipant.getVideoTrack(),
-                    primaryParticipant.getMuted(),
-                    primaryParticipant.getMirror());
+                    primaryParticipant.isMuted(),
+                    primaryParticipant.isMirrored());
         } else {
             renderLocalParticipantStub();
         }

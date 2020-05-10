@@ -9,23 +9,20 @@ import com.twilio.video.RemoteParticipant
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.RemoteVideoTrackPublication
 import com.twilio.video.TwilioException
-import com.twilio.video.app.participant.ParticipantManager
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomManager
 import timber.log.Timber
 
-class RemoteParticipantListener(
-    private val roomManager: RoomManager,
-    private val participantManager: ParticipantManager
-) : RemoteParticipant.Listener {
+class RemoteParticipantListener(private val roomManager: RoomManager) : RemoteParticipant.Listener {
 
     override fun onVideoTrackSubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
         Timber.i("New RemoteParticipant RemoteVideoTrack published for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        participantManager.getParticipant(remoteParticipant.sid)?.copy(
-            videoTrack = remoteParticipant.getFirstVideoTrack()
-        )?.let {
-            roomManager.updateParticipant(it)
+        remoteParticipant.getFirstVideoTrack()?.let { videoTrack ->
+            roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, videoTrack))
         }
     }
 
@@ -33,64 +30,57 @@ class RemoteParticipantListener(
         Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        participantManager.getParticipant(remoteParticipant.sid)?.copy(
-            videoTrack = null
-        )?.let {
-            roomManager.updateParticipant(it)
-        }
+        roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, null))
     }
 
     override fun onNetworkQualityLevelChanged(remoteParticipant: RemoteParticipant, networkQualityLevel: NetworkQualityLevel) {
         Timber.i("RemoteParticipant NetworkQualityLevel changed for RemoteParticipant sid: %s, NetworkQualityLevel: %s",
                 remoteParticipant.sid, networkQualityLevel)
 
-        participantManager.getParticipant(remoteParticipant.sid)?.copy(
-                networkQualityLevel = networkQualityLevel
-        )?.let {
-            roomManager.updateParticipant(it)
-        }
+        roomManager.sendParticipantEvent(NetworkQualityLevelChange(remoteParticipant.sid,
+                networkQualityLevel))
     }
 
     override fun onAudioTrackSubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {
         Timber.i("RemoteParticipant AudioTrack subscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteAudioTrack.sid)
 
-        muteParticipant(remoteParticipant, false)
+        roomManager.sendParticipantEvent(MuteParticipant(remoteParticipant.sid, false))
     }
 
     override fun onAudioTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication, remoteAudioTrack: RemoteAudioTrack) {
         Timber.i("RemoteParticipant AudioTrack unsubscribed for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteAudioTrack.sid)
 
-        muteParticipant(remoteParticipant, true)
+        roomManager.sendParticipantEvent(MuteParticipant(remoteParticipant.sid, true))
     }
 
     override fun onAudioTrackPublished(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
         Timber.i("RemoteParticipant AudioTrack published for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteParticipant.sid)
 
-        muteParticipant(remoteParticipant, false)
+        roomManager.sendParticipantEvent(MuteParticipant(remoteParticipant.sid, false))
     }
 
     override fun onAudioTrackUnpublished(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
         Timber.i("RemoteParticipant AudioTrack unpublished for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteParticipant.sid)
 
-        muteParticipant(remoteParticipant, true)
+        roomManager.sendParticipantEvent(MuteParticipant(remoteParticipant.sid, true))
     }
 
     override fun onAudioTrackEnabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
         Timber.i("RemoteParticipant AudioTrack enabled for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteParticipant.sid)
 
-        muteParticipant(remoteParticipant, false)
+        roomManager.sendParticipantEvent(MuteParticipant(remoteParticipant.sid, false))
     }
 
     override fun onAudioTrackDisabled(remoteParticipant: RemoteParticipant, remoteAudioTrackPublication: RemoteAudioTrackPublication) {
         Timber.i("RemoteParticipant AudioTrack disabled for RemoteParticipant sid: %s, RemoteAudioTrack sid: %s",
                 remoteParticipant.sid, remoteParticipant.sid)
 
-        muteParticipant(remoteParticipant, true)
+        roomManager.sendParticipantEvent(MuteParticipant(remoteParticipant.sid, true))
     }
 
     override fun onDataTrackPublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
@@ -114,12 +104,4 @@ class RemoteParticipantListener(
     override fun onDataTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication, remoteDataTrack: RemoteDataTrack) {}
 
     override fun onDataTrackUnpublished(remoteParticipant: RemoteParticipant, remoteDataTrackPublication: RemoteDataTrackPublication) {}
-
-    private fun muteParticipant(remoteParticipant: RemoteParticipant, mute: Boolean) {
-        participantManager.getParticipant(remoteParticipant.sid)?.copy(
-                muted = mute
-        )?.let {
-            roomManager.updateParticipant(it)
-        }
-    }
 }
