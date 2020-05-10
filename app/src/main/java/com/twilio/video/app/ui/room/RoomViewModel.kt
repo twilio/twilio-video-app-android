@@ -29,6 +29,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished
+import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -71,6 +72,10 @@ class RoomViewModel(
                         viewEvent.isNetworkQualityEnabled)
             }
             is LocalVideoTrackPublished -> updateLocalVideoTrack(viewEvent)
+            is PinParticipant -> {
+                participantManager.changePinnedParticipant(viewEvent.sid)
+                updateParticipantViewState()
+            }
             Disconnect -> roomManager.disconnect()
         }
     }

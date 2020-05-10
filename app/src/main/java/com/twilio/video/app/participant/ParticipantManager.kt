@@ -46,6 +46,15 @@ class ParticipantManager {
         }
     }
 
+    fun changePinnedParticipant(sid: String) {
+        mutableParticipants.find { it.isPinned }?.copy(
+                isPinned = false)?.let { updateParticipant(it) }
+
+        getParticipant(sid)?.copy(isPinned = true)?.let {
+            updateParticipant(it)
+        }
+    }
+
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
         newDominantSpeakerSid?.let {
             clearDominantSpeaker()
@@ -57,9 +66,7 @@ class ParticipantManager {
 
     private fun clearDominantSpeaker() {
         mutableParticipants.find { it.isDominantSpeaker }?.copy(
-                isDominantSpeaker = false)?.let { oldDominantSpeaker ->
-            updateParticipant(oldDominantSpeaker)
-        }
+                isDominantSpeaker = false)?.let { updateParticipant(it) }
     }
 
     fun clearParticipants() {
@@ -68,7 +75,12 @@ class ParticipantManager {
     }
 
     private fun updatePrimaryParticipant() {
-        primaryParticipant = mutableParticipants.find { !it.isLocalParticipant }
+        primaryParticipant = determinePrimaryParticipant()
         Timber.d("Primary Participant: $primaryParticipant")
+    }
+
+    private fun determinePrimaryParticipant(): ParticipantViewState? {
+        return mutableParticipants.find { it.isPinned }
+        ?: mutableParticipants.find { !it.isLocalParticipant }
     }
 }

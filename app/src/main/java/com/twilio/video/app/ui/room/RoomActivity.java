@@ -86,6 +86,7 @@ import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.udf.ViewEffect;
+import com.twilio.video.app.ui.room.ParticipantController.Item;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
@@ -93,6 +94,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished;
+import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
@@ -295,6 +297,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup participant controller
         participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
+        participantController.setListener(participantClickListener());
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
@@ -1007,6 +1010,10 @@ public class RoomActivity extends BaseActivity {
                         statsReports, room.getRemoteParticipants(), localVideoTrackNames);
             }
         };
+    }
+
+    private ParticipantController.ItemClickListener participantClickListener() {
+        return (Item item) -> roomViewModel.processInput(new PinParticipant(item.sid));
     }
 
     private void initializeRoom() {

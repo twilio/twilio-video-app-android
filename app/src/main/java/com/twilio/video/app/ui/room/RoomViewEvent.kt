@@ -13,5 +13,6 @@ sealed class RoomViewEvent {
         val isNetworkQualityEnabled: Boolean
     ) : RoomViewEvent()
     data class LocalVideoTrackPublished(val sid: String, val localVideoTrack: LocalVideoTrack) : RoomViewEvent()
+    data class PinParticipant(val sid: String) : RoomViewEvent()
     object Disconnect : RoomViewEvent()
 }
