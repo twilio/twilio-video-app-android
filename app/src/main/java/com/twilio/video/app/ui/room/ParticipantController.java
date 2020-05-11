@@ -91,20 +91,28 @@ class ParticipantController {
         if (target != null) {
             ParticipantView view = getThumb(participantViewState.getSid());
 
-            removeRender(target.videoTrack, view);
-            target.videoTrack = participantViewState.getVideoTrack();
             view.setMuted(participantViewState.isMuted());
             view.showDominantSpeaker(participantViewState.isDominantSpeaker());
+            view.setPinned(participantViewState.isPinned());
 
+            updateVideoTrack(participantViewState, target, view);
+
+            setNetworkQualityLevelImage(
+                    view.networkQualityLevelImg, participantViewState.getNetworkQualityLevel());
+        }
+    }
+
+    private void updateVideoTrack(
+            ParticipantViewState participantViewState, Item target, ParticipantView view) {
+        if (target.videoTrack != participantViewState.getVideoTrack()) {
+            removeRender(target.videoTrack, view);
+            target.videoTrack = participantViewState.getVideoTrack();
             if (target.videoTrack != null) {
                 view.setState(ParticipantView.State.VIDEO);
                 target.videoTrack.addRenderer(view);
             } else {
                 view.setState(ParticipantView.State.NO_VIDEO);
             }
-
-            setNetworkQualityLevelImage(
-                    view.networkQualityLevelImg, participantViewState.getNetworkQualityLevel());
         }
     }
 

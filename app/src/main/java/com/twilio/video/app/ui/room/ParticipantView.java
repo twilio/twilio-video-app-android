@@ -78,6 +78,10 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     @BindView(R.id.participant_no_audio)
     ImageView audioToggle;
 
+    @Nullable
+    @BindView(R.id.participant_pin)
+    ImageView pinImage;
+
     public ParticipantView(@NonNull Context context) {
         super(context);
         initParams(context, null);
@@ -149,6 +153,10 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     public void setMuted(boolean muted) {
         audioToggle.setVisibility(muted ? VISIBLE : GONE);
+    }
+
+    public void setPinned(boolean pinned) {
+        pinImage.setVisibility(pinned ? VISIBLE : GONE);
     }
 
     public void showDominantSpeaker(boolean show) {

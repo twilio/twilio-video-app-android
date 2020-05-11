@@ -86,7 +86,20 @@
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
         android:contentDescription="@string/audio_toggle"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_thumbnail_no_audio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/participant_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:contentDescription="@string/room_screen_pin_icon_description"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_pin"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
