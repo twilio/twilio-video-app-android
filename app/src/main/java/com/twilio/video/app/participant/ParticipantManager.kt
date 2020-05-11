@@ -11,18 +11,28 @@ class ParticipantManager {
     var primaryParticipant: ParticipantViewState? = null
         private set
 
-    fun updateParticipant(participantViewState: ParticipantViewState) {
-        Timber.d("Updating participant: %s", participantViewState)
-        removeParticipant(participantViewState.sid, false)
+    fun addParticipant(participantViewState: ParticipantViewState) {
+        Timber.d("Adding participant: %s", participantViewState)
         mutableParticipants.add(participantViewState)
         updatePrimaryParticipant()
         Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
-    fun removeParticipant(sid: String, updatePrimaryParticipant: Boolean = true) {
+    fun updateParticipant(participantViewState: ParticipantViewState) {
+        mutableParticipants.indexOfFirst { it.sid == participantViewState.sid }.let { index ->
+            if (index > -1) {
+                Timber.d("Updating participant: %s", participantViewState)
+                mutableParticipants[index] = participantViewState
+                updatePrimaryParticipant()
+                Timber.d("Participant thumbnails: $participantThumbnails")
+            }
+        }
+    }
+
+    fun removeParticipant(sid: String) {
         Timber.d("Removing participant: %s", sid)
         mutableParticipants.removeAll { it.sid == sid }
-        if (updatePrimaryParticipant) updatePrimaryParticipant()
+        updatePrimaryParticipant()
         Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
@@ -47,11 +57,14 @@ class ParticipantManager {
     }
 
     fun changePinnedParticipant(sid: String) {
-        mutableParticipants.find { it.isPinned }?.copy(
-                isPinned = false)?.let { updateParticipant(it) }
+        val existingPin = mutableParticipants.find { it.isPinned }?.copy(
+            isPinned = false)
+        existingPin?.let { updateParticipant(it) }
 
-        getParticipant(sid)?.copy(isPinned = true)?.let {
-            updateParticipant(it)
+        getParticipant(sid)?.let { newPin ->
+            if (existingPin?.sid != newPin.sid) {
+                updateParticipant(newPin.copy(isPinned = true))
+            }
         }
     }
 

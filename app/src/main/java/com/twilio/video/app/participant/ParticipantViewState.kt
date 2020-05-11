@@ -1,6 +1,5 @@
 package com.twilio.video.app.participant
 
-import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
@@ -31,7 +30,7 @@ fun buildParticipantViewState(remoteParticipant: Participant) =
     )
 
 fun buildLocalParticipantViewState(
-    localParticipant: LocalParticipant,
+    localParticipant: Participant,
     identity: String,
     videoTrack: LocalVideoTrack? = null
 ) =

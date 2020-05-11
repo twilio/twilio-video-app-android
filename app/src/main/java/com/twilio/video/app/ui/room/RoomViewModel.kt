@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
+import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.udf.BaseViewModel
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
@@ -113,7 +114,7 @@ class RoomViewModel(
 
     private fun handleParticipantEvent(participantEvent: ParticipantEvent) {
         when (participantEvent) {
-            is ParticipantConnected -> updateParticipant(participantEvent.participant)
+            is ParticipantConnected -> addParticipant(participantEvent.participant)
             is VideoTrackUpdated -> {
                 participantManager.updateParticipantVideoTrack(participantEvent.sid,
                         participantEvent.videoTrack)
@@ -136,9 +137,9 @@ class RoomViewModel(
         }
     }
 
-    private fun updateParticipant(participant: Participant) {
+    private fun addParticipant(participant: Participant) {
         val participantViewState = buildParticipantViewState(participant)
-        participantManager.updateParticipant(participantViewState)
+        participantManager.addParticipant(participantViewState)
         updateParticipantViewState()
     }
 
@@ -179,9 +180,11 @@ class RoomViewModel(
     }
 
     private fun checkParticipants(participants: List<Participant>) {
-        participants.forEach { participant ->
-            val participantViewState = buildParticipantViewState(participant)
-            participantManager.updateParticipant(participantViewState)
+        for ((index, participant) in participants.withIndex()) {
+            val participantViewState = if (index == 0) {
+                buildLocalParticipantViewState(participant, participant.identity)
+            } else buildParticipantViewState(participant)
+            participantManager.addParticipant(participantViewState)
         }
         updateParticipantViewState()
     }
