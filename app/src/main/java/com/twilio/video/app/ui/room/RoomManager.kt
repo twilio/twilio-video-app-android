@@ -2,8 +2,6 @@ package com.twilio.video.app.ui.room
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.twilio.androidenv.Env
 import com.twilio.video.AudioCodec
 import com.twilio.video.ConnectOptions
@@ -42,6 +40,8 @@ import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import com.twilio.video.app.util.EnvUtil
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,12 +54,10 @@ class RoomManager(
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
-    var room: Room? = null
-    private val mutableViewEvents: MutableLiveData<RoomEvent?> = MutableLiveData()
-
-    val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
-
     private val roomListener = RoomListener()
+    private val roomEventSubject = PublishSubject.create<RoomEvent>()
+    var room: Room? = null
+    val roomEvents: Observable<RoomEvent> = roomEventSubject
 
     fun disconnect() {
         room?.disconnect()
@@ -72,7 +70,7 @@ class RoomManager(
     ) {
         coroutineScope.launch {
             try {
-                mutableViewEvents.postValue(Connecting)
+                roomEventSubject.onNext(Connecting)
                 setSdkEnvironment(sharedPreferences)
                 val token = tokenService.getToken(identity, roomName)
                 val enableInsights = sharedPreferences.getBoolean(
@@ -131,12 +129,12 @@ class RoomManager(
     }
 
     fun sendParticipantEvent(participantEvent: ParticipantEvent) {
-        mutableViewEvents.value = participantEvent
+        roomEventSubject.onNext(participantEvent)
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
         Timber.e(e, "Failed to retrieve token")
-        mutableViewEvents.postValue(TokenError(serviceError = error))
+        roomEventSubject.onNext(TokenError(serviceError = error))
     }
 
     private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
@@ -199,7 +197,7 @@ class RoomManager(
 
             stopService(context)
 
-            mutableViewEvents.value = Disconnected
+            roomEventSubject.onNext(Disconnected)
         }
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {
@@ -209,7 +207,7 @@ class RoomManager(
                     room.state,
                     twilioException.code,
                     twilioException.message)
-            mutableViewEvents.value = ConnectFailure
+            roomEventSubject.onNext(ConnectFailure)
         }
 
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
@@ -231,7 +229,7 @@ class RoomManager(
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
 
-            mutableViewEvents.value = DominantSpeakerChanged(remoteParticipant?.sid)
+            roomEventSubject.onNext(DominantSpeakerChanged(remoteParticipant?.sid))
         }
 
         override fun onRecordingStarted(room: Room) {}
@@ -257,7 +255,7 @@ class RoomManager(
                     participants.add(it)
                 }
 
-                mutableViewEvents.value = Connected(participants, room, room.name)
+                roomEventSubject.onNext(Connected(participants, room, room.name))
             }
         }
     }

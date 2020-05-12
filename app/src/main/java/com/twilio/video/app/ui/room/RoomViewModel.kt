@@ -1,7 +1,5 @@
 package com.twilio.video.app.ui.room
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -35,17 +33,20 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.util.plus
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
-    private val participantManager: ParticipantManager = ParticipantManager()
+    private val participantManager: ParticipantManager = ParticipantManager(),
+    private val rxDisposables: CompositeDisposable = CompositeDisposable(),
+    private val scheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
-
-    // TODO Use another type of observable here like a Coroutine flow
-    val roomEvents: LiveData<RoomEvent?> = Transformations.map(roomManager.viewEvents, ::observeRoomEvents)
 
     init {
         audioDeviceSelector.start { audioDevices, selectedDevice ->
@@ -54,11 +55,20 @@ class RoomViewModel(
                 availableAudioDevices = audioDevices)
             }
         }
+
+        rxDisposables + roomManager.roomEvents
+                .observeOn(scheduler)
+                .subscribe({
+            observeRoomEvents(it)
+        }, {
+            Timber.e(it, "Error in RoomManager RoomEvent stream")
+        })
     }
 
     override fun onCleared() {
         super.onCleared()
         audioDeviceSelector.stop()
+        rxDisposables.clear()
     }
 
     override fun processInput(viewEvent: RoomViewEvent) {
@@ -84,7 +94,7 @@ class RoomViewModel(
         }
     }
 
-    private fun observeRoomEvents(roomEvent: RoomEvent?): RoomEvent? {
+    private fun observeRoomEvents(roomEvent: RoomEvent) {
         Timber.d("observeRoomEvents: %s", roomEvent)
         when (roomEvent) {
             is Connecting -> {
@@ -112,7 +122,6 @@ class RoomViewModel(
             }
             is ParticipantEvent -> handleParticipantEvent(roomEvent)
         }
-        return roomEvent
     }
 
     private fun handleParticipantEvent(participantEvent: ParticipantEvent) {

@@ -54,7 +54,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -406,7 +405,6 @@ public class RoomActivity extends BaseActivity {
         deviceMenuItem = menu.findItem(R.id.device_menu_item);
 
         requestPermissions();
-        roomViewModel.getRoomEvents().observe(this, (Observer) o -> {});
         roomViewModel.getViewState().observe(this, this::bindRoomViewState);
         roomViewModel.getViewEffects().observe(this, this::bindRoomViewEffects);
 
