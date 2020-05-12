@@ -69,7 +69,6 @@ import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.Room;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
@@ -237,9 +236,6 @@ public class RoomActivity extends BaseActivity {
     private StatsScheduler statsScheduler;
     private StatsListAdapter statsListAdapter;
     private Map<String, String> localVideoTrackNames = new HashMap<>();
-    // TODO This should be decoupled from this Activity as part of
-    // https://issues.corp.twilio.com/browse/AHOYAPPS-473
-    private Map<String, NetworkQualityLevel> networkQualityLevels = new HashMap<>();
 
     @Inject TokenService tokenService;
 
@@ -1086,7 +1082,6 @@ public class RoomActivity extends BaseActivity {
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
                 updateStats();
                 toggleAudioDevice(false);
-                networkQualityLevels.clear();
             }
             if (roomViewEffect instanceof ShowConnectFailureDialog) {
                 new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
