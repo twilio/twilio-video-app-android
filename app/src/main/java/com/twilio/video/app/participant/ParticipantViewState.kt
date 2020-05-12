@@ -5,7 +5,6 @@ import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
 import com.twilio.video.Participant
 import com.twilio.video.VideoTrack
-import com.twilio.video.app.sdk.getFirstVideoTrack
 
 data class ParticipantViewState(
     val sid: String,
@@ -24,7 +23,7 @@ fun buildParticipantViewState(remoteParticipant: Participant) =
     ParticipantViewState(
             remoteParticipant.sid,
             remoteParticipant.identity,
-            remoteParticipant.getFirstVideoTrack(),
+            remoteParticipant.videoTracks.firstOrNull()?.videoTrack,
             networkQualityLevel = remoteParticipant.networkQualityLevel,
             isMuted = remoteParticipant.audioTracks.firstOrNull() == null
     )
