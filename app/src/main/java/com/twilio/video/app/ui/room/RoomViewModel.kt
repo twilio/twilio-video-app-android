@@ -30,9 +30,9 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
-import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -85,10 +85,12 @@ class RoomViewModel(
                         viewEvent.roomName,
                         viewEvent.isNetworkQualityEnabled)
             }
-            is LocalVideoTrackPublished -> updateLocalVideoTrack(viewEvent)
             is PinParticipant -> {
                 participantManager.changePinnedParticipant(viewEvent.sid)
                 updateParticipantViewState()
+            }
+            is ToggleLocalVideo -> {
+                participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
             }
             Disconnect -> roomManager.disconnect()
         }
@@ -164,14 +166,6 @@ class RoomViewModel(
         val participantViewState = buildParticipantViewState(participant)
         participantManager.addParticipant(participantViewState)
         updateParticipantViewState()
-    }
-
-    private fun updateLocalVideoTrack(viewEvent: LocalVideoTrackPublished) {
-        participantManager.getParticipant(viewEvent.sid)?.copy(
-                videoTrack = viewEvent.localVideoTrack
-        )?.let {
-            participantManager.updateParticipant(it)
-        } ?: Timber.d("Could not find a matching participant")
     }
 
     private fun showLobbyViewState() {

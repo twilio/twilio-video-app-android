@@ -9,6 +9,7 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.LocalVideoTrackPublication
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.TwilioException
+import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
 import com.twilio.video.app.ui.room.RoomManager
 import timber.log.Timber
@@ -22,6 +23,12 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
         roomManager.sendParticipantEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
     }
 
+    override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {
+        Timber.i("New LocalParticipant VideoTrack published for LocalParticipant sid: %s, LocalVideoTrack: %s",
+                localParticipant.sid, localVideoTrackPublication.localVideoTrack)
+        roomManager.sendParticipantEvent(RoomEvent.ParticipantEvent.VideoTrackUpdated(localParticipant.sid, localVideoTrackPublication.localVideoTrack))
+    }
+
     override fun onVideoTrackPublicationFailed(localParticipant: LocalParticipant, localVideoTrack: LocalVideoTrack, twilioException: TwilioException) {}
 
     override fun onDataTrackPublished(localParticipant: LocalParticipant, localDataTrackPublication: LocalDataTrackPublication) {}
@@ -31,6 +38,4 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
     override fun onAudioTrackPublished(localParticipant: LocalParticipant, localAudioTrackPublication: LocalAudioTrackPublication) {}
 
     override fun onAudioTrackPublicationFailed(localParticipant: LocalParticipant, localAudioTrack: LocalAudioTrack, twilioException: TwilioException) {}
-
-    override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {}
 }

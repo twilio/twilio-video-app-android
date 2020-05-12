@@ -74,7 +74,6 @@ import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
@@ -91,9 +90,9 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
-import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished;
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
@@ -533,8 +532,8 @@ public class RoomActivity extends BaseActivity {
     @OnClick(R.id.local_video_image_button)
     void toggleLocalVideo() {
 
-        // remember old video reference for updating thumb in room
-        VideoTrack oldVideo = cameraVideoTrack;
+        if (localParticipant != null)
+            roomViewModel.processInput(new ToggleLocalVideo(localParticipant.getSid()));
 
         if (cameraVideoTrack == null) {
             isVideoMuted = false;
@@ -1039,8 +1038,6 @@ public class RoomActivity extends BaseActivity {
             if (cameraVideoTrack != null) {
                 Timber.d("Camera track: %s", cameraVideoTrack);
                 localParticipant.publishTrack(cameraVideoTrack);
-                roomViewModel.processInput(
-                        new LocalVideoTrackPublished(localParticipant.getSid(), cameraVideoTrack));
             }
 
             if (localAudioTrack != null) {
