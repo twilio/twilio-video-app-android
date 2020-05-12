@@ -50,10 +50,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
 
-    @Nullable
-    @BindView(R.id.participant_badge)
-    ConstraintLayout identityBadge;
-
     @BindView(R.id.participant_video_identity)
     TextView videoIdentity;
 
@@ -66,15 +62,18 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     @BindView(R.id.participant_stub_image)
     ImageView stubImage;
 
+    @Nullable
     @BindView(R.id.dominant_speaker_img)
     ImageView dominantSpeakerImg;
 
+    @Nullable
     @BindView(R.id.network_quality_level_img)
     ImageView networkQualityLevelImg;
 
     @BindView(R.id.participant_selected_identity)
     TextView selectedIdentity;
 
+    @Nullable
     @BindView(R.id.participant_no_audio)
     ImageView audioToggle;
 
@@ -152,7 +151,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     public void setMuted(boolean muted) {
-        audioToggle.setVisibility(muted ? VISIBLE : GONE);
+        if (audioToggle != null) audioToggle.setVisibility(muted ? VISIBLE : GONE);
     }
 
     public void setPinned(boolean pinned) {
