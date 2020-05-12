@@ -746,12 +746,15 @@ public class RoomActivity extends BaseActivity {
      * room.
      */
     private void renderLocalParticipantStub() {
+
         participantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
                 cameraVideoTrack,
                 localAudioTrack == null,
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+                cameraCapturer != null
+                        && cameraCapturer.getCameraSource()
+                                == CameraCapturer.CameraSource.FRONT_CAMERA);
 
         primaryVideoView.showIdentityBadge(false);
     }
