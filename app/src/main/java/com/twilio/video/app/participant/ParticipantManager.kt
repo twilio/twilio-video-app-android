@@ -7,7 +7,7 @@ import timber.log.Timber
 class ParticipantManager {
 
     private val mutableParticipants = mutableListOf<ParticipantViewState>()
-    val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants.toList()
+    val participantThumbnails: List<ParticipantViewState> get() = determineThumbnails()
     var primaryParticipant: ParticipantViewState? = null
         private set
 
@@ -15,7 +15,6 @@ class ParticipantManager {
         Timber.d("Adding participant: %s", participantViewState)
         mutableParticipants.add(participantViewState)
         updatePrimaryParticipant()
-        Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
     fun updateParticipant(participantViewState: ParticipantViewState) {
@@ -24,7 +23,6 @@ class ParticipantManager {
                 Timber.d("Updating participant: %s", participantViewState)
                 mutableParticipants[index] = participantViewState
                 updatePrimaryParticipant()
-                Timber.d("Participant thumbnails: $participantThumbnails")
             }
         }
     }
@@ -33,7 +31,6 @@ class ParticipantManager {
         Timber.d("Removing participant: %s", sid)
         mutableParticipants.removeAll { it.sid == sid }
         updatePrimaryParticipant()
-        Timber.d("Participant thumbnails: $participantThumbnails")
     }
 
     fun getParticipant(sid: String): ParticipantViewState? = mutableParticipants.find { it.sid == sid }
@@ -45,9 +42,8 @@ class ParticipantManager {
     }
 
     fun updateParticipantVideoTrack(sid: String, videoTrack: VideoTrack?) {
-        getParticipant(sid)?.copy(videoTrack = videoTrack)?.let {
-            updateParticipant(it)
-        }
+        mutableParticipants.find { it.sid == sid && !it.isScreenSharing }?.copy(
+                videoTrack = videoTrack)?.let { updateParticipant(it) }
     }
 
     fun muteParticipant(sid: String, mute: Boolean) {
@@ -66,6 +62,12 @@ class ParticipantManager {
                 updateParticipant(newPin.copy(isPinned = true))
             }
         }
+    }
+
+    fun removeScreenShareParticipant(sid: String) {
+        Timber.d("Removing screen share participant: %s", sid)
+        mutableParticipants.removeAll { it.sid == sid && it.isScreenSharing }
+        updatePrimaryParticipant()
     }
 
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
@@ -89,11 +91,17 @@ class ParticipantManager {
 
     private fun updatePrimaryParticipant() {
         primaryParticipant = determinePrimaryParticipant()
+        Timber.d("Participant Cache: $mutableParticipants")
         Timber.d("Primary Participant: $primaryParticipant")
     }
 
     private fun determinePrimaryParticipant(): ParticipantViewState? {
         return mutableParticipants.find { it.isPinned }
+        ?: mutableParticipants.find { it.isScreenSharing }
         ?: mutableParticipants.find { !it.isLocalParticipant }
+    }
+
+    private fun determineThumbnails(): List<ParticipantViewState> {
+        return mutableParticipants.filter { !it.isScreenSharing }
     }
 }

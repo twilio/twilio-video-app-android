@@ -11,6 +11,8 @@ import com.twilio.video.RemoteVideoTrackPublication
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NewScreenTrack
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomManager
 import timber.log.Timber
@@ -21,16 +23,20 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
         Timber.i("New RemoteParticipant RemoteVideoTrack published for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        remoteParticipant.getFirstVideoTrack()?.let { videoTrack ->
-            roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, videoTrack))
-        }
+        if (remoteVideoTrack.name.contains("screen"))
+            roomManager.sendParticipantEvent(NewScreenTrack(remoteParticipant, remoteVideoTrack))
+        else
+            roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, remoteVideoTrack))
     }
 
     override fun onVideoTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
         Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, null))
+        if (remoteVideoTrack.name.contains("screen"))
+            roomManager.sendParticipantEvent(ScreenTrackRemoved(remoteParticipant.sid))
+        else
+            roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, null))
     }
 
     override fun onNetworkQualityLevelChanged(remoteParticipant: RemoteParticipant, networkQualityLevel: NetworkQualityLevel) {

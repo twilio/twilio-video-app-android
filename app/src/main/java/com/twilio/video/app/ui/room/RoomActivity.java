@@ -116,7 +116,7 @@ public class RoomActivity extends BaseActivity {
     private static final int STATS_DELAY = 1000; // milliseconds
     private static final String MICROPHONE_TRACK_NAME = "microphone";
     private static final String CAMERA_TRACK_NAME = "camera";
-    private static final String SCREEN_TRACK_NAME = "screen";
+    static final String SCREEN_TRACK_NAME = "screen";
     private static final String IS_AUDIO_MUTED = "IS_AUDIO_MUTED";
     private static final String IS_VIDEO_MUTED = "IS_VIDEO_MUTED";
 
