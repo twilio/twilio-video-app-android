@@ -469,6 +469,12 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        roomViewModel.processInput(Disconnect.INSTANCE);
+    }
+
     @OnTextChanged(
         value = R.id.room_edit_text,
         callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED
