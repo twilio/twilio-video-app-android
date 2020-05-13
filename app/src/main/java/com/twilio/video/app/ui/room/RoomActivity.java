@@ -82,6 +82,7 @@ import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
+import com.twilio.video.app.sdk.RoomManager;
 import com.twilio.video.app.udf.ViewEffect;
 import com.twilio.video.app.ui.room.ParticipantController.Item;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;

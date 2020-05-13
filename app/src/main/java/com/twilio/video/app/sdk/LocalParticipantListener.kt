@@ -11,7 +11,6 @@ import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomManager
 import timber.log.Timber
 
 class LocalParticipantListener(private val roomManager: RoomManager) : LocalParticipant.Listener {

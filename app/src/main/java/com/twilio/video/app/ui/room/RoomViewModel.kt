@@ -9,6 +9,7 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
+import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.udf.BaseViewModel
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected

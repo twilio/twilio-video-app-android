@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.util.plus
 import dagger.android.AndroidInjection

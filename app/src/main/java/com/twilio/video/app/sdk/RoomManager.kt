@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui.room
+package com.twilio.video.app.sdk
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -26,8 +26,7 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
-import com.twilio.video.app.sdk.LocalParticipantListener
-import com.twilio.video.app.sdk.RemoteParticipantListener
+import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting

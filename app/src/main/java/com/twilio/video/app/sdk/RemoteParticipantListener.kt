@@ -14,7 +14,6 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLev
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NewScreenTrack
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
-import com.twilio.video.app.ui.room.RoomManager
 import timber.log.Timber
 
 class RemoteParticipantListener(private val roomManager: RoomManager) : RemoteParticipant.Listener {
