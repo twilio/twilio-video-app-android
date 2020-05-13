@@ -22,7 +22,6 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLev
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NewScreenTrack
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
@@ -93,6 +92,9 @@ class RoomViewModel(
             is ToggleLocalVideo -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
             }
+            is RoomViewEvent.ScreenTrackRemoved -> {
+                removeScreenShareParticipant(viewEvent.sid)
+            }
             Disconnect -> roomManager.disconnect()
         }
     }
@@ -143,8 +145,8 @@ class RoomViewModel(
                         isScreenSharing = true
                 ))
             }
-            is ScreenTrackRemoved -> {
-                participantManager.removeScreenShareParticipant(participantEvent.sid)
+            is ParticipantEvent.ScreenTrackRemoved -> {
+                removeScreenShareParticipant(participantEvent.sid)
             }
             is MuteParticipant -> {
                 participantManager.muteParticipant(participantEvent.sid,
@@ -161,6 +163,11 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
         }
+    }
+
+    private fun removeScreenShareParticipant(sid: String) {
+        participantManager.removeScreenShareParticipant(sid)
+        updateParticipantViewState()
     }
 
     private fun addParticipant(participant: Participant) {

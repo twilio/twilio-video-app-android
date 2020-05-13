@@ -92,6 +92,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant;
+import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
@@ -912,6 +913,9 @@ public class RoomActivity extends BaseActivity {
 
     private void stopScreenCapture() {
         if (screenVideoTrack != null) {
+
+            roomViewModel.processInput(new ScreenTrackRemoved(localParticipant.getSid()));
+
             if (localParticipant != null) {
                 localParticipant.unpublishTrack(screenVideoTrack);
             }

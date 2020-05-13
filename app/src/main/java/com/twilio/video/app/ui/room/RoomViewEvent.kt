@@ -13,5 +13,6 @@ sealed class RoomViewEvent {
     ) : RoomViewEvent()
     data class PinParticipant(val sid: String) : RoomViewEvent()
     data class ToggleLocalVideo(val sid: String) : RoomViewEvent()
+    data class ScreenTrackRemoved(val sid: String) : RoomViewEvent()
     object Disconnect : RoomViewEvent()
 }
