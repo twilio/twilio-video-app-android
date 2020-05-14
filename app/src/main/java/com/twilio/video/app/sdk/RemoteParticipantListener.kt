@@ -19,7 +19,7 @@ import timber.log.Timber
 class RemoteParticipantListener(private val roomManager: RoomManager) : RemoteParticipant.Listener {
 
     override fun onVideoTrackSubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
-        Timber.i("New RemoteParticipant RemoteVideoTrack published for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
+        Timber.i("RemoteVideoTrack subscribed for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
         if (remoteVideoTrack.name.contains("screen"))
@@ -29,7 +29,7 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
     }
 
     override fun onVideoTrackUnsubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
-        Timber.i("RemoteParticipant RemoteVideoTrack unpublished for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
+        Timber.i("RemoteVideoTrack unsubscribed for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
         if (remoteVideoTrack.name.contains("screen"))
