@@ -155,11 +155,11 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     public void setPinned(boolean pinned) {
-        pinImage.setVisibility(pinned ? VISIBLE : GONE);
+        if (pinImage != null) pinImage.setVisibility(pinned ? VISIBLE : GONE);
     }
 
     public void showDominantSpeaker(boolean show) {
-        dominantSpeakerImg.setVisibility(show ? VISIBLE : GONE);
+        if (dominantSpeakerImg != null) dominantSpeakerImg.setVisibility(show ? VISIBLE : GONE);
     }
 
     @Override
