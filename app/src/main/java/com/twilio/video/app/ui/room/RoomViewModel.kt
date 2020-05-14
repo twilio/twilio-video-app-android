@@ -30,8 +30,10 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
+import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
+import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -91,7 +93,11 @@ class RoomViewModel(
             is ToggleLocalVideo -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
             }
-            is RoomViewEvent.ScreenTrackRemoved -> {
+            is VideoTrackRemoved -> {
+                participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
+                updateParticipantViewState()
+            }
+            is ScreenTrackRemoved -> {
                 participantManager.updateParticipantScreenTrack(viewEvent.sid, null)
                 updateParticipantViewState()
             }
@@ -204,8 +210,12 @@ class RoomViewModel(
     }
 
     private fun updateParticipantViewState() {
-        updateState { it.copy(participantThumbnails = participantManager.participantThumbnails) }
-        updateState { it.copy(primaryParticipant = participantManager.primaryParticipant) }
+        updateState {
+            it.copy(
+                participantThumbnails = participantManager.participantThumbnails,
+                primaryParticipant = participantManager.primaryParticipant
+            )
+        }
     }
 
     private fun connect(

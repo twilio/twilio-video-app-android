@@ -98,6 +98,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
+import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
@@ -954,6 +955,7 @@ public class RoomActivity extends BaseActivity {
     private void removeCameraTrack() {
         if (cameraVideoTrack != null) {
             if (localParticipant != null) {
+                roomViewModel.processInput(new VideoTrackRemoved(localParticipant.getSid()));
                 localParticipant.unpublishTrack(cameraVideoTrack);
             }
             cameraVideoTrack.release();
@@ -967,7 +969,6 @@ public class RoomActivity extends BaseActivity {
         if (restoreLocalVideoCameraTrack) {
             obtainVideoConstraints();
             setupLocalVideoTrack();
-            renderLocalParticipantStub();
             restoreLocalVideoCameraTrack = false;
         }
     }
