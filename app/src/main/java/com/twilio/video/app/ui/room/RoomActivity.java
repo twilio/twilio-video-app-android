@@ -588,6 +588,7 @@ public class RoomActivity extends BaseActivity {
                 participantController.renderAsPrimary(
                         localParticipantSid,
                         getString(R.string.you),
+                        null,
                         cameraVideoTrack,
                         localAudioTrack == null,
                         cameraCapturer.getCameraSource()
@@ -752,6 +753,7 @@ public class RoomActivity extends BaseActivity {
         participantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
+                null,
                 cameraVideoTrack,
                 localAudioTrack == null,
                 cameraCapturer != null
@@ -1108,6 +1110,7 @@ public class RoomActivity extends BaseActivity {
             participantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
+                    primaryParticipant.getScreenTrack(),
                     primaryParticipant.getVideoTrack(),
                     primaryParticipant.isMuted(),
                     primaryParticipant.isMirrored());

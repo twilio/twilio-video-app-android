@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
-import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
@@ -19,7 +18,7 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NewScreenTrack
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
@@ -93,7 +92,8 @@ class RoomViewModel(
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
             }
             is RoomViewEvent.ScreenTrackRemoved -> {
-                removeScreenShareParticipant(viewEvent.sid)
+                participantManager.updateParticipantScreenTrack(viewEvent.sid, null)
+                updateParticipantViewState()
             }
             Disconnect -> roomManager.disconnect()
         }
@@ -137,16 +137,10 @@ class RoomViewModel(
                         participantEvent.videoTrack)
                 updateParticipantViewState()
             }
-            is NewScreenTrack -> {
-                participantManager.addParticipant(ParticipantViewState(
-                        participantEvent.participant.sid,
-                        participantEvent.participant.identity,
-                        participantEvent.videoTrack,
-                        isScreenSharing = true
-                ))
-            }
-            is ParticipantEvent.ScreenTrackRemoved -> {
-                removeScreenShareParticipant(participantEvent.sid)
+            is ScreenTrackUpdated -> {
+                participantManager.updateParticipantScreenTrack(participantEvent.sid,
+                        participantEvent.screenTrack)
+                updateParticipantViewState()
             }
             is MuteParticipant -> {
                 participantManager.muteParticipant(participantEvent.sid,
@@ -163,11 +157,6 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
         }
-    }
-
-    private fun removeScreenShareParticipant(sid: String) {
-        participantManager.removeScreenShareParticipant(sid)
-        updateParticipantViewState()
     }
 
     private fun addParticipant(participant: Participant) {

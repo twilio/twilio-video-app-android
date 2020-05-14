@@ -10,7 +10,7 @@ import com.twilio.video.LocalVideoTrackPublication
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NewScreenTrack
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import timber.log.Timber
 
@@ -28,7 +28,7 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
                 localParticipant.sid, localVideoTrackPublication.localVideoTrack)
 
         if (localVideoTrackPublication.videoTrack.name.contains(SCREEN_TRACK_NAME)) {
-            roomManager.sendParticipantEvent(NewScreenTrack(localParticipant,
+            roomManager.sendParticipantEvent(ScreenTrackUpdated(localParticipant.sid,
                     localVideoTrackPublication.videoTrack))
         } else {
             roomManager.sendParticipantEvent(VideoTrackUpdated(localParticipant.sid,

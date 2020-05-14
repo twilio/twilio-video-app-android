@@ -183,20 +183,17 @@ class ParticipantController {
         thumbs.clear();
     }
 
-    /**
-     * Render participant as primary participant from data.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param videoTrack participant video to display or NULL for empty thumbs.
-     * @param muted participant audio state.
-     * @param mirror enable/disable mirroring for video track.
-     */
     void renderAsPrimary(
-            String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
+            String sid,
+            String identity,
+            VideoTrack screenTrack,
+            VideoTrack videoTrack,
+            boolean muted,
+            boolean mirror) {
 
         Item old = primaryItem;
-        Item newItem = new Item(sid, identity, videoTrack, muted, mirror);
+        VideoTrack selectedTrack = screenTrack != null ? screenTrack : videoTrack;
+        Item newItem = new Item(sid, identity, selectedTrack, muted, mirror);
 
         // clean old primary video renderings
         if (old != null) {

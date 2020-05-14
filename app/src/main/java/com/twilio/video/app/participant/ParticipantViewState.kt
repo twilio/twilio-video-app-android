@@ -10,10 +10,10 @@ data class ParticipantViewState(
     val sid: String,
     val identity: String,
     val videoTrack: VideoTrack? = null,
+    val screenTrack: VideoTrack? = null,
     val isMuted: Boolean = false,
     val isMirrored: Boolean = false,
     val isPinned: Boolean = false,
-    val isScreenSharing: Boolean = false,
     val isDominantSpeaker: Boolean = false,
     val isLocalParticipant: Boolean = false,
     val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN

@@ -11,8 +11,7 @@ import com.twilio.video.RemoteVideoTrackPublication
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NewScreenTrack
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackRemoved
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import timber.log.Timber
 
@@ -23,7 +22,7 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
         if (remoteVideoTrack.name.contains(SCREEN_TRACK_NAME))
-            roomManager.sendParticipantEvent(NewScreenTrack(remoteParticipant, remoteVideoTrack))
+            roomManager.sendParticipantEvent(ScreenTrackUpdated(remoteParticipant.sid, remoteVideoTrack))
         else
             roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, remoteVideoTrack))
     }
@@ -33,7 +32,7 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
         if (remoteVideoTrack.name.contains(SCREEN_TRACK_NAME))
-            roomManager.sendParticipantEvent(ScreenTrackRemoved(remoteParticipant.sid))
+            roomManager.sendParticipantEvent(ScreenTrackUpdated(remoteParticipant.sid, null))
         else
             roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, null))
     }
