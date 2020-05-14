@@ -19,13 +19,13 @@ data class ParticipantViewState(
     val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN
 )
 
-fun buildParticipantViewState(remoteParticipant: Participant) =
+fun buildParticipantViewState(participant: Participant) =
     ParticipantViewState(
-            remoteParticipant.sid,
-            remoteParticipant.identity,
-            remoteParticipant.videoTracks.firstOrNull()?.videoTrack,
-            networkQualityLevel = remoteParticipant.networkQualityLevel,
-            isMuted = remoteParticipant.audioTracks.firstOrNull() == null
+            participant.sid,
+            participant.identity,
+            participant.videoTracks.firstOrNull()?.videoTrack,
+            networkQualityLevel = participant.networkQualityLevel,
+            isMuted = participant.audioTracks.firstOrNull() == null
     )
 
 fun buildLocalParticipantViewState(
