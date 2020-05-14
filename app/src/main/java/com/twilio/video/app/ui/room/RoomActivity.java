@@ -22,6 +22,9 @@ import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
 import static com.twilio.video.app.participant.ParticipantViewStateKt.buildLocalParticipantViewState;
+import static com.twilio.video.app.sdk.RoomManagerKt.CAMERA_TRACK_NAME;
+import static com.twilio.video.app.sdk.RoomManagerKt.MICROPHONE_TRACK_NAME;
+import static com.twilio.video.app.sdk.RoomManagerKt.SCREEN_TRACK_NAME;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -113,9 +116,6 @@ public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int STATS_DELAY = 1000; // milliseconds
-    private static final String MICROPHONE_TRACK_NAME = "microphone";
-    private static final String CAMERA_TRACK_NAME = "camera";
-    static final String SCREEN_TRACK_NAME = "screen";
     private static final String IS_AUDIO_MUTED = "IS_AUDIO_MUTED";
     private static final String IS_VIDEO_MUTED = "IS_VIDEO_MUTED";
 

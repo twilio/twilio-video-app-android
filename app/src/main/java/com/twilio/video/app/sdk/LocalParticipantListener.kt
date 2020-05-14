@@ -27,7 +27,7 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
         Timber.i("New LocalParticipant VideoTrack published for LocalParticipant sid: %s, LocalVideoTrack: %s",
                 localParticipant.sid, localVideoTrackPublication.localVideoTrack)
 
-        if (localVideoTrackPublication.videoTrack.name.contains("screen")) {
+        if (localVideoTrackPublication.videoTrack.name.contains(SCREEN_TRACK_NAME)) {
             roomManager.sendParticipantEvent(NewScreenTrack(localParticipant,
                     localVideoTrackPublication.videoTrack))
         } else {

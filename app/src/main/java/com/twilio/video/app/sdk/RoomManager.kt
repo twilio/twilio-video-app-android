@@ -46,6 +46,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+const val MICROPHONE_TRACK_NAME = "microphone"
+const val CAMERA_TRACK_NAME = "camera"
+const val SCREEN_TRACK_NAME = "screen"
+
 class RoomManager(
     private val context: Context,
     private val sharedPreferences: SharedPreferences,

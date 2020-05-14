@@ -22,7 +22,7 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
         Timber.i("RemoteVideoTrack subscribed for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        if (remoteVideoTrack.name.contains("screen"))
+        if (remoteVideoTrack.name.contains(SCREEN_TRACK_NAME))
             roomManager.sendParticipantEvent(NewScreenTrack(remoteParticipant, remoteVideoTrack))
         else
             roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, remoteVideoTrack))
@@ -32,7 +32,7 @@ class RemoteParticipantListener(private val roomManager: RoomManager) : RemotePa
         Timber.i("RemoteVideoTrack unsubscribed for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
                 remoteParticipant.sid, remoteVideoTrack.sid)
 
-        if (remoteVideoTrack.name.contains("screen"))
+        if (remoteVideoTrack.name.contains(SCREEN_TRACK_NAME))
             roomManager.sendParticipantEvent(ScreenTrackRemoved(remoteParticipant.sid))
         else
             roomManager.sendParticipantEvent(VideoTrackUpdated(remoteParticipant.sid, null))
