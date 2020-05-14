@@ -6,7 +6,11 @@ internal fun ParticipantController.updateThumbnails(participants: List<Participa
     participants?.let {
         // Add or update any participants in the thumbs list
         participants.forEach { participant ->
-            if (getThumb(participant.sid) == null) addThumb(participant) else updateThumb(participant)
+            if (getThumb(participant.sid) == null) {
+                addThumb(participant)
+            } else {
+                updateThumb(participant)
+            }
         }
 
         // Delete any thumbs that aren't in the participant list
