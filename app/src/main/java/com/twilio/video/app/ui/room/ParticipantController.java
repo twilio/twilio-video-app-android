@@ -18,12 +18,18 @@ package com.twilio.video.app.ui.room;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import androidx.annotation.Nullable;
+import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.VideoTrack;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.twilio.video.app.R;
+import com.twilio.video.app.participant.ParticipantViewState;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import timber.log.Timber;
 
+// TODO Replace with RecyclerView / DiffUtil implementation
 /** ParticipantController is main controlling party for rendering participants. */
 class ParticipantController {
 
@@ -40,7 +46,7 @@ class ParticipantController {
     private ViewGroup thumbsViewContainer;
 
     /** Relationship collection - item (data) -> thumb. */
-    private Map<Item, ParticipantView> thumbs = new HashMap<>();
+    ConcurrentMap<Item, ParticipantView> thumbs = new ConcurrentHashMap<>();
 
     /** Each participant thumb click listener. */
     private ItemClickListener listener;
@@ -51,30 +57,14 @@ class ParticipantController {
         this.primaryView = primaryVideoView;
     }
 
-    private void addThumb(String sid, String identity) {
-        addThumb(sid, identity, null, true, false);
-    }
-
-    void addThumb(Item item) {
-        addThumb(item.sid, item.identity, item.videoTrack, item.muted, item.mirror);
-    }
-
-    private void addThumb(String sid, String identity, VideoTrack videoTrack) {
-        addThumb(sid, identity, videoTrack, true, false);
-    }
-
-    /**
-     * Create new participant thumb from data.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param videoTrack participant video to display or NULL for empty thumbs.
-     * @param muted participant audio state.
-     */
-    void addThumb(
-            String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
-
-        Item item = new Item(sid, identity, videoTrack, muted, mirror);
+    void addThumb(ParticipantViewState participantViewState) {
+        Item item =
+                new Item(
+                        participantViewState.getSid(),
+                        participantViewState.getIdentity(),
+                        participantViewState.getVideoTrack(),
+                        participantViewState.isMuted(),
+                        participantViewState.isMirrored());
         ParticipantView view = createThumb(item);
         thumbs.put(item, view);
         thumbsViewContainer.addView(view);
@@ -95,22 +85,28 @@ class ParticipantController {
         }
     }
 
-    /**
-     * Update participant thumb with video track.
-     *
-     * @param sid unique participant identifier.
-     * @param oldVideo video track to replace.
-     * @param newVideo new video track to insert.
-     */
-    void updateThumb(String sid, VideoTrack oldVideo, VideoTrack newVideo) {
-        Item target = findItem(sid, oldVideo);
+    void updateThumb(ParticipantViewState participantViewState) {
+        Timber.d("updateThumb: %s", participantViewState);
+        Item target = findItem(participantViewState.getSid());
         if (target != null) {
-            ParticipantView view = getThumb(sid, oldVideo);
+            ParticipantView view = getThumb(participantViewState.getSid());
 
+            view.setMuted(participantViewState.isMuted());
+            view.showDominantSpeaker(participantViewState.isDominantSpeaker());
+            view.setPinned(participantViewState.isPinned());
+
+            updateVideoTrack(participantViewState, target, view);
+
+            setNetworkQualityLevelImage(
+                    view.networkQualityLevelImg, participantViewState.getNetworkQualityLevel());
+        }
+    }
+
+    private void updateVideoTrack(
+            ParticipantViewState participantViewState, Item target, ParticipantView view) {
+        if (target.videoTrack != participantViewState.getVideoTrack()) {
             removeRender(target.videoTrack, view);
-
-            target.videoTrack = newVideo;
-
+            target.videoTrack = participantViewState.getVideoTrack();
             if (target.videoTrack != null) {
                 view.setState(ParticipantView.State.VIDEO);
                 target.videoTrack.addRenderer(view);
@@ -124,13 +120,12 @@ class ParticipantController {
      * Update participant video track thumb with state.
      *
      * @param sid unique participant identifier.
-     * @param videoTrack target video track.
      * @param state new thumb state.
      */
-    void updateThumb(String sid, VideoTrack videoTrack, @ParticipantView.State int state) {
-        Item target = findItem(sid, videoTrack);
+    void updateThumb(String sid, @ParticipantView.State int state) {
+        Item target = findItem(sid);
         if (target != null) {
-            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid, videoTrack);
+            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid);
 
             view.setState(state);
             switch (state) {
@@ -146,68 +141,14 @@ class ParticipantController {
     }
 
     /**
-     * Update participant video track thumb with mirroring.
-     *
-     * @param sid unique participant identifier.
-     * @param videoTrack target video track.
-     * @param mirror enable/disable mirror.
-     */
-    void updateThumb(String sid, VideoTrack videoTrack, boolean mirror) {
-        Item target = findItem(sid, videoTrack);
-        if (target != null) {
-            ParticipantThumbView view = (ParticipantThumbView) getThumb(sid, videoTrack);
-
-            target.mirror = mirror;
-            view.setMirror(target.mirror);
-        }
-    }
-
-    /**
-     * Update all participant thumbs with audio state.
-     *
-     * @param sid unique participant identifier.
-     * @param muted new audio state.
-     */
-    void updateThumbs(String sid, boolean muted) {
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid)) {
-                entry.getKey().muted = muted;
-                entry.getValue().setMuted(muted);
-            }
-        }
-    }
-
-    /**
-     * Add new participant thumb or update old instance.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param oldVideo video track to replace.
-     * @param newVideo new video track to insert.
-     */
-    void addOrUpdateThumb(String sid, String identity, VideoTrack oldVideo, VideoTrack newVideo) {
-
-        if (hasThumb(sid, oldVideo)) {
-            updateThumb(sid, oldVideo, newVideo);
-        } else {
-            addThumb(sid, identity, newVideo);
-        }
-    }
-
-    void removeThumb(Item item) {
-        removeThumb(item.sid, item.videoTrack);
-    }
-
-    /**
      * Remove participant video track thumb.
      *
      * @param sid unique participant identifier.
-     * @param videoTrack target video track.
      */
-    void removeThumb(String sid, VideoTrack videoTrack) {
-        Item target = findItem(sid, videoTrack);
+    void removeThumb(String sid) {
+        Item target = findItem(sid);
         if (target != null) {
-            ParticipantView view = getThumb(sid, videoTrack);
+            ParticipantView view = getThumb(sid);
 
             removeRender(target.videoTrack, view);
 
@@ -217,58 +158,14 @@ class ParticipantController {
     }
 
     /**
-     * Remove all participant thumbs.
-     *
-     * @param sid unique participant identifier.
-     */
-    void removeThumbs(String sid) {
-        ArrayList<Item> deleteKeys = new ArrayList<>();
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid)) {
-                deleteKeys.add(entry.getKey());
-                thumbsViewContainer.removeView(entry.getValue());
-                VideoTrack remoteVideoTrack = entry.getKey().videoTrack;
-                if (remoteVideoTrack != null) {
-                    remoteVideoTrack.removeRenderer(entry.getValue());
-                }
-            }
-        }
-
-        for (Item deleteKey : deleteKeys) {
-            thumbs.remove(deleteKey);
-        }
-    }
-
-    /**
-     * Remove participant thumb or leave empty (no video) thumb if nothing left.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param videoTrack target video track.
-     */
-    void removeOrEmptyThumb(String sid, String identity, VideoTrack videoTrack) {
-        int thumbsCount = getThumbs(sid).size();
-        if (thumbsCount > 1 || (thumbsCount == 1 && primaryItem.sid.equals(sid))) {
-            removeThumb(sid, videoTrack);
-        } else if (thumbsCount == 0) {
-            addThumb(sid, identity);
-        } else {
-            updateThumb(sid, videoTrack, null);
-        }
-    }
-
-    /**
      * Get participant video track thumb instance.
      *
      * @param sid unique participant identifier.
-     * @param videoTrack target video track.
      * @return participant thumb instance.
      */
-    ParticipantView getThumb(String sid, VideoTrack videoTrack) {
+    ParticipantView getThumb(String sid) {
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey() != null
-                    && entry.getKey().sid.equals(sid)
-                    && entry.getKey().videoTrack == videoTrack) {
+            if (entry.getKey() != null && entry.getKey().sid.equals(sid)) {
                 return entry.getValue();
             }
         }
@@ -286,24 +183,17 @@ class ParticipantController {
         thumbs.clear();
     }
 
-    void renderAsPrimary(Item item) {
-        renderAsPrimary(item.sid, item.identity, item.videoTrack, item.muted, item.mirror);
-    }
-
-    /**
-     * Render participant as primary participant from data.
-     *
-     * @param sid unique participant identifier.
-     * @param identity participant name to display.
-     * @param videoTrack participant video to display or NULL for empty thumbs.
-     * @param muted participant audio state.
-     * @param mirror enable/disable mirroring for video track.
-     */
     void renderAsPrimary(
-            String sid, String identity, VideoTrack videoTrack, boolean muted, boolean mirror) {
+            String sid,
+            String identity,
+            VideoTrack screenTrack,
+            VideoTrack videoTrack,
+            boolean muted,
+            boolean mirror) {
 
         Item old = primaryItem;
-        Item newItem = new Item(sid, identity, videoTrack, muted, mirror);
+        VideoTrack selectedTrack = screenTrack != null ? screenTrack : videoTrack;
+        Item newItem = new Item(sid, identity, selectedTrack, muted, mirror);
 
         // clean old primary video renderings
         if (old != null) {
@@ -323,14 +213,6 @@ class ParticipantController {
         } else {
             primaryView.setState(ParticipantView.State.NO_VIDEO);
         }
-    }
-
-    /** Remove primary participant. */
-    void removePrimary() {
-        removeRender(primaryItem.videoTrack, primaryView);
-        // TODO: temp state
-        primaryView.setState(ParticipantView.State.NO_VIDEO);
-        primaryItem = null;
     }
 
     /**
@@ -362,6 +244,33 @@ class ParticipantController {
         }
     }
 
+    private void setNetworkQualityLevelImage(
+            ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel) {
+
+        if (networkQualityLevel == null
+                || networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN) {
+            networkQualityImage.setVisibility(View.GONE);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
+        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
+            networkQualityImage.setVisibility(View.VISIBLE);
+            networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
+        }
+    }
+
     private void clearDominantSpeaker() {
         getPrimaryView().dominantSpeakerImg.setVisibility(View.GONE);
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
@@ -369,13 +278,9 @@ class ParticipantController {
         }
     }
 
-    private boolean hasThumb(String sid, VideoTrack videoTrack) {
-        return getThumb(sid, videoTrack) != null;
-    }
-
-    private Item findItem(String sid, VideoTrack videoTrack) {
+    private Item findItem(String sid) {
         for (Item item : thumbs.keySet()) {
-            if (item.sid.equals(sid) && item.videoTrack == videoTrack) {
+            if (item.sid.equals(sid)) {
                 return item;
             }
         }
@@ -404,16 +309,6 @@ class ParticipantController {
         }
 
         return view;
-    }
-
-    private ArrayList<ParticipantView> getThumbs(String sid) {
-        ArrayList<ParticipantView> views = new ArrayList<>();
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            if (entry.getKey().sid.equals(sid)) {
-                views.add(entry.getValue());
-            }
-        }
-        return views;
     }
 
     private void removeRender(VideoTrack videoTrack, ParticipantView view) {

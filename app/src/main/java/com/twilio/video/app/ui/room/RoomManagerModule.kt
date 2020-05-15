@@ -7,6 +7,7 @@ import com.twilio.video.app.ApplicationScope
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.VideoAppServiceModule
+import com.twilio.video.app.sdk.RoomManager
 import dagger.Module
 import dagger.Provides
 
