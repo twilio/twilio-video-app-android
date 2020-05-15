@@ -44,9 +44,6 @@ class ParticipantController {
     /** Relationship collection - item (data) -> thumb. */
     ConcurrentMap<Item, ParticipantView> thumbs = new ConcurrentHashMap<>();
 
-    /** Each participant thumb click listener. */
-    private ItemClickListener listener;
-
     ParticipantController(ParticipantPrimaryView primaryVideoView) {
         this.primaryView = primaryVideoView;
     }
@@ -224,10 +221,6 @@ class ParticipantController {
         return primaryView;
     }
 
-    void setListener(ItemClickListener listener) {
-        this.listener = listener;
-    }
-
     void setDominantSpeaker(@Nullable ParticipantView participantView) {
         clearDominantSpeaker();
         if (participantView != null) {
@@ -333,9 +326,5 @@ class ParticipantController {
             this.muted = muted;
             this.mirror = mirror;
         }
-    }
-
-    public interface ItemClickListener {
-        void onThumbClick(Item item);
     }
 }
