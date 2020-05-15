@@ -36,6 +36,7 @@ import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTextureView;
+import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,6 +47,8 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     int state = State.NO_VIDEO;
     boolean mirror = false;
     int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
+
+    VideoTrack videoTrack;
 
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;

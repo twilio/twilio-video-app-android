@@ -152,7 +152,7 @@ public class RoomActivity extends BaseActivity {
     ParticipantPrimaryView primaryVideoView;
 
     @BindView(R.id.remote_video_thumbnails)
-    LinearLayout thumbnailLinearLayout;
+    RecyclerView thumbnailRecyclerView;
 
     @BindView(R.id.local_video_image_button)
     ImageButton localVideoImageButton;
@@ -255,6 +255,7 @@ public class RoomActivity extends BaseActivity {
 
     private Boolean isAudioMuted = false;
     private Boolean isVideoMuted = false;
+    private ParticipantAdapter participantAdapter;
 
     public static void startActivity(Context context, Uri appLink) {
         Intent intent = new Intent(context, RoomActivity.class);
@@ -286,6 +287,13 @@ public class RoomActivity extends BaseActivity {
         setContentView(R.layout.activity_room);
         ButterKnife.bind(this);
 
+        // Setup thumbnail RecyclerView
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        thumbnailRecyclerView.setLayoutManager(layoutManager);
+        participantAdapter = new ParticipantAdapter();
+        thumbnailRecyclerView.setAdapter(participantAdapter);
+
         // Setup toolbar
         setSupportActionBar(toolbar);
 
@@ -293,7 +301,7 @@ public class RoomActivity extends BaseActivity {
         savedVolumeControlStream = getVolumeControlStream();
 
         // setup participant controller
-        participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
+        participantController = new ParticipantController(primaryVideoView);
         participantController.setListener(participantClickListener());
 
         // Setup Activity
@@ -1121,8 +1129,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void renderThumbnails(RoomViewState roomViewState) {
-        List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
-        ParticipantControllerExtensionsKt.updateThumbnails(participantController, thumbnails);
+        participantAdapter.submitList(roomViewState.getParticipantThumbnails());
     }
 
     private void displayAudioDeviceList() {

@@ -17,7 +17,6 @@
 package com.twilio.video.app.ui.room;
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import com.twilio.video.NetworkQualityLevel;
@@ -42,18 +41,13 @@ class ParticipantController {
     /** Primary video track. */
     private ParticipantPrimaryView primaryView;
 
-    /** RemoteParticipant thumb view group, where participants are added or removed from. */
-    private ViewGroup thumbsViewContainer;
-
     /** Relationship collection - item (data) -> thumb. */
     ConcurrentMap<Item, ParticipantView> thumbs = new ConcurrentHashMap<>();
 
     /** Each participant thumb click listener. */
     private ItemClickListener listener;
 
-    ParticipantController(ViewGroup thumbsViewContainer, ParticipantPrimaryView primaryVideoView) {
-
-        this.thumbsViewContainer = thumbsViewContainer;
+    ParticipantController(ParticipantPrimaryView primaryVideoView) {
         this.primaryView = primaryVideoView;
     }
 
@@ -67,7 +61,6 @@ class ParticipantController {
                         participantViewState.isMirrored());
         ParticipantView view = createThumb(item);
         thumbs.put(item, view);
-        thumbsViewContainer.addView(view);
     }
 
     /**
@@ -152,7 +145,6 @@ class ParticipantController {
 
             removeRender(target.videoTrack, view);
 
-            thumbsViewContainer.removeView(view);
             thumbs.remove(target);
         }
     }
@@ -175,7 +167,6 @@ class ParticipantController {
     /** Remove all thumbs for all participants. */
     void removeAllThumbs() {
         for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            thumbsViewContainer.removeView(entry.getValue());
             if (entry.getKey() != null) {
                 removeRender(entry.getKey().videoTrack, entry.getValue());
             }
@@ -288,27 +279,27 @@ class ParticipantController {
     }
 
     private ParticipantView createThumb(final Item item) {
-        final ParticipantView view = new ParticipantThumbView(thumbsViewContainer.getContext());
+        //        final ParticipantView view = new ParticipantThumbView();
+        //
+        //        view.setIdentity(item.identity);
+        //        view.setMuted(item.muted);
+        //        view.setMirror(item.mirror);
+        //
+        //        view.setOnClickListener(
+        //                participantView -> {
+        //                    if (listener != null) {
+        //                        listener.onThumbClick(item);
+        //                    }
+        //                });
+        //
+        //        if (item.videoTrack != null) {
+        //            item.videoTrack.addRenderer(view);
+        //            view.setState(ParticipantView.State.VIDEO);
+        //        } else {
+        //            view.setState(ParticipantView.State.NO_VIDEO);
+        //        }
 
-        view.setIdentity(item.identity);
-        view.setMuted(item.muted);
-        view.setMirror(item.mirror);
-
-        view.setOnClickListener(
-                participantView -> {
-                    if (listener != null) {
-                        listener.onThumbClick(item);
-                    }
-                });
-
-        if (item.videoTrack != null) {
-            item.videoTrack.addRenderer(view);
-            view.setState(ParticipantView.State.VIDEO);
-        } else {
-            view.setState(ParticipantView.State.NO_VIDEO);
-        }
-
-        return view;
+        return null;
     }
 
     private void removeRender(VideoTrack videoTrack, ParticipantView view) {

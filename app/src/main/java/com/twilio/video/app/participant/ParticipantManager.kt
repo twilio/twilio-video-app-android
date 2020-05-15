@@ -7,7 +7,7 @@ import timber.log.Timber
 class ParticipantManager {
 
     private val mutableParticipants = mutableListOf<ParticipantViewState>()
-    val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants
+    val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants.toList()
     var primaryParticipant: ParticipantViewState? = null
         private set
 
