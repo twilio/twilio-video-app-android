@@ -1,9 +1,7 @@
-package com.twilio.video.app.ui.room
+package com.twilio.video.app.sdk
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.twilio.androidenv.Env
 import com.twilio.video.AudioCodec
 import com.twilio.video.ConnectOptions
@@ -14,6 +12,7 @@ import com.twilio.video.IsacCodec
 import com.twilio.video.NetworkQualityConfiguration
 import com.twilio.video.NetworkQualityVerbosity
 import com.twilio.video.OpusCodec
+import com.twilio.video.Participant
 import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
 import com.twilio.video.RemoteParticipant
@@ -27,25 +26,29 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
-import com.twilio.video.app.participant.ParticipantViewState
-import com.twilio.video.app.participant.buildParticipantViewState
-import com.twilio.video.app.sdk.RemoteParticipantListener
+import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.NewRemoteVideoTrack
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantConnected
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import com.twilio.video.app.util.EnvUtil
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+const val MICROPHONE_TRACK_NAME = "microphone"
+const val CAMERA_TRACK_NAME = "camera"
+const val SCREEN_TRACK_NAME = "screen"
 
 class RoomManager(
     private val context: Context,
@@ -54,12 +57,10 @@ class RoomManager(
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
-    var room: Room? = null
-    private val mutableViewEvents: MutableLiveData<RoomEvent?> = MutableLiveData()
-
-    val viewEvents: LiveData<RoomEvent?> = mutableViewEvents
-
     private val roomListener = RoomListener()
+    private val roomEventSubject = PublishSubject.create<RoomEvent>()
+    var room: Room? = null
+    val roomEvents: Observable<RoomEvent> = roomEventSubject
 
     fun disconnect() {
         room?.disconnect()
@@ -72,7 +73,7 @@ class RoomManager(
     ) {
         coroutineScope.launch {
             try {
-                mutableViewEvents.postValue(Connecting)
+                roomEventSubject.onNext(Connecting)
                 setSdkEnvironment(sharedPreferences)
                 val token = tokenService.getToken(identity, roomName)
                 val enableInsights = sharedPreferences.getBoolean(
@@ -130,15 +131,13 @@ class RoomManager(
         }
     }
 
-    fun newRemoteVideoTrack(participantViewState: ParticipantViewState) {
-        Timber.i("RemoteParticipant video track published connected -> remoteParticipant: %s",
-                participantViewState.sid)
-        mutableViewEvents.value = NewRemoteVideoTrack(participantViewState)
+    fun sendParticipantEvent(participantEvent: ParticipantEvent) {
+        roomEventSubject.onNext(participantEvent)
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
         Timber.e(e, "Failed to retrieve token")
-        mutableViewEvents.postValue(TokenError(serviceError = error))
+        roomEventSubject.onNext(TokenError(serviceError = error))
     }
 
     private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
@@ -192,13 +191,7 @@ class RoomManager(
 
             startService(context, room.name)
 
-            val remoteParticipants = mutableListOf<ParticipantViewState>()
-            room.remoteParticipants.forEach {
-                it.setListener(RemoteParticipantListener(this@RoomManager))
-                remoteParticipants.add(buildParticipantViewState(it))
-            }
-
-            mutableViewEvents.value = Connected(remoteParticipants, room, room.name)
+            setupParticipants(room)
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
@@ -207,7 +200,7 @@ class RoomManager(
 
             stopService(context)
 
-            mutableViewEvents.value = Disconnected
+            roomEventSubject.onNext(Disconnected)
         }
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {
@@ -217,36 +210,29 @@ class RoomManager(
                     room.state,
                     twilioException.code,
                     twilioException.message)
-            mutableViewEvents.value = ConnectFailure
+            roomEventSubject.onNext(ConnectFailure)
         }
 
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
+
             remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
-            mutableViewEvents.value = ParticipantConnected(
-                    buildParticipantViewState(remoteParticipant))
+            sendParticipantEvent(ParticipantConnected(remoteParticipant))
         }
 
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
-            mutableViewEvents.value = ParticipantDisconnected(
-                    buildParticipantViewState(remoteParticipant))
+
+            sendParticipantEvent(ParticipantDisconnected(remoteParticipant.sid))
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
-            remoteParticipant?.let {
-                val participantViewState = ParticipantViewState(
-                        remoteParticipant.sid,
-                        remoteParticipant.identity,
-                        remoteParticipant.remoteVideoTracks.firstOrNull()?.remoteVideoTrack,
-                        isDominantSpeaker = true
-                )
-                mutableViewEvents.value = DominantSpeakerChanged(participantViewState)
-            }
+
+            roomEventSubject.onNext(DominantSpeakerChanged(remoteParticipant?.sid))
         }
 
         override fun onRecordingStarted(room: Room) {}
@@ -260,5 +246,20 @@ class RoomManager(
         }
 
         override fun onRecordingStopped(room: Room) {}
+
+        private fun setupParticipants(room: Room) {
+            room.localParticipant?.let { localParticipant ->
+                val participants = mutableListOf<Participant>()
+                participants.add(localParticipant)
+                localParticipant.setListener(LocalParticipantListener(this@RoomManager))
+
+                room.remoteParticipants.forEach {
+                    it.setListener(RemoteParticipantListener(this@RoomManager))
+                    participants.add(it)
+                }
+
+                roomEventSubject.onNext(Connected(participants, room, room.name))
+            }
+        }
     }
 }

@@ -21,6 +21,10 @@ import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
+import static com.twilio.video.app.participant.ParticipantViewStateKt.buildLocalParticipantViewState;
+import static com.twilio.video.app.sdk.RoomManagerKt.CAMERA_TRACK_NAME;
+import static com.twilio.video.app.sdk.RoomManagerKt.MICROPHONE_TRACK_NAME;
+import static com.twilio.video.app.sdk.RoomManagerKt.SCREEN_TRACK_NAME;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -46,7 +50,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -54,7 +57,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -68,20 +70,13 @@ import com.twilio.audioswitch.selection.AudioDeviceSelector;
 import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
-import com.twilio.video.LocalAudioTrackPublication;
-import com.twilio.video.LocalDataTrack;
-import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.LocalVideoTrackPublication;
-import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.Room;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
-import com.twilio.video.TwilioException;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
@@ -90,15 +85,20 @@ import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
+import com.twilio.video.app.sdk.RoomManager;
 import com.twilio.video.app.udf.ViewEffect;
+import com.twilio.video.app.ui.room.ParticipantController.Item;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
-import com.twilio.video.app.ui.room.RoomViewEvent.LocalVideoTrackPublished;
+import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant;
+import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
+import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
@@ -117,9 +117,6 @@ public class RoomActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int MEDIA_PROJECTION_REQUEST_CODE = 101;
     private static final int STATS_DELAY = 1000; // milliseconds
-    private static final String MICROPHONE_TRACK_NAME = "microphone";
-    private static final String CAMERA_TRACK_NAME = "camera";
-    private static final String SCREEN_TRACK_NAME = "screen";
     private static final String IS_AUDIO_MUTED = "IS_AUDIO_MUTED";
     private static final String IS_VIDEO_MUTED = "IS_VIDEO_MUTED";
 
@@ -241,9 +238,6 @@ public class RoomActivity extends BaseActivity {
     private StatsScheduler statsScheduler;
     private StatsListAdapter statsListAdapter;
     private Map<String, String> localVideoTrackNames = new HashMap<>();
-    // TODO This should be decoupled from this Activity as part of
-    // https://issues.corp.twilio.com/browse/AHOYAPPS-473
-    private Map<String, NetworkQualityLevel> networkQualityLevels = new HashMap<>();
 
     @Inject TokenService tokenService;
 
@@ -300,6 +294,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup participant controller
         participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
+        participantController.setListener(participantClickListener());
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
@@ -408,7 +403,6 @@ public class RoomActivity extends BaseActivity {
         deviceMenuItem = menu.findItem(R.id.device_menu_item);
 
         requestPermissions();
-        roomViewModel.getRoomEvents().observe(this, (Observer) o -> {});
         roomViewModel.getViewState().observe(this, this::bindRoomViewState);
         roomViewModel.getViewEffects().observe(this, this::bindRoomViewEffects);
 
@@ -469,6 +463,12 @@ public class RoomActivity extends BaseActivity {
             screenCapturer = new ScreenCapturer(this, resultCode, data, screenCapturerListener);
             startScreenCapture();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        roomViewModel.processInput(Disconnect.INSTANCE);
     }
 
     @OnTextChanged(
@@ -535,8 +535,8 @@ public class RoomActivity extends BaseActivity {
     @OnClick(R.id.local_video_image_button)
     void toggleLocalVideo() {
 
-        // remember old video reference for updating thumb in room
-        VideoTrack oldVideo = cameraVideoTrack;
+        if (localParticipant != null)
+            roomViewModel.processInput(new ToggleLocalVideo(localParticipant.getSid()));
 
         if (cameraVideoTrack == null) {
             isVideoMuted = false;
@@ -579,7 +579,9 @@ public class RoomActivity extends BaseActivity {
         if (room != null && room.getState() == CONNECTED) {
 
             // update local participant thumb
-            participantController.updateThumb(localParticipantSid, cameraVideoTrack);
+            participantController.updateThumb(
+                    buildLocalParticipantViewState(
+                            localParticipant, getString(R.string.you), cameraVideoTrack));
 
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
 
@@ -587,6 +589,7 @@ public class RoomActivity extends BaseActivity {
                 participantController.renderAsPrimary(
                         localParticipantSid,
                         getString(R.string.you),
+                        null,
                         cameraVideoTrack,
                         localAudioTrack == null,
                         cameraCapturer.getCameraSource()
@@ -747,12 +750,16 @@ public class RoomActivity extends BaseActivity {
      * room.
      */
     private void renderLocalParticipantStub() {
+
         participantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
+                null,
                 cameraVideoTrack,
                 localAudioTrack == null,
-                cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.FRONT_CAMERA);
+                cameraCapturer != null
+                        && cameraCapturer.getCameraSource()
+                                == CameraCapturer.CameraSource.FRONT_CAMERA);
 
         primaryVideoView.showIdentityBadge(false);
     }
@@ -857,7 +864,8 @@ public class RoomActivity extends BaseActivity {
             if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
                 participantController.updatePrimaryThumb(mirror);
             } else {
-                participantController.updateThumb(localParticipantSid, mirror);
+                participantController.updateThumb(
+                        buildLocalParticipantViewState(localParticipant, "", null));
             }
         }
     }
@@ -908,6 +916,9 @@ public class RoomActivity extends BaseActivity {
 
     private void stopScreenCapture() {
         if (screenVideoTrack != null) {
+
+            roomViewModel.processInput(new ScreenTrackRemoved(localParticipant.getSid()));
+
             if (localParticipant != null) {
                 localParticipant.unpublishTrack(screenVideoTrack);
             }
@@ -944,6 +955,7 @@ public class RoomActivity extends BaseActivity {
     private void removeCameraTrack() {
         if (cameraVideoTrack != null) {
             if (localParticipant != null) {
+                roomViewModel.processInput(new VideoTrackRemoved(localParticipant.getSid()));
                 localParticipant.unpublishTrack(cameraVideoTrack);
             }
             cameraVideoTrack.release();
@@ -957,7 +969,6 @@ public class RoomActivity extends BaseActivity {
         if (restoreLocalVideoCameraTrack) {
             obtainVideoConstraints();
             setupLocalVideoTrack();
-            renderLocalParticipantStub();
             restoreLocalVideoCameraTrack = false;
         }
     }
@@ -1011,6 +1022,10 @@ public class RoomActivity extends BaseActivity {
         };
     }
 
+    private ParticipantController.ItemClickListener participantClickListener() {
+        return (Item item) -> roomViewModel.processInput(new PinParticipant(item.sid));
+    }
+
     private void initializeRoom() {
         if (room != null) {
 
@@ -1034,27 +1049,12 @@ public class RoomActivity extends BaseActivity {
             if (cameraVideoTrack != null) {
                 Timber.d("Camera track: %s", cameraVideoTrack);
                 localParticipant.publishTrack(cameraVideoTrack);
-                roomViewModel.processInput(
-                        new LocalVideoTrackPublished(buildParticipantViewState()));
             }
 
             if (localAudioTrack != null) {
                 localParticipant.publishTrack(localAudioTrack);
             }
         }
-    }
-
-    private ParticipantViewState buildParticipantViewState() {
-        return new ParticipantViewState(
-                localParticipant.getSid(),
-                getString(R.string.you),
-                cameraVideoTrack,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true);
     }
 
     private void toggleAudioDevice(boolean enableAudioDevice) {
@@ -1080,6 +1080,7 @@ public class RoomActivity extends BaseActivity {
             Timber.d("RoomViewEffect: %s", roomViewEffect);
             requestPermissions();
             if (roomViewEffect instanceof Connected) {
+                room = ((Connected) roomViewEffect).getRoom();
                 toggleAudioDevice(true);
                 initializeRoom();
             }
@@ -1089,7 +1090,6 @@ public class RoomActivity extends BaseActivity {
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
                 updateStats();
                 toggleAudioDevice(false);
-                networkQualityLevels.clear();
             }
             if (roomViewEffect instanceof ShowConnectFailureDialog) {
                 new AlertDialog.Builder(this, R.style.AppTheme_Dialog)
@@ -1111,9 +1111,10 @@ public class RoomActivity extends BaseActivity {
             participantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
+                    primaryParticipant.getScreenTrack(),
                     primaryParticipant.getVideoTrack(),
-                    primaryParticipant.getMuted(),
-                    primaryParticipant.getMirror());
+                    primaryParticipant.isMuted(),
+                    primaryParticipant.isMirrored());
         } else {
             renderLocalParticipantStub();
         }
@@ -1121,27 +1122,7 @@ public class RoomActivity extends BaseActivity {
 
     private void renderThumbnails(RoomViewState roomViewState) {
         List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
-        if (thumbnails != null) {
-            participantController.removeAllThumbs();
-            for (ParticipantViewState thumbnail : roomViewState.getParticipantThumbnails()) {
-                addParticipantThumb(thumbnail);
-            }
-        }
-    }
-
-    private void addParticipantThumb(ParticipantViewState participantViewState) {
-        participantController.addThumb(
-                participantViewState.getSid(),
-                participantViewState.getIdentity(),
-                participantViewState.getVideoTrack(),
-                false,
-                false);
-
-        if (participantViewState.isLocalParticipant()) {
-            localParticipant.setListener(
-                    new LocalParticipantListener(
-                            participantController.getThumb(localParticipantSid)));
-        }
+        ParticipantControllerExtensionsKt.updateThumbnails(participantController, thumbnails);
     }
 
     private void displayAudioDeviceList() {
@@ -1198,83 +1179,6 @@ public class RoomActivity extends BaseActivity {
                 .setMessage(getString(errorMessage))
                 .setNeutralButton("OK", null)
                 .show();
-    }
-
-    private class LocalParticipantListener implements LocalParticipant.Listener {
-
-        private ImageView networkQualityImage;
-
-        LocalParticipantListener(ParticipantView primaryView) {
-            networkQualityImage = primaryView.networkQualityLevelImg;
-        }
-
-        @Override
-        public void onAudioTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalAudioTrackPublication localAudioTrackPublication) {}
-
-        @Override
-        public void onAudioTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalAudioTrack localAudioTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onVideoTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalVideoTrackPublication localVideoTrackPublication) {}
-
-        @Override
-        public void onVideoTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalVideoTrack localVideoTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onDataTrackPublished(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalDataTrackPublication localDataTrackPublication) {}
-
-        @Override
-        public void onDataTrackPublicationFailed(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull LocalDataTrack localDataTrack,
-                @NonNull TwilioException twilioException) {}
-
-        @Override
-        public void onNetworkQualityLevelChanged(
-                @NonNull LocalParticipant localParticipant,
-                @NonNull NetworkQualityLevel networkQualityLevel) {
-            setNetworkQualityLevelImage(
-                    networkQualityImage, networkQualityLevel, localParticipant.getSid());
-        }
-    }
-
-    private void setNetworkQualityLevelImage(
-            ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel, String sid) {
-
-        networkQualityLevels.put(sid, networkQualityLevel);
-        if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN) {
-            networkQualityImage.setVisibility(View.GONE);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_0);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_1);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_2);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_3);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_4);
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
-            networkQualityImage.setVisibility(View.VISIBLE);
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
-        }
     }
 
     private boolean didAcceptPermissions() {

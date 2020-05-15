@@ -1,18 +1,23 @@
 package com.twilio.video.app.ui.room
 
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.Observer
+import android.os.IBinder
+import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
+import com.twilio.video.app.util.plus
 import dagger.android.AndroidInjection
+import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import javax.inject.Inject
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
-class VideoService : LifecycleService() {
+class VideoService(
+    private val rxDisposables: CompositeDisposable = CompositeDisposable()
+) : Service() {
 
     companion object {
         fun startService(context: Context, roomName: String) {
@@ -36,7 +41,12 @@ class VideoService : LifecycleService() {
     override fun onCreate() {
         AndroidInjection.inject(this)
         super.onCreate()
-        roomManager.viewEvents.observe(this, Observer { bindRoomEvents(it) })
+
+        rxDisposables + roomManager.roomEvents.subscribe({
+            observeRoomEvents(it)
+        }, {
+            Timber.e(it, "Error in RoomManager RoomEvent stream")
+        })
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -49,6 +59,11 @@ class VideoService : LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("VideoService destroyed")
+        rxDisposables.clear()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 
     private fun setupForegroundService(intent: Intent?) {
@@ -60,12 +75,10 @@ class VideoService : LifecycleService() {
         } }
     }
 
-    private fun bindRoomEvents(nullableRoomEvent: RoomEvent?) {
-        nullableRoomEvent?.let { roomEvent ->
-            when (roomEvent) {
-                is Disconnected -> stopSelf()
-                else -> {}
-            }
+    private fun observeRoomEvents(roomEvent: RoomEvent) {
+        when (roomEvent) {
+            is Disconnected -> stopSelf()
+            else -> {}
         }
     }
 }
