@@ -12,9 +12,12 @@ import timber.log.Timber
 internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         RecyclerView.ViewHolder(thumb) {
 
-    fun bind(participantViewState: ParticipantViewState) {
+    fun bind(participantViewState: ParticipantViewState, viewEventAction: (RoomViewEvent) -> Unit) {
         Timber.d("bind ParticipantViewHolder with data item: %s", participantViewState)
 
+        thumb.setOnClickListener {
+            viewEventAction(RoomViewEvent.PinParticipant(participantViewState.sid))
+        }
         thumb.setIdentity(participantViewState.identity)
         thumb.setMuted(participantViewState.isMuted)
         thumb.showDominantSpeaker(participantViewState.isDominantSpeaker)

@@ -285,12 +285,7 @@ public class RoomActivity extends BaseActivity {
         setContentView(R.layout.activity_room);
         ButterKnife.bind(this);
 
-        // Setup thumbnail RecyclerView
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        thumbnailRecyclerView.setLayoutManager(layoutManager);
-        participantAdapter = new ParticipantAdapter();
-        thumbnailRecyclerView.setAdapter(participantAdapter);
+        setupThumbnailRecyclerView();
 
         // Setup toolbar
         setSupportActionBar(toolbar);
@@ -304,6 +299,22 @@ public class RoomActivity extends BaseActivity {
         // Setup Activity
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
+    }
+
+    private void setupThumbnailRecyclerView() {
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        thumbnailRecyclerView.setLayoutManager(layoutManager);
+        participantAdapter = new ParticipantAdapter();
+        rxDisposables.add(
+                participantAdapter
+                        .getViewHolderEvents()
+                        .subscribe(
+                                (viewEvent) -> {
+                                    roomViewModel.processInput(viewEvent);
+                                },
+                                Timber::e));
+        thumbnailRecyclerView.setAdapter(participantAdapter);
     }
 
     @Override
@@ -360,7 +371,6 @@ public class RoomActivity extends BaseActivity {
             screenVideoTrack = null;
         }
 
-        // dispose any token requests if needed
         rxDisposables.clear();
         super.onDestroy();
     }
