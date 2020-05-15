@@ -70,12 +70,22 @@ class ParticipantManager {
     }
 
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
-        newDominantSpeakerSid?.let {
+        newDominantSpeakerSid?.let { sid ->
             clearDominantSpeaker()
 
             getParticipant(newDominantSpeakerSid)?.copy(
-                    isDominantSpeaker = true)?.let { updateParticipant(it) }
-        } ?: clearDominantSpeaker()
+                    isDominantSpeaker = true)?.let { moveDominantSpeakerToTop(it) }
+        } ?: run {
+            clearDominantSpeaker()
+        }
+    }
+
+    private fun moveDominantSpeakerToTop(newDominantSpeaker: ParticipantViewState) {
+        mutableParticipants.removeAll { it.sid == newDominantSpeaker.sid }
+        if (mutableParticipants.size > 1) {
+            mutableParticipants.add(1, newDominantSpeaker)
+            updatePrimaryParticipant()
+        }
     }
 
     private fun clearDominantSpeaker() {
@@ -97,6 +107,7 @@ class ParticipantManager {
     private fun determinePrimaryParticipant(): ParticipantViewState? {
         return mutableParticipants.find { it.isPinned }
         ?: mutableParticipants.find { it.screenTrack != null }
+        ?: mutableParticipants.find { it.isDominantSpeaker }
         ?: mutableParticipants.find { !it.isLocalParticipant }
     }
 }

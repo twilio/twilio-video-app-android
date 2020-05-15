@@ -122,6 +122,7 @@ class RoomViewModel(
             }
             is DominantSpeakerChanged -> {
                 participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
+                updateParticipantViewState()
             }
             is ConnectFailure -> viewEffect {
                 showLobbyViewState()
