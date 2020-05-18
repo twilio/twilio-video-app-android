@@ -246,7 +246,7 @@ public class RoomActivity extends BaseActivity {
     @Inject AudioDeviceSelector audioDeviceSelector;
 
     /** Coordinates participant thumbs and primary participant rendering. */
-    private ParticipantController participantController;
+    private PrimaryParticipantController primaryParticipantController;
 
     /** Disposes {@link VideoAppService} requests when activity is destroyed. */
     private final CompositeDisposable rxDisposables = new CompositeDisposable();
@@ -294,7 +294,7 @@ public class RoomActivity extends BaseActivity {
         savedVolumeControlStream = getVolumeControlStream();
 
         // setup participant controller
-        participantController = new ParticipantController(primaryVideoView);
+        primaryParticipantController = new PrimaryParticipantController(primaryVideoView);
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
@@ -695,7 +695,6 @@ public class RoomActivity extends BaseActivity {
         }
         if (cameraVideoTrack == null && !isVideoMuted) {
             setupLocalVideoTrack();
-            renderLocalParticipantStub();
             if (room != null && localParticipant != null)
                 localParticipant.publishTrack(cameraVideoTrack);
         }
@@ -737,7 +736,7 @@ public class RoomActivity extends BaseActivity {
      */
     private void renderLocalParticipantStub() {
 
-        participantController.renderAsPrimary(
+        primaryParticipantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
                 null,
@@ -1073,7 +1072,7 @@ public class RoomActivity extends BaseActivity {
 
     private void renderPrimaryView(ParticipantViewState primaryParticipant) {
         if (primaryParticipant != null) {
-            participantController.renderAsPrimary(
+            primaryParticipantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
                     primaryParticipant.getScreenTrack(),

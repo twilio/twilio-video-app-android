@@ -18,9 +18,7 @@ package com.twilio.video.app.ui.room;
 
 import com.twilio.video.VideoTrack;
 
-// TODO Replace with RecyclerView / DiffUtil implementation
-/** ParticipantController is main controlling party for rendering participants. */
-class ParticipantController {
+class PrimaryParticipantController {
 
     /**
      * Data container about primary participant - sid, identity, video track, audio state and
@@ -31,7 +29,7 @@ class ParticipantController {
     /** Primary video track. */
     private ParticipantPrimaryView primaryView;
 
-    ParticipantController(ParticipantPrimaryView primaryVideoView) {
+    PrimaryParticipantController(ParticipantPrimaryView primaryVideoView) {
         this.primaryView = primaryVideoView;
     }
 
