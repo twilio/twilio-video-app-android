@@ -4,6 +4,12 @@ import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.twilio.video.NetworkQualityLevel
+import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE
+import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR
+import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE
+import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE
+import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO
+import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.R
 import com.twilio.video.app.participant.ParticipantViewState
@@ -16,30 +22,31 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         Timber.d("bind ParticipantViewHolder with data item: %s", participantViewState)
         Timber.d("thumb: %s", thumb)
 
-        thumb.setOnClickListener {
-            viewEventAction(RoomViewEvent.PinParticipant(participantViewState.sid))
-        }
-        thumb.setIdentity(participantViewState.identity)
-        thumb.setMuted(participantViewState.isMuted)
-        thumb.setPinned(participantViewState.isPinned)
+        thumb.run {
+            setOnClickListener {
+                viewEventAction(RoomViewEvent.PinParticipant(participantViewState.sid))
+            }
+            setIdentity(participantViewState.identity)
+            setMuted(participantViewState.isMuted)
+            setPinned(participantViewState.isPinned)
 
-        updateVideoTrack(participantViewState)
+            updateVideoTrack(participantViewState)
 
-        thumb.networkQualityLevelImg?.let {
-            setNetworkQualityLevelImage(it, participantViewState.networkQualityLevel)
+            networkQualityLevelImg?.let {
+                setNetworkQualityLevelImage(it, participantViewState.networkQualityLevel)
+            }
         }
     }
 
     private fun updateVideoTrack(participantViewState: ParticipantViewState) {
-
-        if (thumb.videoTrack !== participantViewState.videoTrack) {
-            removeRender(thumb.videoTrack, thumb)
-            thumb.videoTrack = participantViewState.videoTrack
-            if (thumb.videoTrack != null) {
-                thumb.setState(ParticipantView.State.VIDEO)
-                thumb.videoTrack.addRenderer(thumb)
-            } else {
-                thumb.setState(ParticipantView.State.NO_VIDEO)
+        thumb.run {
+            if (videoTrack !== participantViewState.videoTrack) {
+                removeRender(videoTrack, this)
+                videoTrack = participantViewState.videoTrack
+                videoTrack?.let { videoTrack ->
+                    setState(ParticipantView.State.VIDEO)
+                    videoTrack.addRenderer(this)
+                } ?: setState(ParticipantView.State.NO_VIDEO)
             }
         }
     }
@@ -53,27 +60,17 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         networkQualityImage: ImageView,
         networkQualityLevel: NetworkQualityLevel?
     ) {
-        if (networkQualityLevel == null ||
-                networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN) {
-            networkQualityImage.visibility = View.GONE
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO) {
+        when (networkQualityLevel) {
+            NETWORK_QUALITY_LEVEL_ZERO -> R.drawable.network_quality_level_0
+            NETWORK_QUALITY_LEVEL_ONE -> R.drawable.network_quality_level_1
+            NETWORK_QUALITY_LEVEL_TWO -> R.drawable.network_quality_level_2
+            NETWORK_QUALITY_LEVEL_THREE -> R.drawable.network_quality_level_3
+            NETWORK_QUALITY_LEVEL_FOUR -> R.drawable.network_quality_level_4
+            NETWORK_QUALITY_LEVEL_FIVE -> R.drawable.network_quality_level_5
+            else -> null
+        }?.let { image ->
             networkQualityImage.visibility = View.VISIBLE
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_0)
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ONE) {
-            networkQualityImage.visibility = View.VISIBLE
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_1)
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_TWO) {
-            networkQualityImage.visibility = View.VISIBLE
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_2)
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_THREE) {
-            networkQualityImage.visibility = View.VISIBLE
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_3)
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FOUR) {
-            networkQualityImage.visibility = View.VISIBLE
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_4)
-        } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
-            networkQualityImage.visibility = View.VISIBLE
-            networkQualityImage.setImageResource(R.drawable.network_quality_level_5)
-        }
+            networkQualityImage.setImageResource(image)
+        } ?: run { networkQualityImage.visibility = View.GONE }
     }
 }
