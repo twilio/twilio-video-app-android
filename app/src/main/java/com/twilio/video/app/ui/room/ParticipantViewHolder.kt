@@ -21,7 +21,6 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         }
         thumb.setIdentity(participantViewState.identity)
         thumb.setMuted(participantViewState.isMuted)
-        thumb.showDominantSpeaker(participantViewState.isDominantSpeaker)
         thumb.setPinned(participantViewState.isPinned)
 
         updateVideoTrack(participantViewState)

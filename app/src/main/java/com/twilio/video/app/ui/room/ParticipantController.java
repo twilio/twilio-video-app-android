@@ -18,7 +18,6 @@ package com.twilio.video.app.ui.room;
 
 import android.view.View;
 import android.widget.ImageView;
-import androidx.annotation.Nullable;
 import com.twilio.video.NetworkQualityLevel;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
@@ -82,7 +81,6 @@ class ParticipantController {
             ParticipantView view = getThumb(participantViewState.getSid());
 
             view.setMuted(participantViewState.isMuted());
-            view.showDominantSpeaker(participantViewState.isDominantSpeaker());
             view.setPinned(participantViewState.isPinned());
 
             updateVideoTrack(participantViewState, target, view);
@@ -221,13 +219,6 @@ class ParticipantController {
         return primaryView;
     }
 
-    void setDominantSpeaker(@Nullable ParticipantView participantView) {
-        clearDominantSpeaker();
-        if (participantView != null) {
-            participantView.dominantSpeakerImg.setVisibility(View.VISIBLE);
-        }
-    }
-
     private void setNetworkQualityLevelImage(
             ImageView networkQualityImage, NetworkQualityLevel networkQualityLevel) {
 
@@ -252,13 +243,6 @@ class ParticipantController {
         } else if (networkQualityLevel == NetworkQualityLevel.NETWORK_QUALITY_LEVEL_FIVE) {
             networkQualityImage.setVisibility(View.VISIBLE);
             networkQualityImage.setImageResource(R.drawable.network_quality_level_5);
-        }
-    }
-
-    private void clearDominantSpeaker() {
-        getPrimaryView().dominantSpeakerImg.setVisibility(View.GONE);
-        for (Map.Entry<Item, ParticipantView> entry : thumbs.entrySet()) {
-            entry.getValue().dominantSpeakerImg.setVisibility(View.GONE);
         }
     }
 

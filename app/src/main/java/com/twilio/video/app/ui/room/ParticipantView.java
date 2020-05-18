@@ -66,10 +66,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     ImageView stubImage;
 
     @Nullable
-    @BindView(R.id.dominant_speaker_img)
-    ImageView dominantSpeakerImg;
-
-    @Nullable
     @BindView(R.id.network_quality_level_img)
     ImageView networkQualityLevelImg;
 
@@ -159,10 +155,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     public void setPinned(boolean pinned) {
         if (pinImage != null) pinImage.setVisibility(pinned ? VISIBLE : GONE);
-    }
-
-    public void showDominantSpeaker(boolean show) {
-        if (dominantSpeakerImg != null) dominantSpeakerImg.setVisibility(show ? VISIBLE : GONE);
     }
 
     @Override
