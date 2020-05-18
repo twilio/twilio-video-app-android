@@ -428,7 +428,9 @@ public class RoomActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.switch_camera_menu_item:
-                switchCamera();
+                if (cameraCapturer != null) {
+                    cameraCapturer.switchCamera();
+                }
                 return true;
             case R.id.share_screen_menu_item:
                 String shareScreen = getString(R.string.share_screen);
@@ -589,37 +591,6 @@ public class RoomActivity extends BaseActivity {
             // disable video settings
             switchCameraMenuItem.setVisible(false);
             pauseVideoMenuItem.setVisible(false);
-        }
-
-        if (room != null && room.getState() == CONNECTED) {
-
-            // update local participant thumb
-            participantController.updateThumb(
-                    buildLocalParticipantViewState(
-                            localParticipant, getString(R.string.you), cameraVideoTrack));
-
-            if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
-
-                // local video was rendered as primary view - refreshing
-                participantController.renderAsPrimary(
-                        localParticipantSid,
-                        getString(R.string.you),
-                        null,
-                        cameraVideoTrack,
-                        localAudioTrack == null,
-                        cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA);
-
-                participantController.getPrimaryView().showIdentityBadge(false);
-
-                // update thumb state
-                participantController.updateThumb(
-                        localParticipantSid, ParticipantView.State.SELECTED);
-            }
-
-        } else {
-
-            renderLocalParticipantStub();
         }
 
         // update toggle button icon
@@ -865,23 +836,6 @@ public class RoomActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(toolbarTitle);
-        }
-    }
-
-    private void switchCamera() {
-        if (cameraCapturer != null) {
-
-            boolean mirror =
-                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.BACK_CAMERA;
-
-            cameraCapturer.switchCamera();
-
-            if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
-                participantController.updatePrimaryThumb(mirror);
-            } else {
-                participantController.updateThumb(
-                        buildLocalParticipantViewState(localParticipant, "", null));
-            }
         }
     }
 
