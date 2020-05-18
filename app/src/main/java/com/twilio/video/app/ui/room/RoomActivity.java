@@ -21,7 +21,6 @@ import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
-import static com.twilio.video.app.participant.ParticipantViewStateKt.buildLocalParticipantViewState;
 import static com.twilio.video.app.sdk.RoomManagerKt.CAMERA_TRACK_NAME;
 import static com.twilio.video.app.sdk.RoomManagerKt.MICROPHONE_TRACK_NAME;
 import static com.twilio.video.app.sdk.RoomManagerKt.SCREEN_TRACK_NAME;
@@ -93,6 +92,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
+import com.twilio.video.app.ui.room.RoomViewEvent.ScreenLoad;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
@@ -324,6 +324,8 @@ public class RoomActivity extends BaseActivity {
         checkIntentURI();
 
         restoreCameraTrack();
+
+        roomViewModel.processInput(ScreenLoad.INSTANCE);
 
         publishLocalTracks();
 
