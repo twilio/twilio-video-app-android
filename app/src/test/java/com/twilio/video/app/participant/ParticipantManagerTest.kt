@@ -44,6 +44,18 @@ class ParticipantManagerTest {
     }
 
     @Test
+    fun `changeDominantSpeaker should set the dominant speaker to true for the new dominant speaker participant for only 2 participants`() {
+        val dominantSpeaker = ParticipantViewState("2", "Remote Participant")
+        participantManager.addParticipant(localParticipant)
+        participantManager.addParticipant(dominantSpeaker)
+
+        participantManager.changeDominantSpeaker("2")
+
+        assertThat(dominantSpeakers.first().sid, equalTo("2"))
+        assertThat(dominantSpeakers.first().isDominantSpeaker, equalTo(true))
+    }
+
+    @Test
     fun `changeDominantSpeaker should clear the old dominant speaker when there is a new dominant speaker participant`() {
         setupExistingDominantSpeakerScenario()
 

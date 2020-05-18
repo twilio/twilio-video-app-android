@@ -14,6 +14,7 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
 
     fun bind(participantViewState: ParticipantViewState, viewEventAction: (RoomViewEvent) -> Unit) {
         Timber.d("bind ParticipantViewHolder with data item: %s", participantViewState)
+        Timber.d("thumb: %s", thumb)
 
         thumb.setOnClickListener {
             viewEventAction(RoomViewEvent.PinParticipant(participantViewState.sid))

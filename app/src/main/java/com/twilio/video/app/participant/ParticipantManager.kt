@@ -70,6 +70,7 @@ class ParticipantManager {
     }
 
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
+        Timber.d("new dominant speaker with sid: %s", newDominantSpeakerSid)
         newDominantSpeakerSid?.let { sid ->
             clearDominantSpeaker()
 
@@ -81,8 +82,8 @@ class ParticipantManager {
     }
 
     private fun moveDominantSpeakerToTop(newDominantSpeaker: ParticipantViewState) {
-        mutableParticipants.removeAll { it.sid == newDominantSpeaker.sid }
         if (mutableParticipants.size > 1) {
+            mutableParticipants.removeAll { it.sid == newDominantSpeaker.sid }
             mutableParticipants.add(1, newDominantSpeaker)
             updatePrimaryParticipant()
         }
