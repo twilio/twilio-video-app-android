@@ -33,5 +33,9 @@ internal class ParticipantAdapter : ListAdapter<ParticipantViewState, Participan
             newItem: ParticipantViewState
         ): Boolean =
                 oldItem == newItem
+
+        override fun getChangePayload(oldItem: ParticipantViewState, newItem: ParticipantViewState): Any? {
+            return newItem
+        }
     }
 }
