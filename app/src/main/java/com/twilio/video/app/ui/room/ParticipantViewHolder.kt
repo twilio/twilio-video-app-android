@@ -13,6 +13,7 @@ import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.R
 import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import timber.log.Timber
 
 internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
@@ -24,7 +25,7 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
 
         thumb.run {
             setOnClickListener {
-                viewEventAction(RoomViewEvent.PinParticipant(participantViewState.sid))
+                viewEventAction(PinParticipant(participantViewState.sid))
             }
             setIdentity(participantViewState.identity)
             setMuted(participantViewState.isMuted)

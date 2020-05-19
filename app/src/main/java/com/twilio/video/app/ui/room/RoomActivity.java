@@ -82,7 +82,6 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
-import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.sdk.RoomManager;
 import com.twilio.video.app.udf.ViewEffect;
@@ -102,7 +101,6 @@ import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
-import io.reactivex.disposables.CompositeDisposable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -248,9 +246,6 @@ public class RoomActivity extends BaseActivity {
     /** Coordinates participant thumbs and primary participant rendering. */
     private PrimaryParticipantController primaryParticipantController;
 
-    /** Disposes {@link VideoAppService} requests when activity is destroyed. */
-    private final CompositeDisposable rxDisposables = new CompositeDisposable();
-
     private Boolean isAudioMuted = false;
     private Boolean isVideoMuted = false;
     private ParticipantAdapter participantAdapter;
@@ -306,14 +301,9 @@ public class RoomActivity extends BaseActivity {
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         thumbnailRecyclerView.setLayoutManager(layoutManager);
         participantAdapter = new ParticipantAdapter();
-        rxDisposables.add(
-                participantAdapter
-                        .getViewHolderEvents()
-                        .subscribe(
-                                (viewEvent) -> {
-                                    roomViewModel.processInput(viewEvent);
-                                },
-                                Timber::e));
+        participantAdapter
+                .getViewHolderEvents()
+                .observe(this, (viewEvent) -> roomViewModel.processInput(viewEvent));
         thumbnailRecyclerView.setAdapter(participantAdapter);
     }
 
@@ -373,7 +363,6 @@ public class RoomActivity extends BaseActivity {
             screenVideoTrack = null;
         }
 
-        rxDisposables.clear();
         super.onDestroy();
     }
 
