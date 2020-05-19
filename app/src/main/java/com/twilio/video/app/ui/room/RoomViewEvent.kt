@@ -3,6 +3,7 @@ package com.twilio.video.app.ui.room
 import com.twilio.audioswitch.selection.AudioDevice
 
 sealed class RoomViewEvent {
+    object ScreenLoad : RoomViewEvent()
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()
     object ActivateAudioDevice : RoomViewEvent()
     object DeactivateAudioDevice : RoomViewEvent()

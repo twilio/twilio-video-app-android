@@ -36,6 +36,7 @@ import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTextureView;
+import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,6 +47,8 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     int state = State.NO_VIDEO;
     boolean mirror = false;
     int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
+
+    VideoTrack videoTrack;
 
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
@@ -61,10 +64,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     @BindView(R.id.participant_stub_image)
     ImageView stubImage;
-
-    @Nullable
-    @BindView(R.id.dominant_speaker_img)
-    ImageView dominantSpeakerImg;
 
     @Nullable
     @BindView(R.id.network_quality_level_img)
@@ -156,10 +155,6 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
     public void setPinned(boolean pinned) {
         if (pinImage != null) pinImage.setVisibility(pinned ? VISIBLE : GONE);
-    }
-
-    public void showDominantSpeaker(boolean show) {
-        if (dominantSpeakerImg != null) dominantSpeakerImg.setVisibility(show ? VISIBLE : GONE);
     }
 
     @Override

@@ -21,7 +21,6 @@ import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
-import static com.twilio.video.app.participant.ParticipantViewStateKt.buildLocalParticipantViewState;
 import static com.twilio.video.app.sdk.RoomManagerKt.CAMERA_TRACK_NAME;
 import static com.twilio.video.app.sdk.RoomManagerKt.MICROPHONE_TRACK_NAME;
 import static com.twilio.video.app.sdk.RoomManagerKt.SCREEN_TRACK_NAME;
@@ -83,18 +82,16 @@ import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.Preferences;
 import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
-import com.twilio.video.app.data.api.VideoAppService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.sdk.RoomManager;
 import com.twilio.video.app.udf.ViewEffect;
-import com.twilio.video.app.ui.room.ParticipantController.Item;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
-import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant;
+import com.twilio.video.app.ui.room.RoomViewEvent.ScreenLoad;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
@@ -104,7 +101,6 @@ import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
 import com.twilio.video.app.util.StatsScheduler;
-import io.reactivex.disposables.CompositeDisposable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -152,7 +148,7 @@ public class RoomActivity extends BaseActivity {
     ParticipantPrimaryView primaryVideoView;
 
     @BindView(R.id.remote_video_thumbnails)
-    LinearLayout thumbnailLinearLayout;
+    RecyclerView thumbnailRecyclerView;
 
     @BindView(R.id.local_video_image_button)
     ImageButton localVideoImageButton;
@@ -248,13 +244,11 @@ public class RoomActivity extends BaseActivity {
     @Inject AudioDeviceSelector audioDeviceSelector;
 
     /** Coordinates participant thumbs and primary participant rendering. */
-    private ParticipantController participantController;
-
-    /** Disposes {@link VideoAppService} requests when activity is destroyed. */
-    private final CompositeDisposable rxDisposables = new CompositeDisposable();
+    private PrimaryParticipantController primaryParticipantController;
 
     private Boolean isAudioMuted = false;
     private Boolean isVideoMuted = false;
+    private ParticipantAdapter participantAdapter;
 
     public static void startActivity(Context context, Uri appLink) {
         Intent intent = new Intent(context, RoomActivity.class);
@@ -286,6 +280,8 @@ public class RoomActivity extends BaseActivity {
         setContentView(R.layout.activity_room);
         ButterKnife.bind(this);
 
+        setupThumbnailRecyclerView();
+
         // Setup toolbar
         setSupportActionBar(toolbar);
 
@@ -293,12 +289,22 @@ public class RoomActivity extends BaseActivity {
         savedVolumeControlStream = getVolumeControlStream();
 
         // setup participant controller
-        participantController = new ParticipantController(thumbnailLinearLayout, primaryVideoView);
-        participantController.setListener(participantClickListener());
+        primaryParticipantController = new PrimaryParticipantController(primaryVideoView);
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
+    }
+
+    private void setupThumbnailRecyclerView() {
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        thumbnailRecyclerView.setLayoutManager(layoutManager);
+        participantAdapter = new ParticipantAdapter();
+        participantAdapter
+                .getViewHolderEvents()
+                .observe(this, (viewEvent) -> roomViewModel.processInput(viewEvent));
+        thumbnailRecyclerView.setAdapter(participantAdapter);
     }
 
     @Override
@@ -308,6 +314,8 @@ public class RoomActivity extends BaseActivity {
         checkIntentURI();
 
         restoreCameraTrack();
+
+        roomViewModel.processInput(ScreenLoad.INSTANCE);
 
         publishLocalTracks();
 
@@ -355,8 +363,6 @@ public class RoomActivity extends BaseActivity {
             screenVideoTrack = null;
         }
 
-        // dispose any token requests if needed
-        rxDisposables.clear();
         super.onDestroy();
     }
 
@@ -413,7 +419,9 @@ public class RoomActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.switch_camera_menu_item:
-                switchCamera();
+                if (cameraCapturer != null) {
+                    cameraCapturer.switchCamera();
+                }
                 return true;
             case R.id.share_screen_menu_item:
                 String shareScreen = getString(R.string.share_screen);
@@ -576,37 +584,6 @@ public class RoomActivity extends BaseActivity {
             pauseVideoMenuItem.setVisible(false);
         }
 
-        if (room != null && room.getState() == CONNECTED) {
-
-            // update local participant thumb
-            participantController.updateThumb(
-                    buildLocalParticipantViewState(
-                            localParticipant, getString(R.string.you), cameraVideoTrack));
-
-            if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
-
-                // local video was rendered as primary view - refreshing
-                participantController.renderAsPrimary(
-                        localParticipantSid,
-                        getString(R.string.you),
-                        null,
-                        cameraVideoTrack,
-                        localAudioTrack == null,
-                        cameraCapturer.getCameraSource()
-                                == CameraCapturer.CameraSource.FRONT_CAMERA);
-
-                participantController.getPrimaryView().showIdentityBadge(false);
-
-                // update thumb state
-                participantController.updateThumb(
-                        localParticipantSid, ParticipantView.State.SELECTED);
-            }
-
-        } else {
-
-            renderLocalParticipantStub();
-        }
-
         // update toggle button icon
         localVideoImageButton.setImageResource(
                 cameraVideoTrack != null
@@ -709,7 +686,6 @@ public class RoomActivity extends BaseActivity {
         }
         if (cameraVideoTrack == null && !isVideoMuted) {
             setupLocalVideoTrack();
-            renderLocalParticipantStub();
             if (room != null && localParticipant != null)
                 localParticipant.publishTrack(cameraVideoTrack);
         }
@@ -751,7 +727,7 @@ public class RoomActivity extends BaseActivity {
      */
     private void renderLocalParticipantStub() {
 
-        participantController.renderAsPrimary(
+        primaryParticipantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
                 null,
@@ -850,23 +826,6 @@ public class RoomActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(toolbarTitle);
-        }
-    }
-
-    private void switchCamera() {
-        if (cameraCapturer != null) {
-
-            boolean mirror =
-                    cameraCapturer.getCameraSource() == CameraCapturer.CameraSource.BACK_CAMERA;
-
-            cameraCapturer.switchCamera();
-
-            if (participantController.getPrimaryItem().sid.equals(localParticipantSid)) {
-                participantController.updatePrimaryThumb(mirror);
-            } else {
-                participantController.updateThumb(
-                        buildLocalParticipantViewState(localParticipant, "", null));
-            }
         }
     }
 
@@ -1022,10 +981,6 @@ public class RoomActivity extends BaseActivity {
         };
     }
 
-    private ParticipantController.ItemClickListener participantClickListener() {
-        return (Item item) -> roomViewModel.processInput(new PinParticipant(item.sid));
-    }
-
     private void initializeRoom() {
         if (room != null) {
 
@@ -1108,7 +1063,7 @@ public class RoomActivity extends BaseActivity {
 
     private void renderPrimaryView(ParticipantViewState primaryParticipant) {
         if (primaryParticipant != null) {
-            participantController.renderAsPrimary(
+            primaryParticipantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
                     primaryParticipant.getScreenTrack(),
@@ -1121,8 +1076,7 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void renderThumbnails(RoomViewState roomViewState) {
-        List<ParticipantViewState> thumbnails = roomViewState.getParticipantThumbnails();
-        ParticipantControllerExtensionsKt.updateThumbnails(participantController, thumbnails);
+        participantAdapter.submitList(roomViewState.getParticipantThumbnails());
     }
 
     private void displayAudioDeviceList() {

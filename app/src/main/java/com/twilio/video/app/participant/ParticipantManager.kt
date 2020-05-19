@@ -7,7 +7,7 @@ import timber.log.Timber
 class ParticipantManager {
 
     private val mutableParticipants = mutableListOf<ParticipantViewState>()
-    val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants
+    val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants.toList()
     var primaryParticipant: ParticipantViewState? = null
         private set
 
@@ -70,12 +70,23 @@ class ParticipantManager {
     }
 
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
-        newDominantSpeakerSid?.let {
+        Timber.d("new dominant speaker with sid: %s", newDominantSpeakerSid)
+        newDominantSpeakerSid?.let { sid ->
             clearDominantSpeaker()
 
             getParticipant(newDominantSpeakerSid)?.copy(
-                    isDominantSpeaker = true)?.let { updateParticipant(it) }
-        } ?: clearDominantSpeaker()
+                    isDominantSpeaker = true)?.let { moveDominantSpeakerToTop(it) }
+        } ?: run {
+            clearDominantSpeaker()
+        }
+    }
+
+    private fun moveDominantSpeakerToTop(newDominantSpeaker: ParticipantViewState) {
+        if (mutableParticipants.size > 1) {
+            mutableParticipants.removeAll { it.sid == newDominantSpeaker.sid }
+            mutableParticipants.add(1, newDominantSpeaker)
+            updatePrimaryParticipant()
+        }
     }
 
     private fun clearDominantSpeaker() {
@@ -97,6 +108,7 @@ class ParticipantManager {
     private fun determinePrimaryParticipant(): ParticipantViewState? {
         return mutableParticipants.find { it.isPinned }
         ?: mutableParticipants.find { it.screenTrack != null }
+        ?: mutableParticipants.find { it.isDominantSpeaker }
         ?: mutableParticipants.find { !it.isLocalParticipant }
     }
 }
