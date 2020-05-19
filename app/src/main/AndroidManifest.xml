@@ -47,6 +47,7 @@
         <activity
             android:launchMode="singleInstance"
             android:name=".ui.room.RoomActivity"
+            android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.Lobby">
         </activity>
