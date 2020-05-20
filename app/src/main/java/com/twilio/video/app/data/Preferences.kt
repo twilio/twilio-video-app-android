@@ -39,12 +39,12 @@ object Preferences {
     const val ENABLE_STATS = "pref_enable_stats"
     const val ENABLE_INSIGHTS = "pref_enable_insights"
     const val ENABLE_NETWORK_QUALITY_LEVEL = "pref_enable_network_quality_level"
+    const val ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT = true
     const val ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION = "pref_enable_automatic_subscription"
     const val ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT = true
     const val ENABLE_DOMINANT_SPEAKER = "pref_enable_dominant_speaker"
     const val ENABLE_DOMINANT_SPEAKER_DEFAULT = true
     const val ENABLE_INSIGHTS_DEFAULT = true
-    const val ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT = true
     const val VIDEO_CODEC = "pref_video_codecs"
     const val VIDEO_CODEC_DEFAULT = Vp8Codec.NAME
     const val VP8_SIMULCAST = "pref_vp8_simulcast"
@@ -52,7 +52,7 @@ object Preferences {
     const val AUDIO_CODEC = "pref_audio_codecs"
     const val AUDIO_CODEC_DEFAULT = OpusCodec.NAME
     const val MAX_AUDIO_BITRATE = "pref_max_audio_bitrate"
-    const val MAX_AUDIO_BITRATE_DEFAULT = 0
+    const val MAX_AUDIO_BITRATE_DEFAULT = 16
     const val MAX_VIDEO_BITRATE = "pref_max_video_bitrate"
     const val MAX_VIDEO_BITRATE_DEFAULT = 0
     const val MAX_VIDEO_TRACKS = "pref_max_video_tracks"

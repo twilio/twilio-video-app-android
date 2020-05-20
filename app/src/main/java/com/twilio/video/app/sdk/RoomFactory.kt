@@ -17,6 +17,7 @@ import com.twilio.video.OpusCodec
 import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
 import com.twilio.video.Room
+import com.twilio.video.TrackPriority
 import com.twilio.video.Video
 import com.twilio.video.VideoBandwidthProfileOptions
 import com.twilio.video.VideoCodec
@@ -68,6 +69,7 @@ class RoomFactory(
                         VideoBandwidthProfileOptions.Builder()
                                 .mode(BandwidthProfileMode.COLLABORATION)
                                 .maxTracks(maxTracks)
+                                .dominantSpeakerPriority(TrackPriority.STANDARD)
                                 .build())
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
