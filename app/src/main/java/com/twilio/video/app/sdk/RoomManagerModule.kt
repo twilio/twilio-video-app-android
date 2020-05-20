@@ -1,4 +1,4 @@
-package com.twilio.video.app.ui.room
+package com.twilio.video.app.sdk
 
 import android.app.Application
 import android.content.SharedPreferences
@@ -7,7 +7,6 @@ import com.twilio.video.app.ApplicationScope
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.data.api.VideoAppServiceModule
-import com.twilio.video.app.sdk.RoomManager
 import dagger.Module
 import dagger.Provides
 

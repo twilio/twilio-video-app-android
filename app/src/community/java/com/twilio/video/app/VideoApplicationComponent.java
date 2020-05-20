@@ -18,10 +18,10 @@ package com.twilio.video.app;
 
 import com.twilio.video.app.auth.CommunityAuthModule;
 import com.twilio.video.app.data.AuthServiceModule;
+import com.twilio.video.app.sdk.CommunityRoomManagerModule;
 import com.twilio.video.app.security.SecurityModule;
 import com.twilio.video.app.ui.CommunityScreenSelectorModule;
 import com.twilio.video.app.ui.login.CommunityLoginActivityModule;
-import com.twilio.video.app.ui.room.CommunityRoomManagerModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
 import com.twilio.video.app.ui.room.VideoServiceModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
