@@ -502,8 +502,8 @@ public class RoomActivity extends BaseActivity {
         if (text != null) {
             final String roomName = text.toString();
 
-            RoomViewEvent.CreateRoom viewEvent =
-                    new RoomViewEvent.CreateRoom(displayName, roomName, isNetworkQualityEnabled());
+            RoomViewEvent.Connect viewEvent =
+                    new RoomViewEvent.Connect(displayName, roomName, isNetworkQualityEnabled());
             roomViewModel.processInput(viewEvent);
         }
     }
@@ -616,9 +616,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup video dimensions
         int minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0);
-        int maxVideoDim =
-                sharedPreferences.getInt(
-                        Preferences.MAX_VIDEO_DIMENSIONS, 1);
+        int maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1);
 
         if (maxVideoDim != -1 && minVideoDim != -1) {
             builder.minVideoDimensions(videoDimensions[minVideoDim]);

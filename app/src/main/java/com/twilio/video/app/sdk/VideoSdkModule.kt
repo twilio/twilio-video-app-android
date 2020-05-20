@@ -21,14 +21,14 @@ class VideoSdkModule {
         application: Application,
         sharedPreferences: SharedPreferences,
         tokenService: TokenService
-    ): RoomFactory =
-            RoomFactory(application, sharedPreferences, tokenService)
+    ): VideoClient =
+            VideoClient(application, sharedPreferences, tokenService)
 
     @Provides
     @ApplicationScope
     fun providesRoomManager(
         application: Application,
-        roomFactory: RoomFactory
+        videoClient: VideoClient
     ): RoomManager =
-            RoomManager(application, roomFactory)
+            RoomManager(application, videoClient)
 }

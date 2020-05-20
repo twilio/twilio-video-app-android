@@ -29,13 +29,13 @@ import com.twilio.video.app.data.Preferences.MAX_VIDEO_TRACKS_DEFAULT
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
 
-class RoomFactory(
+class VideoClient(
     private val context: Context,
     private val sharedPreferences: SharedPreferences,
     private val tokenService: TokenService
 ) {
 
-    suspend fun newInstance(
+    suspend fun connect(
         identity: String,
         roomName: String,
         isNetworkQualityEnabled: Boolean,

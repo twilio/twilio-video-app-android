@@ -28,7 +28,7 @@ const val SCREEN_TRACK_NAME = "screen"
 
 class RoomManager(
     private val context: Context,
-    private val roomFactory: RoomFactory
+    private val videoClient: VideoClient
 ) {
 
     private val roomListener = RoomListener()
@@ -40,14 +40,14 @@ class RoomManager(
         room?.disconnect()
     }
 
-    suspend fun createRoom(
+    suspend fun connect(
         identity: String,
         roomName: String,
         isNetworkQualityEnabled: Boolean
     ) {
         roomEventSubject.onNext(Connecting)
         room = try {
-            roomFactory.newInstance(identity, roomName, isNetworkQualityEnabled, roomListener)
+            videoClient.connect(identity, roomName, isNetworkQualityEnabled, roomListener)
         } catch (e: AuthServiceException) {
             handleTokenException(e, e.error)
         } catch (e: Exception) {
