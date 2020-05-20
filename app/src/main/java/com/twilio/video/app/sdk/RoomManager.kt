@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.twilio.androidenv.Env
 import com.twilio.video.AudioCodec
+import com.twilio.video.BandwidthProfileMode
+import com.twilio.video.BandwidthProfileOptions
 import com.twilio.video.ConnectOptions
 import com.twilio.video.EncodingParameters
 import com.twilio.video.G722Codec
@@ -19,6 +21,7 @@ import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 import com.twilio.video.TwilioException
 import com.twilio.video.Video
+import com.twilio.video.VideoBandwidthProfileOptions
 import com.twilio.video.VideoCodec
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
@@ -96,6 +99,13 @@ class RoomManager(
                         NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
                         NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
 
+                val bandwidthProfileOptions = BandwidthProfileOptions(
+                        VideoBandwidthProfileOptions.Builder()
+                                .mode(BandwidthProfileMode.COLLABORATION)
+                                .maxTracks(5)
+                                .build()
+                )
+
                 val connectOptionsBuilder = ConnectOptions.Builder(token)
                         .roomName(roomName)
                         .enableAutomaticSubscription(enableAutomaticTrackSubscription)
@@ -103,6 +113,7 @@ class RoomManager(
                         .enableInsights(enableInsights)
                         .enableNetworkQuality(isNetworkQualityEnabled)
                         .networkQualityConfiguration(configuration)
+                        .bandwidthProfile(bandwidthProfileOptions)
 
                 val maxVideoBitrate = sharedPreferences.getInt(
                         Preferences.MAX_VIDEO_BITRATE,
