@@ -69,7 +69,7 @@ class RoomManager(
         room?.disconnect()
     }
 
-    suspend fun connectToRoom(
+    suspend fun createRoom(
         identity: String,
         roomName: String,
         isNetworkQualityEnabled: Boolean

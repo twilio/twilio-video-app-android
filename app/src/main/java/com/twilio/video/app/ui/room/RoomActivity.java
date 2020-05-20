@@ -502,8 +502,8 @@ public class RoomActivity extends BaseActivity {
         if (text != null) {
             final String roomName = text.toString();
 
-            RoomViewEvent.Connect viewEvent =
-                    new RoomViewEvent.Connect(displayName, roomName, isNetworkQualityEnabled());
+            RoomViewEvent.CreateRoom viewEvent =
+                    new RoomViewEvent.CreateRoom(displayName, roomName, isNetworkQualityEnabled());
             roomViewModel.processInput(viewEvent);
         }
     }

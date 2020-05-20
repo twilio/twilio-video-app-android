@@ -26,7 +26,7 @@ import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.Connect
+import com.twilio.video.app.ui.room.RoomViewEvent.CreateRoom
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
@@ -82,8 +82,8 @@ class RoomViewModel(
             }
             ActivateAudioDevice -> { audioDeviceSelector.activate() }
             DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
-            is Connect -> {
-                connect(
+            is CreateRoom -> {
+                createRoom(
                         viewEvent.identity,
                         viewEvent.roomName,
                         viewEvent.isNetworkQualityEnabled)
@@ -221,13 +221,13 @@ class RoomViewModel(
         }
     }
 
-    private fun connect(
+    private fun createRoom(
         identity: String,
         roomName: String,
         isNetworkQualityEnabled: Boolean
     ) =
         viewModelScope.launch {
-            roomManager.connectToRoom(
+            roomManager.createRoom(
                     identity,
                     roomName,
                     isNetworkQualityEnabled)
