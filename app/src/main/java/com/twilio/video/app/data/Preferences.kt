@@ -55,6 +55,8 @@ object Preferences {
     const val MAX_AUDIO_BITRATE_DEFAULT = 0
     const val MAX_VIDEO_BITRATE = "pref_max_video_bitrate"
     const val MAX_VIDEO_BITRATE_DEFAULT = 0
+    const val MAX_VIDEO_TRACKS = "pref_max_video_tracks"
+    const val MAX_VIDEO_TRACKS_DEFAULT = 5L
     const val RECORD_PARTICIPANTS_ON_CONNECT = "pref_record_participants_on_connect"
     const val RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT = false
 }

@@ -23,6 +23,8 @@ import com.twilio.video.VideoCodec
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_TRACKS
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_TRACKS_DEFAULT
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
 
@@ -61,12 +63,12 @@ class RoomFactory(
                     NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
                     NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
 
+            val maxTracks = sharedPreferences.getLong(MAX_VIDEO_TRACKS, MAX_VIDEO_TRACKS_DEFAULT)
             val bandwidthProfileOptions = BandwidthProfileOptions(
-                    VideoBandwidthProfileOptions.Builder()
-                            .mode(BandwidthProfileMode.COLLABORATION)
-                            .maxTracks(5)
-                            .build()
-            )
+                        VideoBandwidthProfileOptions.Builder()
+                                .mode(BandwidthProfileMode.COLLABORATION)
+                                .maxTracks(maxTracks)
+                                .build())
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
                     .roomName(roomName)
