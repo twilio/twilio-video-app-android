@@ -2,7 +2,6 @@ package com.twilio.video.app.ui.room
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
@@ -39,6 +38,8 @@ import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -46,8 +47,9 @@ class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
     private val participantManager: ParticipantManager = ParticipantManager(),
+    private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     private val rxDisposables: CompositeDisposable = CompositeDisposable(),
-    private val scheduler: Scheduler = AndroidSchedulers.mainThread()
+    scheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
 
     init {
@@ -226,8 +228,8 @@ class RoomViewModel(
         roomName: String,
         isNetworkQualityEnabled: Boolean
     ) =
-        viewModelScope.launch {
-            roomManager.connectToRoom(
+        backgroundScope.launch {
+            roomManager.connect(
                     identity,
                     roomName,
                     isNetworkQualityEnabled)

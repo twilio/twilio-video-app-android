@@ -616,9 +616,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup video dimensions
         int minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0);
-        int maxVideoDim =
-                sharedPreferences.getInt(
-                        Preferences.MAX_VIDEO_DIMENSIONS, videoDimensions.length - 1);
+        int maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1);
 
         if (maxVideoDim != -1 && minVideoDim != -1) {
             builder.minVideoDimensions(videoDimensions[minVideoDim]);
@@ -636,7 +634,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup fps
         int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
-        int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 30);
+        int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 24);
 
         if (maxFps != -1 && minFps != -1) {
             builder.minFps(minFps);
