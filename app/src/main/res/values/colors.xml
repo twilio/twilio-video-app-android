@@ -27,4 +27,5 @@
     <!-- RemoteParticipant view colors -->
     <color name="participantBackground">#66000000</color>
     <color name="participantSelectedBackground">#cc000000</color>
+    <color name="participantTrackSwitchOff">#80000000</color>
 </resources>
