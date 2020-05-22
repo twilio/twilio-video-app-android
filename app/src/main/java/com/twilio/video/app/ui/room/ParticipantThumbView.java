@@ -23,9 +23,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-
 import androidx.core.content.ContextCompat;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.twilio.video.app.R;
@@ -78,6 +76,9 @@ public class ParticipantThumbView extends ParticipantView {
         trackSwitchOffImage.setVisibility(isSwitchOffViewVisible(state));
 
         int resId = R.drawable.participant_background;
+        if (state == State.SELECTED) {
+            resId = R.drawable.participant_selected_background;
+        }
         selectedLayout.setBackground(ContextCompat.getDrawable(getContext(), resId));
     }
 

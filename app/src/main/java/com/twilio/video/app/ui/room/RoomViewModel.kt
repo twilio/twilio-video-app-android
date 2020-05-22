@@ -8,6 +8,7 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
+import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.udf.BaseViewModel
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
@@ -20,6 +21,7 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLev
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
@@ -145,12 +147,18 @@ class RoomViewModel(
             is ParticipantConnected -> addParticipant(participantEvent.participant)
             is VideoTrackUpdated -> {
                 participantManager.updateParticipantVideoTrack(participantEvent.sid,
-                        participantEvent.videoTrack)
+                        participantEvent.videoTrack?.let { VideoTrackViewState(it) })
+                updateParticipantViewState()
+            }
+            is TrackSwitchOff -> {
+                participantManager.updateParticipantVideoTrack(participantEvent.sid,
+                        VideoTrackViewState(participantEvent.videoTrack,
+                                participantEvent.switchOff))
                 updateParticipantViewState()
             }
             is ScreenTrackUpdated -> {
                 participantManager.updateParticipantScreenTrack(participantEvent.sid,
-                        participantEvent.screenTrack)
+                        participantEvent.screenTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
             }
             is MuteParticipant -> {

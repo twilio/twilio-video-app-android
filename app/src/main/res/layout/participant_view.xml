@@ -57,6 +57,34 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- RemoteParticipant layout without video track -->
+
+    <RelativeLayout
+        android:id="@+id/participant_selected_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/participant_selected_background">
+
+        <ImageView
+            android:id="@+id/participant_stub_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/profile_picture"
+            app:srcCompat="@drawable/ic_account_circle_white_24dp" />
+
+        <TextView
+            android:id="@+id/participant_selected_identity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/participant_stub_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+
     <!-- RemoteParticipant audio toggle -->
 
     <ImageView

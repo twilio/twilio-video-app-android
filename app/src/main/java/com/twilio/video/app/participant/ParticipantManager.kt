@@ -1,7 +1,7 @@
 package com.twilio.video.app.participant
 
 import com.twilio.video.NetworkQualityLevel
-import com.twilio.video.VideoTrack
+import com.twilio.video.app.sdk.VideoTrackViewState
 import timber.log.Timber
 
 class ParticipantManager {
@@ -41,12 +41,12 @@ class ParticipantManager {
         }
     }
 
-    fun updateParticipantVideoTrack(sid: String, videoTrack: VideoTrack?) {
+    fun updateParticipantVideoTrack(sid: String, videoTrack: VideoTrackViewState?) {
         mutableParticipants.find { it.sid == sid }?.copy(
                 videoTrack = videoTrack)?.let { updateParticipant(it) }
     }
 
-    fun updateParticipantScreenTrack(sid: String, screenTrack: VideoTrack?) {
+    fun updateParticipantScreenTrack(sid: String, screenTrack: VideoTrackViewState?) {
         mutableParticipants.find { it.sid == sid }?.copy(
                 screenTrack = screenTrack)?.let { updateParticipant(it) }
     }

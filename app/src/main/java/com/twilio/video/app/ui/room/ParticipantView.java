@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -121,6 +120,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
                 videoState();
                 break;
             case State.NO_VIDEO:
+            case State.SELECTED:
                 videoLayout.setVisibility(GONE);
                 videoIdentity.setVisibility(GONE);
                 videoView.setVisibility(GONE);
@@ -198,12 +198,14 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     @IntDef({
         ParticipantView.State.VIDEO,
         ParticipantView.State.NO_VIDEO,
+        ParticipantView.State.SELECTED,
         ParticipantView.State.SWITCHED_OFF
     })
     @Retention(RetentionPolicy.SOURCE)
     @interface State {
         int VIDEO = 0;
         int NO_VIDEO = 1;
-        int SWITCHED_OFF = 2;
+        int SELECTED = 2;
+        int SWITCHED_OFF = 3;
     }
 }

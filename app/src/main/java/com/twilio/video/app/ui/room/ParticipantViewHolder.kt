@@ -43,7 +43,7 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
     private fun updateVideoTrack(participantViewState: ParticipantViewState) {
         thumb.run {
             val videoTrackViewState = participantViewState.videoTrack
-            val newVideoTrack = videoTrackViewState?.let{ it.videoTrack }
+            val newVideoTrack = videoTrackViewState?.let { it.videoTrack }
             if (videoTrack !== newVideoTrack) {
                 removeRender(videoTrack, this)
                 videoTrack = newVideoTrack
@@ -59,9 +59,9 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
 
     private fun ParticipantThumbView.setVideoState(videoTrackViewState: VideoTrackViewState?) {
         if (videoTrackViewState?.let { it.isSwitchedOff } == true) {
-            setState(ParticipantView.State.VIDEO)
-        } else {
             setState(ParticipantView.State.SWITCHED_OFF)
+        } else {
+            setState(ParticipantView.State.VIDEO)
         }
     }
 

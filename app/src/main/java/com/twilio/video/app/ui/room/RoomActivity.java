@@ -76,6 +76,7 @@ import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
+import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
@@ -84,6 +85,7 @@ import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.sdk.RoomManager;
+import com.twilio.video.app.sdk.VideoTrackViewState;
 import com.twilio.video.app.udf.ViewEffect;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
@@ -1061,11 +1063,21 @@ public class RoomActivity extends BaseActivity {
 
     private void renderPrimaryView(ParticipantViewState primaryParticipant) {
         if (primaryParticipant != null) {
+            VideoTrackViewState videoTrackViewState = primaryParticipant.getVideoTrack();
+            VideoTrackViewState screenTrackViewState = primaryParticipant.getScreenTrack();
+            VideoTrack videoTrack = null;
+            VideoTrack screenTrack = null;
+            if (videoTrackViewState != null) {
+                videoTrack = videoTrackViewState.getVideoTrack();
+            }
+            if (screenTrackViewState != null) {
+                screenTrack = screenTrackViewState.getVideoTrack();
+            }
             primaryParticipantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
-                    primaryParticipant.getScreenTrack(),
-                    primaryParticipant.getVideoTrack(),
+                    videoTrack,
+                    screenTrack,
                     primaryParticipant.isMuted(),
                     primaryParticipant.isMirrored());
         } else {
