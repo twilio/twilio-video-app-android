@@ -76,7 +76,6 @@ import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
 import com.twilio.video.app.base.BaseActivity;
@@ -731,7 +730,7 @@ public class RoomActivity extends BaseActivity {
                 localParticipantSid,
                 getString(R.string.you),
                 null,
-                cameraVideoTrack,
+                new VideoTrackViewState(cameraVideoTrack, false),
                 localAudioTrack == null,
                 cameraCapturer != null
                         && cameraCapturer.getCameraSource()
@@ -1063,21 +1062,11 @@ public class RoomActivity extends BaseActivity {
 
     private void renderPrimaryView(ParticipantViewState primaryParticipant) {
         if (primaryParticipant != null) {
-            VideoTrackViewState videoTrackViewState = primaryParticipant.getVideoTrack();
-            VideoTrackViewState screenTrackViewState = primaryParticipant.getScreenTrack();
-            VideoTrack videoTrack = null;
-            VideoTrack screenTrack = null;
-            if (videoTrackViewState != null) {
-                videoTrack = videoTrackViewState.getVideoTrack();
-            }
-            if (screenTrackViewState != null) {
-                screenTrack = screenTrackViewState.getVideoTrack();
-            }
             primaryParticipantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
-                    videoTrack,
-                    screenTrack,
+                    primaryParticipant.getVideoTrack(),
+                    primaryParticipant.getScreenTrack(),
                     primaryParticipant.isMuted(),
                     primaryParticipant.isMirrored());
         } else {
