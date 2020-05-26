@@ -15,34 +15,54 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
 
+private const val PARTICIPANT_SID = "123"
+
 class RoomViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    private val roomManager = RoomManager(mock(),
+            VideoClient(mock(), mock(), mock()))
+    private val scheduler = TestScheduler()
+    private val participantViewState = ParticipantViewState(PARTICIPANT_SID, "Test Participant")
+    private val participantManager = ParticipantManager().apply {
+        addParticipant(participantViewState)
+    }
+    private val viewModel = RoomViewModel(
+            roomManager,
+            mock(),
+            participantManager,
+            scheduler = scheduler)
+
     @Test
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState`() {
-        val roomManager = RoomManager(mock(),
-                VideoClient(mock(), mock(), mock()))
-        val participantManager = ParticipantManager()
-        val participantViewState = ParticipantViewState("123", "Test Participant")
         val expectedVideoTrack = mock<VideoTrack>()
-        participantManager.addParticipant(participantViewState)
-        val scheduler = TestScheduler()
-        val viewModel = RoomViewModel(
-                roomManager,
-                mock(),
-                participantManager,
-                scheduler = scheduler)
 
-        roomManager.sendParticipantEvent(TrackSwitchOff("123", expectedVideoTrack, true))
+        roomManager.sendParticipantEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, false))
+        scheduler.triggerActions()
+
+        val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
+        val expectedParticipantViewState = participantViewState.copy(
+                videoTrack = expectedTrackViewState)
+        val updatedParticipant = viewModel.viewState.value?.participantThumbnails?.find {
+            it.sid == PARTICIPANT_SID
+        }
+        assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
+    }
+
+    @Test
+    fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState with the switch off set to true`() {
+        val expectedVideoTrack = mock<VideoTrack>()
+
+        roomManager.sendParticipantEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, true))
         scheduler.triggerActions()
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack, true)
         val expectedParticipantViewState = participantViewState.copy(
                 videoTrack = expectedTrackViewState)
         val updatedParticipant = viewModel.viewState.value?.participantThumbnails?.find {
-            it.sid == "123"
+            it.sid == PARTICIPANT_SID
         }
         assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
     }
