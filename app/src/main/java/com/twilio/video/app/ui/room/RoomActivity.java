@@ -726,11 +726,13 @@ public class RoomActivity extends BaseActivity {
      */
     private void renderLocalParticipantStub() {
 
+        VideoTrackViewState cameraTrackViewState =
+                cameraVideoTrack != null ? new VideoTrackViewState(cameraVideoTrack, false) : null;
         primaryParticipantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
                 null,
-                new VideoTrackViewState(cameraVideoTrack, false),
+                cameraTrackViewState,
                 localAudioTrack == null,
                 cameraCapturer != null
                         && cameraCapturer.getCameraSource()
