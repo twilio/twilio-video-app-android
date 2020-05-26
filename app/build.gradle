@@ -192,6 +192,7 @@ dependencies {
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
+    testImplementation 'android.arch.core:core-testing:1.1.1'
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
 
