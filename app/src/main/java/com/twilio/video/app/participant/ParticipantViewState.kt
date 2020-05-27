@@ -17,7 +17,9 @@ data class ParticipantViewState(
     val isDominantSpeaker: Boolean = false,
     val isLocalParticipant: Boolean = false,
     val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN
-)
+) {
+    val isScreenSharing: Boolean get() = screenTrack != null
+}
 
 fun buildParticipantViewState(participant: Participant): ParticipantViewState {
     val videoTrack = participant.videoTracks.firstOrNull()?.videoTrack

@@ -1,21 +1,32 @@
 package com.twilio.video.app.participant
 
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.twilio.video.LocalVideoTrack
+import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.TrackPriority
+import com.twilio.video.app.sdk.VideoTrackViewState
+import junitparams.JUnitParamsRunner
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(JUnitParamsRunner::class)
 class ParticipantManagerTest {
 
     val participantManager = ParticipantManager()
     private val localParticipant = ParticipantViewState("1", "Local Participant",
-            isLocalParticipant = true)
+            videoTrack = VideoTrackViewState(mock<LocalVideoTrack>()), isLocalParticipant = true)
     val dominantSpeakers get() =
         participantManager.participantThumbnails.filter { it.isDominantSpeaker }
 
     @Test
     fun `changeDominantSpeaker should insert the new dominant speaker in the second position in the thumbnail list`() {
-        val dominantSpeaker = setupDominantSpeakerHappyPathScenario()
+        val dominantSpeaker = setupThreeParticipantScenario()
 
         participantManager.changeDominantSpeaker("3")
 
@@ -26,7 +37,7 @@ class ParticipantManagerTest {
 
     @Test
     fun `changeDominantSpeaker should assign the new dominant speaker to the primary view`() {
-        val dominantSpeaker = setupDominantSpeakerHappyPathScenario()
+        val dominantSpeaker = setupThreeParticipantScenario()
         val expectedParticipant = dominantSpeaker.copy(isDominantSpeaker = true)
         participantManager.changeDominantSpeaker("3")
 
@@ -35,7 +46,7 @@ class ParticipantManagerTest {
 
     @Test
     fun `changeDominantSpeaker should set the dominant speaker to true for the new dominant speaker participant`() {
-        setupDominantSpeakerHappyPathScenario()
+        setupThreeParticipantScenario()
 
         participantManager.changeDominantSpeaker("3")
 
@@ -86,21 +97,107 @@ class ParticipantManagerTest {
         assertThat(dominantSpeakers.isEmpty(), equalTo(true))
     }
 
+    @Test
+    fun `primary participant VideoTrack priority should be high when pinned`() {
+        val pinnedParticipant = setupThreeParticipantScenario()
+
+        participantManager.changePinnedParticipant(pinnedParticipant.sid)
+
+        val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
+        verify(videoTrack).priority = TrackPriority.HIGH
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should not be set when pinned with a null video track`() {
+        val pinnedParticipant = setupThreeParticipantScenario()
+
+        participantManager.changePinnedParticipant(pinnedParticipant.sid)
+        participantManager.updateParticipantVideoTrack(pinnedParticipant.sid, null)
+
+        val videoTrack = participantManager.primaryParticipant!!.videoTrack
+        assertThat(videoTrack, `is`(nullValue()))
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should be high when screen sharing`() {
+        val screenTrack = mock<RemoteVideoTrack>()
+        val screenSharingParticipant = setupThreeParticipantScenario()
+
+        participantManager.updateParticipantScreenTrack(screenSharingParticipant.sid,
+                VideoTrackViewState(videoTrack = screenTrack))
+
+        verify(screenTrack).priority = TrackPriority.HIGH
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should not be set when there is only a local participant`() {
+        participantManager.addParticipant(localParticipant)
+
+        assertThat(participantManager.primaryParticipant, `is`(nullValue()))
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should be null when dominant speaker`() {
+        val dominantSpeaker = setupThreeParticipantScenario()
+
+        participantManager.changeDominantSpeaker(dominantSpeaker.sid)
+
+        val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
+        verify(videoTrack).priority = null
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should be not be set when dominant speaker has a null video track`() {
+        val dominantSpeaker = setupThreeParticipantScenario()
+
+        participantManager.changeDominantSpeaker(dominantSpeaker.sid)
+        participantManager.updateParticipantVideoTrack(dominantSpeaker.sid, null)
+
+        val videoTrack = participantManager.primaryParticipant!!.videoTrack
+        assertThat(videoTrack, `is`(nullValue()))
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should be high when there is one remote participant`() {
+        val participant2 = ParticipantViewState("2", "Participant 2",
+                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+        participantManager.addParticipant(localParticipant)
+        participantManager.addParticipant(participant2)
+
+        val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
+        verify(videoTrack).priority = TrackPriority.HIGH
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should note be set when there is one remote participant with a null video track`() {
+        val participant2 = ParticipantViewState("2", "Participant 2",
+                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+        participantManager.addParticipant(localParticipant)
+        participantManager.addParticipant(participant2)
+
+        participantManager.updateParticipantVideoTrack(participant2.sid, null)
+
+        val videoTrack = participantManager.primaryParticipant!!.videoTrack
+        assertThat(videoTrack, `is`(nullValue()))
+    }
+
     private fun setupExistingDominantSpeakerScenario() {
-        val participant2 = ParticipantViewState("2", "Remote Participant 1",
+        val participant2 = ParticipantViewState("2", "Participant 2",
                 isDominantSpeaker = true)
-        val dominantSpeaker = ParticipantViewState("3", "Remote Participant 2")
+        val dominantSpeaker = ParticipantViewState("3", "Participant 3")
         participantManager.addParticipant(localParticipant)
         participantManager.addParticipant(participant2)
         participantManager.addParticipant(dominantSpeaker)
     }
 
-    private fun setupDominantSpeakerHappyPathScenario(): ParticipantViewState {
-        val participant2 = ParticipantViewState("2", "Remote Participant 1")
-        val dominantSpeaker = ParticipantViewState("3", "Remote Participant 2")
+    private fun setupThreeParticipantScenario(): ParticipantViewState {
+        val participant2 = ParticipantViewState("2", "Participant 2",
+            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+        val participant3 = ParticipantViewState("3", "Participant 3",
+            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
         participantManager.addParticipant(localParticipant)
         participantManager.addParticipant(participant2)
-        participantManager.addParticipant(dominantSpeaker)
-        return dominantSpeaker
+        participantManager.addParticipant(participant3)
+        return participant3
     }
 }

@@ -1,6 +1,8 @@
 package com.twilio.video.app.participant
 
 import com.twilio.video.NetworkQualityLevel
+import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.TrackPriority
 import com.twilio.video.app.sdk.VideoTrackViewState
 import timber.log.Timber
 
@@ -100,15 +102,43 @@ class ParticipantManager {
     }
 
     private fun updatePrimaryParticipant() {
-        primaryParticipant = determinePrimaryParticipant()
+        primaryParticipant = retrievePrimaryParticipant()
         Timber.d("Participant Cache: $mutableParticipants")
         Timber.d("Primary Participant: $primaryParticipant")
     }
 
+    private fun retrievePrimaryParticipant(): ParticipantViewState? =
+            determinePrimaryParticipant()?.apply { setTrackPriority(this) }
+
     private fun determinePrimaryParticipant(): ParticipantViewState? {
         return mutableParticipants.find { it.isPinned }
-        ?: mutableParticipants.find { it.screenTrack != null }
-        ?: mutableParticipants.find { it.isDominantSpeaker }
-        ?: mutableParticipants.find { !it.isLocalParticipant }
+                ?: mutableParticipants.find { it.isScreenSharing }
+                ?: mutableParticipants.find { it.isDominantSpeaker }
+                ?: mutableParticipants.find { !it.isLocalParticipant }
+    }
+
+    private fun setTrackPriority(participant: ParticipantViewState) {
+        when {
+            participant.isPinned -> {
+                setVideoTrackPriority(participant)
+            }
+            participant.isScreenSharing -> {
+                (participant.screenTrack?.videoTrack as RemoteVideoTrack?)?.priority =
+                        TrackPriority.HIGH
+            }
+            participant.isDominantSpeaker -> {
+                setVideoTrackPriority(participant, null)
+            }
+            else -> {
+                setVideoTrackPriority(participant)
+            }
+        }
+    }
+
+    private fun setVideoTrackPriority(
+        participant: ParticipantViewState,
+        priority: TrackPriority? = TrackPriority.HIGH
+    ) {
+        (participant.videoTrack?.videoTrack as RemoteVideoTrack?)?.priority = priority
     }
 }
