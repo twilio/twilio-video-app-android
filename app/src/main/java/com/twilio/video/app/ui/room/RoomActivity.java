@@ -84,6 +84,7 @@ import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.sdk.RoomManager;
+import com.twilio.video.app.sdk.VideoTrackViewState;
 import com.twilio.video.app.udf.ViewEffect;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
@@ -725,11 +726,13 @@ public class RoomActivity extends BaseActivity {
      */
     private void renderLocalParticipantStub() {
 
+        VideoTrackViewState cameraTrackViewState =
+                cameraVideoTrack != null ? new VideoTrackViewState(cameraVideoTrack, false) : null;
         primaryParticipantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
                 null,
-                cameraVideoTrack,
+                cameraTrackViewState,
                 localAudioTrack == null,
                 cameraCapturer != null
                         && cameraCapturer.getCameraSource()
@@ -1064,8 +1067,8 @@ public class RoomActivity extends BaseActivity {
             primaryParticipantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
-                    primaryParticipant.getScreenTrack(),
                     primaryParticipant.getVideoTrack(),
+                    primaryParticipant.getScreenTrack(),
                     primaryParticipant.isMuted(),
                     primaryParticipant.isMirrored());
         } else {

@@ -13,6 +13,7 @@ import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_ZERO
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.R
 import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import timber.log.Timber
 
@@ -41,14 +42,26 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
 
     private fun updateVideoTrack(participantViewState: ParticipantViewState) {
         thumb.run {
-            if (videoTrack !== participantViewState.videoTrack) {
+            val videoTrackViewState = participantViewState.videoTrack
+            val newVideoTrack = videoTrackViewState?.let { it.videoTrack }
+            if (videoTrack !== newVideoTrack) {
                 removeRender(videoTrack, this)
-                videoTrack = participantViewState.videoTrack
+                videoTrack = newVideoTrack
                 videoTrack?.let { videoTrack ->
-                    setState(ParticipantView.State.VIDEO)
+                    setVideoState(videoTrackViewState)
                     videoTrack.addRenderer(this)
                 } ?: setState(ParticipantView.State.NO_VIDEO)
+            } else {
+                setVideoState(videoTrackViewState)
             }
+        }
+    }
+
+    private fun ParticipantThumbView.setVideoState(videoTrackViewState: VideoTrackViewState?) {
+        if (videoTrackViewState?.let { it.isSwitchedOff } == true) {
+            setState(ParticipantView.State.SWITCHED_OFF)
+        } else {
+            setState(ParticipantView.State.VIDEO)
         }
     }
 
