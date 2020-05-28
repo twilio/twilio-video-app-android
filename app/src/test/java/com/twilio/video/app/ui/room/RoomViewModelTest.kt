@@ -2,7 +2,7 @@ package com.twilio.video.app.ui.room
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.mock
-import com.twilio.video.VideoTrack
+import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
@@ -37,7 +37,7 @@ class RoomViewModelTest {
 
     @Test
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState`() {
-        val expectedVideoTrack = mock<VideoTrack>()
+        val expectedVideoTrack = mock<RemoteVideoTrack>()
 
         roomManager.sendParticipantEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, false))
         scheduler.triggerActions()
@@ -53,7 +53,7 @@ class RoomViewModelTest {
 
     @Test
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState with the switch off set to true`() {
-        val expectedVideoTrack = mock<VideoTrack>()
+        val expectedVideoTrack = mock<RemoteVideoTrack>()
 
         roomManager.sendParticipantEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, true))
         scheduler.triggerActions()
