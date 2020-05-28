@@ -4,6 +4,7 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.NetworkQualityLevel.NETWORK_QUALITY_LEVEL_UNKNOWN
 import com.twilio.video.Participant
+import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.app.sdk.VideoTrackViewState
 
 data class ParticipantViewState(
@@ -17,7 +18,15 @@ data class ParticipantViewState(
     val isDominantSpeaker: Boolean = false,
     val isLocalParticipant: Boolean = false,
     val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN
-)
+) {
+    val isScreenSharing: Boolean get() = screenTrack != null
+
+    fun getRemoteVideoTrack(): RemoteVideoTrack? =
+            if (!isLocalParticipant) videoTrack?.videoTrack as RemoteVideoTrack? else null
+
+    fun getRemoteScreenTrack(): RemoteVideoTrack? =
+            if (!isLocalParticipant) screenTrack?.videoTrack as RemoteVideoTrack? else null
+}
 
 fun buildParticipantViewState(participant: Participant): ParticipantViewState {
     val videoTrack = participant.videoTracks.firstOrNull()?.videoTrack

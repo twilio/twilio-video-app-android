@@ -1,6 +1,7 @@
 package com.twilio.video.app.participant
 
 import com.twilio.video.NetworkQualityLevel
+import com.twilio.video.TrackPriority.HIGH
 import com.twilio.video.app.sdk.VideoTrackViewState
 import timber.log.Timber
 
@@ -100,15 +101,41 @@ class ParticipantManager {
     }
 
     private fun updatePrimaryParticipant() {
-        primaryParticipant = determinePrimaryParticipant()
+        primaryParticipant = retrievePrimaryParticipant()
         Timber.d("Participant Cache: $mutableParticipants")
         Timber.d("Primary Participant: $primaryParticipant")
     }
 
+    private fun retrievePrimaryParticipant(): ParticipantViewState? =
+            determinePrimaryParticipant()?.apply { setTrackPriority(this) }
+
     private fun determinePrimaryParticipant(): ParticipantViewState? {
         return mutableParticipants.find { it.isPinned }
-        ?: mutableParticipants.find { it.screenTrack != null }
-        ?: mutableParticipants.find { it.isDominantSpeaker }
-        ?: mutableParticipants.find { !it.isLocalParticipant }
+                ?: mutableParticipants.find { it.isScreenSharing }
+                ?: mutableParticipants.find { it.isDominantSpeaker }
+                ?: mutableParticipants.find { !it.isLocalParticipant }
+    }
+
+    private fun setTrackPriority(participant: ParticipantViewState) {
+        when {
+            participant.isScreenSharing -> {
+                participant.getRemoteScreenTrack()?.priority = HIGH
+            }
+            participant.isDominantSpeaker -> {
+                participant.getRemoteVideoTrack()?.priority = null
+            }
+            else -> {
+                participant.getRemoteVideoTrack()?.priority = HIGH
+            }
+        }
+
+        clearOldTrackPriorities()
+    }
+
+    private fun clearOldTrackPriorities() {
+        primaryParticipant?.run {
+            getRemoteVideoTrack()?.priority = null
+            getRemoteScreenTrack()?.priority = null
+        }
     }
 }

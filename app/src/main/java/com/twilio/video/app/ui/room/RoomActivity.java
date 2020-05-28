@@ -70,10 +70,12 @@ import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
+import com.twilio.video.LocalTrackPublicationOptions;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Room;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
+import com.twilio.video.TrackPriority;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.app.R;
@@ -559,7 +561,7 @@ public class RoomActivity extends BaseActivity {
                             videoConstraints,
                             CAMERA_TRACK_NAME);
             if (localParticipant != null && cameraVideoTrack != null) {
-                localParticipant.publishTrack(cameraVideoTrack);
+                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
 
                 // enable video settings
                 switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
@@ -590,6 +592,12 @@ public class RoomActivity extends BaseActivity {
                 cameraVideoTrack != null
                         ? R.drawable.ic_videocam_white_24px
                         : R.drawable.ic_videocam_off_gray_24px);
+    }
+
+    private void publishVideoTrack(LocalVideoTrack videoTrack, TrackPriority trackPriority) {
+        LocalTrackPublicationOptions localTrackPublicationOptions =
+                new LocalTrackPublicationOptions(trackPriority);
+        localParticipant.publishTrack(videoTrack, localTrackPublicationOptions);
     }
 
     private boolean isNetworkQualityEnabled() {
@@ -686,7 +694,7 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack == null && !isVideoMuted) {
             setupLocalVideoTrack();
             if (room != null && localParticipant != null)
-                localParticipant.publishTrack(cameraVideoTrack);
+                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
         }
     }
 
@@ -862,7 +870,7 @@ public class RoomActivity extends BaseActivity {
                     screenVideoTrack.getName(), getString(R.string.screen_video_track));
 
             if (localParticipant != null) {
-                localParticipant.publishTrack(screenVideoTrack);
+                publishVideoTrack(screenVideoTrack, TrackPriority.HIGH);
             }
         } else {
             Snackbar.make(
@@ -1004,7 +1012,7 @@ public class RoomActivity extends BaseActivity {
         if (localParticipant != null) {
             if (cameraVideoTrack != null) {
                 Timber.d("Camera track: %s", cameraVideoTrack);
-                localParticipant.publishTrack(cameraVideoTrack);
+                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
             }
 
             if (localAudioTrack != null) {
