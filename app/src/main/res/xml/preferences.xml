@@ -96,6 +96,15 @@
         <EditTextPreference
             android:key="pref_display_name"
             android:title="@string/settings_screen_identity"/>
+        <PreferenceCategory android:title="@string/settings_screen_bandwidth_profile">
+            <ListPreference
+                android:key="pref_bandwidth_profile_mode"
+                android:entries="@array/settings_screen_bandwidth_profile_modes"
+                android:entryValues="@array/settings_screen_bandwidth_profile_mode_values"
+                android:summary="%s"
+                android:title="@string/settings_screen_bandwidth_profile_mode"
+                android:negativeButtonText="@null"/>
+        </PreferenceCategory>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">
         <Preference

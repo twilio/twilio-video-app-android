@@ -45,6 +45,7 @@ import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.get
 import com.twilio.video.app.ui.ScreenSelector
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -118,6 +119,12 @@ class SettingsActivity : BaseActivity() {
             }
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).summary = Video.getVersion()
             findPreference(Preferences.LOGOUT).onPreferenceClickListener = Preference.OnPreferenceClickListener { logout(); true }
+            val bandwidthProfileModeDefaultIndex =
+                    resources.getStringArray(R.array.settings_screen_bandwidth_profile_mode_values)
+                            .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
+                                    Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT))
+            (findPreference(Preferences.BANDWIDTH_PROFILE_MODE) as ListPreference)
+                    .setValueIndex(bandwidthProfileModeDefaultIndex)
         }
 
         override fun onDisplayPreferenceDialog(preference: Preference?) {

@@ -24,6 +24,7 @@ import com.twilio.video.VideoCodec
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.get
 import com.twilio.video.app.data.Preferences.MAX_VIDEO_TRACKS
 import com.twilio.video.app.data.Preferences.MAX_VIDEO_TRACKS_DEFAULT
 import com.twilio.video.app.data.api.TokenService
@@ -48,11 +49,11 @@ class VideoClient(
                     Preferences.ENABLE_INSIGHTS,
                     Preferences.ENABLE_INSIGHTS_DEFAULT)
 
-            val enableAutomaticTrackSubscription: Boolean = getPreferenceByKeyWithDefault(
+            val enableAutomaticTrackSubscription = sharedPreferences.get(
                     Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION,
                     Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT)
 
-            val enableDominantSpeaker: Boolean = getPreferenceByKeyWithDefault(
+            val enableDominantSpeaker = sharedPreferences.get(
                     Preferences.ENABLE_DOMINANT_SPEAKER,
                     Preferences.ENABLE_DOMINANT_SPEAKER_DEFAULT)
 
@@ -65,12 +66,15 @@ class VideoClient(
                     NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
 
             val maxTracks = sharedPreferences.getLong(MAX_VIDEO_TRACKS, MAX_VIDEO_TRACKS_DEFAULT)
-            val bandwidthProfileOptions = BandwidthProfileOptions(
-                        VideoBandwidthProfileOptions.Builder()
-                                .mode(BandwidthProfileMode.COLLABORATION)
-                                .maxTracks(maxTracks)
-                                .dominantSpeakerPriority(TrackPriority.STANDARD)
-                                .build())
+            val videoBandwidthProfileOptionsBuilder = VideoBandwidthProfileOptions.Builder()
+
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
+                    Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT)?.let {
+                videoBandwidthProfileOptionsBuilder.mode(getBandwidthProfileMode(it))
+            }
+            videoBandwidthProfileOptionsBuilder.maxTracks(maxTracks)
+            videoBandwidthProfileOptionsBuilder.dominantSpeakerPriority(TrackPriority.STANDARD)
+            val bandwidthProfileOptions = BandwidthProfileOptions(videoBandwidthProfileOptionsBuilder.build())
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
                     .roomName(roomName)
@@ -101,8 +105,13 @@ class VideoClient(
                     roomListener)
     }
 
-    private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
-        return sharedPreferences.getBoolean(key, defaultValue)
+    private fun getBandwidthProfileMode(modeString: String): BandwidthProfileMode? {
+        return when (modeString) {
+            BandwidthProfileMode.COLLABORATION.name -> BandwidthProfileMode.COLLABORATION
+            BandwidthProfileMode.GRID.name -> BandwidthProfileMode.GRID
+            BandwidthProfileMode.PRESENTATION.name -> BandwidthProfileMode.PRESENTATION
+            else -> null
+        }
     }
 
     private fun getVideoCodecPreference(key: String): VideoCodec {

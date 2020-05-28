@@ -86,6 +86,19 @@
         <item>1920x1080</item>
     </string-array>
 
+    <string-array name="settings_screen_bandwidth_profile_modes">
+        <item>Server Default</item>
+        <item>Collaboration</item>
+        <item>Grid</item>
+        <item>Presentation</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_mode_values">
+        <item>none</item>
+        <item>COLLABORATION</item>
+        <item>GRID</item>
+        <item>PRESENTATION</item>
+    </string-array>
+
     <string name="stats_enable_in_settings">Enable in Settings</string>
     <string name="enable_ice">Enable ICE Options</string>
     <string name="ice_options">Enable ICE options</string>
@@ -162,6 +175,8 @@
     <string name="stats_disabled">Stats disabled</string>
     <string name="profile_picture">Profile picture</string>
     <string name="number">Number</string>
+    <string name="settings_screen_bandwidth_profile">Bandwidth Profile</string>
+    <string name="settings_screen_bandwidth_profile_mode">Mode</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>
