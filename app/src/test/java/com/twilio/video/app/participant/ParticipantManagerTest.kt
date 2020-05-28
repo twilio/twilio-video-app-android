@@ -160,7 +160,7 @@ class ParticipantManagerTest {
     }
 
     @Test
-    fun `primary participant VideoTrack priority should be null when dominant speaker`() {
+    fun `primary participant VideoTrack priority should be null when dominant speaker is set`() {
         val dominantSpeaker = setupThreeParticipantScenario()
 
         participantManager.changeDominantSpeaker(dominantSpeaker.sid)
@@ -170,7 +170,7 @@ class ParticipantManagerTest {
     }
 
     @Test
-    fun `primary participant VideoTrack priority should be not be set when dominant speaker has a null video track`() {
+    fun `primary participant VideoTrack priority should not be set when dominant speaker has a null video track`() {
         val dominantSpeaker = setupThreeParticipantScenario()
 
         participantManager.changeDominantSpeaker(dominantSpeaker.sid)
