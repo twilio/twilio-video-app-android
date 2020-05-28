@@ -1,8 +1,7 @@
 package com.twilio.video.app.participant
 
 import com.twilio.video.NetworkQualityLevel
-import com.twilio.video.RemoteVideoTrack
-import com.twilio.video.TrackPriority
+import com.twilio.video.TrackPriority.HIGH
 import com.twilio.video.app.sdk.VideoTrackViewState
 import timber.log.Timber
 
@@ -119,26 +118,24 @@ class ParticipantManager {
 
     private fun setTrackPriority(participant: ParticipantViewState) {
         when {
-            participant.isPinned -> {
-                setVideoTrackPriority(participant)
-            }
             participant.isScreenSharing -> {
-                (participant.screenTrack?.videoTrack as RemoteVideoTrack?)?.priority =
-                        TrackPriority.HIGH
+                participant.getRemoteScreenTrack()?.priority = HIGH
             }
             participant.isDominantSpeaker -> {
-                setVideoTrackPriority(participant, null)
+                participant.getRemoteVideoTrack()?.priority = null
             }
             else -> {
-                setVideoTrackPriority(participant)
+                participant.getRemoteVideoTrack()?.priority = HIGH
             }
         }
+
+        clearOldTrackPriorities()
     }
 
-    private fun setVideoTrackPriority(
-        participant: ParticipantViewState,
-        priority: TrackPriority? = TrackPriority.HIGH
-    ) {
-        (participant.videoTrack?.videoTrack as RemoteVideoTrack?)?.priority = priority
+    private fun clearOldTrackPriorities() {
+        primaryParticipant?.run {
+            getRemoteVideoTrack()?.priority = null
+            getRemoteScreenTrack()?.priority = null
+        }
     }
 }

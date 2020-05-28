@@ -1,10 +1,13 @@
 package com.twilio.video.app.participant
 
+import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.TrackPriority
+import com.twilio.video.VideoTrack
 import com.twilio.video.app.sdk.VideoTrackViewState
 import junitparams.JUnitParamsRunner
 import org.hamcrest.CoreMatchers.`is`
@@ -137,6 +140,26 @@ class ParticipantManagerTest {
     }
 
     @Test
+    fun `primary participant VideoTrack priority should not be set when the local participant is screen sharing`() {
+        setupThreeParticipantScenario()
+
+        val screenTrack = mock<VideoTrack>()
+        participantManager.updateParticipantScreenTrack(localParticipant.sid,
+            VideoTrackViewState(screenTrack))
+
+        verifyZeroInteractions(screenTrack)
+    }
+
+    @Test
+    fun `primary participant VideoTrack priority should not be set when the local participant is pinned`() {
+        setupThreeParticipantScenario()
+
+        participantManager.changePinnedParticipant(localParticipant.sid)
+
+        verifyZeroInteractions(localParticipant.videoTrack!!.videoTrack)
+    }
+
+    @Test
     fun `primary participant VideoTrack priority should be null when dominant speaker`() {
         val dominantSpeaker = setupThreeParticipantScenario()
 
@@ -169,7 +192,7 @@ class ParticipantManagerTest {
     }
 
     @Test
-    fun `primary participant VideoTrack priority should note be set when there is one remote participant with a null video track`() {
+    fun `primary participant VideoTrack priority should not be set when there is one remote participant with a null video track`() {
         val participant2 = ParticipantViewState("2", "Participant 2",
                 videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
         participantManager.addParticipant(localParticipant)
@@ -179,6 +202,64 @@ class ParticipantManagerTest {
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack
         assertThat(videoTrack, `is`(nullValue()))
+    }
+
+    @Test
+    fun `the old primary participant VideoTrack priority should be reset to null when a new participant is assigned`() {
+        val participant3 = setupThreeParticipantScenario()
+
+        participantManager.changePinnedParticipant(participant3.sid)
+        participantManager.changePinnedParticipant("2")
+
+        val videoTrack = participant3.videoTrack!!.videoTrack as RemoteVideoTrack
+        inOrder(videoTrack).run {
+            verify(videoTrack).priority = TrackPriority.HIGH
+            verify(videoTrack).priority = null
+        }
+    }
+
+    @Test
+    fun `the old primary participant screen track priority should be reset to null when a new participant is assigned`() {
+        val participant3 = setupThreeParticipantScenario()
+        val screenTrack = mock<RemoteVideoTrack>()
+
+        participantManager.updateParticipantScreenTrack(participant3.sid,
+                VideoTrackViewState(screenTrack))
+        participantManager.changePinnedParticipant("2")
+
+        inOrder(screenTrack).run {
+            verify(screenTrack).priority = TrackPriority.HIGH
+            verify(screenTrack).priority = null
+        }
+    }
+
+    @Test
+    fun `the old primary participant VideoTrack priority should be reset to null when the local participant is assigned`() {
+        val participant3 = setupThreeParticipantScenario()
+
+        participantManager.changePinnedParticipant(participant3.sid)
+        participantManager.changePinnedParticipant(localParticipant.sid)
+
+        val videoTrack = participant3.videoTrack!!.videoTrack as RemoteVideoTrack
+        inOrder(videoTrack).run {
+            verify(videoTrack).priority = TrackPriority.HIGH
+            verify(videoTrack).priority = null
+        }
+    }
+
+    @Test
+    fun `the old primary participant screen track priority should be reset to null when the local participant is assigned`() {
+        setupThreeParticipantScenario()
+        val screenTrack = mock<RemoteVideoTrack>()
+
+        participantManager.updateParticipantScreenTrack("2",
+                VideoTrackViewState(screenTrack))
+        participantManager.changePinnedParticipant(localParticipant.sid)
+
+        inOrder(screenTrack).run {
+            verify(screenTrack).priority = TrackPriority.HIGH
+            verify(screenTrack).priority = null
+        }
     }
 
     private fun setupExistingDominantSpeakerScenario() {
