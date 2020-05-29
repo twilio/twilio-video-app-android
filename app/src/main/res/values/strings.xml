@@ -178,6 +178,7 @@
     <string name="settings_screen_bandwidth_profile">Bandwidth Profile</string>
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>
     <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
+    <string name="settings_screen_max_video_tracks">Max Video Tracks</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>
