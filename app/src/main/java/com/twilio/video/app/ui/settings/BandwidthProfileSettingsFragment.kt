@@ -2,9 +2,7 @@ package com.twilio.video.app.ui.settings
 
 import android.os.Bundle
 import com.twilio.video.app.R
-import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.get
 
 class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -13,25 +11,10 @@ class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
         setListPreferenceValue(R.array.settings_screen_bandwidth_profile_mode_values,
             Preferences.BANDWIDTH_PROFILE_MODE,
             Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT)
-
-        (findPreference(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE) as NumberPreference).apply {
-            val maxTracks = sharedPreferences
-                .get(
-                    Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
-                    Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT)
-            summary = maxTracks.toString()
-            number = maxTracks
-        }
-
-        (findPreference(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS) as NumberPreference).apply {
-            val maxTracks = sharedPreferences
-                .get(
-                    Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
-                    Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT)
-            summary = maxTracks.toString()
-            number = maxTracks
-        }
-
+        setNumberPreferenceValue(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
+            Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT)
+        setNumberPreferenceValue(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
+            Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT)
         setListPreferenceValue(R.array.settings_screen_bandwidth_profile_dominant_speaker_priority_values,
             Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
             Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT)

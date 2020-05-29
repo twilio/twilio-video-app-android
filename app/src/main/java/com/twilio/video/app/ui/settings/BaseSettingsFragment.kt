@@ -41,9 +41,25 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    /*
+     * This function sets the ListPreference value based on the current or default
+     * value of the preference.
+     */
     protected fun setListPreferenceValue(arrayId: Int, key: String, defaultValue: String) {
-        val defaultValueIndex = resources
+        val valueIndex = resources
             .getStringArray(arrayId).indexOf(sharedPreferences.get(key, defaultValue))
-        (findPreference(key) as ListPreference).setValueIndex(defaultValueIndex)
+        (findPreference(key) as ListPreference).setValueIndex(valueIndex)
+    }
+
+    /*
+     * This function sets the NumberPreference value based on the current or default value
+     * of the preference.
+     */
+    protected fun setNumberPreferenceValue(key: String, defaultValue: Int) {
+        (findPreference(key) as NumberPreference).apply {
+            val numberValue = sharedPreferences.get(key, defaultValue)
+            summary = numberValue.toString()
+            number = numberValue
+        }
     }
 }
