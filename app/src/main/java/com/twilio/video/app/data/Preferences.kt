@@ -69,7 +69,13 @@ object Preferences {
     const val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY = "pref_bandwidth_profile_dominant_speaker_priority"
     val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT = TrackPriority.STANDARD.name
     const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE = "pref_bandwidth_profile_track_switch_off_mode"
-    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT = "SERVER_DEFAULT"
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT = "Server Default"
+    const val BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_low_track_priority_dimensions"
+    const val BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = "Server Default"
+    const val BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_standard_track_priority_dimensions"
+    const val BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = "Server Default"
+    const val BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_high_track_priority_dimensions"
+    const val BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = "Server Default"
 }
 
 /*

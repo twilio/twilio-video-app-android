@@ -22,12 +22,14 @@ import com.twilio.video.TrackSwitchOffMode
 import com.twilio.video.Video
 import com.twilio.video.VideoBandwidthProfileOptions
 import com.twilio.video.VideoCodec
+import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.get
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
+import timber.log.Timber
 
 class VideoClient(
     private val context: Context,
@@ -86,6 +88,32 @@ class VideoClient(
                 Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
                 videoBandwidthProfileOptionsBuilder.trackSwitchOffMode(getTrackSwitchOffMode(it))
             }
+            val renderDimensions = mutableMapOf<TrackPriority, VideoDimensions>()
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT).let {
+                Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
+                    val (width, height) = match.destructured
+                    renderDimensions[TrackPriority.LOW] = VideoDimensions(width.toInt(),
+                        height.toInt())
+                }
+            }
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT).let {
+                Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
+                    val (width, height) = match.destructured
+                    renderDimensions[TrackPriority.STANDARD] = VideoDimensions(width.toInt(),
+                        height.toInt())
+                }
+            }
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT).let {
+                Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
+                    val (width, height) = match.destructured
+                    renderDimensions[TrackPriority.HIGH] = VideoDimensions(width.toInt(),
+                        height.toInt())
+                }
+            }
+            videoBandwidthProfileOptionsBuilder.renderDimensions(renderDimensions)
             val bandwidthProfileOptions = BandwidthProfileOptions(videoBandwidthProfileOptionsBuilder.build())
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
