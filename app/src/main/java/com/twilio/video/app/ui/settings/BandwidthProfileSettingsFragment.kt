@@ -55,5 +55,26 @@ class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
                     Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT))
         (findPreference(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE) as ListPreference)
             .setValueIndex(bandwidthProfileTrackSwitchOffModeDefaultIndex)
+        val bandwidthProfileLowTrackPriorityRenderDimensionsDefaultIndex =
+            resources.getStringArray(R.array.settings_screen_bandwidth_profile_render_dimensions)
+                .indexOf(sharedPreferences.get(
+                    Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                    Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT))
+        (findPreference(Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS) as ListPreference)
+            .setValueIndex(bandwidthProfileLowTrackPriorityRenderDimensionsDefaultIndex)
+        val bandwidthProfileStandardTrackPriorityRenderDimensionsDefaultIndex =
+            resources.getStringArray(R.array.settings_screen_bandwidth_profile_render_dimensions)
+                .indexOf(sharedPreferences.get(
+                    Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                    Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT))
+        (findPreference(Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS) as ListPreference)
+            .setValueIndex(bandwidthProfileStandardTrackPriorityRenderDimensionsDefaultIndex)
+        val bandwidthProfileHighTrackPriorityRenderDimensionsDefaultIndex =
+            resources.getStringArray(R.array.settings_screen_bandwidth_profile_render_dimensions)
+                .indexOf(sharedPreferences.get(
+                    Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                    Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT))
+        (findPreference(Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS) as ListPreference)
+            .setValueIndex(bandwidthProfileHighTrackPriorityRenderDimensionsDefaultIndex)
     }
 }

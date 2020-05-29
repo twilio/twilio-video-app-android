@@ -93,7 +93,7 @@
         <item>Presentation</item>
     </string-array>
     <string-array name="settings_screen_bandwidth_profile_mode_values">
-        <item>SERVER_DEFAULT</item>
+        <item>Server Default</item>
         <item>COLLABORATION</item>
         <item>GRID</item>
         <item>PRESENTATION</item>
@@ -105,7 +105,7 @@
         <item>High</item>
     </string-array>
     <string-array name="settings_screen_bandwidth_profile_dominant_speaker_priority_values">
-        <item>SERVER_DEFAULT</item>
+        <item>Server Default</item>
         <item>LOW</item>
         <item>STANDARD</item>
         <item>HIGH</item>
@@ -117,7 +117,7 @@
         <item>Detected</item>
     </string-array>
     <string-array name="settings_screen_bandwidth_profile_track_switch_mode_values">
-        <item>SERVER_DEFAULT</item>
+        <item>Server Default</item>
         <item>DISABLED</item>
         <item>PREDICTED</item>
         <item>DETECTED</item>
