@@ -77,7 +77,10 @@ class VideoClient(
                 Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT).let {
                 videoBandwidthProfileOptionsBuilder.maxTracks(it.toLong())
             }
-            videoBandwidthProfileOptionsBuilder.dominantSpeakerPriority(TrackPriority.STANDARD)
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
+                Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT).let {
+                videoBandwidthProfileOptionsBuilder.dominantSpeakerPriority(getDominantSpeakerPriority(it))
+            }
             val bandwidthProfileOptions = BandwidthProfileOptions(videoBandwidthProfileOptionsBuilder.build())
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
@@ -104,6 +107,15 @@ class VideoClient(
                     context,
                     connectOptionsBuilder.build(),
                     roomListener)
+    }
+
+    private fun getDominantSpeakerPriority(dominantSpeakerPriorityString: String): TrackPriority? {
+        return when (dominantSpeakerPriorityString) {
+            TrackPriority.LOW.name ->TrackPriority.LOW
+            TrackPriority.STANDARD.name ->TrackPriority.STANDARD
+            TrackPriority.HIGH.name ->TrackPriority.HIGH
+            else -> null
+        }
     }
 
     private fun getBandwidthProfileMode(modeString: String): BandwidthProfileMode? {

@@ -18,6 +18,7 @@ package com.twilio.video.app.data
 import android.content.SharedPreferences
 import com.twilio.video.BandwidthProfileMode
 import com.twilio.video.OpusCodec
+import com.twilio.video.TrackPriority
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.data.api.model.Topology
@@ -65,6 +66,8 @@ object Preferences {
     const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT = 2400
     const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS = "pref_bandwidth_profile_max_video_tracks"
     const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT = 5
+    const val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY = "pref_bandwidth_profile_dominant_speaker_priority"
+    val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT = TrackPriority.STANDARD.name
 }
 
 /*

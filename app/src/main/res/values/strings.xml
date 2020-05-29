@@ -98,6 +98,18 @@
         <item>GRID</item>
         <item>PRESENTATION</item>
     </string-array>
+    <string-array name="settings_screen_bandwidth_profile_dominant_speaker_priorities">
+        <item>Server Default</item>
+        <item>Low</item>
+        <item>Standard</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_dominant_speaker_priority_values">
+        <item>none</item>
+        <item>LOW</item>
+        <item>STANDARD</item>
+        <item>HIGH</item>
+    </string-array>
 
     <string name="stats_enable_in_settings">Enable in Settings</string>
     <string name="enable_ice">Enable ICE Options</string>
@@ -179,6 +191,7 @@
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>
     <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
     <string name="settings_screen_max_video_tracks">Max Video Tracks</string>
+    <string name="settings_screen_bandwidth_profile_dominant_speaker_priority">Dominant Speaker Priority</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>

@@ -112,6 +112,13 @@
                 style="@style/AppTheme.Preference.DialogPreference"
                 android:key="pref_bandwidth_profile_max_video_tracks"
                 android:title="@string/settings_screen_max_video_tracks" />
+            <ListPreference
+                android:key="pref_bandwidth_profile_dominant_speaker_priority"
+                android:entries="@array/settings_screen_bandwidth_profile_dominant_speaker_priorities"
+                android:entryValues="@array/settings_screen_bandwidth_profile_dominant_speaker_priority_values"
+                android:summary="%s"
+                android:title="@string/settings_screen_bandwidth_profile_dominant_speaker_priority"
+                android:negativeButtonText="@null"/>
         </PreferenceCategory>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">

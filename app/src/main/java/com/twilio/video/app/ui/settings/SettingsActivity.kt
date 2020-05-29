@@ -139,6 +139,12 @@ class SettingsActivity : BaseActivity() {
                 summary = maxTracks.toString()
                 number = maxTracks
             }
+            val bandwidthProfileDominantSpeakerPriorityDefaultIndex =
+                resources.getStringArray(R.array.settings_screen_bandwidth_profile_dominant_speaker_priority_values)
+                    .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
+                        Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT))
+            (findPreference(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY) as ListPreference)
+                .setValueIndex(bandwidthProfileDominantSpeakerPriorityDefaultIndex)
         }
 
         override fun onDisplayPreferenceDialog(preference: Preference?) {
