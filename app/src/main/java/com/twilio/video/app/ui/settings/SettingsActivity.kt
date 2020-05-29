@@ -21,7 +21,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.fragment.app.DialogFragment
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -42,8 +41,6 @@ import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.base.BaseActivity
-import com.twilio.video.app.data.NumberPreference
-import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.ScreenSelector
 import dagger.android.support.AndroidSupportInjection
@@ -96,7 +93,7 @@ class SettingsActivity : BaseActivity(),
         return super.onOptionsItemSelected(item)
     }
 
-    class SettingsFragment : PreferenceFragmentCompat() {
+    class SettingsFragment : BaseSettingsFragment() {
 
         @Inject
         internal lateinit var sharedPreferences: SharedPreferences
@@ -105,11 +102,6 @@ class SettingsActivity : BaseActivity(),
         @Inject
         internal lateinit var authenticator: Authenticator
         private var identityPreference: EditTextPreference? = null
-
-        override fun onAttach(context: Context) {
-            AndroidSupportInjection.inject(this)
-            super.onAttach(context)
-        }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             // Add our preference from resources
@@ -141,25 +133,6 @@ class SettingsActivity : BaseActivity(),
             }
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).summary = Video.getVersion()
             findPreference(Preferences.LOGOUT).onPreferenceClickListener = Preference.OnPreferenceClickListener { logout(); true }
-        }
-
-        override fun onDisplayPreferenceDialog(preference: Preference?) {
-            if (preference == null) {
-                return
-            }
-
-            // show custom dialog preference
-            if (preference is NumberPreference) {
-                val dialogFragment: DialogFragment?
-                dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.key)
-
-                if (dialogFragment != null) {
-                    dialogFragment.setTargetFragment(this, 0)
-                    dialogFragment.show(requireFragmentManager(), PREFERENCE_FRAGMENT_TAG)
-                }
-            } else {
-                super.onDisplayPreferenceDialog(preference)
-            }
         }
 
         private fun setupCodecListPreference(
@@ -201,10 +174,6 @@ class SettingsActivity : BaseActivity(),
                 startActivity(loginIntent)
                 activity.finishAffinity()
             }
-        }
-
-        companion object {
-            private const val PREFERENCE_FRAGMENT_TAG = "android.support.v7.preference.PreferenceFragment.DIALOG"
         }
     }
 
