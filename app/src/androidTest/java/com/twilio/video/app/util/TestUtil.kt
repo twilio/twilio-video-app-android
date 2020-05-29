@@ -32,6 +32,8 @@ fun getTargetContext(): Context = InstrumentationRegistry.getInstrumentation().t
 
 fun getString(@IdRes stringId: Int) = getTargetContext().getString(stringId)
 
+fun getStringArray(@IdRes stringArrayId: Int) = getTargetContext().resources.getStringArray(stringArrayId)
+
 fun retrieveEmailCredentials(): EmailCredentials {
     val reader = InputStreamReader(InstrumentationRegistry.getInstrumentation().context.assets.open("Credentials/TestCredentials.json"))
     val jsonReader = JsonReader(reader)
