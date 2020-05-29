@@ -145,6 +145,12 @@ class SettingsActivity : BaseActivity() {
                         Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT))
             (findPreference(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY) as ListPreference)
                 .setValueIndex(bandwidthProfileDominantSpeakerPriorityDefaultIndex)
+            val bandwidthProfileTrackSwitchOffModeDefaultIndex =
+                resources.getStringArray(R.array.settings_screen_bandwidth_profile_track_switch_mode_values)
+                    .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
+                        Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT))
+            (findPreference(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE) as ListPreference)
+                .setValueIndex(bandwidthProfileTrackSwitchOffModeDefaultIndex)
         }
 
         override fun onDisplayPreferenceDialog(preference: Preference?) {

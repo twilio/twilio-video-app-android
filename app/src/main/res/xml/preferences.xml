@@ -119,6 +119,13 @@
                 android:summary="%s"
                 android:title="@string/settings_screen_bandwidth_profile_dominant_speaker_priority"
                 android:negativeButtonText="@null"/>
+            <ListPreference
+                android:key="pref_bandwidth_profile_track_switch_off_mode"
+                android:entries="@array/settings_screen_bandwidth_profile_track_switch_modes"
+                android:entryValues="@array/settings_screen_bandwidth_profile_track_switch_mode_values"
+                android:summary="%s"
+                android:title="@string/settings_screen_bandwidth_profile_track_switch_mode"
+                android:negativeButtonText="@null"/>
         </PreferenceCategory>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">
