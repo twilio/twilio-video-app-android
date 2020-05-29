@@ -1,6 +1,7 @@
 package com.twilio.video.app.ui.settings
 
 import android.os.Bundle
+import android.view.MenuItem
 import com.twilio.video.app.R
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
@@ -8,6 +9,8 @@ import com.twilio.video.app.data.Preferences
 class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.bandwidth_profile_preferences)
+
+        setHasOptionsMenu(true)
 
         setListPreferenceValue(R.array.settings_screen_bandwidth_profile_mode_values,
             Preferences.BANDWIDTH_PROFILE_MODE,
@@ -37,5 +40,13 @@ class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
         super.onResume()
 
         (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            parentFragmentManager.popBackStack()
+            return true
+        }
+        return false
     }
 }
