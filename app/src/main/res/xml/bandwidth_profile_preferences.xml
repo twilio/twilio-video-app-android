@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/settings_screen_bandwidth_profile">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_screen_bandwidth_profile"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <ListPreference
         android:key="pref_bandwidth_profile_mode"
         android:entries="@array/settings_screen_bandwidth_profile_modes"
@@ -36,6 +39,20 @@
             android:entryValues="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:summary="%s"
             android:title="@string/settings_screen_bandwidth_profile_low_track_priority"
+            android:negativeButtonText="@null"/>
+        <ListPreference
+            android:key="pref_bandwidth_profile_standard_track_priority_dimensions"
+            android:entries="@array/settings_screen_bandwidth_profile_render_dimensions"
+            android:entryValues="@array/settings_screen_bandwidth_profile_render_dimensions"
+            android:summary="%s"
+            android:title="@string/settings_screen_bandwidth_profile_standard_track_priority"
+            android:negativeButtonText="@null"/>
+        <ListPreference
+            android:key="pref_bandwidth_profile_high_track_priority_dimensions"
+            android:entries="@array/settings_screen_bandwidth_profile_render_dimensions"
+            android:entryValues="@array/settings_screen_bandwidth_profile_render_dimensions"
+            android:summary="%s"
+            android:title="@string/settings_screen_bandwidth_profile_high_track_priority"
             android:negativeButtonText="@null"/>
     </PreferenceCategory>
 </PreferenceScreen>
