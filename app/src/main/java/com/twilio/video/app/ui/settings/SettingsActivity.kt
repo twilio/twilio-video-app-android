@@ -18,7 +18,6 @@ package com.twilio.video.app.ui.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.twilio.video.app.base.BaseActivity
@@ -54,11 +53,9 @@ class SettingsActivity : BaseActivity(),
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        if (supportFragmentManager.fragments.size == 0) finish()
     }
 }

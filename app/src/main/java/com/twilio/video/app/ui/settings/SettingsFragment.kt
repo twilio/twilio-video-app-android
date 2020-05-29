@@ -2,6 +2,7 @@ package com.twilio.video.app.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -38,6 +39,8 @@ class SettingsFragment : BaseSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         // Add our preference from resources
         addPreferencesFromResource(R.xml.preferences)
+
+        setHasOptionsMenu(true)
 
         setupCodecListPreference(
             VideoCodec::class.java,
@@ -112,5 +115,13 @@ class SettingsFragment : BaseSettingsFragment() {
         super.onResume()
 
         (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            requireActivity().finish()
+            return true
+        }
+        return false
     }
 }
