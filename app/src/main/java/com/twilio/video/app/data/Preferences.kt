@@ -63,6 +63,8 @@ object Preferences {
     const val RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT = false
     const val BANDWIDTH_PROFILE_MODE = "pref_bandwidth_profile_mode"
     val BANDWIDTH_PROFILE_MODE_DEFAULT = BandwidthProfileMode.COLLABORATION.name
+    const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE = "pref_bandwidth_profile_max_subscription_bitrate"
+    const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT = 2400
 }
 
 /*
@@ -76,6 +78,6 @@ inline fun <reified T> SharedPreferences.get(key: String, defaultValue: T): T {
         is Int -> getInt(key, defaultValue) as T
         is Long -> getLong(key, defaultValue) as T
         is String -> getString(key, defaultValue) as T
-        else -> defaultValue
+        else -> throw IllegalArgumentException("Attempted to get preference with unsupported type")
     }
 }

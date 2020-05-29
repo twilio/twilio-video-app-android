@@ -104,6 +104,10 @@
                 android:summary="%s"
                 android:title="@string/settings_screen_bandwidth_profile_mode"
                 android:negativeButtonText="@null"/>
+            <com.twilio.video.app.data.NumberPreference
+                style="@style/AppTheme.Preference.DialogPreference"
+                android:key="pref_bandwidth_profile_max_subscription_bitrate"
+                android:title="@string/settings_screen_max_subscription_bitrate" />
         </PreferenceCategory>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">

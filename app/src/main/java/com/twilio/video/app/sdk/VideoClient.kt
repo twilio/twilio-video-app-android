@@ -69,8 +69,12 @@ class VideoClient(
             val videoBandwidthProfileOptionsBuilder = VideoBandwidthProfileOptions.Builder()
 
             sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
-                    Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT)?.let {
+                    Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT).let {
                 videoBandwidthProfileOptionsBuilder.mode(getBandwidthProfileMode(it))
+            }
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
+                    Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT).let {
+                videoBandwidthProfileOptionsBuilder.maxSubscriptionBitrate(it.toLong())
             }
             videoBandwidthProfileOptionsBuilder.maxTracks(maxTracks)
             videoBandwidthProfileOptionsBuilder.dominantSpeakerPriority(TrackPriority.STANDARD)
@@ -78,26 +82,23 @@ class VideoClient(
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
                     .roomName(roomName)
+                    .enableInsights(enableInsights)
                     .enableAutomaticSubscription(enableAutomaticTrackSubscription)
                     .enableDominantSpeaker(enableDominantSpeaker)
-                    .enableInsights(enableInsights)
                     .enableNetworkQuality(isNetworkQualityEnabled)
                     .networkQualityConfiguration(configuration)
                     .bandwidthProfile(bandwidthProfileOptions)
 
-            val maxVideoBitrate = sharedPreferences.getInt(
+            val maxVideoBitrate = sharedPreferences.get(
                     Preferences.MAX_VIDEO_BITRATE,
                     Preferences.MAX_VIDEO_BITRATE_DEFAULT)
 
-            val maxAudioBitrate = sharedPreferences.getInt(
+            val maxAudioBitrate = sharedPreferences.get(
                     Preferences.MAX_AUDIO_BITRATE,
                     Preferences.MAX_AUDIO_BITRATE_DEFAULT)
-
-            val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
-
+            connectOptionsBuilder.encodingParameters(EncodingParameters(maxAudioBitrate, maxVideoBitrate))
             connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
             connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
-            connectOptionsBuilder.encodingParameters(encodingParameters)
 
             return Video.connect(
                     context,
