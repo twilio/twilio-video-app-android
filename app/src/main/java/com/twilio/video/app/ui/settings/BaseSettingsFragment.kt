@@ -2,7 +2,6 @@ package com.twilio.video.app.ui.settings
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.fragment.app.DialogFragment
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -29,12 +28,9 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
 
         // show custom dialog preference
         if (preference is NumberPreference) {
-            val dialogFragment: DialogFragment?
-            dialogFragment = NumberPreferenceDialogFragmentCompat.newInstance(preference.key)
-
-            if (dialogFragment != null) {
-                dialogFragment.setTargetFragment(this, 0)
-                dialogFragment.show(requireFragmentManager(), tag)
+            NumberPreferenceDialogFragmentCompat.newInstance(preference.key)?.let{ dialog ->
+                dialog.setTargetFragment(this, 0)
+                dialog.show(requireFragmentManager(), tag)
             }
         } else {
             super.onDisplayPreferenceDialog(preference)
