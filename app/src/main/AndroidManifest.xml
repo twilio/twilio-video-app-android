@@ -53,7 +53,6 @@
         </activity>
         <activity android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.room.RoomActivity"
-            android:label="@string/settings"
             android:theme="@style/AppTheme.Settings" />
         <service android:name=".ui.room.VideoService"/>
     </application>

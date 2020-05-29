@@ -2,6 +2,7 @@ package com.twilio.video.app.ui.settings
 
 import android.os.Bundle
 import com.twilio.video.app.R
+import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 
 class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
@@ -30,5 +31,11 @@ class BandwidthProfileSettingsFragment : BaseSettingsFragment() {
         setListPreferenceValue(R.array.settings_screen_bandwidth_profile_render_dimensions,
             Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
             Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
     }
 }
