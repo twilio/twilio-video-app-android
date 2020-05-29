@@ -40,14 +40,10 @@ class RoomManager(
         room?.disconnect()
     }
 
-    suspend fun connect(
-        identity: String,
-        roomName: String,
-        isNetworkQualityEnabled: Boolean
-    ) {
+    suspend fun connect(identity: String, roomName: String) {
         roomEventSubject.onNext(Connecting)
         room = try {
-            videoClient.connect(identity, roomName, isNetworkQualityEnabled, roomListener)
+            videoClient.connect(identity, roomName, roomListener)
         } catch (e: AuthServiceException) {
             handleTokenException(e, e.error)
         } catch (e: Exception) {

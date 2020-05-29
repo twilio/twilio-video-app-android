@@ -6,9 +6,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.twilio.video.app.data.get
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
+import com.twilio.video.app.util.get
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
