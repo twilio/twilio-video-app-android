@@ -29,7 +29,6 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.get
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
-import timber.log.Timber
 
 class VideoClient(
     private val context: Context,
@@ -136,10 +135,12 @@ class VideoClient(
      * track priority. If the preference value does match the NxN format, then no render
      * dimenions will be set for the track priority.
      */
-    private fun setTrackPriorityRenderDimensions(renderDimensions: MutableMap<TrackPriority, VideoDimensions>,
-                                                 trackPriority: TrackPriority,
-                                                 preferenceKey: String,
-                                                 preferenceDefaultValue: String) {
+    private fun setTrackPriorityRenderDimensions(
+        renderDimensions: MutableMap<TrackPriority, VideoDimensions>,
+        trackPriority: TrackPriority,
+        preferenceKey: String,
+        preferenceDefaultValue: String
+    ) {
         sharedPreferences.get(preferenceKey, preferenceDefaultValue).let {
             Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
                 val (width, height) = match.destructured

@@ -11,5 +11,6 @@ public abstract class BandwidthProfileSettingsFragmentModule {
     @Binds
     @IntoMap
     @ClassKey(BandwidthProfileSettingsFragment.class)
-    abstract AndroidInjector.Factory<?> bindYourFragmentInjectorFactory(BandwidthProfileSettingsFragmentSubcomponent.Factory factory);
+    abstract AndroidInjector.Factory<?> bindYourFragmentInjectorFactory(
+            BandwidthProfileSettingsFragmentSubcomponent.Factory factory);
 }
