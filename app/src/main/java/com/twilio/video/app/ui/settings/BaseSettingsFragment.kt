@@ -28,7 +28,7 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
 
         // show custom dialog preference
         if (preference is NumberPreference) {
-            NumberPreferenceDialogFragmentCompat.newInstance(preference.key)?.let{ dialog ->
+            NumberPreferenceDialogFragmentCompat.newInstance(preference.key)?.let { dialog ->
                 dialog.setTargetFragment(this, 0)
                 dialog.show(requireFragmentManager(), tag)
             }

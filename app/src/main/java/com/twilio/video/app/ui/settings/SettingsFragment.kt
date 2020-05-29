@@ -20,6 +20,7 @@ import com.twilio.video.Vp9Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
+import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.ScreenSelector
 import javax.inject.Inject
@@ -105,5 +106,11 @@ class SettingsFragment : BaseSettingsFragment() {
             startActivity(loginIntent)
             activity.finishAffinity()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
     }
 }
