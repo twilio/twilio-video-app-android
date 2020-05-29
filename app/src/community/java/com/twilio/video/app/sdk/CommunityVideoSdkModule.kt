@@ -17,12 +17,19 @@ import dagger.Provides
 class CommunityVideoSdkModule {
 
     @Provides
-    fun providesVideoClient(
+    fun providesConnectOptionsFactory(
         application: Application,
         sharedPreferences: SharedPreferences,
         tokenService: TokenService
+    ): ConnectOptionsFactory =
+            ConnectOptionsFactory(application, sharedPreferences, tokenService)
+
+    @Provides
+    fun providesRoomFactory(
+        application: Application,
+        connectOptionsFactory: ConnectOptionsFactory
     ): VideoClient =
-            VideoClient(application, sharedPreferences, tokenService)
+            VideoClient(application, connectOptionsFactory)
 
     @Provides
     @ApplicationScope

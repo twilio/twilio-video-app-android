@@ -87,10 +87,7 @@ class RoomViewModel(
             ActivateAudioDevice -> { audioDeviceSelector.activate() }
             DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
             is Connect -> {
-                connect(
-                        viewEvent.identity,
-                        viewEvent.roomName,
-                        viewEvent.isNetworkQualityEnabled)
+                connect(viewEvent.identity, viewEvent.roomName)
             }
             is PinParticipant -> {
                 participantManager.changePinnedParticipant(viewEvent.sid)
@@ -231,16 +228,11 @@ class RoomViewModel(
         }
     }
 
-    private fun connect(
-        identity: String,
-        roomName: String,
-        isNetworkQualityEnabled: Boolean
-    ) =
+    private fun connect(identity: String, roomName: String) =
         backgroundScope.launch {
             roomManager.connect(
                     identity,
-                    roomName,
-                    isNetworkQualityEnabled)
+                    roomName)
         }
 
     class RoomViewModelFactory(

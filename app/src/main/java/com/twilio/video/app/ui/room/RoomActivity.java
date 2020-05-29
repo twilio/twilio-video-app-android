@@ -503,8 +503,7 @@ public class RoomActivity extends BaseActivity {
         if (text != null) {
             final String roomName = text.toString();
 
-            RoomViewEvent.Connect viewEvent =
-                    new RoomViewEvent.Connect(displayName, roomName, isNetworkQualityEnabled());
+            RoomViewEvent.Connect viewEvent = new RoomViewEvent.Connect(displayName, roomName);
             roomViewModel.processInput(viewEvent);
         }
     }
@@ -590,12 +589,6 @@ public class RoomActivity extends BaseActivity {
                 cameraVideoTrack != null
                         ? R.drawable.ic_videocam_white_24px
                         : R.drawable.ic_videocam_off_gray_24px);
-    }
-
-    private boolean isNetworkQualityEnabled() {
-        return sharedPreferences.getBoolean(
-                Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
-                Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT);
     }
 
     private void obtainVideoConstraints() {

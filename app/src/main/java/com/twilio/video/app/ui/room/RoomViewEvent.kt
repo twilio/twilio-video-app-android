@@ -7,11 +7,7 @@ sealed class RoomViewEvent {
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()
     object ActivateAudioDevice : RoomViewEvent()
     object DeactivateAudioDevice : RoomViewEvent()
-    data class Connect(
-        val identity: String,
-        val roomName: String,
-        val isNetworkQualityEnabled: Boolean
-    ) : RoomViewEvent()
+    data class Connect(val identity: String, val roomName: String) : RoomViewEvent()
     data class PinParticipant(val sid: String) : RoomViewEvent()
     data class ToggleLocalVideo(val sid: String) : RoomViewEvent()
     data class VideoTrackRemoved(val sid: String) : RoomViewEvent()
