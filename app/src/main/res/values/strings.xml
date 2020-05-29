@@ -122,6 +122,13 @@
         <item>PREDICTED</item>
         <item>DETECTED</item>
     </string-array>
+    <string-array name="settings_screen_bandwidth_profile_render_dimensions">
+        <item>176x144</item>
+        <item>640x480</item>
+        <item>960x540</item>
+        <item>1280x720</item>
+        <item>1920x1080</item>
+    </string-array>
 
     <string name="stats_enable_in_settings">Enable in Settings</string>
     <string name="enable_ice">Enable ICE Options</string>
@@ -205,6 +212,8 @@
     <string name="settings_screen_max_video_tracks">Max Video Tracks</string>
     <string name="settings_screen_bandwidth_profile_dominant_speaker_priority">Dominant Speaker Priority</string>
     <string name="settings_screen_bandwidth_profile_track_switch_mode">Track Switch Off Mode</string>
+    <string name="settings_screen_render_dimensions">Render Dimensions</string>
+    <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>

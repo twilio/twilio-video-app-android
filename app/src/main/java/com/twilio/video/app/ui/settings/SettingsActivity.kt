@@ -45,25 +45,47 @@ import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.get
 import com.twilio.video.app.ui.ScreenSelector
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : BaseActivity(),
+    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
+    private val backStackTitleMap = mutableMapOf<Int, CharSequence?>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Add the preference fragment
         val settingsFragment = SettingsFragment()
+        backStackTitleMap[supportFragmentManager.backStackEntryCount] = supportActionBar?.title
+        supportFragmentManager.addOnBackStackChangedListener {
+            supportActionBar?.title = backStackTitleMap[supportFragmentManager.backStackEntryCount]
+        }
         supportFragmentManager
-                .beginTransaction()
-                .replace(android.R.id.content, settingsFragment)
-                .commit()
+            .beginTransaction()
+            .replace(android.R.id.content, settingsFragment)
+            .commit()
+    }
+
+    override fun onPreferenceStartFragment(
+        caller: PreferenceFragmentCompat?,
+        pref: Preference
+    ): Boolean {
+        val args = pref.extras
+        val fragment = supportFragmentManager.fragmentFactory.instantiate(
+            classLoader,
+            pref.fragment)
+        fragment.arguments = args
+        fragment.setTargetFragment(caller, 0)
+        backStackTitleMap[supportFragmentManager.backStackEntryCount + 1] = pref.title
+        supportFragmentManager.beginTransaction()
+            .replace(android.R.id.content, fragment)
+            .addToBackStack(null)
+            .commit()
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -119,38 +141,6 @@ class SettingsActivity : BaseActivity() {
             }
             findPreference(Preferences.VIDEO_LIBRARY_VERSION).summary = Video.getVersion()
             findPreference(Preferences.LOGOUT).onPreferenceClickListener = Preference.OnPreferenceClickListener { logout(); true }
-            val bandwidthProfileModeDefaultIndex =
-                    resources.getStringArray(R.array.settings_screen_bandwidth_profile_mode_values)
-                            .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
-                                    Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT))
-            (findPreference(Preferences.BANDWIDTH_PROFILE_MODE) as ListPreference)
-                .setValueIndex(bandwidthProfileModeDefaultIndex)
-            (findPreference(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE) as NumberPreference).apply {
-                val maxTracks = sharedPreferences
-                    .get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
-                        Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT)
-                summary = maxTracks.toString()
-                number = maxTracks
-            }
-            (findPreference(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS) as NumberPreference).apply {
-                val maxTracks = sharedPreferences
-                    .get(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
-                        Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT)
-                summary = maxTracks.toString()
-                number = maxTracks
-            }
-            val bandwidthProfileDominantSpeakerPriorityDefaultIndex =
-                resources.getStringArray(R.array.settings_screen_bandwidth_profile_dominant_speaker_priority_values)
-                    .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
-                        Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT))
-            (findPreference(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY) as ListPreference)
-                .setValueIndex(bandwidthProfileDominantSpeakerPriorityDefaultIndex)
-            val bandwidthProfileTrackSwitchOffModeDefaultIndex =
-                resources.getStringArray(R.array.settings_screen_bandwidth_profile_track_switch_mode_values)
-                    .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
-                        Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT))
-            (findPreference(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE) as ListPreference)
-                .setValueIndex(bandwidthProfileTrackSwitchOffModeDefaultIndex)
         }
 
         override fun onDisplayPreferenceDialog(preference: Preference?) {
