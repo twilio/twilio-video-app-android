@@ -89,30 +89,18 @@ class VideoClient(
                 videoBandwidthProfileOptionsBuilder.trackSwitchOffMode(getTrackSwitchOffMode(it))
             }
             val renderDimensions = mutableMapOf<TrackPriority, VideoDimensions>()
-            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS,
-                Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT).let {
-                Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
-                    val (width, height) = match.destructured
-                    renderDimensions[TrackPriority.LOW] = VideoDimensions(width.toInt(),
-                        height.toInt())
-                }
-            }
-            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS,
-                Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT).let {
-                Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
-                    val (width, height) = match.destructured
-                    renderDimensions[TrackPriority.STANDARD] = VideoDimensions(width.toInt(),
-                        height.toInt())
-                }
-            }
-            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
-                Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT).let {
-                Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
-                    val (width, height) = match.destructured
-                    renderDimensions[TrackPriority.HIGH] = VideoDimensions(width.toInt(),
-                        height.toInt())
-                }
-            }
+            setTrackPriorityRenderDimensions(renderDimensions,
+                TrackPriority.LOW,
+                Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
+            setTrackPriorityRenderDimensions(renderDimensions,
+                TrackPriority.STANDARD,
+                Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
+            setTrackPriorityRenderDimensions(renderDimensions,
+                TrackPriority.HIGH,
+                Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
+                Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
             videoBandwidthProfileOptionsBuilder.renderDimensions(renderDimensions)
             val bandwidthProfileOptions = BandwidthProfileOptions(videoBandwidthProfileOptionsBuilder.build())
 
@@ -140,6 +128,24 @@ class VideoClient(
                     context,
                     connectOptionsBuilder.build(),
                     roomListener)
+    }
+
+    /*
+     * Utility method that extracts the VideoDimensions from a preference string in the format
+     * NxN. The resolution will be extracted and set to the render dimensions of the specified
+     * track priority. If the preference value does match the NxN format, then no render
+     * dimenions will be set for the track priority.
+     */
+    private fun setTrackPriorityRenderDimensions(renderDimensions: MutableMap<TrackPriority, VideoDimensions>,
+                                                 trackPriority: TrackPriority,
+                                                 preferenceKey: String,
+                                                 preferenceDefaultValue: String) {
+        sharedPreferences.get(preferenceKey, preferenceDefaultValue).let {
+            Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
+                val (width, height) = match.destructured
+                renderDimensions[trackPriority] = VideoDimensions(width.toInt(), height.toInt())
+            }
+        }
     }
 
     private fun getTrackSwitchOffMode(trackSwitchOffModeString: String): TrackSwitchOffMode? {

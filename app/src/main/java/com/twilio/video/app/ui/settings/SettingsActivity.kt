@@ -16,7 +16,6 @@
 
 package com.twilio.video.app.ui.settings
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -43,7 +42,6 @@ import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.ScreenSelector
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class SettingsActivity : BaseActivity(),
