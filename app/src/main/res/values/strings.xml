@@ -177,6 +177,7 @@
     <string name="number">Number</string>
     <string name="settings_screen_bandwidth_profile">Bandwidth Profile</string>
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>
+    <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>

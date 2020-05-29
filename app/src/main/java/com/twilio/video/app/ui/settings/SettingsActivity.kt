@@ -188,7 +188,7 @@ class SettingsActivity : BaseActivity() {
         }
 
         companion object {
-            private val PREFERENCE_FRAGMENT_TAG = "android.support.v7.preference.PreferenceFragment.DIALOG"
+            private const val PREFERENCE_FRAGMENT_TAG = "android.support.v7.preference.PreferenceFragment.DIALOG"
         }
     }
 
