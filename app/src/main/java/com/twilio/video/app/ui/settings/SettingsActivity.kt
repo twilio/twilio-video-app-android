@@ -29,12 +29,23 @@ class SettingsActivity : BaseActivity(),
 
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
+
+    /*
+     * This map tracks the settings action bar title for navigations through the backstack.
+     * Each time a separate settings fragment is launched, the back stack title map will be updated
+     * with the expected title for the current back stack entry count.
+     */
     private val backStackTitleMap = mutableMapOf<Int, CharSequence?>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val settingsFragment = SettingsFragment()
+
+        /*
+         * Initialize the back stack title map with the default settings and listen for
+         * changes in the backstack and update the actionbar title.
+         */
         backStackTitleMap[supportFragmentManager.backStackEntryCount] = supportActionBar?.title
         supportFragmentManager.addOnBackStackChangedListener {
             supportActionBar?.title = backStackTitleMap[supportFragmentManager.backStackEntryCount]
@@ -55,6 +66,10 @@ class SettingsActivity : BaseActivity(),
             pref.fragment)
         fragment.arguments = args
         fragment.setTargetFragment(caller, 0)
+
+        /*
+         * Add the action bar settings title for the upcoming preference fragment
+         */
         backStackTitleMap[supportFragmentManager.backStackEntryCount + 1] = pref.title
         supportFragmentManager.beginTransaction()
             .replace(android.R.id.content, fragment)
