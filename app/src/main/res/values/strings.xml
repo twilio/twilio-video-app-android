@@ -123,6 +123,7 @@
         <item>DETECTED</item>
     </string-array>
     <string-array name="settings_screen_bandwidth_profile_render_dimensions">
+        <item>Server Default</item>
         <item>176x144</item>
         <item>640x480</item>
         <item>960x540</item>
@@ -214,6 +215,8 @@
     <string name="settings_screen_bandwidth_profile_track_switch_mode">Track Switch Off Mode</string>
     <string name="settings_screen_render_dimensions">Render Dimensions</string>
     <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
+    <string name="settings_screen_bandwidth_profile_standard_track_priority">Standard Track Priority</string>
+    <string name="settings_screen_bandwidth_profile_high_track_priority">High Track Priority</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>
