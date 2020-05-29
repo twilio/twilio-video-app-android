@@ -57,14 +57,14 @@ object Preferences {
     const val MAX_AUDIO_BITRATE_DEFAULT = 16
     const val MAX_VIDEO_BITRATE = "pref_max_video_bitrate"
     const val MAX_VIDEO_BITRATE_DEFAULT = 0
-    const val MAX_VIDEO_TRACKS = "pref_max_video_tracks"
-    const val MAX_VIDEO_TRACKS_DEFAULT = 5L
     const val RECORD_PARTICIPANTS_ON_CONNECT = "pref_record_participants_on_connect"
     const val RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT = false
     const val BANDWIDTH_PROFILE_MODE = "pref_bandwidth_profile_mode"
     val BANDWIDTH_PROFILE_MODE_DEFAULT = BandwidthProfileMode.COLLABORATION.name
     const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE = "pref_bandwidth_profile_max_subscription_bitrate"
     const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT = 2400
+    const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS = "pref_bandwidth_profile_max_video_tracks"
+    const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT = 5
 }
 
 /*

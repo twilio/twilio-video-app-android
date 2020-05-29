@@ -108,6 +108,10 @@
                 style="@style/AppTheme.Preference.DialogPreference"
                 android:key="pref_bandwidth_profile_max_subscription_bitrate"
                 android:title="@string/settings_screen_max_subscription_bitrate" />
+            <com.twilio.video.app.data.NumberPreference
+                style="@style/AppTheme.Preference.DialogPreference"
+                android:key="pref_bandwidth_profile_max_video_tracks"
+                android:title="@string/settings_screen_max_video_tracks" />
         </PreferenceCategory>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">

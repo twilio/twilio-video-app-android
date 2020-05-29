@@ -124,7 +124,21 @@ class SettingsActivity : BaseActivity() {
                             .indexOf(sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
                                     Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT))
             (findPreference(Preferences.BANDWIDTH_PROFILE_MODE) as ListPreference)
-                    .setValueIndex(bandwidthProfileModeDefaultIndex)
+                .setValueIndex(bandwidthProfileModeDefaultIndex)
+            (findPreference(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE) as NumberPreference).apply {
+                val maxTracks = sharedPreferences
+                    .get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
+                        Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT)
+                summary = maxTracks.toString()
+                number = maxTracks
+            }
+            (findPreference(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS) as NumberPreference).apply {
+                val maxTracks = sharedPreferences
+                    .get(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
+                        Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT)
+                summary = maxTracks.toString()
+                number = maxTracks
+            }
         }
 
         override fun onDisplayPreferenceDialog(preference: Preference?) {
