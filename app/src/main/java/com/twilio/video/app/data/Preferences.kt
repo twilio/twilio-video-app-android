@@ -68,6 +68,8 @@ object Preferences {
     const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT = 5
     const val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY = "pref_bandwidth_profile_dominant_speaker_priority"
     val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT = TrackPriority.STANDARD.name
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE = "pref_bandwidth_profile_track_switch_off_mode"
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT = "SERVER_DEFAULT"
 }
 
 /*

@@ -18,6 +18,7 @@ import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
 import com.twilio.video.Room
 import com.twilio.video.TrackPriority
+import com.twilio.video.TrackSwitchOffMode
 import com.twilio.video.Video
 import com.twilio.video.VideoBandwidthProfileOptions
 import com.twilio.video.VideoCodec
@@ -81,6 +82,10 @@ class VideoClient(
                 Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT).let {
                 videoBandwidthProfileOptionsBuilder.dominantSpeakerPriority(getDominantSpeakerPriority(it))
             }
+            sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
+                Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
+                videoBandwidthProfileOptionsBuilder.trackSwitchOffMode(getTrackSwitchOffMode(it))
+            }
             val bandwidthProfileOptions = BandwidthProfileOptions(videoBandwidthProfileOptionsBuilder.build())
 
             val connectOptionsBuilder = ConnectOptions.Builder(token)
@@ -109,11 +114,20 @@ class VideoClient(
                     roomListener)
     }
 
+    private fun getTrackSwitchOffMode(trackSwitchOffModeString: String): TrackSwitchOffMode? {
+        return when (trackSwitchOffModeString) {
+            TrackSwitchOffMode.PREDICTED.name -> TrackSwitchOffMode.PREDICTED
+            TrackSwitchOffMode.DETECTED.name -> TrackSwitchOffMode.DETECTED
+            TrackSwitchOffMode.DISABLED.name -> TrackSwitchOffMode.DISABLED
+            else -> null
+        }
+    }
+
     private fun getDominantSpeakerPriority(dominantSpeakerPriorityString: String): TrackPriority? {
         return when (dominantSpeakerPriorityString) {
-            TrackPriority.LOW.name ->TrackPriority.LOW
-            TrackPriority.STANDARD.name ->TrackPriority.STANDARD
-            TrackPriority.HIGH.name ->TrackPriority.HIGH
+            TrackPriority.LOW.name -> TrackPriority.LOW
+            TrackPriority.STANDARD.name -> TrackPriority.STANDARD
+            TrackPriority.HIGH.name -> TrackPriority.HIGH
             else -> null
         }
     }

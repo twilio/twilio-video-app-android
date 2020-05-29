@@ -93,7 +93,7 @@
         <item>Presentation</item>
     </string-array>
     <string-array name="settings_screen_bandwidth_profile_mode_values">
-        <item>none</item>
+        <item>SERVER_DEFAULT</item>
         <item>COLLABORATION</item>
         <item>GRID</item>
         <item>PRESENTATION</item>
@@ -105,10 +105,22 @@
         <item>High</item>
     </string-array>
     <string-array name="settings_screen_bandwidth_profile_dominant_speaker_priority_values">
-        <item>none</item>
+        <item>SERVER_DEFAULT</item>
         <item>LOW</item>
         <item>STANDARD</item>
         <item>HIGH</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_track_switch_modes">
+        <item>Server Default</item>
+        <item>Disabled</item>
+        <item>Predicted</item>
+        <item>Detected</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_track_switch_mode_values">
+        <item>SERVER_DEFAULT</item>
+        <item>DISABLED</item>
+        <item>PREDICTED</item>
+        <item>DETECTED</item>
     </string-array>
 
     <string name="stats_enable_in_settings">Enable in Settings</string>
@@ -192,6 +204,7 @@
     <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
     <string name="settings_screen_max_video_tracks">Max Video Tracks</string>
     <string name="settings_screen_bandwidth_profile_dominant_speaker_priority">Dominant Speaker Priority</string>
+    <string name="settings_screen_bandwidth_profile_track_switch_mode">Track Switch Off Mode</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>
