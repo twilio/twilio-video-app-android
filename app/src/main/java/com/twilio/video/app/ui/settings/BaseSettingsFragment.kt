@@ -2,9 +2,11 @@ package com.twilio.video.app.ui.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.view.MenuItem
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.util.get
@@ -21,6 +23,12 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
         super.onAttach(context)
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
+    }
+
     override fun onDisplayPreferenceDialog(preference: Preference?) {
         if (preference == null) {
             return
@@ -35,6 +43,18 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
         } else {
             super.onDisplayPreferenceDialog(preference)
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            if (this is SettingsFragment) {
+                requireActivity().finish()
+            } else {
+                parentFragmentManager.popBackStack()
+            }
+            return true
+        }
+        return false
     }
 
     /*
