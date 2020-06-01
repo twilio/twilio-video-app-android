@@ -483,9 +483,8 @@ public class RoomActivity extends BaseActivity {
     }
 
     @OnTextChanged(
-        value = R.id.room_edit_text,
-        callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED
-    )
+            value = R.id.room_edit_text,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void onTextChanged(CharSequence text) {
         connect.setEnabled(!TextUtils.isEmpty(text));
     }

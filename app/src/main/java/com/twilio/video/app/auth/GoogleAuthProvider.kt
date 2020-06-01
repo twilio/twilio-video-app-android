@@ -6,10 +6,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInResult
-import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
-import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
 import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
+import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
+import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter

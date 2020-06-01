@@ -18,9 +18,9 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError

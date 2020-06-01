@@ -3,7 +3,6 @@ package com.twilio.video.app
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.ui.login.LoginActivity
 import com.twilio.video.app.ui.login.LoginActivityModule
-
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 

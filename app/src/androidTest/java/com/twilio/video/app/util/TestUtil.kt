@@ -8,9 +8,9 @@ import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.TestCredentials
-import junit.framework.AssertionFailedError
 import java.io.InputStreamReader
 import java.util.concurrent.TimeoutException
+import junit.framework.AssertionFailedError
 
 fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> Unit) {
     val startTime = System.currentTimeMillis()

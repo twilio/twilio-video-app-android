@@ -32,24 +32,23 @@ import dagger.android.AndroidInjectionModule;
 
 @ApplicationScope
 @Component(
-    modules = {
-        AndroidInjectionModule.class,
-        ApplicationModule.class,
-        CommunityTreeModule.class,
-        AuthServiceModule.class,
-        CommunityAuthModule.class,
-        CommunityScreenSelectorModule.class,
-        SplashActivityModule.class,
-        CommunityLoginActivityModule.class,
-        RoomActivityModule.class,
-        SettingsActivityModule.class,
-        SettingsFragmentModule.class,
-        VideoServiceModule.class,
-        CommunityVideoSdkModule.class,
-        SecurityModule.class,
-        AudioSwitchModule.class
-    }
-)
+        modules = {
+            AndroidInjectionModule.class,
+            ApplicationModule.class,
+            CommunityTreeModule.class,
+            AuthServiceModule.class,
+            CommunityAuthModule.class,
+            CommunityScreenSelectorModule.class,
+            SplashActivityModule.class,
+            CommunityLoginActivityModule.class,
+            RoomActivityModule.class,
+            SettingsActivityModule.class,
+            SettingsFragmentModule.class,
+            VideoServiceModule.class,
+            CommunityVideoSdkModule.class,
+            SecurityModule.class,
+            AudioSwitchModule.class
+        })
 public interface VideoApplicationComponent {
     void inject(VideoApplication application);
 }
