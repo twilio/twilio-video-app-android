@@ -50,7 +50,6 @@ android {
         multiDexEnabled true
 
         testInstrumentationRunner "com.twilio.video.app.InstrumentationRunner"
-        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     compileOptions {
@@ -63,7 +62,6 @@ android {
     }
 
     testOptions {
-        execution 'ANDROIDX_TEST_ORCHESTRATOR'
         unitTests {
             includeAndroidResources = true
         }
