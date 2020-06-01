@@ -16,10 +16,10 @@ import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
+import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest

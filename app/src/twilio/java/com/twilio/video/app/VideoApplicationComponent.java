@@ -16,24 +16,23 @@ import dagger.android.AndroidInjectionModule;
 
 @ApplicationScope
 @Component(
-    modules = {
-        AndroidInjectionModule.class,
-        ApplicationModule.class,
-        TreeModule.class,
-        DataModule.class,
-        VideoAppServiceModule.class,
-        ScreenSelectorModule.class,
-        AuthModule.class,
-        SplashActivityModule.class,
-        LoginActivityModule.class,
-        RoomActivityModule.class,
-        SettingsActivityModule.class,
-        SettingsFragmentModule.class,
-        VideoServiceModule.class,
-        VideoSdkModule.class,
-        AudioSwitchModule.class
-    }
-)
+        modules = {
+            AndroidInjectionModule.class,
+            ApplicationModule.class,
+            TreeModule.class,
+            DataModule.class,
+            VideoAppServiceModule.class,
+            ScreenSelectorModule.class,
+            AuthModule.class,
+            SplashActivityModule.class,
+            LoginActivityModule.class,
+            RoomActivityModule.class,
+            SettingsActivityModule.class,
+            SettingsFragmentModule.class,
+            VideoServiceModule.class,
+            VideoSdkModule.class,
+            AudioSwitchModule.class
+        })
 public interface VideoApplicationComponent {
     void inject(VideoApplication application);
 }
