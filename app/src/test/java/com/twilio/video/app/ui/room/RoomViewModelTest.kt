@@ -23,7 +23,7 @@ class RoomViewModelTest {
     val rule = InstantTaskExecutorRule()
 
     private val roomManager = RoomManager(mock(),
-            VideoClient(mock(), mock(), mock()))
+            VideoClient(mock(), mock()))
     private val scheduler = TestScheduler()
     private val participantViewState = ParticipantViewState(PARTICIPANT_SID, "Test Participant")
     private val participantManager = ParticipantManager().apply {

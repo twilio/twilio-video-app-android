@@ -6,11 +6,11 @@ import dagger.android.AndroidInjector;
 import dagger.multibindings.ClassKey;
 import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = SettingsFragmentSubcomponent.class)
-public abstract class SettingsFragmentModule {
+@Module(subcomponents = BandwidthProfileSettingsFragmentSubcomponent.class)
+public abstract class BandwidthProfileSettingsFragmentModule {
     @Binds
     @IntoMap
-    @ClassKey(SettingsFragment.class)
+    @ClassKey(BandwidthProfileSettingsFragment.class)
     abstract AndroidInjector.Factory<?> bindYourFragmentInjectorFactory(
-            SettingsFragmentSubcomponent.Factory factory);
+            BandwidthProfileSettingsFragmentSubcomponent.Factory factory);
 }

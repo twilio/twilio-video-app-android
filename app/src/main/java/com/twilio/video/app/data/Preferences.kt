@@ -15,18 +15,21 @@
  */
 package com.twilio.video.app.data
 
+import com.twilio.video.BandwidthProfileMode
 import com.twilio.video.OpusCodec
+import com.twilio.video.TrackPriority
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.data.api.model.Topology
 
 object Preferences {
+    const val SERVER_DEFAULT = "Server Default"
     const val EMAIL = "pref_email"
     const val DISPLAY_NAME = "pref_display_name"
     const val ENVIRONMENT = "pref_environment"
     const val ENVIRONMENT_DEFAULT = BuildConfig.ENVIRONMENT_DEFAULT
     const val TOPOLOGY = "pref_topology"
-    val TOPOLOGY_DEFAULT = Topology.GROUP.string
+    val TOPOLOGY_DEFAULT: String = Topology.GROUP.string
     const val MIN_FPS = "pref_min_fps"
     const val MAX_FPS = "pref_max_fps"
     const val MIN_VIDEO_DIMENSIONS = "pref_min_video_dim"
@@ -55,8 +58,22 @@ object Preferences {
     const val MAX_AUDIO_BITRATE_DEFAULT = 16
     const val MAX_VIDEO_BITRATE = "pref_max_video_bitrate"
     const val MAX_VIDEO_BITRATE_DEFAULT = 0
-    const val MAX_VIDEO_TRACKS = "pref_max_video_tracks"
-    const val MAX_VIDEO_TRACKS_DEFAULT = 5L
     const val RECORD_PARTICIPANTS_ON_CONNECT = "pref_record_participants_on_connect"
     const val RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT = false
+    const val BANDWIDTH_PROFILE_MODE = "pref_bandwidth_profile_mode"
+    val BANDWIDTH_PROFILE_MODE_DEFAULT = BandwidthProfileMode.COLLABORATION.name
+    const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE = "pref_bandwidth_profile_max_subscription_bitrate"
+    const val BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT = 2400
+    const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS = "pref_bandwidth_profile_max_video_tracks"
+    const val BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT = 5
+    const val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY = "pref_bandwidth_profile_dominant_speaker_priority"
+    val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT = TrackPriority.STANDARD.name
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE = "pref_bandwidth_profile_track_switch_off_mode"
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT = SERVER_DEFAULT
+    const val BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_low_track_priority_dimensions"
+    const val BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = SERVER_DEFAULT
+    const val BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_standard_track_priority_dimensions"
+    const val BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = SERVER_DEFAULT
+    const val BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_high_track_priority_dimensions"
+    const val BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = SERVER_DEFAULT
 }

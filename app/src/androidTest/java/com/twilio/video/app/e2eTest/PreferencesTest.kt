@@ -6,7 +6,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.screen.assertDefaultBandwidthProfileSettings
 import com.twilio.video.app.screen.assertSettingsTitleIsVisible
+import com.twilio.video.app.screen.clickBandwidthProfileSettings
 import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.getTargetContext
@@ -37,5 +39,21 @@ class PreferencesTest : BaseUITest() {
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getTargetContext())
         assertThat(sharedPreferences.getString(Preferences.TOPOLOGY, null), equalTo(Topology.GROUP.string))
+    }
+
+    @Test
+    fun it_should_assert_correct_default_bandwidth_preferences() {
+        retryEspressoAction { clickSettingsMenuItem() }
+
+        retryEspressoAction { assertSettingsTitleIsVisible() }
+
+        clickBandwidthProfileSettings()
+
+        assertDefaultBandwidthProfileSettings()
+
+        uiDevice().run {
+            pressBack()
+            pressBack()
+        }
     }
 }
