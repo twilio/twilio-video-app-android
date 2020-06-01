@@ -2,7 +2,6 @@ package com.twilio.video.app.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -21,7 +20,6 @@ import com.twilio.video.Vp9Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.ScreenSelector
 import javax.inject.Inject
@@ -109,19 +107,5 @@ class SettingsFragment : BaseSettingsFragment() {
             startActivity(loginIntent)
             activity.finishAffinity()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            requireActivity().finish()
-            return true
-        }
-        return false
     }
 }
