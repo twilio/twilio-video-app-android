@@ -94,7 +94,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
-import com.twilio.video.app.ui.room.RoomViewEvent.ScreenLoad;
+import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
@@ -318,7 +318,7 @@ public class RoomActivity extends BaseActivity {
 
         restoreCameraTrack();
 
-        roomViewModel.processInput(ScreenLoad.INSTANCE);
+        roomViewModel.processInput(RefreshViewState.INSTANCE);
 
         publishLocalTracks();
 
@@ -688,6 +688,7 @@ public class RoomActivity extends BaseActivity {
             if (room != null && localParticipant != null)
                 publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
         }
+        roomViewModel.processInput(RefreshViewState.INSTANCE);
     }
 
     /** Create local video track */
