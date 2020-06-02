@@ -10,10 +10,7 @@ fun uiDevice(): UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstr
 fun UiDevice.allowPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val device = uiDevice()
-        val allowPermissions = device.findObject(UiSelector()
-                .clickable(true)
-                .checkable(false)
-                .index(0))
+        val allowPermissions = device.findObject(UiSelector().textMatches("Allow|ALLOW"))
         if (allowPermissions.exists()) {
             allowPermissions.click()
         }
