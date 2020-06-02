@@ -14,7 +14,7 @@ open class BaseUITest {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @Before
-    fun setUp() {
+    open fun setUp() {
         loginWithEmail(retrieveEmailCredentials())
     }
 }
