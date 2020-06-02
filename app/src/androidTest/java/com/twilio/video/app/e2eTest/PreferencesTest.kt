@@ -50,10 +50,5 @@ class PreferencesTest : BaseUITest() {
         clickBandwidthProfileSettings()
 
         assertDefaultBandwidthProfileSettings()
-
-        uiDevice().run {
-            pressBack()
-            pressBack()
-        }
     }
 }
