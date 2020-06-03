@@ -50,9 +50,8 @@ internal class PrimaryParticipantController(
         primaryView.setMuted(newItem.muted)
         primaryView.setMirror(mirror)
         newItem.videoTrack?.let { newVideoTrack ->
-            removeRender(newVideoTrack, primaryView)
-            primaryView.setState(ParticipantView.State.VIDEO)
             newVideoTrack.addRenderer(primaryView)
+            primaryView.setState(ParticipantView.State.VIDEO)
         } ?: primaryView.setState(ParticipantView.State.NO_VIDEO)
     }
 
