@@ -7,7 +7,7 @@ import com.twilio.video.app.HiddenView
 import com.twilio.video.app.R
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.ui.splash.SplashActivity
-import com.twilio.video.app.util.allowPermission
+import com.twilio.video.app.util.allowAllPermissions
 import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
@@ -24,9 +24,7 @@ class PermissionTest {
         loginWithEmail(retrieveEmailCredentials())
 
         uiDevice().run {
-            retryEspressoAction { allowPermission() }
-            retryEspressoAction { allowPermission() }
-            retryEspressoAction { allowPermission() }
+            allowAllPermissions()
         }
 
         retryEspressoAction { onView(withId(R.id.participant_stub_image))
