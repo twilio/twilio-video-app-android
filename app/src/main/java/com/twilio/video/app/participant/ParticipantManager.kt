@@ -117,22 +117,24 @@ class ParticipantManager {
     }
 
     private fun setTrackPriority(participant: ParticipantViewState) {
-        when {
-            participant.isScreenSharing -> {
-                participant.getRemoteScreenTrack()?.priority = HIGH
-                Timber.d("Setting screen track priority to high for participant with sid: ${participant.sid}")
+        if (participant.sid != primaryParticipant?.sid) {
+            when {
+                participant.isScreenSharing -> {
+                    participant.getRemoteScreenTrack()?.priority = HIGH
+                    Timber.d("Setting screen track priority to high for participant with sid: ${participant.sid}")
+                }
+                participant.isDominantSpeaker -> {
+                    participant.getRemoteVideoTrack()?.priority = null
+                    Timber.d("Clearing dominant speaker priority for participant with sid: ${participant.sid}")
+                }
+                else -> {
+                    participant.getRemoteVideoTrack()?.priority = HIGH
+                    Timber.d("Setting video track priority to high for participant with sid: ${participant.sid}")
+                }
             }
-            participant.isDominantSpeaker -> {
-                participant.getRemoteVideoTrack()?.priority = null
-                Timber.d("Clearing dominant speaker priority for participant with sid: ${participant.sid}")
-            }
-            else -> {
-                participant.getRemoteVideoTrack()?.priority = HIGH
-                Timber.d("Setting video track priority to high for participant with sid: ${participant.sid}")
-            }
-        }
 
-        clearOldTrackPriorities()
+            clearOldTrackPriorities()
+        }
     }
 
     private fun clearOldTrackPriorities() {

@@ -2,11 +2,12 @@ package com.twilio.video.app.participant
 
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.RemoteVideoTrack
-import com.twilio.video.TrackPriority
+import com.twilio.video.TrackPriority.HIGH
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.sdk.VideoTrackViewState
 import junitparams.JUnitParamsRunner
@@ -107,7 +108,7 @@ class ParticipantManagerTest {
         participantManager.changePinnedParticipant(pinnedParticipant.sid)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
-        verify(videoTrack).priority = TrackPriority.HIGH
+        verify(videoTrack).priority = HIGH
     }
 
     @Test
@@ -129,7 +130,7 @@ class ParticipantManagerTest {
         participantManager.updateParticipantScreenTrack(screenSharingParticipant.sid,
                 VideoTrackViewState(videoTrack = screenTrack))
 
-        verify(screenTrack).priority = TrackPriority.HIGH
+        verify(screenTrack).priority = HIGH
     }
 
     @Test
@@ -188,7 +189,7 @@ class ParticipantManagerTest {
         participantManager.addParticipant(participant2)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
-        verify(videoTrack).priority = TrackPriority.HIGH
+        verify(videoTrack).priority = HIGH
     }
 
     @Test
@@ -205,6 +206,18 @@ class ParticipantManagerTest {
     }
 
     @Test
+    fun `primary participant VideoTrack priority should not be set for the same previous participant`() {
+        val participant3 = setupThreeParticipantScenario()
+        val participant2 = participantManager.getParticipant("2")
+
+        participantManager.updateParticipant(participant3.copy(isMuted = true))
+
+        val videoTrack = participant2!!.getRemoteVideoTrack()
+        verify(videoTrack)!!.priority = HIGH
+        verify(videoTrack, times(0))!!.priority = null
+    }
+
+    @Test
     fun `the old primary participant VideoTrack priority should be reset to null when a new participant is assigned`() {
         val participant3 = setupThreeParticipantScenario()
 
@@ -213,7 +226,7 @@ class ParticipantManagerTest {
 
         val videoTrack = participant3.videoTrack!!.videoTrack as RemoteVideoTrack
         inOrder(videoTrack).run {
-            verify(videoTrack).priority = TrackPriority.HIGH
+            verify(videoTrack).priority = HIGH
             verify(videoTrack).priority = null
         }
     }
@@ -228,7 +241,7 @@ class ParticipantManagerTest {
         participantManager.changePinnedParticipant("2")
 
         inOrder(screenTrack).run {
-            verify(screenTrack).priority = TrackPriority.HIGH
+            verify(screenTrack).priority = HIGH
             verify(screenTrack).priority = null
         }
     }
@@ -242,7 +255,7 @@ class ParticipantManagerTest {
 
         val videoTrack = participant3.videoTrack!!.videoTrack as RemoteVideoTrack
         inOrder(videoTrack).run {
-            verify(videoTrack).priority = TrackPriority.HIGH
+            verify(videoTrack).priority = HIGH
             verify(videoTrack).priority = null
         }
     }
@@ -252,12 +265,12 @@ class ParticipantManagerTest {
         setupThreeParticipantScenario()
         val screenTrack = mock<RemoteVideoTrack>()
 
-        participantManager.updateParticipantScreenTrack("2",
+        participantManager.updateParticipantScreenTrack("3",
                 VideoTrackViewState(screenTrack))
         participantManager.changePinnedParticipant(localParticipant.sid)
 
         inOrder(screenTrack).run {
-            verify(screenTrack).priority = TrackPriority.HIGH
+            verify(screenTrack).priority = HIGH
             verify(screenTrack).priority = null
         }
     }
