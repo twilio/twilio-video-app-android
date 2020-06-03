@@ -13,6 +13,7 @@ import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.retryEspressoAction
 import java.util.UUID
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,10 +25,15 @@ class RoomTest : BaseUITest() {
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()
 
+    @Before
+    override fun setUp() {
+        super.setUp()
+
+        retryEspressoAction { assertScreenIsDisplayed() }
+    }
+
     @Test
     fun it_should_connect_to_a_room_successfully() {
-        retryEspressoAction { assertScreenIsDisplayed() }
-
         enterRoomName(UUID.randomUUID().toString())
         clickJoinRoomButton()
 
@@ -38,8 +44,6 @@ class RoomTest : BaseUITest() {
 
     @Test
     fun it_should_connect_to_a_room_successfully_with_mic_and_video_muted() {
-        retryEspressoAction { assertScreenIsDisplayed() }
-
         clickVideoButton()
         clickMicButton()
         enterRoomName(UUID.randomUUID().toString())

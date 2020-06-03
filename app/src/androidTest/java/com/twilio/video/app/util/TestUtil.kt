@@ -2,7 +2,6 @@ package com.twilio.video.app.util
 
 import android.content.Context
 import androidx.annotation.IdRes
-import androidx.test.espresso.NoMatchingViewException
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
@@ -19,7 +18,7 @@ fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> U
         currentTime = try {
             espressoAction()
             return
-        } catch (e: NoMatchingViewException) {
+        } catch (e: Exception) {
             countDown(startTime)
         } catch (e: AssertionFailedError) {
             countDown(startTime)

@@ -165,7 +165,7 @@ jobs:
       - run:
           name: UI Tests
           command: >
-            gcloud firebase test android run --use-orchestrator --no-record-video --project video-app-79418
+            gcloud firebase test android run --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
             ui-test-args.yaml:ui-tests
 
   build-release-app:

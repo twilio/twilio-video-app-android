@@ -31,7 +31,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
-import com.twilio.video.app.ui.room.RoomViewEvent.ScreenLoad
+import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
@@ -80,7 +80,7 @@ class RoomViewModel(
     override fun processInput(viewEvent: RoomViewEvent) {
         Timber.d("View Event: $viewEvent")
         when (viewEvent) {
-            is ScreenLoad -> updateState { it.copy() }
+            is RefreshViewState -> updateState { it.copy() }
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
             }
