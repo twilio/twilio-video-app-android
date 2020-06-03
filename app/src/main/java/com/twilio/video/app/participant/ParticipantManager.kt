@@ -120,12 +120,15 @@ class ParticipantManager {
         when {
             participant.isScreenSharing -> {
                 participant.getRemoteScreenTrack()?.priority = HIGH
+                Timber.d("Setting screen track priority to high for participant with sid: ${participant.sid}")
             }
             participant.isDominantSpeaker -> {
                 participant.getRemoteVideoTrack()?.priority = null
+                Timber.d("Clearing dominant speaker priority for participant with sid: ${participant.sid}")
             }
             else -> {
                 participant.getRemoteVideoTrack()?.priority = HIGH
+                Timber.d("Setting video track priority to high for participant with sid: ${participant.sid}")
             }
         }
 
@@ -136,6 +139,7 @@ class ParticipantManager {
         primaryParticipant?.run {
             getRemoteVideoTrack()?.priority = null
             getRemoteScreenTrack()?.priority = null
+            Timber.d("Clearing video and screen track priorities for participant with sid: $sid")
         }
     }
 }
