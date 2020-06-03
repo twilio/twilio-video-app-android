@@ -9,6 +9,7 @@ import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.TestCredentials
 import java.io.InputStreamReader
 import java.util.concurrent.TimeoutException
+import junit.framework.AssertionFailedError
 
 fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> Unit) {
     val startTime = System.currentTimeMillis()
@@ -18,6 +19,8 @@ fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> U
             espressoAction()
             return
         } catch (e: Exception) {
+            countDown(startTime)
+        } catch (e: AssertionFailedError) {
             countDown(startTime)
         }
     }
