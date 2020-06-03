@@ -376,7 +376,12 @@ public class RoomActivity extends BaseActivity {
             boolean recordAudioPermissionGranted =
                     grantResults[0] == PackageManager.PERMISSION_GRANTED;
             boolean cameraPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-            boolean permissionsGranted = recordAudioPermissionGranted && cameraPermissionGranted;
+            boolean writeExternalStoragePermissionGranted =
+                    grantResults[2] == PackageManager.PERMISSION_GRANTED;
+            boolean permissionsGranted =
+                    recordAudioPermissionGranted
+                            && cameraPermissionGranted
+                            && writeExternalStoragePermissionGranted;
 
             if (permissionsGranted) {
                 setupLocalMedia();
@@ -646,7 +651,11 @@ public class RoomActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!permissionsGranted()) {
                 requestPermissions(
-                        new String[] {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA},
+                        new String[] {
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        },
                         PERMISSIONS_REQUEST_CODE);
             } else {
                 setupLocalMedia();
@@ -659,9 +668,12 @@ public class RoomActivity extends BaseActivity {
     private boolean permissionsGranted() {
         int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+        int resultStorage =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         return ((resultCamera == PackageManager.PERMISSION_GRANTED)
-                && (resultMic == PackageManager.PERMISSION_GRANTED));
+                && (resultMic == PackageManager.PERMISSION_GRANTED)
+                && (resultStorage == PackageManager.PERMISSION_GRANTED));
     }
 
     /** Initialize local media and provide stub participant for primary view. */
@@ -1129,6 +1141,9 @@ public class RoomActivity extends BaseActivity {
         return PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                         == PermissionChecker.PERMISSION_GRANTED
                 && PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA)
+                        == PermissionChecker.PERMISSION_GRANTED
+                && PermissionChecker.checkSelfPermission(
+                                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PermissionChecker.PERMISSION_GRANTED;
     }
 }
