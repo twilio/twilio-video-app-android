@@ -1068,8 +1068,8 @@ public class RoomActivity extends BaseActivity {
             primaryParticipantController.renderAsPrimary(
                     primaryParticipant.getSid(),
                     primaryParticipant.getIdentity(),
-                    primaryParticipant.getVideoTrack(),
                     primaryParticipant.getScreenTrack(),
+                    primaryParticipant.getVideoTrack(),
                     primaryParticipant.isMuted(),
                     primaryParticipant.isMirrored());
         } else {
