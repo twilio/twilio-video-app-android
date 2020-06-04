@@ -61,7 +61,8 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         if (videoTrackViewState?.let { it.isSwitchedOff } == true) {
             setState(ParticipantView.State.SWITCHED_OFF)
         } else {
-            setState(ParticipantView.State.VIDEO)
+            videoTrackViewState?.videoTrack?.let { setState(ParticipantView.State.VIDEO) }
+                    ?: setState(ParticipantView.State.NO_VIDEO)
         }
     }
 

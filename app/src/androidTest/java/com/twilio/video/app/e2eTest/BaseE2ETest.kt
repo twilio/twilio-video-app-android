@@ -6,7 +6,8 @@ import com.twilio.video.app.util.retrieveEmailCredentials
 import org.junit.Before
 import org.junit.Rule
 
-open class BaseUITest {
+@E2ETest
+open class BaseE2ETest {
 
     @get:Rule
     var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA,

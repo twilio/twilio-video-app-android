@@ -1,4 +1,4 @@
-ui-tests:
+e2e-tests:
   timeout: 30m
   type: instrumentation
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
@@ -6,3 +6,16 @@ ui-tests:
   device:
     - {model: lucye, version: 24}
     - {model: blueline, version: 29}
+  test-targets:
+    - "annotation com.twilio.video.app.e2eTest.E2ETest"
+
+integration-tests:
+  timeout: 30m
+  type: instrumentation
+  app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
+  test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
+  device:
+    - {model: lucye, version: 24}
+    - {model: blueline, version: 29}
+  test-targets:
+    - "annotation com.twilio.video.app.integrationTest.IntegrationTest"

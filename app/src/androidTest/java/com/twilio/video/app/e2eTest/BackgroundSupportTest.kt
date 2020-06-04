@@ -14,16 +14,16 @@ import com.twilio.video.app.screen.clickJoinRoomButton
 import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.getString
+import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
-import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class BackgroundSupportTest : BaseUITest() {
+class BackgroundSupportTest : BaseE2ETest() {
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()
@@ -32,7 +32,7 @@ class BackgroundSupportTest : BaseUITest() {
     fun it_should_show_a_notification_when_the_app_is_in_the_background() {
         retryEspressoAction { assertScreenIsDisplayed() }
 
-        enterRoomName(UUID.randomUUID().toString())
+        enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }

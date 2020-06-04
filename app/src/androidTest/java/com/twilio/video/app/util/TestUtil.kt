@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonReader
 import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.TestCredentials
 import java.io.InputStreamReader
+import java.util.UUID
 import java.util.concurrent.TimeoutException
 import junit.framework.AssertionFailedError
 
@@ -38,6 +39,8 @@ fun retrieveEmailCredentials(): EmailCredentials {
     val jsonReader = JsonReader(reader)
     return (Gson().fromJson(jsonReader, TestCredentials::class.java) as TestCredentials).email_sign_in_user
 }
+
+fun randomUUID() = UUID.randomUUID().toString()
 
 private fun countDown(startTime: Long): Long {
     Thread.sleep(10)
