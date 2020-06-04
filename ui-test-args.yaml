@@ -1,4 +1,4 @@
-ui-tests:
+e2e-tests:
   timeout: 30m
   type: instrumentation
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk

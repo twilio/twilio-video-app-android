@@ -153,7 +153,7 @@ jobs:
           command: ./gradlew app:testCommunityDebugUnitTest
       - save-cache: *save-cache-gradle
 
-  ui-tests:
+  e2e-tests:
     <<: *ui-test-defaults
     steps:
       # Setup
@@ -166,7 +166,7 @@ jobs:
           name: UI Tests
           command: >
             gcloud firebase test android run --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
-            ui-test-args.yaml:ui-tests
+            ui-test-args.yaml:e2e-tests
 
   build-release-app:
     <<: *build-defaults
@@ -229,7 +229,7 @@ workflows:
             - build-app
             - lint
             - check-format
-      - ui-tests:
+      - e2e-tests:
           <<: *build-test-filter
           requires:
             - build-app
