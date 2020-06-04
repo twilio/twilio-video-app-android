@@ -20,7 +20,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class RoomTest : BaseUITest() {
+class RoomTest : BaseE2ETest() {
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()

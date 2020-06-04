@@ -15,6 +15,7 @@ import com.twilio.video.app.util.uiDevice
 import org.junit.Rule
 import org.junit.Test
 
+@E2ETest
 class PermissionTest {
 
     @get:Rule

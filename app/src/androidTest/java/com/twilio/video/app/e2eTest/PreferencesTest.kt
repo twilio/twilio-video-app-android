@@ -22,7 +22,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class PreferencesTest : BaseUITest() {
+class PreferencesTest : BaseE2ETest() {
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()

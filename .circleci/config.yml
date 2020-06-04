@@ -161,12 +161,25 @@ jobs:
       - attach_workspace:
           at: *workspace
       - run: *gcloud-auth
-      # Execute tests
       - run:
-          name: UI Tests
+          name: E2E Tests
           command: >
             gcloud firebase test android run --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
             ui-test-args.yaml:e2e-tests
+
+  integration-tests:
+    <<: *ui-test-defaults
+    steps:
+      # Setup
+      - checkout
+      - attach_workspace:
+          at: *workspace
+      - run: *gcloud-auth
+      - run:
+          name: Integration Tests
+          command: >
+            gcloud firebase test android run --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
+            ui-test-args.yaml:integration-tests
 
   build-release-app:
     <<: *build-defaults
@@ -230,6 +243,12 @@ workflows:
             - lint
             - check-format
       - e2e-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - integration-tests:
           <<: *build-test-filter
           requires:
             - build-app
