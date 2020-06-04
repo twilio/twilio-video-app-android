@@ -11,8 +11,8 @@ import com.twilio.video.app.screen.clickMicButton
 import com.twilio.video.app.screen.clickVideoButton
 import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
-import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,7 +34,7 @@ class RoomTest : BaseE2ETest() {
 
     @Test
     fun it_should_connect_to_a_room_successfully() {
-        enterRoomName(UUID.randomUUID().toString())
+        enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
@@ -46,7 +46,7 @@ class RoomTest : BaseE2ETest() {
     fun it_should_connect_to_a_room_successfully_with_mic_and_video_muted() {
         clickVideoButton()
         clickMicButton()
-        enterRoomName(UUID.randomUUID().toString())
+        enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
