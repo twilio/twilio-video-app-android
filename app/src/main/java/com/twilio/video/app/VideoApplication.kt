@@ -22,10 +22,10 @@ import androidx.multidex.MultiDex
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
+import javax.inject.Inject
 import timber.log.Timber
 import tvi.webrtc.voiceengine.WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage
 import tvi.webrtc.voiceengine.WebRtcAudioUtils.deviceIsBlacklistedForOpenSLESUsage
-import javax.inject.Inject
 
 class VideoApplication : Application(), HasAndroidInjector {
     @Inject

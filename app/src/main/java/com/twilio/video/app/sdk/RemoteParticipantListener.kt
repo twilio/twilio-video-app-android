@@ -12,10 +12,27 @@ import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import timber.log.Timber
 
 class RemoteParticipantListener(private val roomManager: RoomManager) : RemoteParticipant.Listener {
+
+    override fun onVideoTrackSwitchedOff(remoteParticipant: RemoteParticipant, remoteVideoTrack: RemoteVideoTrack) {
+        Timber.i("RemoteVideoTrack switched off for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
+                remoteParticipant.sid, remoteVideoTrack.sid)
+
+        roomManager.sendParticipantEvent(TrackSwitchOff(remoteParticipant.sid, remoteVideoTrack,
+                true))
+    }
+
+    override fun onVideoTrackSwitchedOn(remoteParticipant: RemoteParticipant, remoteVideoTrack: RemoteVideoTrack) {
+        Timber.i("RemoteVideoTrack switched on for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",
+                remoteParticipant.sid, remoteVideoTrack.sid)
+
+        roomManager.sendParticipantEvent(TrackSwitchOff(remoteParticipant.sid, remoteVideoTrack,
+                false))
+    }
 
     override fun onVideoTrackSubscribed(remoteParticipant: RemoteParticipant, remoteVideoTrackPublication: RemoteVideoTrackPublication, remoteVideoTrack: RemoteVideoTrack) {
         Timber.i("RemoteVideoTrack subscribed for RemoteParticipant sid: %s, RemoteVideoTrack sid: %s",

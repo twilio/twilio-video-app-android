@@ -23,6 +23,7 @@ sealed class RoomEvent {
 
         data class ParticipantConnected(val participant: Participant) : ParticipantEvent()
         data class VideoTrackUpdated(val sid: String, val videoTrack: VideoTrack?) : ParticipantEvent()
+        data class TrackSwitchOff(val sid: String, val videoTrack: VideoTrack, val switchOff: Boolean) : ParticipantEvent()
         data class ScreenTrackUpdated(
             val sid: String,
             val screenTrack: VideoTrack?

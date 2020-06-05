@@ -11,5 +11,5 @@ sealed class RoomViewEffect {
     object Disconnected : RoomViewEffect()
 
     object ShowConnectFailureDialog : RoomViewEffect()
-    data class ShowTokenErrorDialog(val serviceError: AuthServiceError? = null ) : RoomViewEffect()
+    data class ShowTokenErrorDialog(val serviceError: AuthServiceError? = null) : RoomViewEffect()
 }

@@ -16,8 +16,8 @@
 
 package com.twilio.video.app.auth
 
-import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
 import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
+import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
 import com.twilio.video.app.util.plus
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter

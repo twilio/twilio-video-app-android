@@ -18,10 +18,10 @@ package com.twilio.video.app;
 
 import com.twilio.video.app.auth.CommunityAuthModule;
 import com.twilio.video.app.data.AuthServiceModule;
+import com.twilio.video.app.sdk.CommunityVideoSdkModule;
 import com.twilio.video.app.security.SecurityModule;
 import com.twilio.video.app.ui.CommunityScreenSelectorModule;
 import com.twilio.video.app.ui.login.CommunityLoginActivityModule;
-import com.twilio.video.app.ui.room.CommunityRoomManagerModule;
 import com.twilio.video.app.ui.room.RoomActivityModule;
 import com.twilio.video.app.ui.room.VideoServiceModule;
 import com.twilio.video.app.ui.settings.SettingsActivityModule;
@@ -32,24 +32,23 @@ import dagger.android.AndroidInjectionModule;
 
 @ApplicationScope
 @Component(
-    modules = {
-        AndroidInjectionModule.class,
-        ApplicationModule.class,
-        CommunityTreeModule.class,
-        AuthServiceModule.class,
-        CommunityAuthModule.class,
-        CommunityScreenSelectorModule.class,
-        SplashActivityModule.class,
-        CommunityLoginActivityModule.class,
-        RoomActivityModule.class,
-        SettingsActivityModule.class,
-        SettingsFragmentModule.class,
-        VideoServiceModule.class,
-        CommunityRoomManagerModule.class,
-        SecurityModule.class,
-        AudioSwitchModule.class
-    }
-)
+        modules = {
+            AndroidInjectionModule.class,
+            ApplicationModule.class,
+            CommunityTreeModule.class,
+            AuthServiceModule.class,
+            CommunityAuthModule.class,
+            CommunityScreenSelectorModule.class,
+            SplashActivityModule.class,
+            CommunityLoginActivityModule.class,
+            RoomActivityModule.class,
+            SettingsActivityModule.class,
+            SettingsFragmentModule.class,
+            VideoServiceModule.class,
+            CommunityVideoSdkModule.class,
+            SecurityModule.class,
+            AudioSwitchModule.class
+        })
 public interface VideoApplicationComponent {
     void inject(VideoApplication application);
 }

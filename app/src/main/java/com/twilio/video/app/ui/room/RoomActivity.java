@@ -70,10 +70,12 @@ import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
+import com.twilio.video.LocalTrackPublicationOptions;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Room;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
+import com.twilio.video.TrackPriority;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.app.R;
@@ -84,6 +86,7 @@ import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.data.api.TokenService;
 import com.twilio.video.app.participant.ParticipantViewState;
 import com.twilio.video.app.sdk.RoomManager;
+import com.twilio.video.app.sdk.VideoTrackViewState;
 import com.twilio.video.app.udf.ViewEffect;
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected;
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
@@ -91,7 +94,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
-import com.twilio.video.app.ui.room.RoomViewEvent.ScreenLoad;
+import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice;
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo;
@@ -315,7 +318,7 @@ public class RoomActivity extends BaseActivity {
 
         restoreCameraTrack();
 
-        roomViewModel.processInput(ScreenLoad.INSTANCE);
+        roomViewModel.processInput(RefreshViewState.INSTANCE);
 
         publishLocalTracks();
 
@@ -480,9 +483,8 @@ public class RoomActivity extends BaseActivity {
     }
 
     @OnTextChanged(
-        value = R.id.room_edit_text,
-        callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED
-    )
+            value = R.id.room_edit_text,
+            callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void onTextChanged(CharSequence text) {
         connect.setEnabled(!TextUtils.isEmpty(text));
     }
@@ -502,8 +504,7 @@ public class RoomActivity extends BaseActivity {
         if (text != null) {
             final String roomName = text.toString();
 
-            RoomViewEvent.Connect viewEvent =
-                    new RoomViewEvent.Connect(displayName, roomName, isNetworkQualityEnabled());
+            RoomViewEvent.Connect viewEvent = new RoomViewEvent.Connect(displayName, roomName);
             roomViewModel.processInput(viewEvent);
         }
     }
@@ -558,7 +559,7 @@ public class RoomActivity extends BaseActivity {
                             videoConstraints,
                             CAMERA_TRACK_NAME);
             if (localParticipant != null && cameraVideoTrack != null) {
-                localParticipant.publishTrack(cameraVideoTrack);
+                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
 
                 // enable video settings
                 switchCameraMenuItem.setVisible(cameraVideoTrack.isEnabled());
@@ -591,10 +592,10 @@ public class RoomActivity extends BaseActivity {
                         : R.drawable.ic_videocam_off_gray_24px);
     }
 
-    private boolean isNetworkQualityEnabled() {
-        return sharedPreferences.getBoolean(
-                Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
-                Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT);
+    private void publishVideoTrack(LocalVideoTrack videoTrack, TrackPriority trackPriority) {
+        LocalTrackPublicationOptions localTrackPublicationOptions =
+                new LocalTrackPublicationOptions(trackPriority);
+        localParticipant.publishTrack(videoTrack, localTrackPublicationOptions);
     }
 
     private void obtainVideoConstraints() {
@@ -616,9 +617,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup video dimensions
         int minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0);
-        int maxVideoDim =
-                sharedPreferences.getInt(
-                        Preferences.MAX_VIDEO_DIMENSIONS, videoDimensions.length - 1);
+        int maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1);
 
         if (maxVideoDim != -1 && minVideoDim != -1) {
             builder.minVideoDimensions(videoDimensions[minVideoDim]);
@@ -636,7 +635,7 @@ public class RoomActivity extends BaseActivity {
 
         // setup fps
         int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
-        int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 30);
+        int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 24);
 
         if (maxFps != -1 && minFps != -1) {
             builder.minFps(minFps);
@@ -687,8 +686,9 @@ public class RoomActivity extends BaseActivity {
         if (cameraVideoTrack == null && !isVideoMuted) {
             setupLocalVideoTrack();
             if (room != null && localParticipant != null)
-                localParticipant.publishTrack(cameraVideoTrack);
+                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
         }
+        roomViewModel.processInput(RefreshViewState.INSTANCE);
     }
 
     /** Create local video track */
@@ -727,11 +727,13 @@ public class RoomActivity extends BaseActivity {
      */
     private void renderLocalParticipantStub() {
 
+        VideoTrackViewState cameraTrackViewState =
+                cameraVideoTrack != null ? new VideoTrackViewState(cameraVideoTrack, false) : null;
         primaryParticipantController.renderAsPrimary(
                 localParticipantSid,
                 getString(R.string.you),
                 null,
-                cameraVideoTrack,
+                cameraTrackViewState,
                 localAudioTrack == null,
                 cameraCapturer != null
                         && cameraCapturer.getCameraSource()
@@ -861,7 +863,7 @@ public class RoomActivity extends BaseActivity {
                     screenVideoTrack.getName(), getString(R.string.screen_video_track));
 
             if (localParticipant != null) {
-                localParticipant.publishTrack(screenVideoTrack);
+                publishVideoTrack(screenVideoTrack, TrackPriority.HIGH);
             }
         } else {
             Snackbar.make(
@@ -1003,7 +1005,7 @@ public class RoomActivity extends BaseActivity {
         if (localParticipant != null) {
             if (cameraVideoTrack != null) {
                 Timber.d("Camera track: %s", cameraVideoTrack);
-                localParticipant.publishTrack(cameraVideoTrack);
+                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
             }
 
             if (localAudioTrack != null) {

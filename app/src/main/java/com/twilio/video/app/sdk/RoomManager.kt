@@ -1,31 +1,12 @@
 package com.twilio.video.app.sdk
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.twilio.androidenv.Env
-import com.twilio.video.AudioCodec
-import com.twilio.video.ConnectOptions
-import com.twilio.video.EncodingParameters
-import com.twilio.video.G722Codec
-import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
-import com.twilio.video.NetworkQualityConfiguration
-import com.twilio.video.NetworkQualityVerbosity
-import com.twilio.video.OpusCodec
 import com.twilio.video.Participant
-import com.twilio.video.PcmaCodec
-import com.twilio.video.PcmuCodec
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 import com.twilio.video.TwilioException
-import com.twilio.video.Video
-import com.twilio.video.VideoCodec
-import com.twilio.video.Vp8Codec
-import com.twilio.video.Vp9Codec
-import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
-import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
@@ -35,15 +16,10 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
-import com.twilio.video.app.util.EnvUtil
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 const val MICROPHONE_TRACK_NAME = "microphone"
@@ -52,9 +28,7 @@ const val SCREEN_TRACK_NAME = "screen"
 
 class RoomManager(
     private val context: Context,
-    private val sharedPreferences: SharedPreferences,
-    private val tokenService: TokenService,
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val videoClient: VideoClient
 ) {
 
     private val roomListener = RoomListener()
@@ -66,68 +40,14 @@ class RoomManager(
         room?.disconnect()
     }
 
-    suspend fun connectToRoom(
-        identity: String,
-        roomName: String,
-        isNetworkQualityEnabled: Boolean
-    ) {
-        coroutineScope.launch {
-            try {
-                roomEventSubject.onNext(Connecting)
-                setSdkEnvironment(sharedPreferences)
-                val token = tokenService.getToken(identity, roomName)
-                val enableInsights = sharedPreferences.getBoolean(
-                        Preferences.ENABLE_INSIGHTS,
-                        Preferences.ENABLE_INSIGHTS_DEFAULT)
-
-                val enableAutomaticTrackSubscription: Boolean = getPreferenceByKeyWithDefault(
-                        Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION,
-                        Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT)
-
-                val enableDominantSpeaker: Boolean = getPreferenceByKeyWithDefault(
-                        Preferences.ENABLE_DOMINANT_SPEAKER,
-                        Preferences.ENABLE_DOMINANT_SPEAKER_DEFAULT)
-
-                val preferedVideoCodec: VideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC)
-
-                val preferredAudioCodec: AudioCodec = getAudioCodecPreference()
-
-                val configuration = NetworkQualityConfiguration(
-                        NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
-                        NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
-
-                val connectOptionsBuilder = ConnectOptions.Builder(token)
-                        .roomName(roomName)
-                        .enableAutomaticSubscription(enableAutomaticTrackSubscription)
-                        .enableDominantSpeaker(enableDominantSpeaker)
-                        .enableInsights(enableInsights)
-                        .enableNetworkQuality(isNetworkQualityEnabled)
-                        .networkQualityConfiguration(configuration)
-
-                val maxVideoBitrate = sharedPreferences.getInt(
-                        Preferences.MAX_VIDEO_BITRATE,
-                        Preferences.MAX_VIDEO_BITRATE_DEFAULT)
-
-                val maxAudioBitrate = sharedPreferences.getInt(
-                        Preferences.MAX_AUDIO_BITRATE,
-                        Preferences.MAX_AUDIO_BITRATE_DEFAULT)
-
-                val encodingParameters = EncodingParameters(maxAudioBitrate, maxVideoBitrate)
-
-                connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
-                connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
-                connectOptionsBuilder.encodingParameters(encodingParameters)
-
-                val room = Video.connect(
-                        context,
-                        connectOptionsBuilder.build(),
-                        roomListener)
-                this@RoomManager.room = room
-            } catch (e: AuthServiceException) {
-                handleTokenException(e, e.error)
-            } catch (e: Exception) {
-                handleTokenException(e)
-            }
+    suspend fun connect(identity: String, roomName: String) {
+        roomEventSubject.onNext(Connecting)
+        room = try {
+            videoClient.connect(identity, roomName, roomListener)
+        } catch (e: AuthServiceException) {
+            handleTokenException(e, e.error)
+        } catch (e: Exception) {
+            handleTokenException(e)
         }
     }
 
@@ -135,53 +55,10 @@ class RoomManager(
         roomEventSubject.onNext(participantEvent)
     }
 
-    private fun handleTokenException(e: Exception, error: AuthServiceError? = null) {
+    private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
         Timber.e(e, "Failed to retrieve token")
-        roomEventSubject.onNext(TokenError(serviceError = error))
-    }
-
-    private fun getPreferenceByKeyWithDefault(key: String, defaultValue: Boolean): Boolean {
-        return sharedPreferences.getBoolean(key, defaultValue)
-    }
-
-    private fun getVideoCodecPreference(key: String): VideoCodec {
-        return sharedPreferences.getString(key, Preferences.VIDEO_CODEC_DEFAULT)?.let { videoCodecName ->
-                when (videoCodecName) {
-                    Vp8Codec.NAME -> {
-                        val simulcast = sharedPreferences.getBoolean(
-                                Preferences.VP8_SIMULCAST, Preferences.VP8_SIMULCAST_DEFAULT)
-                        Vp8Codec(simulcast)
-                    }
-                    H264Codec.NAME -> H264Codec()
-                    Vp9Codec.NAME -> Vp9Codec()
-                    else -> Vp8Codec()
-                }
-            } ?: Vp8Codec()
-    }
-
-    private fun getAudioCodecPreference(): AudioCodec {
-        return sharedPreferences.getString(
-                Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT)?.let { audioCodecName ->
-
-            when (audioCodecName) {
-                IsacCodec.NAME -> IsacCodec()
-                PcmaCodec.NAME -> PcmaCodec()
-                PcmuCodec.NAME -> PcmuCodec()
-                G722Codec.NAME -> G722Codec()
-                else -> OpusCodec()
-            }
-        } ?: OpusCodec()
-    }
-
-    private fun setSdkEnvironment(sharedPreferences: SharedPreferences) {
-        val env = sharedPreferences.getString(
-                Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
-        val nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env)
-        Env.set(
-                context,
-                EnvUtil.TWILIO_ENV_KEY,
-                nativeEnvironmentVariableValue,
-                true)
+        roomEventSubject.onNext(RoomEvent.TokenError(serviceError = error))
+        return null
     }
 
     inner class RoomListener : Room.Listener {

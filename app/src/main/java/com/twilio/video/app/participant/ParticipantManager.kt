@@ -1,7 +1,8 @@
 package com.twilio.video.app.participant
 
 import com.twilio.video.NetworkQualityLevel
-import com.twilio.video.VideoTrack
+import com.twilio.video.TrackPriority.HIGH
+import com.twilio.video.app.sdk.VideoTrackViewState
 import timber.log.Timber
 
 class ParticipantManager {
@@ -41,12 +42,12 @@ class ParticipantManager {
         }
     }
 
-    fun updateParticipantVideoTrack(sid: String, videoTrack: VideoTrack?) {
+    fun updateParticipantVideoTrack(sid: String, videoTrack: VideoTrackViewState?) {
         mutableParticipants.find { it.sid == sid }?.copy(
                 videoTrack = videoTrack)?.let { updateParticipant(it) }
     }
 
-    fun updateParticipantScreenTrack(sid: String, screenTrack: VideoTrack?) {
+    fun updateParticipantScreenTrack(sid: String, screenTrack: VideoTrackViewState?) {
         mutableParticipants.find { it.sid == sid }?.copy(
                 screenTrack = screenTrack)?.let { updateParticipant(it) }
     }
@@ -100,15 +101,47 @@ class ParticipantManager {
     }
 
     private fun updatePrimaryParticipant() {
-        primaryParticipant = determinePrimaryParticipant()
+        primaryParticipant = retrievePrimaryParticipant()
         Timber.d("Participant Cache: $mutableParticipants")
         Timber.d("Primary Participant: $primaryParticipant")
     }
 
+    private fun retrievePrimaryParticipant(): ParticipantViewState? =
+            determinePrimaryParticipant()?.apply { setTrackPriority(this) }
+
     private fun determinePrimaryParticipant(): ParticipantViewState? {
         return mutableParticipants.find { it.isPinned }
-        ?: mutableParticipants.find { it.screenTrack != null }
-        ?: mutableParticipants.find { it.isDominantSpeaker }
-        ?: mutableParticipants.find { !it.isLocalParticipant }
+                ?: mutableParticipants.find { it.isScreenSharing }
+                ?: mutableParticipants.find { it.isDominantSpeaker }
+                ?: mutableParticipants.find { !it.isLocalParticipant }
+    }
+
+    private fun setTrackPriority(participant: ParticipantViewState) {
+        if (participant.sid != primaryParticipant?.sid) {
+            when {
+                participant.isScreenSharing -> {
+                    participant.getRemoteScreenTrack()?.priority = HIGH
+                    Timber.d("Setting screen track priority to high for participant with sid: ${participant.sid}")
+                }
+                participant.isDominantSpeaker -> {
+                    participant.getRemoteVideoTrack()?.priority = null
+                    Timber.d("Clearing dominant speaker priority for participant with sid: ${participant.sid}")
+                }
+                else -> {
+                    participant.getRemoteVideoTrack()?.priority = HIGH
+                    Timber.d("Setting video track priority to high for participant with sid: ${participant.sid}")
+                }
+            }
+
+            clearOldTrackPriorities()
+        }
+    }
+
+    private fun clearOldTrackPriorities() {
+        primaryParticipant?.run {
+            getRemoteVideoTrack()?.priority = null
+            getRemoteScreenTrack()?.priority = null
+            Timber.d("Clearing video and screen track priorities for participant with sid: $sid")
+        }
     }
 }

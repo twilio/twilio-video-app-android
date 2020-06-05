@@ -2,13 +2,13 @@ package com.twilio.video.app.ui.room
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.selection.AudioDeviceSelector
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
+import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.udf.BaseViewModel
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
@@ -18,9 +18,10 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
@@ -30,7 +31,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
-import com.twilio.video.app.ui.room.RoomViewEvent.ScreenLoad
+import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
@@ -39,6 +40,8 @@ import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -46,8 +49,9 @@ class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
     private val participantManager: ParticipantManager = ParticipantManager(),
+    private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     private val rxDisposables: CompositeDisposable = CompositeDisposable(),
-    private val scheduler: Scheduler = AndroidSchedulers.mainThread()
+    scheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
 
     init {
@@ -76,17 +80,14 @@ class RoomViewModel(
     override fun processInput(viewEvent: RoomViewEvent) {
         Timber.d("View Event: $viewEvent")
         when (viewEvent) {
-            is ScreenLoad -> updateState { it.copy() }
+            is RefreshViewState -> updateState { it.copy() }
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
             }
             ActivateAudioDevice -> { audioDeviceSelector.activate() }
             DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
             is Connect -> {
-                connect(
-                        viewEvent.identity,
-                        viewEvent.roomName,
-                        viewEvent.isNetworkQualityEnabled)
+                connect(viewEvent.identity, viewEvent.roomName)
             }
             is PinParticipant -> {
                 participantManager.changePinnedParticipant(viewEvent.sid)
@@ -143,12 +144,18 @@ class RoomViewModel(
             is ParticipantConnected -> addParticipant(participantEvent.participant)
             is VideoTrackUpdated -> {
                 participantManager.updateParticipantVideoTrack(participantEvent.sid,
-                        participantEvent.videoTrack)
+                        participantEvent.videoTrack?.let { VideoTrackViewState(it) })
+                updateParticipantViewState()
+            }
+            is TrackSwitchOff -> {
+                participantManager.updateParticipantVideoTrack(participantEvent.sid,
+                        VideoTrackViewState(participantEvent.videoTrack,
+                                participantEvent.switchOff))
                 updateParticipantViewState()
             }
             is ScreenTrackUpdated -> {
                 participantManager.updateParticipantScreenTrack(participantEvent.sid,
-                        participantEvent.screenTrack)
+                        participantEvent.screenTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
             }
             is MuteParticipant -> {
@@ -221,16 +228,11 @@ class RoomViewModel(
         }
     }
 
-    private fun connect(
-        identity: String,
-        roomName: String,
-        isNetworkQualityEnabled: Boolean
-    ) =
-        viewModelScope.launch {
-            roomManager.connectToRoom(
+    private fun connect(identity: String, roomName: String) =
+        backgroundScope.launch {
+            roomManager.connect(
                     identity,
-                    roomName,
-                    isNetworkQualityEnabled)
+                    roomName)
         }
 
     class RoomViewModelFactory(

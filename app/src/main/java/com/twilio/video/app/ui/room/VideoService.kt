@@ -10,8 +10,8 @@ import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.util.plus
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
