@@ -14,6 +14,7 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [x] Switch between front and back camera
 - [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
 - [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
+- [x] [Bandwidth Profile API](https://www.twilio.com/docs/video/tutorials/using-bandwidth-profile-api)
 
 ## Requirements
 
