@@ -45,14 +45,14 @@
             android:theme="@style/AppTheme.LoginScreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
-            android:launchMode="singleTop"
+            android:launchMode="singleInstance"
             android:name=".ui.room.RoomActivity"
+            android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.Lobby">
         </activity>
         <activity android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.room.RoomActivity"
-            android:label="@string/settings"
             android:theme="@style/AppTheme.Settings" />
         <service android:name=".ui.room.VideoService"/>
     </application>

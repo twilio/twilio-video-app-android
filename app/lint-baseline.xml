@@ -694,41 +694,6 @@
     <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
-        errorLine1="            &lt;EditText"
-        errorLine2="             ~~~~~~~~"
-        includedVariants="communityDebug"
-        excludedVariants="internalDebug,internalRelease,twilioRelease">
-        <location
-            file="src/community/res/layout/development_activity_login.xml"
-            line="56"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="            &lt;EditText"
-        errorLine2="             ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_existing_account_login.xml"
-            line="56"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="            &lt;EditText"
-        errorLine2="             ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_existing_account_login.xml"
-            line="69"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
         errorLine1="        &lt;EditText"
         errorLine2="         ~~~~~~~~">
         <location

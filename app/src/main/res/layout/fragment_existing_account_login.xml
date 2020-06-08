@@ -63,6 +63,7 @@
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autofillHints="username"
                 android:inputType="textEmailAddress"
                 android:hint="@string/email"/>
 
@@ -76,6 +77,7 @@
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autofillHints="password"
                 android:inputType="textPassword"
                 android:hint="@string/password"/>
         </LinearLayout>

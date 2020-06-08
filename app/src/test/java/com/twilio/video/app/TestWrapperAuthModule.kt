@@ -1,13 +1,12 @@
 package com.twilio.video.app
 
-import dagger.Module
-import dagger.Provides
-
 import com.twilio.video.app.auth.FirebaseWrapper
+import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
-import com.twilio.video.app.auth.GoogleAuthProviderWrapper
+import dagger.Module
+import dagger.Provides
 
 @Module
 class TestWrapperAuthModule(

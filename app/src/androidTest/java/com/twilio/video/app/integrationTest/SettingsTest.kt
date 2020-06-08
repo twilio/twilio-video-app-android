@@ -11,6 +11,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
+@IntegrationTest
 class SettingsTest {
 
     @get:Rule

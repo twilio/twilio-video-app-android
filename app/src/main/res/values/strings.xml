@@ -13,6 +13,8 @@
     <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
     <string name="room_screen_token_retrieval_failure_message">Failed to retrieve the room token.</string>
     <string name="room_screen_token_expired_message">Passcode expired. Please sign in with a new passcode.</string>
+    <string name="room_screen_select_device">Select Device</string>
+    <string name="room_screen_pin_icon_description">Participant Pin</string>
 
     <!--  Notifications  -->
     <string name="room_notification_channel_title">Video Call</string>
@@ -84,6 +86,51 @@
         <item>1920x1080</item>
     </string-array>
 
+    <string-array name="settings_screen_bandwidth_profile_modes">
+        <item>Server Default</item>
+        <item>Collaboration</item>
+        <item>Grid</item>
+        <item>Presentation</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_mode_values">
+        <item>Server Default</item>
+        <item>COLLABORATION</item>
+        <item>GRID</item>
+        <item>PRESENTATION</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_dominant_speaker_priorities">
+        <item>Server Default</item>
+        <item>Low</item>
+        <item>Standard</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_dominant_speaker_priority_values">
+        <item>Server Default</item>
+        <item>LOW</item>
+        <item>STANDARD</item>
+        <item>HIGH</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_track_switch_modes">
+        <item>Server Default</item>
+        <item>Disabled</item>
+        <item>Predicted</item>
+        <item>Detected</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_track_switch_mode_values">
+        <item>Server Default</item>
+        <item>DISABLED</item>
+        <item>PREDICTED</item>
+        <item>DETECTED</item>
+    </string-array>
+    <string-array name="settings_screen_bandwidth_profile_render_dimensions">
+        <item>Server Default</item>
+        <item>176x144</item>
+        <item>640x480</item>
+        <item>960x540</item>
+        <item>1280x720</item>
+        <item>1920x1080</item>
+    </string-array>
+
     <string name="stats_enable_in_settings">Enable in Settings</string>
     <string name="enable_ice">Enable ICE Options</string>
     <string name="ice_options">Enable ICE options</string>
@@ -119,13 +166,13 @@
     <string name="pause_video">Pause video</string>
     <string name="resume_video">Resume video</string>
     <string name="share_screen">Share screen</string>
+    <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
     <string name="screen_capture_error">Screen capturer error occurred.</string>
     <string name="general">General</string>
     <string name="join">Join</string>
     <string name="room">Room</string>
-    <string name="turn_speaker_on">Speaker ON</string>
     <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
     <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
     <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
@@ -160,6 +207,16 @@
     <string name="stats_disabled">Stats disabled</string>
     <string name="profile_picture">Profile picture</string>
     <string name="number">Number</string>
+    <string name="settings_screen_bandwidth_profile">Bandwidth Profile</string>
+    <string name="settings_screen_bandwidth_profile_mode">Mode</string>
+    <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
+    <string name="settings_screen_max_video_tracks">Max Video Tracks</string>
+    <string name="settings_screen_bandwidth_profile_dominant_speaker_priority">Dominant Speaker Priority</string>
+    <string name="settings_screen_bandwidth_profile_track_switch_mode">Track Switch Off Mode</string>
+    <string name="settings_screen_render_dimensions">Render Dimensions</string>
+    <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
+    <string name="settings_screen_bandwidth_profile_standard_track_priority">Standard Track Priority</string>
+    <string name="settings_screen_bandwidth_profile_high_track_priority">High Track Priority</string>
 
     <string-array name="ice_trans_policy_array">
         <item>All</item>

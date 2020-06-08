@@ -36,6 +36,7 @@ import com.twilio.video.I420Frame;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTextureView;
+import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -47,12 +48,10 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     boolean mirror = false;
     int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
 
+    VideoTrack videoTrack;
+
     @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
-
-    @Nullable
-    @BindView(R.id.participant_badge)
-    ConstraintLayout identityBadge;
 
     @BindView(R.id.participant_video_identity)
     TextView videoIdentity;
@@ -66,17 +65,20 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     @BindView(R.id.participant_stub_image)
     ImageView stubImage;
 
-    @BindView(R.id.dominant_speaker_img)
-    ImageView dominantSpeakerImg;
-
+    @Nullable
     @BindView(R.id.network_quality_level_img)
     ImageView networkQualityLevelImg;
 
     @BindView(R.id.participant_selected_identity)
     TextView selectedIdentity;
 
+    @Nullable
     @BindView(R.id.participant_no_audio)
     ImageView audioToggle;
+
+    @Nullable
+    @BindView(R.id.participant_pin)
+    ImageView pinImage;
 
     public ParticipantView(@NonNull Context context) {
         super(context);
@@ -113,14 +115,9 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     public void setState(int state) {
         this.state = state;
         switch (state) {
+            case State.SWITCHED_OFF:
             case State.VIDEO:
-                selectedLayout.setVisibility(GONE);
-                stubImage.setVisibility(GONE);
-                selectedIdentity.setVisibility(GONE);
-
-                videoLayout.setVisibility(VISIBLE);
-                videoIdentity.setVisibility(VISIBLE);
-                videoView.setVisibility(VISIBLE);
+                videoState();
                 break;
             case State.NO_VIDEO:
             case State.SELECTED:
@@ -137,6 +134,16 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
         }
     }
 
+    private void videoState() {
+        selectedLayout.setVisibility(GONE);
+        stubImage.setVisibility(GONE);
+        selectedIdentity.setVisibility(GONE);
+
+        videoLayout.setVisibility(VISIBLE);
+        videoIdentity.setVisibility(VISIBLE);
+        videoView.setVisibility(VISIBLE);
+    }
+
     public void setMirror(boolean mirror) {
         this.mirror = mirror;
         videoView.setMirror(this.mirror);
@@ -148,7 +155,11 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     public void setMuted(boolean muted) {
-        audioToggle.setVisibility(muted ? VISIBLE : GONE);
+        if (audioToggle != null) audioToggle.setVisibility(muted ? VISIBLE : GONE);
+    }
+
+    public void setPinned(boolean pinned) {
+        if (pinImage != null) pinImage.setVisibility(pinned ? VISIBLE : GONE);
     }
 
     @Override
@@ -187,12 +198,14 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     @IntDef({
         ParticipantView.State.VIDEO,
         ParticipantView.State.NO_VIDEO,
-        ParticipantView.State.SELECTED
+        ParticipantView.State.SELECTED,
+        ParticipantView.State.SWITCHED_OFF
     })
     @Retention(RetentionPolicy.SOURCE)
     @interface State {
         int VIDEO = 0;
         int NO_VIDEO = 1;
         int SELECTED = 2;
+        int SWITCHED_OFF = 3;
     }
 }
