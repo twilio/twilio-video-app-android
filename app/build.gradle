@@ -23,7 +23,6 @@ def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '28.0.3'
 
     lintOptions {
         disable 'GradleDependency'
@@ -151,7 +150,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0'
+    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
     implementation videoAndroidSdkDep
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation 'com.google.android.material:material:1.0.0'
