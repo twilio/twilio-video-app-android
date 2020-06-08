@@ -19,8 +19,8 @@ package com.twilio.video.app.ui.splash
 import android.content.Intent
 import android.os.Bundle
 import com.twilio.video.app.auth.Authenticator
-import com.twilio.video.app.ui.ScreenSelector
 import com.twilio.video.app.base.BaseActivity
+import com.twilio.video.app.ui.ScreenSelector
 import com.twilio.video.app.ui.room.RoomActivity
 import javax.inject.Inject
 

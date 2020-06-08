@@ -22,11 +22,19 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.twilio.video.app.R;
 
 public class ParticipantThumbView extends ParticipantView {
+
+    @BindView(R.id.participant_track_switch_off_background)
+    View trackSwitchOffBackground;
+
+    @BindView(R.id.participant_track_switch_off_icon)
+    ImageView trackSwitchOffImage;
 
     public ParticipantThumbView(Context context) {
         super(context);
@@ -64,10 +72,17 @@ public class ParticipantThumbView extends ParticipantView {
     public void setState(int state) {
         super.setState(state);
 
+        trackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
+        trackSwitchOffImage.setVisibility(isSwitchOffViewVisible(state));
+
         int resId = R.drawable.participant_background;
         if (state == State.SELECTED) {
             resId = R.drawable.participant_selected_background;
         }
         selectedLayout.setBackground(ContextCompat.getDrawable(getContext(), resId));
+    }
+
+    private int isSwitchOffViewVisible(int state) {
+        return state == State.SWITCHED_OFF ? View.VISIBLE : View.GONE;
     }
 }

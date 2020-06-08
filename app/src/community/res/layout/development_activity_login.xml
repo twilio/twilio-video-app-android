@@ -71,6 +71,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/community_login_screen_name_edittext"
+                    android:autofillHints="username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/login_screen_name"
@@ -93,6 +94,7 @@
                     android:id="@+id/community_login_screen_passcode_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="password"
                     android:hint="@string/login_screen_passcode"
                     android:inputType="numberPassword"/>
             </com.google.android.material.textfield.TextInputLayout>

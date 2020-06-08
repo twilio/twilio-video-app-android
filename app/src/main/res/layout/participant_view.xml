@@ -20,6 +20,24 @@
             android:layout_height="match_parent"
             app:overlaySurface="true"/>
 
+        <View
+            android:id="@+id/participant_track_switch_off_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/participantTrackSwitchOff"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/participant_track_switch_off_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_error_outline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"/>
+
         <TextView
             android:id="@+id/participant_video_identity"
             android:layout_width="match_parent"
@@ -31,17 +49,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
-
-        <ImageView
-            android:id="@+id/dominant_speaker_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_dominant_speaker_img"
-            android:visibility="gone"
-            android:layout_gravity="bottom|left"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
 
         <View
             android:layout_width="match_parent"
@@ -86,7 +93,19 @@
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
         android:contentDescription="@string/audio_toggle"
+        android:visibility="gone"
         app:srcCompat="@drawable/ic_thumbnail_no_audio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/participant_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:contentDescription="@string/room_screen_pin_icon_description"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_pin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -99,7 +118,8 @@
         app:srcCompat="@drawable/network_quality_level_5"
         android:contentDescription="@string/settings_screen_enable_network_quality_level_description"
         android:visibility="gone"
+
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

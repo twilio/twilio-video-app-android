@@ -3,6 +3,7 @@ package com.twilio.video.app.e2eTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.rule.GrantPermissionRule
 import com.twilio.video.app.screen.assertGoogleSignInButtonIsVisible
 import com.twilio.video.app.screen.assertSignInErrorIsVisible
 import com.twilio.video.app.screen.clickSettingsMenuItem
@@ -18,7 +19,13 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
+@E2ETest
 class LoginTest {
+
+    @get:Rule
+    var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA,
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()

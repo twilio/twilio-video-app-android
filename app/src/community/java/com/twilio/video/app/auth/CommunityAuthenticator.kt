@@ -27,10 +27,10 @@ import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.util.putString
 import com.twilio.video.app.util.remove
 import io.reactivex.Observable
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 
 class CommunityAuthenticator constructor(
     private val sharedPreferences: SharedPreferences,

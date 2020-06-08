@@ -16,14 +16,14 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.app.ApplicationModule
-import com.twilio.video.app.TestApp
 import com.twilio.video.app.DaggerIntegrationTestComponent
+import com.twilio.video.app.TestApp
 import com.twilio.video.app.TestWrapperAuthModule
 import com.twilio.video.app.auth.FirebaseWrapper
+import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
-import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.screen.clickGoogleSignInButton
 import com.twilio.video.app.ui.room.RoomActivity
 import org.hamcrest.CoreMatchers.equalTo

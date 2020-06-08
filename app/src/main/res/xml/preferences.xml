@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/general">
         <CheckBoxPreference
@@ -96,6 +97,10 @@
         <EditTextPreference
             android:key="pref_display_name"
             android:title="@string/settings_screen_identity"/>
+        <Preference
+            android:title="@string/settings_screen_bandwidth_profile"
+            app:fragment="com.twilio.video.app.ui.settings.BandwidthProfileSettingsFragment">
+        </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_screen_about">
         <Preference

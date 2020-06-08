@@ -14,6 +14,7 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 - [x] Switch between front and back camera
 - [x] [Dominant speaker](https://www.twilio.com/docs/video/detecting-dominant-speaker) indicator
 - [x] [Network quality](https://www.twilio.com/docs/video/using-network-quality-api) indicator
+- [x] [Bandwidth Profile API](https://www.twilio.com/docs/video/tutorials/using-bandwidth-profile-api)
 
 ## Requirements
 
@@ -52,8 +53,9 @@ If any errors occur after running a [Twilio CLI RTC Plugin](https://github.com/t
 Currently there are three product flavors for the application.
 
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
-1. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
-1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
+2. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
+3. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
+   1. debug and release build types are supported.
 
 #### Building the Community Flavor
 

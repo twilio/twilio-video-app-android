@@ -24,20 +24,20 @@ import androidx.appcompat.app.AlertDialog
 import butterknife.ButterKnife
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
+import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
+import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
+import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
 import com.twilio.video.app.auth.LoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
-import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
-import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
-import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.plus
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 internal const val GOOGLE_SIGN_IN = 4615
 

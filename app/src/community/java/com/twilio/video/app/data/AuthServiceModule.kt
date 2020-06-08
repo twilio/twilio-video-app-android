@@ -22,11 +22,11 @@ import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.security.SecurityModule
 import dagger.Module
 import dagger.Provides
+import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
 @Module(includes = [SecurityModule::class])
 class AuthServiceModule {

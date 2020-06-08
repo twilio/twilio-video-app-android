@@ -2,11 +2,11 @@ package com.twilio.video.app.security
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 import com.facebook.android.crypto.keychain.AndroidConceal
 import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain
 import com.facebook.crypto.Crypto
 import com.facebook.crypto.CryptoConfig
-import android.util.Base64
 import com.facebook.crypto.Entity
 import com.facebook.soloader.SoLoader
 

@@ -11,24 +11,30 @@ import com.twilio.video.app.screen.clickMicButton
 import com.twilio.video.app.screen.clickVideoButton
 import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class RoomTest : BaseUITest() {
+class RoomTest : BaseE2ETest() {
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()
 
+    @Before
+    override fun setUp() {
+        super.setUp()
+
+        retryEspressoAction { assertScreenIsDisplayed() }
+    }
+
     @Test
     fun it_should_connect_to_a_room_successfully() {
-        retryEspressoAction { assertScreenIsDisplayed() }
-
-        enterRoomName(UUID.randomUUID().toString())
+        enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
@@ -38,11 +44,9 @@ class RoomTest : BaseUITest() {
 
     @Test
     fun it_should_connect_to_a_room_successfully_with_mic_and_video_muted() {
-        retryEspressoAction { assertScreenIsDisplayed() }
-
         clickVideoButton()
         clickMicButton()
-        enterRoomName(UUID.randomUUID().toString())
+        enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
