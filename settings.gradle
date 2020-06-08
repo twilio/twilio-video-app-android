@@ -1,1 +1,2 @@
+include ':audioswitch'
 include ':app'
