@@ -43,10 +43,12 @@ import java.lang.annotation.RetentionPolicy;
 
 abstract class ParticipantView extends FrameLayout implements VideoRenderer {
 
+    private static final VideoScaleType DEFAULT_VIDEO_SCALE_TYPE = VideoScaleType.ASPECT_FIT;
+
     String identity = "";
     int state = State.NO_VIDEO;
     boolean mirror = false;
-    int scaleType = VideoScaleType.ASPECT_BALANCED.ordinal();
+    int scaleType = DEFAULT_VIDEO_SCALE_TYPE.ordinal();
 
     VideoTrack videoTrack;
 
@@ -189,7 +191,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
             scaleType =
                     stylables.getInt(
                             R.styleable.ParticipantView_type,
-                            VideoScaleType.ASPECT_BALANCED.ordinal());
+                            DEFAULT_VIDEO_SCALE_TYPE.ordinal());
 
             stylables.recycle();
         }
