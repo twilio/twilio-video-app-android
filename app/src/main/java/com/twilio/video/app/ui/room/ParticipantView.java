@@ -190,8 +190,7 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
             // obtain scale type
             scaleType =
                     stylables.getInt(
-                            R.styleable.ParticipantView_type,
-                            DEFAULT_VIDEO_SCALE_TYPE.ordinal());
+                            R.styleable.ParticipantView_type, DEFAULT_VIDEO_SCALE_TYPE.ordinal());
 
             stylables.recycle();
         }
