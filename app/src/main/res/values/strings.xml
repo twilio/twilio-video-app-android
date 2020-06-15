@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- General -->
     <string name="web_app_domain">twilio-video-react.appspot.com</string>
 
@@ -147,11 +146,8 @@
     <string name="statistics">Statistics</string>
     <string name="local">Local Media</string>
     <string name="remote">Remote Media</string>
-    <string name="ice_transp_policy">Transportation policy</string>
     <string name="stun_turn">STUN or TURN server</string>
     <string name="add_server">Add</string>
-    <string name="ice_servers_dialog_title">ICE Options</string>
-    <string name="ice_servers_list_desc">Choose server(s)</string>
     <string name="ice_options_button">Ice Options</string>
     <string name="prefer_h264">Prefer H264</string>
     <string name="auto_register">Automatically register when app launches</string>
@@ -217,10 +213,4 @@
     <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
     <string name="settings_screen_bandwidth_profile_standard_track_priority">Standard Track Priority</string>
     <string name="settings_screen_bandwidth_profile_high_track_priority">High Track Priority</string>
-
-    <string-array name="ice_trans_policy_array">
-        <item>All</item>
-        <item>Relay</item>
-    </string-array>
-
 </resources>
