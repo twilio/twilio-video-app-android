@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.room
 
+import android.Manifest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.twilio.audioswitch.selection.AudioDeviceSelector
@@ -36,6 +37,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
+import com.twilio.video.app.util.PermissionUtil
 import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,6 +50,7 @@ import timber.log.Timber
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
+    private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
     private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     private val rxDisposables: CompositeDisposable = CompositeDisposable(),
@@ -80,7 +83,7 @@ class RoomViewModel(
     override fun processInput(viewEvent: RoomViewEvent) {
         Timber.d("View Event: $viewEvent")
         when (viewEvent) {
-            is RefreshViewState -> updateState { it.copy() }
+            is RefreshViewState -> checkCameraAndMicPermissions()
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
             }
@@ -106,6 +109,13 @@ class RoomViewModel(
             }
             Disconnect -> roomManager.disconnect()
         }
+    }
+
+    private fun checkCameraAndMicPermissions() {
+        val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
+        val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
+
+        updateState { it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled) }
     }
 
     private fun observeRoomEvents(roomEvent: RoomEvent) {
@@ -237,11 +247,12 @@ class RoomViewModel(
 
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioDeviceSelector
+        private val audioDeviceSelector: AudioDeviceSelector,
+        private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector) as T
+            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil) as T
         }
     }
 }

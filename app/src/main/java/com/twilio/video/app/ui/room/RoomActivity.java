@@ -103,6 +103,7 @@ import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
+import com.twilio.video.app.util.PermissionUtil;
 import com.twilio.video.app.util.StatsScheduler;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -266,7 +267,9 @@ public class RoomActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RoomViewModelFactory factory = new RoomViewModelFactory(roomManager, audioDeviceSelector);
+        RoomViewModelFactory factory =
+                new RoomViewModelFactory(
+                        roomManager, audioDeviceSelector, new PermissionUtil(this));
         roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
@@ -384,6 +387,7 @@ public class RoomActivity extends BaseActivity {
                             && writeExternalStoragePermissionGranted;
 
             if (permissionsGranted) {
+                roomViewModel.processInput(RefreshViewState.INSTANCE);
                 setupLocalMedia();
             } else {
                 Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
@@ -797,6 +801,8 @@ public class RoomActivity extends BaseActivity {
         if (isVideoMuted) {
             localVideoImageButton.setImageResource(R.drawable.ic_videocam_off_gray_24px);
         }
+        localAudioImageButton.setEnabled(roomViewState.isMicEnabled());
+        localVideoImageButton.setEnabled(roomViewState.isCameraEnabled());
 
         statsListAdapter = new StatsListAdapter(this);
         statsRecyclerView.setAdapter(statsListAdapter);

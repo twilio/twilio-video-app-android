@@ -12,6 +12,8 @@ data class RoomViewState(
     val isLobbyLayoutVisible: Boolean = true,
     val isConnectingLayoutVisible: Boolean = false,
     val isConnectedLayoutVisible: Boolean = false,
+    val isCameraEnabled: Boolean = false,
+    val isMicEnabled: Boolean = false,
     val isAudioMuted: Boolean = true,
     val isVideoMuted: Boolean = true
 )
