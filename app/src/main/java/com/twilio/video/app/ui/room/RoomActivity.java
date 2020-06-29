@@ -757,7 +757,8 @@ public class RoomActivity extends BaseActivity {
         boolean screenCaptureMenuItemState = false;
 
         Editable roomEditable = roomEditText.getText();
-        boolean connectButtonEnabled = roomEditable != null && !roomEditable.toString().isEmpty();
+        boolean isRoomTextNotEmpty = roomEditable != null && !roomEditable.toString().isEmpty();
+        boolean connectButtonEnabled = isRoomTextNotEmpty;
 
         String roomName = displayName;
         String toolbarTitle = displayName;
@@ -792,7 +793,7 @@ public class RoomActivity extends BaseActivity {
             joinStatus = "";
         }
         if (roomViewState.isLobbyLayoutVisible()) {
-            connectButtonEnabled = true;
+            connectButtonEnabled = isRoomTextNotEmpty;
             screenCaptureMenuItemState = false;
         }
 

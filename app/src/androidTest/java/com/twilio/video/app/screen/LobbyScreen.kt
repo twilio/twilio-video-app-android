@@ -17,7 +17,9 @@ import com.twilio.video.app.util.getTargetContext
 import org.hamcrest.CoreMatchers.not
 
 fun assertScreenIsDisplayed() {
-    onView(withText(getString(R.string.join))).check(matches(isDisplayed()))
+    onView(withText(getString(R.string.join)))
+            .check(matches(isDisplayed()))
+            .check(matches(not(isEnabled())))
 }
 
 fun clickSettingsMenuItem() {
