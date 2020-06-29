@@ -93,6 +93,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
+import com.twilio.video.app.ui.room.RoomViewEvent.CheckLocalMedia;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
@@ -322,6 +323,7 @@ public class RoomActivity extends BaseActivity {
         restoreCameraTrack();
 
         roomViewModel.processInput(RefreshViewState.INSTANCE);
+        roomViewModel.processInput(CheckLocalMedia.INSTANCE);
 
         publishLocalTracks();
 
@@ -387,7 +389,7 @@ public class RoomActivity extends BaseActivity {
                             && writeExternalStoragePermissionGranted;
 
             if (permissionsGranted) {
-                roomViewModel.processInput(RefreshViewState.INSTANCE);
+                roomViewModel.processInput(CheckLocalMedia.INSTANCE);
                 setupLocalMedia();
             } else {
                 Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
@@ -796,14 +798,15 @@ public class RoomActivity extends BaseActivity {
 
         boolean isMicEnabled = roomViewState.isMicEnabled();
         boolean isCameraEnabled = roomViewState.isCameraEnabled();
-        localAudioImageButton.setEnabled(isMicEnabled);
-        localVideoImageButton.setEnabled(isCameraEnabled);
+        boolean isLocalMediaEnabled = isMicEnabled && isCameraEnabled;
+        localAudioImageButton.setEnabled(isLocalMediaEnabled);
+        localVideoImageButton.setEnabled(isLocalMediaEnabled);
         int micDrawable =
-                isAudioMuted || !isMicEnabled
+                isAudioMuted || !isLocalMediaEnabled
                         ? R.drawable.ic_mic_off_gray_24px
                         : R.drawable.ic_mic_white_24px;
         int videoDrawable =
-                isVideoMuted || !isCameraEnabled
+                isVideoMuted || !isLocalMediaEnabled
                         ? R.drawable.ic_videocam_off_gray_24px
                         : R.drawable.ic_videocam_white_24px;
         localAudioImageButton.setImageResource(micDrawable);

@@ -25,6 +25,7 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdate
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
@@ -83,7 +84,8 @@ class RoomViewModel(
     override fun processInput(viewEvent: RoomViewEvent) {
         Timber.d("View Event: $viewEvent")
         when (viewEvent) {
-            is RefreshViewState -> checkCameraAndMicPermissions()
+            is RefreshViewState -> updateState { it.copy() }
+            is RoomViewEvent.CheckLocalMedia -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
             }
@@ -111,11 +113,13 @@ class RoomViewModel(
         }
     }
 
-    private fun checkCameraAndMicPermissions() {
+    private fun checkLocalMedia() {
         val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
         val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
 
         updateState { it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled) }
+
+        if (isCameraEnabled && isMicEnabled) viewEffect { CheckLocalMedia }
     }
 
     private fun observeRoomEvents(roomEvent: RoomEvent) {
