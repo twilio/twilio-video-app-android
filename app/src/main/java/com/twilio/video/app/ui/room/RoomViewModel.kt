@@ -55,8 +55,9 @@ class RoomViewModel(
     private val participantManager: ParticipantManager = ParticipantManager(),
     private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     private val rxDisposables: CompositeDisposable = CompositeDisposable(),
-    scheduler: Scheduler = AndroidSchedulers.mainThread()
-) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
+    scheduler: Scheduler = AndroidSchedulers.mainThread(),
+    initialViewState: RoomViewState = RoomViewState()
+) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(initialViewState) {
 
     init {
         audioDeviceSelector.start { audioDevices, selectedDevice ->
@@ -118,7 +119,6 @@ class RoomViewModel(
         val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
 
         updateState { it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled) }
-
         if (isCameraEnabled && isMicEnabled) viewEffect { CheckLocalMedia }
     }
 
