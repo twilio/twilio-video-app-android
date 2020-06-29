@@ -596,6 +596,8 @@ public class RoomActivity extends BaseActivity {
                 cameraVideoTrack != null
                         ? R.drawable.ic_videocam_white_24px
                         : R.drawable.ic_videocam_off_gray_24px);
+
+        roomViewModel.processInput(RefreshViewState.INSTANCE);
     }
 
     private void publishVideoTrack(LocalVideoTrack videoTrack, TrackPriority trackPriority) {
