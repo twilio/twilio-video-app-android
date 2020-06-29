@@ -794,15 +794,20 @@ public class RoomActivity extends BaseActivity {
             screenCaptureMenuItemState = false;
         }
 
-        // Check mute state
-        if (isAudioMuted) {
-            localAudioImageButton.setImageResource(R.drawable.ic_mic_off_gray_24px);
-        }
-        if (isVideoMuted) {
-            localVideoImageButton.setImageResource(R.drawable.ic_videocam_off_gray_24px);
-        }
-        localAudioImageButton.setEnabled(roomViewState.isMicEnabled());
-        localVideoImageButton.setEnabled(roomViewState.isCameraEnabled());
+        boolean isMicEnabled = roomViewState.isMicEnabled();
+        boolean isCameraEnabled = roomViewState.isCameraEnabled();
+        localAudioImageButton.setEnabled(isMicEnabled);
+        localVideoImageButton.setEnabled(isCameraEnabled);
+        int micDrawable =
+                isAudioMuted || !isMicEnabled
+                        ? R.drawable.ic_mic_off_gray_24px
+                        : R.drawable.ic_mic_white_24px;
+        int videoDrawable =
+                isVideoMuted || !isCameraEnabled
+                        ? R.drawable.ic_videocam_off_gray_24px
+                        : R.drawable.ic_videocam_white_24px;
+        localAudioImageButton.setImageResource(micDrawable);
+        localVideoImageButton.setImageResource(videoDrawable);
 
         statsListAdapter = new StatsListAdapter(this);
         statsRecyclerView.setAdapter(statsListAdapter);
