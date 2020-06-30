@@ -7,14 +7,19 @@ import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasChildCount
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import com.twilio.video.app.HiddenView
 import com.twilio.video.app.R
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.getTargetContext
+import org.hamcrest.CoreMatchers.not
 
 fun assertScreenIsDisplayed() {
-    onView(withText(getString(R.string.join))).check(matches(isDisplayed()))
+    onView(withText(getString(R.string.join)))
+            .check(matches(isDisplayed()))
+            .check(matches(not(isEnabled())))
 }
 
 fun clickSettingsMenuItem() {
@@ -48,4 +53,25 @@ fun assertRoomIsConnected() {
 
 fun clickDisconnectButton() {
     onView(withId(R.id.disconnect)).perform(click())
+}
+
+fun assertParticipantStubIsHidden() {
+    onView(withId(R.id.participant_stub_image))
+        .check(HiddenView())
+}
+
+fun assertVideoButtonIsDisabled() {
+    onView(withId(R.id.local_video_image_button)).check(matches(not(isEnabled())))
+}
+
+fun assertMicButtonIsDisabled() {
+    onView(withId(R.id.local_audio_image_button)).check(matches(not(isEnabled())))
+}
+
+fun assertVideoButtonIsEnabled() {
+    onView(withId(R.id.local_video_image_button)).check(matches(isEnabled()))
+}
+
+fun assertMicButtonIsEnabled() {
+    onView(withId(R.id.local_audio_image_button)).check(matches(isEnabled()))
 }

@@ -4,6 +4,7 @@ import com.twilio.audioswitch.selection.AudioDevice
 
 sealed class RoomViewEvent {
     object RefreshViewState : RoomViewEvent()
+    object CheckPermissions : RoomViewEvent()
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()
     object ActivateAudioDevice : RoomViewEvent()
     object DeactivateAudioDevice : RoomViewEvent()

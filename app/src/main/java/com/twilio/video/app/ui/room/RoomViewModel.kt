@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.room
 
+import android.Manifest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.twilio.audioswitch.selection.AudioDeviceSelector
@@ -24,9 +25,11 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdate
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
@@ -36,6 +39,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
+import com.twilio.video.app.util.PermissionUtil
 import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,11 +52,13 @@ import timber.log.Timber
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioDeviceSelector: AudioDeviceSelector,
+    private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
     private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     private val rxDisposables: CompositeDisposable = CompositeDisposable(),
-    scheduler: Scheduler = AndroidSchedulers.mainThread()
-) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(RoomViewState()) {
+    scheduler: Scheduler = AndroidSchedulers.mainThread(),
+    initialViewState: RoomViewState = RoomViewState()
+) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(initialViewState) {
 
     init {
         audioDeviceSelector.start { audioDevices, selectedDevice ->
@@ -81,6 +87,7 @@ class RoomViewModel(
         Timber.d("View Event: $viewEvent")
         when (viewEvent) {
             is RefreshViewState -> updateState { it.copy() }
+            is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
             }
@@ -106,6 +113,14 @@ class RoomViewModel(
             }
             Disconnect -> roomManager.disconnect()
         }
+    }
+
+    private fun checkLocalMedia() {
+        val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
+        val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
+
+        updateState { it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled) }
+        if (isCameraEnabled && isMicEnabled) viewEffect { CheckLocalMedia }
     }
 
     private fun observeRoomEvents(roomEvent: RoomEvent) {
@@ -237,11 +252,12 @@ class RoomViewModel(
 
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioDeviceSelector
+        private val audioDeviceSelector: AudioDeviceSelector,
+        private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector) as T
+            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil) as T
         }
     }
 }
