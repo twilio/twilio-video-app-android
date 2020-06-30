@@ -29,6 +29,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
@@ -86,7 +87,7 @@ class RoomViewModel(
         Timber.d("View Event: $viewEvent")
         when (viewEvent) {
             is RefreshViewState -> updateState { it.copy() }
-            is RoomViewEvent.CheckLocalMedia -> checkLocalMedia()
+            is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioDeviceSelector.selectDevice(viewEvent.device)
             }

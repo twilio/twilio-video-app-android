@@ -80,7 +80,7 @@ class RoomViewModelTest {
                 .thenReturn(true)
         val expectedViewState = RoomViewState(isCameraEnabled = true)
 
-        viewModel.processInput(RoomViewEvent.CheckLocalMedia)
+        viewModel.processInput(RoomViewEvent.CheckPermissions)
 
         assertThat(viewModel.viewState.value, equalTo(expectedViewState))
     }
@@ -98,7 +98,7 @@ class RoomViewModelTest {
                 .thenReturn(false)
         val expectedViewState = RoomViewState(isCameraEnabled = false)
 
-        viewModel.processInput(RoomViewEvent.CheckLocalMedia)
+        viewModel.processInput(RoomViewEvent.CheckPermissions)
 
         assertThat(viewModel.viewState.value, equalTo(expectedViewState))
         assertThat(viewModel.viewEffects.value, `is`(nullValue()))
@@ -110,7 +110,7 @@ class RoomViewModelTest {
                 .thenReturn(true)
         val expectedViewState = RoomViewState(isMicEnabled = true)
 
-        viewModel.processInput(RoomViewEvent.CheckLocalMedia)
+        viewModel.processInput(RoomViewEvent.CheckPermissions)
 
         assertThat(viewModel.viewState.value, equalTo(expectedViewState))
     }
@@ -128,7 +128,7 @@ class RoomViewModelTest {
                 .thenReturn(false)
         val expectedViewState = RoomViewState(isMicEnabled = false)
 
-        viewModel.processInput(RoomViewEvent.CheckLocalMedia)
+        viewModel.processInput(RoomViewEvent.CheckPermissions)
 
         assertThat(viewModel.viewState.value, equalTo(expectedViewState))
         assertThat(viewModel.viewEffects.value, `is`(nullValue()))
@@ -141,7 +141,7 @@ class RoomViewModelTest {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
                 .thenReturn(true)
 
-        viewModel.processInput(RoomViewEvent.CheckLocalMedia)
+        viewModel.processInput(RoomViewEvent.CheckPermissions)
 
         val expectedViewEffect = viewModel.viewEffects.value!!
                 .getContentIfNotHandled() is RoomViewEffect.CheckLocalMedia

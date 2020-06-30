@@ -93,7 +93,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
-import com.twilio.video.app.ui.room.RoomViewEvent.CheckLocalMedia;
+import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
@@ -323,7 +323,7 @@ public class RoomActivity extends BaseActivity {
         restoreCameraTrack();
 
         roomViewModel.processInput(RefreshViewState.INSTANCE);
-        roomViewModel.processInput(CheckLocalMedia.INSTANCE);
+        roomViewModel.processInput(CheckPermissions.INSTANCE);
 
         publishLocalTracks();
 
@@ -389,7 +389,7 @@ public class RoomActivity extends BaseActivity {
                             && writeExternalStoragePermissionGranted;
 
             if (permissionsGranted) {
-                roomViewModel.processInput(CheckLocalMedia.INSTANCE);
+                roomViewModel.processInput(CheckPermissions.INSTANCE);
                 setupLocalMedia();
             } else {
                 Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
