@@ -73,8 +73,8 @@ internal class AudioDeviceManager(
         audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
     }
 
-    fun enableBluetoothSco(start: Boolean) {
-        audioManager.run { if (start) startBluetoothSco() else stopBluetoothSco() }
+    fun enableBluetoothSco(enable: Boolean) {
+        audioManager.run { if (enable) startBluetoothSco() else stopBluetoothSco() }
     }
 
     fun enableSpeakerphone(enable: Boolean) {

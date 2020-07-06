@@ -18,6 +18,7 @@ import android.media.AudioManager.SCO_AUDIO_STATE_ERROR
 import com.twilio.audioswitch.android.BluetoothDeviceWrapper
 import com.twilio.audioswitch.android.BluetoothIntentProcessor
 import com.twilio.audioswitch.android.LogWrapper
+import com.twilio.audioswitch.selection.AudioDeviceManager
 
 private const val TAG = "BluetoothDeviceReceiver"
 
@@ -25,6 +26,9 @@ internal class BluetoothHeadsetReceiver(
     private val context: Context,
     private val logger: LogWrapper,
     private val bluetoothIntentProcessor: BluetoothIntentProcessor,
+    audioDeviceManager: AudioDeviceManager,
+    private val enableBluetoothScoJob: BluetoothScoJob = EnableBluetoothScoJob(logger, audioDeviceManager),
+    private val disableBluetoothScoJob: BluetoothScoJob = DisableBluetoothScoJob(logger, audioDeviceManager),
     var deviceListener: BluetoothDeviceConnectionListener? = null
 ) : BroadcastReceiver() {
 
@@ -56,9 +60,11 @@ internal class BluetoothHeadsetReceiver(
                         when (state) {
                             SCO_AUDIO_STATE_CONNECTED -> {
                                 logger.d(TAG, "Bluetooth SCO Audio connected")
+                                enableBluetoothScoJob.cancelBluetoothScoJob()
                             }
                             SCO_AUDIO_STATE_DISCONNECTED -> {
                                 logger.d(TAG, "Bluetooth SCO Audio disconnected")
+                                disableBluetoothScoJob.cancelBluetoothScoJob()
                             }
                             SCO_AUDIO_STATE_ERROR -> {
                                 logger.e(TAG, "Error retrieving Bluetooth SCO Audio state")
@@ -71,8 +77,24 @@ internal class BluetoothHeadsetReceiver(
         }
     }
 
+    fun enableBluetoothSco(enable: Boolean) {
+        if (enable) {
+            enableBluetoothScoJob.executeBluetoothScoJob()
+        } else {
+            disableBluetoothScoJob.executeBluetoothScoJob()
+        }
+    }
+
+    fun setupDeviceListener(deviceListener: BluetoothDeviceConnectionListener) {
+        this.deviceListener = deviceListener
+        enableBluetoothScoJob.deviceListener = deviceListener
+        disableBluetoothScoJob.deviceListener = deviceListener
+    }
+
     fun stop() {
         deviceListener = null
+        enableBluetoothScoJob.deviceListener = null
+        disableBluetoothScoJob.deviceListener = null
         context.unregisterReceiver(this)
     }
 
