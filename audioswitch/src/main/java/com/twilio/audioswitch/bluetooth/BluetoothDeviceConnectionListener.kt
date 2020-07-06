@@ -1,9 +1,10 @@
 package com.twilio.audioswitch.bluetooth
 
-import com.twilio.audioswitch.android.BluetoothDeviceWrapper
+import com.twilio.audioswitch.selection.AudioDevice.BluetoothHeadset
+
 
 internal interface BluetoothDeviceConnectionListener {
-    fun onBluetoothConnected(bluetoothDeviceWrapper: BluetoothDeviceWrapper)
+    fun onBluetoothConnected()
     fun onBluetoothDisconnected()
     fun onBluetoothConnectionError(error: ConnectionError)
 

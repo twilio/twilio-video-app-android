@@ -18,6 +18,7 @@ import android.media.AudioManager.SCO_AUDIO_STATE_ERROR
 import com.twilio.audioswitch.android.BluetoothDeviceWrapper
 import com.twilio.audioswitch.android.BluetoothIntentProcessor
 import com.twilio.audioswitch.android.LogWrapper
+import com.twilio.audioswitch.selection.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.selection.AudioDeviceManager
 
 private const val TAG = "BluetoothDeviceReceiver"
@@ -27,6 +28,7 @@ internal class BluetoothHeadsetReceiver(
     private val logger: LogWrapper,
     private val bluetoothIntentProcessor: BluetoothIntentProcessor,
     audioDeviceManager: AudioDeviceManager,
+    private val deviceCache: BluetoothDeviceCacheManager,
     private val enableBluetoothScoJob: BluetoothScoJob = EnableBluetoothScoJob(logger, audioDeviceManager),
     private val disableBluetoothScoJob: BluetoothScoJob = DisableBluetoothScoJob(logger, audioDeviceManager),
     var deviceListener: BluetoothDeviceConnectionListener? = null
@@ -42,7 +44,8 @@ internal class BluetoothHeadsetReceiver(
                                 "Bluetooth ACL device " +
                                         bluetoothDevice.name +
                                         " connected")
-                        deviceListener?.onBluetoothConnected(bluetoothDevice)
+                        deviceCache.addDevice(BluetoothHeadset(bluetoothDevice.name, bluetoothDevice))
+                        deviceListener?.onBluetoothConnected()
                     }
                 }
                 ACTION_ACL_DISCONNECTED -> {
@@ -52,6 +55,7 @@ internal class BluetoothHeadsetReceiver(
                                 "Bluetooth ACL device " +
                                         bluetoothDevice.name +
                                         " disconnected")
+                        deviceCache.removeDevice(BluetoothHeadset(bluetoothDevice.name, bluetoothDevice))
                         deviceListener?.onBluetoothDisconnected()
                     }
                 }

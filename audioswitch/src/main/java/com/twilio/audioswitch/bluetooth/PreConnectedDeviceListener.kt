@@ -1,11 +1,11 @@
 package com.twilio.audioswitch.bluetooth
 
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothProfile
 import com.twilio.audioswitch.android.BluetoothDeviceWrapperImpl
 import com.twilio.audioswitch.android.LogWrapper
+import com.twilio.audioswitch.selection.AudioDevice
 import kotlin.reflect.full.declaredFunctions
 
 private const val TAG = "PreConnectedDeviceListener"
@@ -13,6 +13,7 @@ private const val TAG = "PreConnectedDeviceListener"
 internal class PreConnectedDeviceListener(
     private val logger: LogWrapper,
     private val bluetoothAdapter: BluetoothAdapter,
+    private val deviceCache: BluetoothDeviceCacheManager,
     var deviceListener: BluetoothDeviceConnectionListener? = null
 ) : BluetoothProfile.ServiceListener {
 
@@ -23,26 +24,25 @@ internal class PreConnectedDeviceListener(
         bluetoothProfile.connectedDevices.let { deviceList ->
             deviceList.forEach { device ->
                 logger.d(TAG, "Bluetooth " + device.name + " connected")
-                deviceListener?.onBluetoothConnected(BluetoothDeviceWrapperImpl(device))
+
+                val bluetoothHeadset = AudioDevice.BluetoothHeadset(device.name,
+                        BluetoothDeviceWrapperImpl(device))
+                deviceCache.addDevice(bluetoothHeadset)
+                deviceListener?.onBluetoothConnected()
             }
         }
     }
 
     override fun onServiceDisconnected(profile: Int) {
         logger.d(TAG, "Bluetooth disconnected")
-        deviceListener?.onBluetoothDisconnected()
     }
 
-    fun connectHeadset(device: BluetoothDevice) {
+    fun selectDevice(deviceWrapper: BluetoothDeviceWrapperImpl) {
         headsetProxy?.let { proxy ->
-            proxy::class.declaredFunctions.find { it.name == "connect"}?.call(proxy, device)
-            proxy::class.declaredFunctions.find { it.name == "setActiveDevice"}?.call(proxy, device)
-        }
-    }
-
-    fun disconnectHeadset(device: BluetoothDevice) {
-        headsetProxy?.let { proxy ->
-            proxy::class.declaredFunctions.find { it.name == "disconnect" }?.call(proxy, device)
+            val result = proxy::class.declaredFunctions.find { it.name == "setActiveDevice" }
+                    ?.call(proxy, deviceWrapper.device) as Boolean
+            if (result) logger.d(TAG, "Set the following bluetooth device to active: " +
+                    deviceWrapper.name)
         }
     }
 
