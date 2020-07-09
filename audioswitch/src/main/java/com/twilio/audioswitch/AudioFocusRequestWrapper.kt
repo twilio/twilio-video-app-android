@@ -1,14 +1,15 @@
-package com.twilio.audioswitch.selection
+package com.twilio.audioswitch
 
 import android.annotation.SuppressLint
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.AudioManager.OnAudioFocusChangeListener
 
 internal class AudioFocusRequestWrapper {
 
     @SuppressLint("NewApi")
-    fun buildRequest(): AudioFocusRequest {
+    fun buildRequest(audioFocusChangeListener: OnAudioFocusChangeListener): AudioFocusRequest {
         val playbackAttributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
@@ -16,7 +17,7 @@ internal class AudioFocusRequestWrapper {
         return AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
                 .setAudioAttributes(playbackAttributes)
                 .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener { i: Int -> }
+                .setOnAudioFocusChangeListener(audioFocusChangeListener)
                 .build()
     }
 }

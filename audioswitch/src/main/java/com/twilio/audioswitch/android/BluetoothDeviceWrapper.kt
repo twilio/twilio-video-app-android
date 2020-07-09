@@ -1,6 +1,6 @@
 package com.twilio.audioswitch.android
 
-interface BluetoothDeviceWrapper {
+internal interface BluetoothDeviceWrapper {
 
     val name: String
     val deviceClass: Int?

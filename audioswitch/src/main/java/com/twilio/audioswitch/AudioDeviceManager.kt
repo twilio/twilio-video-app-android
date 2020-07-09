@@ -1,4 +1,4 @@
-package com.twilio.audioswitch.selection
+package com.twilio.audioswitch
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,18 +6,20 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.AudioManager.OnAudioFocusChangeListener
 import android.os.Build
 import com.twilio.audioswitch.android.BuildWrapper
-import com.twilio.audioswitch.android.LogWrapper
+import com.twilio.audioswitch.android.Logger
 
 private const val TAG = "AudioDeviceManager"
 
 internal class AudioDeviceManager(
     private val context: Context,
-    private val logger: LogWrapper,
+    private val logger: Logger,
     private val audioManager: AudioManager,
-    private val build: BuildWrapper,
-    private val audioFocusRequest: AudioFocusRequestWrapper
+    private val build: BuildWrapper = BuildWrapper(),
+    private val audioFocusRequest: AudioFocusRequestWrapper = AudioFocusRequestWrapper(),
+    private val audioFocusChangeListener: OnAudioFocusChangeListener
 ) {
 
     private var savedAudioMode = 0
@@ -56,11 +58,11 @@ internal class AudioDeviceManager(
     fun setAudioFocus() {
         // Request audio focus before making any device switch.
         if (build.getVersion() >= Build.VERSION_CODES.O) {
-            audioRequest = audioFocusRequest.buildRequest()
+            audioRequest = audioFocusRequest.buildRequest(audioFocusChangeListener)
             audioRequest?.let { audioManager.requestAudioFocus(it) }
         } else {
             audioManager.requestAudioFocus(
-                    {},
+                    audioFocusChangeListener,
                     AudioManager.STREAM_VOICE_CALL,
                     AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
         }
@@ -100,7 +102,7 @@ internal class AudioDeviceManager(
         if (build.getVersion() >= Build.VERSION_CODES.O) {
             audioRequest?.let { audioManager.abandonAudioFocusRequest(it) }
         } else {
-            audioManager.abandonAudioFocus { }
+            audioManager.abandonAudioFocus(audioFocusChangeListener)
         }
     }
 }
