@@ -4,6 +4,8 @@
 
 This application demonstrates multi-party voice and video built with [Twilio’s Programmable Video Android SDK](https://www.twilio.com/docs/video).
 
+To make sure your app is ready for Android 11 please visit [this page](https://github.com/twilio/video-quickstart-android/issues/543).
+
 ![video-app-screenshots](https://user-images.githubusercontent.com/1930363/76543029-867ec080-644b-11ea-8145-d15d3fe9f7ea.png)
 
 ## Features
