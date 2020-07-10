@@ -19,7 +19,6 @@ package com.twilio.video.app.ui.room;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
 import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
-import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
 import static com.twilio.video.app.sdk.RoomManagerKt.CAMERA_TRACK_NAME;
 import static com.twilio.video.app.sdk.RoomManagerKt.MICROPHONE_TRACK_NAME;
@@ -182,18 +181,6 @@ public class RoomActivity extends BaseActivity {
     @BindView(R.id.recording_notice)
     TextView recordingNoticeTextView;
 
-    @BindView(R.id.stats_recycler_view)
-    RecyclerView statsRecyclerView;
-
-    @BindView(R.id.stats_disabled)
-    LinearLayout statsDisabledLayout;
-
-    @BindView(R.id.stats_disabled_title)
-    TextView statsDisabledTitleTextView;
-
-    @BindView(R.id.stats_disabled_description)
-    TextView statsDisabledDescTextView;
-
     private MenuItem switchCameraMenuItem;
     private MenuItem pauseVideoMenuItem;
     private MenuItem pauseAudioMenuItem;
@@ -237,7 +224,6 @@ public class RoomActivity extends BaseActivity {
             };
 
     private StatsScheduler statsScheduler;
-    private StatsListAdapter statsListAdapter;
     private Map<String, String> localVideoTrackNames = new HashMap<>();
 
     @Inject TokenService tokenService;
@@ -326,8 +312,6 @@ public class RoomActivity extends BaseActivity {
         roomViewModel.processInput(CheckPermissions.INSTANCE);
 
         publishLocalTracks();
-
-        updateStats();
     }
 
     @Override
@@ -815,10 +799,6 @@ public class RoomActivity extends BaseActivity {
         localAudioImageButton.setImageResource(micDrawable);
         localVideoImageButton.setImageResource(videoDrawable);
 
-        statsListAdapter = new StatsListAdapter(this);
-        statsRecyclerView.setAdapter(statsListAdapter);
-        statsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         disconnectButton.setVisibility(disconnectButtonState);
         joinRoomLayout.setVisibility(joinRoomLayoutState);
         joinStatusLayout.setVisibility(joinStatusLayoutState);
@@ -951,63 +931,12 @@ public class RoomActivity extends BaseActivity {
         }
     }
 
-    private void updateStatsUI(boolean enabled) {
-        if (enabled) {
-            if (room != null && room.getRemoteParticipants().size() > 0) {
-                // show stats
-                statsRecyclerView.setVisibility(View.VISIBLE);
-                statsDisabledLayout.setVisibility(View.GONE);
-            } else if (room != null) {
-                // disable stats when there is no room
-                statsDisabledTitleTextView.setText(getString(R.string.stats_unavailable));
-                statsDisabledDescTextView.setText(
-                        getString(R.string.stats_description_media_not_shared));
-                statsRecyclerView.setVisibility(View.GONE);
-                statsDisabledLayout.setVisibility(View.VISIBLE);
-            } else {
-                // disable stats if there is room but no participants (no media)
-                statsDisabledTitleTextView.setText(getString(R.string.stats_unavailable));
-                statsDisabledDescTextView.setText(getString(R.string.stats_description_join_room));
-                statsRecyclerView.setVisibility(View.GONE);
-                statsDisabledLayout.setVisibility(View.VISIBLE);
-            }
-        } else {
-            statsDisabledTitleTextView.setText(getString(R.string.stats_gathering_disabled));
-            statsDisabledDescTextView.setText(getString(R.string.stats_enable_in_settings));
-            statsRecyclerView.setVisibility(View.GONE);
-            statsDisabledLayout.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void updateStats() {
-        if (statsScheduler.isRunning()) {
-            statsScheduler.cancelStatsGathering();
-        }
-        boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
-        if (enableStats && (room != null) && (room.getState() == CONNECTED)) {
-            statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
-        }
-        updateStatsUI(enableStats);
-    }
-
-    private StatsListener statsListener() {
-        return statsReports -> {
-            // Running on StatsScheduler thread
-            if (room != null) {
-                statsListAdapter.updateStatsData(
-                        statsReports, room.getRemoteParticipants(), localVideoTrackNames);
-            }
-        };
-    }
-
     private void initializeRoom() {
         if (room != null) {
 
             setupLocalParticipant(room);
 
             publishLocalTracks();
-
-            updateStats();
         }
     }
 
@@ -1062,7 +991,6 @@ public class RoomActivity extends BaseActivity {
                 localParticipant = null;
                 room = null;
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
-                updateStats();
                 toggleAudioDevice(false);
             }
             if (roomViewEffect instanceof ShowConnectFailureDialog) {

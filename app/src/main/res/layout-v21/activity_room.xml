@@ -6,12 +6,15 @@
     android:id="@+id/navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layoutDescription="@xml/room_scene"
     tools:context=".ui.room.RoomActivity" >
 
     <include layout="@layout/content_room"/>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/lobby_toolbar"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -39,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <TextView
