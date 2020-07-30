@@ -1066,7 +1066,7 @@ public class RoomActivity extends BaseActivity {
 
     private void bindRoomViewState(RoomViewState roomViewState) {
         Timber.d("RoomViewState: %s", roomViewState);
-        deviceMenuItem.setVisible(!roomViewState.getAvailableAudioDevices().isEmpty());
+        deviceMenuItem.setVisible(false);
         renderPrimaryView(roomViewState.getPrimaryParticipant());
         renderThumbnails(roomViewState);
         updateLayout(roomViewState);

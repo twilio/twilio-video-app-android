@@ -61,12 +61,12 @@ class RoomViewModel(
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(initialViewState) {
 
     init {
-        audioDeviceSelector.start { audioDevices, selectedDevice ->
-            updateState { it.copy(
-                selectedDevice = selectedDevice,
-                availableAudioDevices = audioDevices)
-            }
-        }
+//        audioDeviceSelector.start { audioDevices, selectedDevice ->
+//            updateState { it.copy(
+//                selectedDevice = selectedDevice,
+//                availableAudioDevices = audioDevices)
+//            }
+//        }
 
         rxDisposables + roomManager.roomEvents
                 .observeOn(scheduler)
@@ -79,7 +79,7 @@ class RoomViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        audioDeviceSelector.stop()
+//        audioDeviceSelector.stop()
         rxDisposables.clear()
     }
 
@@ -89,10 +89,14 @@ class RoomViewModel(
             is RefreshViewState -> updateState { it.copy() }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
-                audioDeviceSelector.selectDevice(viewEvent.device)
+//                audioDeviceSelector.selectDevice(viewEvent.device)
             }
-            ActivateAudioDevice -> { audioDeviceSelector.activate() }
-            DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
+            ActivateAudioDevice -> {
+//                audioDeviceSelector.activate()
+            }
+            DeactivateAudioDevice -> {
+//                audioDeviceSelector.deactivate()
+            }
             is Connect -> {
                 connect(viewEvent.identity, viewEvent.roomName)
             }
