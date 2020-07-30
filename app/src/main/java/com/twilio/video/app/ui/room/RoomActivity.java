@@ -41,6 +41,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,6 +52,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -112,6 +115,8 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
+
+import kotlin.Unit;
 import timber.log.Timber;
 
 public class RoomActivity extends BaseActivity {
@@ -301,6 +306,25 @@ public class RoomActivity extends BaseActivity {
         // Setup Activity
         statsScheduler = new StatsScheduler();
         obtainVideoConstraints();
+
+        forceSpeakerPhone();
+    }
+
+    private void forceSpeakerPhone() {
+        audioDeviceSelector.start((audioDevices, audioDevice) -> {
+            Toast.makeText(this, audioDevice.getName(), Toast.LENGTH_SHORT).show();
+            return Unit.INSTANCE;
+        });
+
+        List<AudioDevice> availableAudioDevices = audioDeviceSelector.getAvailableAudioDevices();
+        AudioDevice.Speakerphone speakerphone = null;
+
+        for (AudioDevice audioDevice : availableAudioDevices) {
+            Timber.d( "Available Audio devices - " + audioDevice.getName());
+            if(audioDevice instanceof AudioDevice.Speakerphone) speakerphone = (AudioDevice.Speakerphone) audioDevice;
+        }
+        audioDeviceSelector.selectDevice(speakerphone);
+        audioDeviceSelector.activate();
     }
 
     private void setupThumbnailRecyclerView() {
