@@ -313,6 +313,7 @@ public class RoomActivity extends BaseActivity {
     private void forceSpeakerPhone() {
         audioDeviceSelector.start((audioDevices, audioDevice) -> {
             Toast.makeText(this, audioDevice.getName(), Toast.LENGTH_SHORT).show();
+            audioDeviceSelector.selectDevice(audioDevice);
             return Unit.INSTANCE;
         });
 
