@@ -175,6 +175,9 @@ allprojects {
         jcenter()
         mavenCentral()
         maven {
+            url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
+        }
+        maven {
             url  "https://twilio.bintray.com/releases"
         }
         maven {

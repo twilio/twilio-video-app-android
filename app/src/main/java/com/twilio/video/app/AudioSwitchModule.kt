@@ -1,7 +1,7 @@
 package com.twilio.video.app
 
 import android.app.Application
-import com.twilio.audioswitch.selection.AudioDeviceSelector
+import com.twilio.audioswitch.AudioSwitch
 import dagger.Module
 import dagger.Provides
 
@@ -9,6 +9,6 @@ import dagger.Provides
 class AudioSwitchModule {
 
     @Provides
-    fun providesAudioDeviceSelector(application: Application): AudioDeviceSelector =
-            AudioDeviceSelector(application)
+    fun providesAudioSwitch(application: Application): AudioSwitch =
+            AudioSwitch(application)
 }

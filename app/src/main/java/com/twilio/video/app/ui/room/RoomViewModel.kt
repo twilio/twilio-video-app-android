@@ -3,7 +3,7 @@ package com.twilio.video.app.ui.room
 import android.Manifest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.twilio.audioswitch.selection.AudioDeviceSelector
+import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildLocalParticipantViewState
@@ -51,7 +51,7 @@ import timber.log.Timber
 
 class RoomViewModel(
     private val roomManager: RoomManager,
-    private val audioDeviceSelector: AudioDeviceSelector,
+    private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
     private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
@@ -61,7 +61,7 @@ class RoomViewModel(
 ) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(initialViewState) {
 
     init {
-        audioDeviceSelector.start { audioDevices, selectedDevice ->
+        audioSwitch.start { audioDevices, selectedDevice ->
             updateState { it.copy(
                 selectedDevice = selectedDevice,
                 availableAudioDevices = audioDevices)
@@ -79,7 +79,7 @@ class RoomViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        audioDeviceSelector.stop()
+        audioSwitch.stop()
         rxDisposables.clear()
     }
 
@@ -89,10 +89,10 @@ class RoomViewModel(
             is RefreshViewState -> updateState { it.copy() }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
-                audioDeviceSelector.selectDevice(viewEvent.device)
+                audioSwitch.selectDevice(viewEvent.device)
             }
-            ActivateAudioDevice -> { audioDeviceSelector.activate() }
-            DeactivateAudioDevice -> { audioDeviceSelector.deactivate() }
+            ActivateAudioDevice -> { audioSwitch.activate() }
+            DeactivateAudioDevice -> { audioSwitch.deactivate() }
             is Connect -> {
                 connect(viewEvent.identity, viewEvent.roomName)
             }
@@ -252,7 +252,7 @@ class RoomViewModel(
 
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioDeviceSelector,
+        private val audioDeviceSelector: AudioSwitch,
         private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
