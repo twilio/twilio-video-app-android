@@ -1,6 +1,6 @@
 package com.twilio.video.app.ui.room
 
-import com.twilio.audioswitch.AudioDevice
+import com.twilio.audioswitch.selection.AudioDevice
 
 sealed class RoomViewEvent {
     object RefreshViewState : RoomViewEvent()

@@ -64,8 +64,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.google.android.material.snackbar.Snackbar;
-import com.twilio.audioswitch.AudioDevice;
-import com.twilio.audioswitch.AudioSwitch;
+import com.twilio.audioswitch.selection.AudioDevice;
+import com.twilio.audioswitch.selection.AudioDeviceSelector;
 import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
@@ -246,7 +246,7 @@ public class RoomActivity extends BaseActivity {
 
     @Inject RoomManager roomManager;
 
-    @Inject AudioSwitch audioSwitch;
+    @Inject AudioDeviceSelector audioDeviceSelector;
 
     /** Coordinates participant thumbs and primary participant rendering. */
     private PrimaryParticipantController primaryParticipantController;
@@ -269,7 +269,8 @@ public class RoomActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         RoomViewModelFactory factory =
-                new RoomViewModelFactory(roomManager, audioSwitch, new PermissionUtil(this));
+                new RoomViewModelFactory(
+                        roomManager, audioDeviceSelector, new PermissionUtil(this));
         roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
