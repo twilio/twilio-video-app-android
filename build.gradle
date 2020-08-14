@@ -139,13 +139,6 @@ task incrementVersionCode {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "tag", "-a", "$versionCodeTag", "-m", "$versionCodeTag"
-            standardOutput propertiesFile
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "--quiet", "${remote}", "$versionCodeTag"
-            standardOutput pushNullFile
         }
 
         exec {
@@ -177,6 +170,12 @@ task incrementVersionCode {
         exec {
             workingDir "${rootDir}"
             commandLine "git", "push", "--quiet", "${remote}", "${System.env.CIRCLE_BRANCH}"
+            standardOutput pushNullFile
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "--quiet", "${remote}", "$versionCodeTag"
             standardOutput pushNullFile
         }
     }
