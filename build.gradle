@@ -119,6 +119,7 @@ task incrementVersionCode {
         def remote = "upstream"
         def pushNullFile = new FileOutputStream("/dev/null")
         def versionCode = project.property("versionCode")
+        def versionCodeTag = "v0.$versionCode"
         def newVersionCode = (versionCode as Integer) + 1
 
         exec {
@@ -134,6 +135,18 @@ task incrementVersionCode {
         }
 
         def propertiesFile = new FileOutputStream("${rootDir}/gradle.properties")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "tag", "-a", "$versionCodeTag", "-m", "$versionCodeTag"
+            standardOutput propertiesFile
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "--quiet", "${remote}", "$versionCodeTag"
+            standardOutput pushNullFile
+        }
 
         exec {
             workingDir "${rootDir}"
