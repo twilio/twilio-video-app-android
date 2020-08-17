@@ -22,11 +22,13 @@ import com.twilio.video.app.security.SecurePreferences
 import retrofit2.HttpException
 import timber.log.Timber
 
+private const val LEGACY_PASSCODE_SIZE = 10
+private const val PASSCODE_SIZE = 14
+
 class AuthServiceRepository(
     private val authService: AuthService,
     private val securePreferences: SecurePreferences
 ) : TokenService {
-
     override suspend fun getToken(identity: String?, roomName: String?): String {
         return getToken(identity, roomName, passcode = null)
     }
@@ -37,8 +39,13 @@ class AuthServiceRepository(
                     passcode,
                     identity,
                     roomName)
-            val appId = passcode.substring(6)
-            val url = URL_PREFIX + appId + URL_SUFFIX
+            val appId = passcode.substring(6, 10)
+            val serverlessId = passcode.substring(10)
+            val url = if (passcode.length == PASSCODE_SIZE) {
+                "$URL_PREFIX$appId-$serverlessId$URL_SUFFIX"
+            } else {
+                "$URL_PREFIX$appId$URL_SUFFIX"
+            }
 
             try {
                 authService.getToken(url, requestBody).let { response ->
@@ -56,8 +63,18 @@ class AuthServiceRepository(
         throw IllegalArgumentException("Passcode cannot be null")
     }
 
-    private fun getPasscode(passcode: String?) =
-        passcode ?: securePreferences.getSecureString(PASSCODE)
+    private fun getPasscode(passcode: String?): String? {
+        validatePasscode(passcode)
+        return passcode ?: securePreferences.getSecureString(PASSCODE)
+    }
+
+    private fun validatePasscode(passcode: String?) {
+        passcode?.let { passcode ->
+            require(passcode.isNotEmpty() &&
+                    (passcode.length == LEGACY_PASSCODE_SIZE ||
+                    passcode.length == PASSCODE_SIZE))
+        }
+    }
 
     private fun handleException(httpException: HttpException) {
         Timber.e(httpException)

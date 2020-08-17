@@ -63,7 +63,7 @@ aliases:
     docker:
       - image: circleci/android:api-28-node
     environment:
-      - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      - _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
 
   - &ui-test-defaults
     working_directory: *workspace

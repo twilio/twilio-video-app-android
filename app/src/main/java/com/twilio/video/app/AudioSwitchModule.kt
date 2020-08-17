@@ -9,6 +9,6 @@ import dagger.Provides
 class AudioSwitchModule {
 
     @Provides
-    fun providesAudioSwitch(application: Application): AudioSwitch =
-            AudioSwitch(application)
+    fun providesAudioDeviceSelector(application: Application): AudioSwitch =
+            AudioSwitch(application, loggingEnabled = true)
 }
