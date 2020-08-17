@@ -167,6 +167,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
     implementation 'com.twilio:audioswitch:1.0.0'
+    implementation 'io.uniflow:uniflow-android:0.11.2'
 
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:2.5.1"
 
