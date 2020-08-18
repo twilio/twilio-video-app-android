@@ -11,7 +11,9 @@ fun RoomActivity.onStates(dataFlow: AndroidDataFlow, action: (RoomViewState) -> 
 }
 
 fun RoomActivity.onEvents(dataFlow: AndroidDataFlow, action: (RoomViewEffect) -> Unit) {
-    onEvents(dataFlow) { event ->
-        if (event is RoomViewEffect) action.invoke(event)
+    onEvents(dataFlow) { eventWrapper ->
+        eventWrapper.take()?.let { event ->
+            if (event is RoomViewEffect) action.invoke(event)
+        }
     }
 }

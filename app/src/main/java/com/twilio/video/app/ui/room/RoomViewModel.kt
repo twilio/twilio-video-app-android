@@ -63,11 +63,12 @@ class RoomViewModel(
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
-            action {
+            actionOn<RoomViewState> { currentState ->
                 setState {
-                    RoomViewState(
+                    currentState.copy(
                         selectedDevice = selectedDevice,
-                        availableAudioDevices = audioDevices)
+                        availableAudioDevices = audioDevices
+                    )
                 }
             }
         }
@@ -91,7 +92,7 @@ class RoomViewModel(
         Timber.d("View Event: $viewEvent")
 
         when (viewEvent) {
-            is RefreshViewState -> actionOn<RoomViewState> { currentState -> currentState }
+            is RefreshViewState -> actionOn<RoomViewState> { it }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioSwitch.selectDevice(viewEvent.device)
@@ -124,7 +125,11 @@ class RoomViewModel(
         val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
         val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
 
-        action { RoomViewState(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled) }
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
+            }
+        }
         if (isCameraEnabled && isMicEnabled) action { sendEvent { CheckLocalMedia } }
     }
 
@@ -141,7 +146,11 @@ class RoomViewModel(
             }
             is Disconnected -> {
                 showLobbyViewState()
-                action { RoomViewState(participantThumbnails = null, primaryParticipant = null) }
+                actionOn<RoomViewState> { currentState ->
+                    setState {
+                        currentState.copy(participantThumbnails = null, primaryParticipant = null)
+                    }
+                }
             }
             is DominantSpeakerChanged -> {
                 participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
@@ -207,30 +216,39 @@ class RoomViewModel(
 
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
-        action { RoomViewState(
-                isLobbyLayoutVisible = true,
-                isConnectingLayoutVisible = false,
-                isConnectedLayoutVisible = false
-        ) }
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(
+                        isLobbyLayoutVisible = true,
+                        isConnectingLayoutVisible = false,
+                        isConnectedLayoutVisible = false)
+            }
+        }
         participantManager.clearParticipants()
     }
 
     private fun showConnectingViewState() {
         action { sendEvent { RoomViewEffect.Connecting } }
-        action { RoomViewState(
-            isLobbyLayoutVisible = false,
-            isConnectingLayoutVisible = true,
-            isConnectedLayoutVisible = false
-        ) }
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(
+                    isLobbyLayoutVisible = false,
+                    isConnectingLayoutVisible = true,
+                    isConnectedLayoutVisible = false)
+            }
+        }
     }
 
     private fun showConnectedViewState(roomName: String) {
-        action { RoomViewState(
-                title = roomName,
-                isLobbyLayoutVisible = false,
-                isConnectingLayoutVisible = false,
-                isConnectedLayoutVisible = true
-        ) }
+            actionOn<RoomViewState> { currentState ->
+                setState {
+                    currentState.copy(
+                        title = roomName,
+                        isLobbyLayoutVisible = false,
+                        isConnectingLayoutVisible = false,
+                        isConnectedLayoutVisible = true)
+                }
+        }
     }
 
     private fun checkParticipants(participants: List<Participant>) {
@@ -244,11 +262,13 @@ class RoomViewModel(
     }
 
     private fun updateParticipantViewState() {
-        action {
-            RoomViewState(
-                participantThumbnails = participantManager.participantThumbnails,
-                primaryParticipant = participantManager.primaryParticipant
-            )
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(
+                        participantThumbnails = participantManager.participantThumbnails,
+                        primaryParticipant = participantManager.primaryParticipant
+                )
+            }
         }
     }
 
