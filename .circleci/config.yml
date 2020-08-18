@@ -25,9 +25,6 @@ aliases:
       # Internal release google services
       mkdir -p app/src/internal/release || true
       echo $GOOGLE_SERVICES_INTERNAL_RELEASE_JSON | base64 -di > app/src/internal/release/google-services.json
-      # Twilio release google services
-      mkdir -p app/src/twilio/release || true
-      echo $GOOGLE_SERVICES_TWILIO_RELEASE_JSON | base64 -di > app/src/twilio/release/google-services.json
       # Gradle Properties
       mkdir -p ~/.gradle
       mkdir -p $PWD/secrets
