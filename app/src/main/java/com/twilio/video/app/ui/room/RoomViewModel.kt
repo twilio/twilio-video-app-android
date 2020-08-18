@@ -43,7 +43,7 @@ import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.uniflow.android.flow.AndroidDataFlow
+import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

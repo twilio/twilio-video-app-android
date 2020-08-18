@@ -1,8 +1,8 @@
 package com.twilio.video.app.ui.room
 
-import io.uniflow.android.flow.AndroidDataFlow
-import io.uniflow.android.flow.onEvents
-import io.uniflow.android.flow.onStates
+import io.uniflow.androidx.flow.AndroidDataFlow
+import io.uniflow.androidx.flow.onEvents
+import io.uniflow.androidx.flow.onStates
 
 fun RoomActivity.onStates(dataFlow: AndroidDataFlow, action: (RoomViewState) -> Unit) {
     onStates(dataFlow) { state ->
