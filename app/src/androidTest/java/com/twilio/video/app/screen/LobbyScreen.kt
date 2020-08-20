@@ -24,7 +24,7 @@ fun assertScreenIsDisplayed() {
 
 fun clickSettingsMenuItem() {
     openActionBarOverflowOrOptionsMenu(getTargetContext())
-    onView(withText(getString(R.string.settings))).perform(click())
+    onView(withText(getString(R.string.settings_title))).perform(click())
 }
 
 fun assertRoomNameIsDisplayed(roomName: String) {
