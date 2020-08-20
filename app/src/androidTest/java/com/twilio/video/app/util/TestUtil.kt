@@ -9,23 +9,25 @@ import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.TestCredentials
 import java.io.InputStreamReader
 import java.util.UUID
-import java.util.concurrent.TimeoutException
 import junit.framework.AssertionFailedError
 
 fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> Unit) {
     val startTime = System.currentTimeMillis()
     var currentTime = 0L
+    var exception: Throwable? = null
     while (currentTime <= timeoutInSeconds) {
         currentTime = try {
             espressoAction()
             return
         } catch (e: Exception) {
+            exception = e
             countDown(startTime)
         } catch (e: AssertionFailedError) {
+            exception = e
             countDown(startTime)
         }
     }
-    throw TimeoutException("Timeout occurred while attempting to execute an espresso action")
+    throw AssertionError("Timeout occurred while attempting to find a matching view", exception)
 }
 
 fun getTargetContext(): Context = InstrumentationRegistry.getInstrumentation().targetContext
