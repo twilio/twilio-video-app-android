@@ -9,14 +9,10 @@
         <Preference
             android:key="pref_video_library_version"
             android:title="@string/settings_screen_video_library_version"/>
-    </PreferenceCategory>
-    <PreferenceCategory>
         <Preference
             android:title="@string/settings_screen_advanced"
             app:fragment="com.twilio.video.app.ui.settings.AdvancedSettingsFragment">
         </Preference>
-    </PreferenceCategory>
-    <PreferenceCategory>
         <Preference
             android:key="pref_logout"
             android:title="@string/settings_screen_logout"/>
