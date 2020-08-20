@@ -15,6 +15,7 @@ import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.util.isInternalFlavor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
 
@@ -24,6 +25,8 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.advanced_preferences)
+
+        findPreference(Preferences.INTERNAL).isVisible = isInternalFlavor
 
         setHasOptionsMenu(true)
 

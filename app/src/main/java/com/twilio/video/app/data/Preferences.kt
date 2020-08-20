@@ -23,6 +23,7 @@ import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.data.api.model.Topology
 
 object Preferences {
+    const val INTERNAL = "pref_internal"
     const val SERVER_DEFAULT = "Server Default"
     const val EMAIL = "pref_email"
     const val DISPLAY_NAME = "pref_display_name"

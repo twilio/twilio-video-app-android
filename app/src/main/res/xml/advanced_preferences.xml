@@ -88,6 +88,7 @@
     <PreferenceCategory>
         <Preference
             android:title="@string/settings_title_internal"
+            app:key="pref_internal"
             app:fragment="com.twilio.video.app.ui.settings.InternalSettingsFragment">
         </Preference>
     </PreferenceCategory>
