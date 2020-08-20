@@ -21,7 +21,6 @@
     <string name="room_notification_message">Tap to return to the room.</string>
 
     <!--  Settings Screen  -->
-    <string name="settings_screen_internal">Internal</string>
     <string name="settings_screen_advanced">Advanced</string>
     <string name="settings_screen_enable_stats">Enable Stats</string>
     <string name="settings_screen_enable_network_quality_level">Enable Network Quality Level</string>
@@ -33,7 +32,6 @@
     <string name="settings_screen_environment_string">Environment</string>
     <string name="settings_screen_topology">Room Type</string>
     <string name="settings_screen_media">Media</string>
-    <string name="settings_screen_about">About</string>
     <string name="settings_screen_video_codecs">Video Codec</string>
     <string name="settings_screen_audio_codecs">Audio Codec</string>
     <string name="settings_screen_max_video_bitrate">Video Bitrate (Kbps)</string>
@@ -43,7 +41,6 @@
     <string name="settings_screen_fps">Frames per second</string>
     <string name="settings_screen_identity">User Identity</string>
     <string name="settings_screen_version">App Version</string>
-    <string name="settings_screen_version_code">Version Code</string>
     <string name="settings_screen_video_library_version">SDK Version</string>
     <string name="settings_screen_logout">Log Out</string>
     <string name="settings_screen_video_dimensions">Video dimensions</string>
@@ -169,7 +166,6 @@
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
     <string name="screen_capture_error">Screen capturer error occurred.</string>
-    <string name="general">General</string>
     <string name="join">Join</string>
     <string name="room">Room</string>
     <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
