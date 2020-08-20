@@ -2,7 +2,7 @@
 
 ERRORS_REPO=https://code.hq.twilio.com/client/twilio-video-errors.git
 ERROR_DIR="temp/gen_errors"
-INSTALL_PATH="../../../library/src/main/java/com/twilio/video"
+INSTALL_PATH="../../../video/src/main/java/com/twilio/video"
 
 rm -rf "${ERROR_DIR}"
 
