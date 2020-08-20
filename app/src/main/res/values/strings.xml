@@ -137,6 +137,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_title_advanced">Advanced</string>
     <string name="settings_title_internal">Internal</string>
+    <string name="settings_title_bandwidth_profile">Bandwidth Profile</string>
     <string name="username">Username</string>
     <string name="join_room">Join Room</string>
     <string name="registering">Registering</string>
@@ -202,7 +203,6 @@
     <string name="stats_disabled">Stats disabled</string>
     <string name="profile_picture">Profile picture</string>
     <string name="number">Number</string>
-    <string name="settings_screen_bandwidth_profile">Bandwidth Profile</string>
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>
     <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
     <string name="settings_screen_max_video_tracks">Max Video Tracks</string>

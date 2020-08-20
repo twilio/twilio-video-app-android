@@ -80,10 +80,14 @@
             app:height="@dimen/preference_video_dimensions_height"
             app:pinRadius="36dp"
             app:startKey="pref_min_video_dim" />
+        <Preference
+            android:title="@string/settings_title_bandwidth_profile"
+            app:fragment="com.twilio.video.app.ui.settings.BandwidthProfileSettingsFragment">
+        </Preference>
     </PreferenceCategory>
     <PreferenceCategory>
         <Preference
-            android:title="Internal"
+            android:title="@string/settings_title_internal"
             app:fragment="com.twilio.video.app.ui.settings.InternalSettingsFragment">
         </Preference>
     </PreferenceCategory>
