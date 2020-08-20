@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.settings
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.view.MenuItem
 import androidx.preference.ListPreference
@@ -9,10 +10,18 @@ import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.util.get
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
 
-    protected val sharedPreferences: SharedPreferences get() = preferenceManager.sharedPreferences
+    @Inject
+    internal lateinit var sharedPreferences: SharedPreferences
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onResume() {
         super.onResume()
