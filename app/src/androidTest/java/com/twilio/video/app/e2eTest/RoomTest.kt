@@ -20,6 +20,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
+@E2ETest
 class RoomTest : BaseE2ETest() {
 
     @get:Rule

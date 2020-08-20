@@ -22,6 +22,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
+@E2ETest
 class PreferencesTest : BaseE2ETest() {
 
     @get:Rule
