@@ -7,9 +7,6 @@
             android:key="pref_version_name"
             android:title="@string/settings_screen_version"/>
         <Preference
-            android:key="pref_version_code"
-            android:title="@string/settings_screen_version_code"/>
-        <Preference
             android:key="pref_video_library_version"
             android:title="@string/settings_screen_video_library_version"/>
     </PreferenceCategory>
