@@ -133,6 +133,7 @@ dependencies {
     def lifecycleVersion = '2.2.0'
     def coroutinesAndroidVersion = '1.3.3'
     def fragmentVersion = '1.2.2'
+    def preference_version = "1.1.1"
 
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
@@ -143,7 +144,8 @@ dependencies {
     implementation videoAndroidSdkDep
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
+    implementation "androidx.preference:preference:$preference_version"
+    implementation "androidx.preference:preference-ktx:$preference_version"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
     implementation "androidx.fragment:fragment:$fragmentVersion"

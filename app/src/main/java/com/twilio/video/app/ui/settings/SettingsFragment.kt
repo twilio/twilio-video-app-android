@@ -33,9 +33,9 @@ class SettingsFragment : BaseSettingsFragment() {
         setHasOptionsMenu(true)
 
         val versionCode = BuildConfig.VERSION_CODE.toString()
-        findPreference(Preferences.VERSION_NAME).summary = "${BuildConfig.VERSION_NAME} ($versionCode)"
-        findPreference(Preferences.VIDEO_LIBRARY_VERSION).summary = Video.getVersion()
-        findPreference(Preferences.LOGOUT).onPreferenceClickListener = Preference.OnPreferenceClickListener { logout(); true }
+        findPreference<Preference>(Preferences.VERSION_NAME)?.summary = "${BuildConfig.VERSION_NAME} ($versionCode)"
+        findPreference<Preference>(Preferences.VIDEO_LIBRARY_VERSION)?.summary = Video.getVersion()
+        findPreference<Preference>(Preferences.LOGOUT)?.onPreferenceClickListener = Preference.OnPreferenceClickListener { logout(); true }
     }
 
     private fun logout() {
