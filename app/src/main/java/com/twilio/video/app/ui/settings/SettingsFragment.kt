@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.settings
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.EditTextPreference
@@ -22,6 +23,7 @@ import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.ScreenSelector
+import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class SettingsFragment : BaseSettingsFragment() {
@@ -33,6 +35,11 @@ class SettingsFragment : BaseSettingsFragment() {
     private var identityPreference: EditTextPreference? = null
     private val videoCodecNames = arrayOf(Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME)
     private val audioCodecNames = arrayOf(IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME)
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         // Add our preference from resources
