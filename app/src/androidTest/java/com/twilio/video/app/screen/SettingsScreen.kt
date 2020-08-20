@@ -15,8 +15,6 @@ import com.twilio.video.app.util.retryEspressoAction
 
 fun assertSettingsTitleIsVisible(title: String) {
     retryEspressoAction { onView(withText(title)).check(matches(isDisplayed())) }
-//    retryEspressoAction { onView(withText(getString(R.string.settings_title))).check(matches(isDisplayed())) }
-//    retryEspressoAction { onView(withText(getString(R.string.settings_title_advanced))).check(matches(isDisplayed())) }
 }
 
 fun logout() {
