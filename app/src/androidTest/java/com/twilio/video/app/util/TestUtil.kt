@@ -1,20 +1,15 @@
 package com.twilio.video.app.util
 
-import android.app.Activity
 import android.content.Context
 import androidx.annotation.IdRes
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
-import androidx.test.runner.lifecycle.Stage
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.twilio.video.app.EmailCredentials
 import com.twilio.video.app.TestCredentials
-import junit.framework.AssertionFailedError
 import java.io.InputStreamReader
-import java.util.*
-
+import java.util.UUID
+import junit.framework.AssertionFailedError
 
 fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> Unit) {
     val startTime = System.currentTimeMillis()
