@@ -17,7 +17,6 @@ import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +24,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @E2ETest
-@Ignore("singleTop declared in the manifest allows this test to work, but it causes a bug in the production code")
 class BackgroundSupportTest : BaseE2ETest() {
 
     @get:Rule
