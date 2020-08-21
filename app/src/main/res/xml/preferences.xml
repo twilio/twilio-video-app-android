@@ -17,6 +17,10 @@
             app:iconSpaceReserved="false">
         </Preference>
         <Preference
+            android:title="@string/settings_title_advanced"
+            app:fragment="com.twilio.video.app.ui.settings.AdvancedSettingsFragment">
+        </Preference>
+        <Preference
             android:key="pref_logout"
             android:title="@string/settings_screen_logout"
             app:iconSpaceReserved="false"/>
