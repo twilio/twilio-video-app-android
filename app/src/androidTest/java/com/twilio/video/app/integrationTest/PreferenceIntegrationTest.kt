@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.twilio.video.app.R
 import com.twilio.video.app.ui.settings.SettingsActivity
+import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.scrollAndClick
 import org.junit.Rule
@@ -14,7 +15,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @IntegrationTest
-class SettingsTest {
+class PreferenceIntegrationTest {
 
     @get:Rule
     var scenario = activityScenarioRule<SettingsActivity>()
@@ -22,8 +23,8 @@ class SettingsTest {
     @Test
     fun configuration_change_should_not_crash_app() {
         val title = getString(R.string.settings_title)
-        scrollAndClick(title, R.id.recycler_view)
+        assertTextIsDisplayedRetry(title)
         scenario.scenario.recreate()
-        scrollAndClick(title, R.id.recycler_view)
+        assertTextIsDisplayedRetry(title)
     }
 }
