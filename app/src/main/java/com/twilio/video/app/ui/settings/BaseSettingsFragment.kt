@@ -55,7 +55,7 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
     protected fun setListPreferenceValue(arrayId: Int, key: String, defaultValue: String) {
         val valueIndex = resources
             .getStringArray(arrayId).indexOf(sharedPreferences.get(key, defaultValue))
-        (findPreference(key) as ListPreference).setValueIndex(valueIndex)
+        findPreference<ListPreference>(key)?.setValueIndex(valueIndex)
     }
 
     /*
@@ -63,7 +63,7 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
      * of the preference.
      */
     protected fun setNumberPreferenceValue(key: String, defaultValue: Int) {
-        (findPreference(key) as NumberPreference).apply {
+        findPreference<NumberPreference>(key)?.apply {
             val numberValue = sharedPreferences.get(key, defaultValue)
             summary = numberValue.toString()
             number = numberValue

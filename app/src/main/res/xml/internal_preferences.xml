@@ -8,12 +8,14 @@
         android:key="pref_environment"
         android:summary="%s"
         android:title="@string/settings_screen_environment_string"
-        android:negativeButtonText="@null"/>
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
     <ListPreference
         android:entries="@array/settings_screen_topology_array"
         android:entryValues="@array/settings_screen_topology_array"
         android:key="pref_topology"
         android:summary="%s"
         android:title="@string/settings_screen_topology"
-        android:negativeButtonText="@null"/>
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
 </PreferenceScreen>

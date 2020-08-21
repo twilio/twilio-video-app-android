@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="@string/settings_title"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/settings_title">
     <PreferenceCategory>
         <Preference
             android:key="pref_version_name"
-            android:title="@string/settings_screen_version"/>
+            android:title="@string/settings_screen_version"
+            app:iconSpaceReserved="false"/>
         <Preference
             android:key="pref_video_library_version"
-            android:title="@string/settings_screen_video_library_version"/>
+            android:title="@string/settings_screen_video_library_version"
+            app:iconSpaceReserved="false"/>
         <Preference
             android:title="@string/settings_title_advanced"
-            app:fragment="com.twilio.video.app.ui.settings.AdvancedSettingsFragment">
+            app:fragment="com.twilio.video.app.ui.settings.AdvancedSettingsFragment"
+            app:iconSpaceReserved="false">
         </Preference>
         <Preference
             android:key="pref_logout"
-            android:title="@string/settings_screen_logout"/>
+            android:title="@string/settings_screen_logout"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

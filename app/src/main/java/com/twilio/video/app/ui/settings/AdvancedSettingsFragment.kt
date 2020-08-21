@@ -3,6 +3,7 @@ package com.twilio.video.app.ui.settings
 import android.os.Bundle
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
+import androidx.preference.Preference
 import com.twilio.video.AudioCodec
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
@@ -26,7 +27,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.advanced_preferences)
 
-        findPreference(Preferences.INTERNAL).isVisible = isInternalFlavor
+        findPreference<Preference>(Preferences.INTERNAL)?.isVisible = isInternalFlavor
 
         setHasOptionsMenu(true)
 
