@@ -45,7 +45,6 @@
             android:theme="@style/AppTheme.LoginScreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
-            android:launchMode="singleInstance"
             android:name=".ui.room.RoomActivity"
             android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|screenSize"

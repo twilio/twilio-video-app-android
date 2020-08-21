@@ -2,7 +2,7 @@ package com.twilio.video.app.util
 
 import android.content.Context
 import androidx.annotation.IdRes
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.twilio.video.app.EmailCredentials
@@ -30,14 +30,14 @@ fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> U
     throw AssertionError("Timeout occurred while attempting to find a matching view", exception)
 }
 
-fun getTargetContext(): Context = InstrumentationRegistry.getInstrumentation().targetContext
+fun getTargetContext(): Context = getInstrumentation().targetContext
 
 fun getString(@IdRes stringId: Int) = getTargetContext().getString(stringId)
 
 fun getStringArray(@IdRes stringArrayId: Int) = getTargetContext().resources.getStringArray(stringArrayId)
 
 fun retrieveEmailCredentials(): EmailCredentials {
-    val reader = InputStreamReader(InstrumentationRegistry.getInstrumentation().context.assets.open("Credentials/TestCredentials.json"))
+    val reader = InputStreamReader(getInstrumentation().context.assets.open("Credentials/TestCredentials.json"))
     val jsonReader = JsonReader(reader)
     return (Gson().fromJson(jsonReader, TestCredentials::class.java) as TestCredentials).email_sign_in_user
 }

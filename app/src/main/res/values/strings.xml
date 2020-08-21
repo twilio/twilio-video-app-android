@@ -21,7 +21,6 @@
     <string name="room_notification_message">Tap to return to the room.</string>
 
     <!--  Settings Screen  -->
-    <string name="settings_screen_advanced">Advanced</string>
     <string name="settings_screen_enable_stats">Enable Stats</string>
     <string name="settings_screen_enable_network_quality_level">Enable Network Quality Level</string>
     <string name="settings_screen_enable_insights">Enable Insights</string>
