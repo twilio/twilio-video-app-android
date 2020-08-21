@@ -108,11 +108,6 @@ android {
                     "\"${getLocalProperty("APPCENTER_APP_KEY")}\""
         }
 
-        twilio {
-            dimension "environment"
-            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
-        }
-
         community {
             dimension "environment"
             applicationId "com.twilio.video.app.community"
@@ -120,15 +115,6 @@ android {
             buildConfigField("String",
                     "TWILIO_ACCESS_TOKEN",
                     "\"${getLocalProperty("TWILIO_ACCESS_TOKEN")}\"")
-        }
-    }
-
-    variantFilter { variant ->
-        def names = variant.flavors*.name
-
-        // Ignore twilio debug and community release builds
-        if ((names.contains("twilio") && variant.buildType.name == "debug")) {
-            setIgnore(true)
         }
     }
 }

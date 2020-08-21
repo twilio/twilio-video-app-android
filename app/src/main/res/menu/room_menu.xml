@@ -28,7 +28,7 @@
           app:showAsAction="never"/>
 
     <item android:id="@+id/settings_menu_item"
-          android:title="@string/settings"
+          android:title="@string/settings_title"
           android:enabled="true"
           app:showAsAction="never"/>
 </menu>
