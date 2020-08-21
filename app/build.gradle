@@ -127,7 +127,7 @@ dependencies {
     def retrofitVersion = '2.6.4'
     def espressoVersion = '3.2.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
-    def androidXTest = '1.2.0'
+    def androidXTest = '1.3.0-rc03'
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.2.0'
