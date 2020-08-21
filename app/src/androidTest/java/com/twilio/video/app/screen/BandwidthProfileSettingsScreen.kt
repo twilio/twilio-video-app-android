@@ -17,18 +17,6 @@ import com.twilio.video.app.data.Preferences.SERVER_DEFAULT
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.getStringArray
 
-fun clickAdvancedSettings() {
-    val advanced = R.string.settings_title_advanced
-    onView(withId(R.id.recycler_view))
-            .perform(actionOnItem<ViewHolder>(hasDescendant(withText(advanced)), click()))
-}
-
-fun clickBandwidthProfileSettings() {
-    val bandwidthProfile = R.string.settings_title_bandwidth_profile
-    onView(withId(R.id.recycler_view))
-            .perform(actionOnItem<ViewHolder>(hasDescendant(withText(bandwidthProfile)), click()))
-}
-
 fun assertDefaultBandwidthProfileSettings() {
     assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_mode),
             getStringArray(R.array.settings_screen_bandwidth_profile_modes)[1])

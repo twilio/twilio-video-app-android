@@ -10,7 +10,7 @@
             android:key="pref_video_library_version"
             android:title="@string/settings_screen_video_library_version"/>
         <Preference
-            android:title="@string/settings_screen_advanced"
+            android:title="@string/settings_title_advanced"
             app:fragment="com.twilio.video.app.ui.settings.AdvancedSettingsFragment">
         </Preference>
         <Preference

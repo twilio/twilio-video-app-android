@@ -5,13 +5,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.twilio.video.app.R
 import com.twilio.video.app.screen.assertDefaultBandwidthProfileSettings
-import com.twilio.video.app.screen.assertSettingsTitleIsVisible
-import com.twilio.video.app.screen.clickAdvancedSettings
-import com.twilio.video.app.screen.clickBandwidthProfileSettings
 import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.retryEspressoAction
+import com.twilio.video.app.util.scrollAndClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,15 +27,15 @@ class PreferencesTest : BaseE2ETest() {
     fun it_should_assert_correct_default_bandwidth_preferences() {
         retryEspressoAction { clickSettingsMenuItem() }
 
-        assertSettingsTitleIsVisible(getString(R.string.settings_title))
+        assertTextIsDisplayedRetry(getString(R.string.settings_title))
 
-        clickAdvancedSettings()
+        scrollAndClick(getString(R.string.settings_title_advanced), R.id.recycler_view)
 
-        assertSettingsTitleIsVisible(getString(R.string.settings_title_advanced))
+        assertTextIsDisplayedRetry(getString(R.string.settings_title_advanced))
 
-        clickBandwidthProfileSettings()
+        scrollAndClick(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
 
-        assertSettingsTitleIsVisible(getString(R.string.settings_title_bandwidth_profile))
+        assertTextIsDisplayedRetry(getString(R.string.settings_title_bandwidth_profile))
 
         assertDefaultBandwidthProfileSettings()
     }
