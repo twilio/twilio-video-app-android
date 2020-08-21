@@ -4,6 +4,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.twilio.video.app.screen.assertRoomIsConnected
+import com.twilio.video.app.screen.assertScreenIsDisplayed
 import com.twilio.video.app.screen.clickDisconnectButton
 import com.twilio.video.app.screen.clickJoinRoomButton
 import com.twilio.video.app.screen.clickMicButton
@@ -12,6 +13,7 @@ import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,6 +25,13 @@ class RoomTest : BaseE2ETest() {
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()
+
+    @Before
+    override fun setUp() {
+        super.setUp()
+
+        retryEspressoAction { assertScreenIsDisplayed() }
+    }
 
     @Test
     fun it_should_connect_to_a_room_successfully() {
