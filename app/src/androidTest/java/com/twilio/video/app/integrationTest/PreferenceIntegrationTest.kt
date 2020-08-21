@@ -7,6 +7,7 @@ import com.twilio.video.app.R
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.getString
+import com.twilio.video.app.util.scrollAndClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
