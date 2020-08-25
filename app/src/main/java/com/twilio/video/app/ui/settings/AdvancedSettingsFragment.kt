@@ -44,7 +44,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
                 findPreference(Preferences.AUDIO_CODEC) as ListPreference?)
 
         // Fill out the rest of settings
-        identityPreference = (findPreference(Preferences.DISPLAY_NAME) as EditTextPreference?)?.apply {
+        identityPreference = findPreference<EditTextPreference>(Preferences.DISPLAY_NAME)?.apply {
             summary = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
             setOnPreferenceChangeListener { _, newValue ->
                 summary = newValue as CharSequence?
