@@ -2,18 +2,6 @@ package com.twilio.video.app.util
 
 import android.content.SharedPreferences
 
-fun SharedPreferences.remove(key: String) {
-    edit()
-        .remove(key)
-        .apply()
-}
-
-fun SharedPreferences.putString(key: String, value: String) {
-    edit()
-        .putString(key, value)
-        .apply()
-}
-
 /*
  * Utility method that allows getting a shared preference with a default value. The return value
  * type is inferred by the default value type.
