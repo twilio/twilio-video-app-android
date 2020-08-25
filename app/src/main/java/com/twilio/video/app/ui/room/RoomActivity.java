@@ -982,7 +982,7 @@ public class RoomActivity extends BaseActivity {
         if (statsScheduler.isRunning()) {
             statsScheduler.cancelStatsGathering();
         }
-        boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
+        boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT);
         if (enableStats && (room != null) && (room.getState() == CONNECTED)) {
             statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
         }

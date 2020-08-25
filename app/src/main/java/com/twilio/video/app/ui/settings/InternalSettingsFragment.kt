@@ -10,12 +10,12 @@ class InternalSettingsFragment : BaseSettingsFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.internal_preferences)
 
-        (findPreference(Preferences.ENVIRONMENT) as ListPreference?)?.run {
+        findPreference<ListPreference>(Preferences.ENVIRONMENT)?.run {
             value = sharedPreferences.getString(Preferences.ENVIRONMENT,
                     Preferences.ENVIRONMENT_DEFAULT)
         }
 
-        (findPreference(Preferences.TOPOLOGY) as ListPreference?)?.run {
+        findPreference<ListPreference>(Preferences.TOPOLOGY)?.run {
             value = sharedPreferences.getString(Preferences.TOPOLOGY,
                     Preferences.TOPOLOGY_DEFAULT)
         }

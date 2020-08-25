@@ -41,6 +41,7 @@ object Preferences {
     const val VIDEO_LIBRARY_VERSION = "pref_video_library_version"
     const val LOGOUT = "pref_logout"
     const val ENABLE_STATS = "pref_enable_stats"
+    const val ENABLE_STATS_DEFAULT = true
     const val ENABLE_INSIGHTS = "pref_enable_insights"
     const val ENABLE_NETWORK_QUALITY_LEVEL = "pref_enable_network_quality_level"
     const val ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT = true
