@@ -68,7 +68,9 @@
                 android:text="@string/stats_bytes_sent"
                 android:gravity="start"
                 android:paddingLeft="0dp"
+                android:paddingStart="0dp"
                 android:paddingRight="5dp"
+                android:paddingEnd="5dp"
                 style="@style/Stats.TextTitle" />
                 <TextView
                 android:id="@+id/stats_bytes_value"
@@ -82,7 +84,9 @@
                 android:gravity="start"
                 android:text="@string/stats_rtt"
                 android:paddingLeft="0dp"
+                android:paddingStart="0dp"
                 android:paddingRight="5dp"
+                android:paddingEnd="5dp"
                 style="@style/Stats.TextTitle"/>
             <TextView
                 android:id="@+id/stats_rtt_value"
