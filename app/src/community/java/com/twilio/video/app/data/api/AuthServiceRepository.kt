@@ -91,9 +91,8 @@ class AuthServiceRepository(
                         GROUP, GROUP_SMALL -> true
                         PEER_TO_PEER -> false
                     }
-                    Timber.d("Server topology has changed to %s. " +
-                            "Setting the codec to Vp8 with simulcast set to %s", serverTopology,
-                            enableSimulcast)
+                    Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
+                            serverTopology, enableSimulcast)
                     sharedPreferences.edit { putString(VIDEO_CODEC, Vp8Codec.NAME) }
                     sharedPreferences.edit { putBoolean(VP8_SIMULCAST, enableSimulcast) }
                 }
