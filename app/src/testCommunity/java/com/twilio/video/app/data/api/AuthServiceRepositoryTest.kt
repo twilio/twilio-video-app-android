@@ -1,10 +1,21 @@
 package com.twilio.video.app.data.api
 
+import android.content.SharedPreferences
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.video.Vp8Codec
+import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.data.Preferences.TOPOLOGY
+import com.twilio.video.app.data.Preferences.VIDEO_CODEC
+import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
+import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.data.api.model.Topology.GROUP
+import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
+import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
 import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
@@ -48,7 +59,7 @@ class AuthServiceRepositoryTest {
             val securePreferences = mock<SecurePreferences> {
                 whenever(mock.getSecureString(PASSCODE)).thenReturn(passcode)
             }
-            val repository = AuthServiceRepository(authService, securePreferences)
+            val repository = AuthServiceRepository(authService, securePreferences, mock())
 
             val actualToken = repository.getToken()
 
@@ -60,7 +71,7 @@ class AuthServiceRepositoryTest {
     @Test(expected = IllegalArgumentException::class)
     fun `it should throw an IllegalArgumentException if the passcode parameter and passcode retrieved from SecurePreferences are null`() {
         coroutineScope.runBlockingTest {
-            val repository = AuthServiceRepository(mock(), mock())
+            val repository = AuthServiceRepository(mock(), mock(), mock())
             repository.getToken()
         }
     }
@@ -141,7 +152,7 @@ class AuthServiceRepositoryTest {
     @Test
     fun `it should throw an AuthServiceException with no error type`(authService: AuthService) {
         coroutineScope.runBlockingTest {
-            val repository = AuthServiceRepository(authService, mock())
+            val repository = AuthServiceRepository(authService, mock(), mock())
             try {
                 repository.getToken(passcode = passcode)
                 fail("Exception was never thrown!")
@@ -169,6 +180,55 @@ class AuthServiceRepositoryTest {
         }
     }
 
+    fun videoCodecParams() =
+            arrayOf(
+                    arrayOf(GROUP, GROUP_SMALL, true),
+                    arrayOf(PEER_TO_PEER, GROUP, true),
+                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false)
+            )
+
+    @Parameters(method = "videoCodecParams")
+    @Test
+    fun `it should update the video codec and room type if room type has changed`(
+        oldRoomType: Topology,
+        newRoomType: Topology,
+        enableSimulcast: Boolean
+    ) {
+        runBlockingTest {
+            val (editor, repository) = setupServerRoomTypeMock(newRoomType, oldRoomType)
+
+            repository.getToken(passcode = "12345678901234")
+
+            verify(editor).putString(TOPOLOGY, newRoomType.value)
+            verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
+            verify(editor).putBoolean(VP8_SIMULCAST, enableSimulcast)
+        }
+    }
+
+    @Test
+    fun `it should not update the video codec nor the room type if the room type has not changed`() {
+        runBlockingTest {
+            val (editor, repository) = setupServerRoomTypeMock(GROUP, GROUP)
+
+            repository.getToken(passcode = "12345678901234")
+
+            verifyZeroInteractions(editor)
+        }
+    }
+
+    @Test
+    fun `it should update the video codec and the room type if using a legacy passcode`() {
+        runBlockingTest {
+            val (editor, repository) = setupServerRoomTypeMock(GROUP_SMALL, GROUP)
+
+            repository.getToken(passcode = "1234567890")
+
+            verify(editor).putString(TOPOLOGY, GROUP_SMALL.value)
+            verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
+            verify(editor).putBoolean(VP8_SIMULCAST, true)
+        }
+    }
+
     @Test
     fun `it should throw an AuthServiceException with error type INVALID_PASSCODE_ERROR if the passcode is invalid`() {
         coroutineScope.runBlockingTest {
@@ -177,7 +237,7 @@ class AuthServiceRepositoryTest {
                 whenever(mock.getToken(isA(), isA()))
                         .thenThrow(exception)
             }
-            val repository = AuthServiceRepository(authService, mock())
+            val repository = AuthServiceRepository(authService, mock(), mock())
             try {
                 repository.getToken(passcode = passcode)
                 fail("Exception was never thrown!")
@@ -196,7 +256,7 @@ class AuthServiceRepositoryTest {
                 whenever(mock.getToken(isA(), isA()))
                         .thenThrow(exception)
             }
-            val repository = AuthServiceRepository(authService, mock())
+            val repository = AuthServiceRepository(authService, mock(), mock())
             try {
                 repository.getToken(passcode = passcode)
                 fail("Exception was never thrown!")
@@ -207,13 +267,29 @@ class AuthServiceRepositoryTest {
         }
     }
 
+    private suspend fun setupServerRoomTypeMock(newRoomType: Topology, oldRoomType: Topology): Pair<SharedPreferences.Editor, AuthServiceRepository> {
+        authService = mock {
+            whenever(mock.getToken(isA(), isA()))
+                    .thenReturn(AuthServiceResponseDTO(token, newRoomType))
+        }
+        val editor = mock<SharedPreferences.Editor>()
+        val sharedPreferences = mock<SharedPreferencesWrapper> {
+            whenever(mock.getString(TOPOLOGY, null)).thenReturn(oldRoomType.value)
+            whenever(mock.edit(isA())).thenAnswer {
+                (it.arguments[0] as SharedPreferences.Editor.() -> Unit).invoke(editor)
+            }
+        }
+        val repository = AuthServiceRepository(authService, mock(), sharedPreferences)
+        return Pair(editor, repository)
+    }
+
     private suspend fun setupRepository():
             AuthServiceRepository {
         authService = mock {
             whenever(mock.getToken(isA(), isA()))
                     .thenReturn(AuthServiceResponseDTO(token))
         }
-        return AuthServiceRepository(authService, mock())
+        return AuthServiceRepository(authService, mock(), mock())
     }
 
     private suspend fun getMockAuthService(json: String? = null): AuthService =

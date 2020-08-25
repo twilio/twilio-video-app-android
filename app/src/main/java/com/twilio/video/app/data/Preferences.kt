@@ -30,7 +30,7 @@ object Preferences {
     const val ENVIRONMENT = "pref_environment"
     const val ENVIRONMENT_DEFAULT = BuildConfig.ENVIRONMENT_DEFAULT
     const val TOPOLOGY = "pref_topology"
-    val TOPOLOGY_DEFAULT: String = Topology.GROUP.string
+    val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     const val MIN_FPS = "pref_min_fps"
     const val MAX_FPS = "pref_max_fps"
     const val MIN_VIDEO_DIMENSIONS = "pref_min_video_dim"

@@ -12,6 +12,7 @@ import com.twilio.video.app.ApplicationModule
 import com.twilio.video.app.DaggerCommunityIntegrationTestComponent
 import com.twilio.video.app.R
 import com.twilio.video.app.TestApp
+import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.auth.CommunityAuthModule
 import com.twilio.video.app.auth.CommunityAuthenticator
 import com.twilio.video.app.data.AuthServiceModule
@@ -71,14 +72,14 @@ class CommunityLoginActivityTest {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(testApp)
     private val securePreferences = SecurePreferencesFake()
     private val authServiceRepository = AuthServiceRepository(authService,
-            securePreferences)
+            securePreferences, SharedPreferencesWrapper(preferences))
     private val securityModule: SecurityModule = mock {
         whenever(mock.providesSecurePreferences(any(), any())).thenReturn(securePreferences)
     }
     private val authServiceModule: AuthServiceModule = mock {
         whenever(mock.providesOkHttpClient()).thenReturn(mock())
         whenever(mock.providesAuthService(any())).thenReturn(authService)
-        whenever(mock.providesTokenService(any(), any())).thenReturn(authServiceRepository)
+        whenever(mock.providesTokenService(any(), any(), any())).thenReturn(authServiceRepository)
     }
     private val authenticator = CommunityAuthenticator(
             preferences,
