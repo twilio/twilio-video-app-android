@@ -15,6 +15,8 @@
  */
 package com.twilio.video.app.data
 
+import android.content.SharedPreferences
+import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.TokenService
@@ -58,8 +60,9 @@ class AuthServiceModule {
     @Provides
     fun providesTokenService(
         authService: AuthService,
-        securePreferences: SecurePreferences
+        securePreferences: SecurePreferences,
+        sharedPreferences: SharedPreferences
     ): TokenService {
-        return AuthServiceRepository(authService, securePreferences)
+        return AuthServiceRepository(authService, securePreferences, SharedPreferencesWrapper(sharedPreferences))
     }
 }
