@@ -1,4 +1,5 @@
 # Twilio Video Android App
+> To make sure your app is ready for **Android 11** please visit [this page](https://github.com/twilio/video-quickstart-android/issues/543).
 
 [![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=svg)](https://circleci.com/gh/twilio/twilio-video-app-android)
 
@@ -53,7 +54,6 @@ If any errors occur after running a [Twilio CLI RTC Plugin](https://github.com/t
 Currently there are three product flavors for the application.
 
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
-2. Twilio - The application intended for every day use at Twilio. _This variant can only be built by Twilions._
 3. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
    1. debug and release build types are supported.
 

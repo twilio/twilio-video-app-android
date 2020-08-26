@@ -13,24 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.twilio.video.app.util
 
-package com.twilio.video.app.model;
+import com.twilio.video.app.BuildConfig
 
-import org.jetbrains.annotations.NotNull;
+val isCommunityFlavor: Boolean get() = BuildConfig.FLAVOR == "community"
 
-public class TwilioIceServer {
-    private String url;
-
-    public TwilioIceServer() {
-        url = "";
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    @NotNull
-    public String toString() {
-        return url;
-    }
-}
+val isInternalFlavor: Boolean get() = BuildConfig.FLAVOR == "internal"
