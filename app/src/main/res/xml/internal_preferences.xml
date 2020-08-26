@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/settings_title_internal">
+    <ListPreference
+        android:entries="@array/settings_screen_environment_array"
+        android:entryValues="@array/settings_screen_environment_array_values"
+        android:key="pref_environment"
+        android:summary="%s"
+        android:title="@string/settings_screen_environment_string"
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
+    <ListPreference
+        android:key="pref_topology"
+        android:summary="%s"
+        android:title="@string/settings_screen_topology"
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
+</PreferenceScreen>

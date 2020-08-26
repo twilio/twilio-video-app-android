@@ -122,6 +122,7 @@ task incrementVersionCode {
         def remote = "upstream"
         def pushNullFile = new FileOutputStream("/dev/null")
         def versionCode = project.property("versionCode")
+        def versionCodeTag = "v0.$versionCode"
         def newVersionCode = (versionCode as Integer) + 1
 
         exec {
@@ -137,6 +138,11 @@ task incrementVersionCode {
         }
 
         def propertiesFile = new FileOutputStream("${rootDir}/gradle.properties")
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "tag", "-a", "$versionCodeTag", "-m", "$versionCodeTag"
+        }
 
         exec {
             workingDir "${rootDir}"
@@ -169,6 +175,12 @@ task incrementVersionCode {
             commandLine "git", "push", "--quiet", "${remote}", "${System.env.CIRCLE_BRANCH}"
             standardOutput pushNullFile
         }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "git", "push", "--quiet", "${remote}", "$versionCodeTag"
+            standardOutput pushNullFile
+        }
     }
 }
 
@@ -177,6 +189,9 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        maven {
+            url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
+        }
         maven {
             url  "https://twilio.bintray.com/releases"
         }

@@ -18,7 +18,7 @@ package com.twilio.video.app;
 
 import com.twilio.video.LogLevel;
 import com.twilio.video.Video;
-import com.twilio.video.app.util.BuildConfigUtils;
+import com.twilio.video.app.util.BuildConfigUtilsKt;
 import com.twilio.video.app.util.CrashlyticsTreeRanger;
 import com.twilio.video.app.util.DebugTree;
 import com.twilio.video.app.util.ReleaseTree;
@@ -31,7 +31,7 @@ public class TreeModule {
     @Provides
     @ApplicationScope
     Timber.Tree providesTree(CrashlyticsTreeRanger treeRanger) {
-        if (BuildConfig.DEBUG || BuildConfigUtils.isInternalFlavor()) {
+        if (BuildConfig.DEBUG || BuildConfigUtilsKt.isInternalFlavor()) {
             Video.setLogLevel(LogLevel.DEBUG);
             return new DebugTree(treeRanger);
         } else {

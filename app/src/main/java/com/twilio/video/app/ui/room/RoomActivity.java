@@ -64,8 +64,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.google.android.material.snackbar.Snackbar;
-import com.twilio.audioswitch.selection.AudioDevice;
-import com.twilio.audioswitch.selection.AudioDeviceSelector;
+import com.twilio.audioswitch.AudioDevice;
+import com.twilio.audioswitch.AudioSwitch;
 import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
@@ -93,6 +93,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog;
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog;
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice;
+import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions;
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect;
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState;
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved;
@@ -103,6 +104,7 @@ import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory;
 import com.twilio.video.app.ui.settings.SettingsActivity;
 import com.twilio.video.app.util.CameraCapturerCompat;
 import com.twilio.video.app.util.InputUtils;
+import com.twilio.video.app.util.PermissionUtil;
 import com.twilio.video.app.util.StatsScheduler;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -244,7 +246,7 @@ public class RoomActivity extends BaseActivity {
 
     @Inject RoomManager roomManager;
 
-    @Inject AudioDeviceSelector audioDeviceSelector;
+    @Inject AudioSwitch audioSwitch;
 
     /** Coordinates participant thumbs and primary participant rendering. */
     private PrimaryParticipantController primaryParticipantController;
@@ -266,7 +268,8 @@ public class RoomActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RoomViewModelFactory factory = new RoomViewModelFactory(roomManager, audioDeviceSelector);
+        RoomViewModelFactory factory =
+                new RoomViewModelFactory(roomManager, audioSwitch, new PermissionUtil(this));
         roomViewModel = new ViewModelProvider(this, factory).get(RoomViewModel.class);
 
         if (savedInstanceState != null) {
@@ -319,6 +322,7 @@ public class RoomActivity extends BaseActivity {
         restoreCameraTrack();
 
         roomViewModel.processInput(RefreshViewState.INSTANCE);
+        roomViewModel.processInput(CheckPermissions.INSTANCE);
 
         publishLocalTracks();
 
@@ -384,6 +388,7 @@ public class RoomActivity extends BaseActivity {
                             && writeExternalStoragePermissionGranted;
 
             if (permissionsGranted) {
+                roomViewModel.processInput(CheckPermissions.INSTANCE);
                 setupLocalMedia();
             } else {
                 Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
@@ -590,6 +595,8 @@ public class RoomActivity extends BaseActivity {
                 cameraVideoTrack != null
                         ? R.drawable.ic_videocam_white_24px
                         : R.drawable.ic_videocam_off_gray_24px);
+
+        roomViewModel.processInput(RefreshViewState.INSTANCE);
     }
 
     private void publishVideoTrack(LocalVideoTrack videoTrack, TrackPriority trackPriority) {
@@ -751,7 +758,8 @@ public class RoomActivity extends BaseActivity {
         boolean screenCaptureMenuItemState = false;
 
         Editable roomEditable = roomEditText.getText();
-        boolean connectButtonEnabled = roomEditable != null && !roomEditable.toString().isEmpty();
+        boolean isRoomTextNotEmpty = roomEditable != null && !roomEditable.toString().isEmpty();
+        boolean connectButtonEnabled = isRoomTextNotEmpty;
 
         String roomName = displayName;
         String toolbarTitle = displayName;
@@ -786,17 +794,25 @@ public class RoomActivity extends BaseActivity {
             joinStatus = "";
         }
         if (roomViewState.isLobbyLayoutVisible()) {
-            connectButtonEnabled = true;
+            connectButtonEnabled = isRoomTextNotEmpty;
             screenCaptureMenuItemState = false;
         }
 
-        // Check mute state
-        if (isAudioMuted) {
-            localAudioImageButton.setImageResource(R.drawable.ic_mic_off_gray_24px);
-        }
-        if (isVideoMuted) {
-            localVideoImageButton.setImageResource(R.drawable.ic_videocam_off_gray_24px);
-        }
+        boolean isMicEnabled = roomViewState.isMicEnabled();
+        boolean isCameraEnabled = roomViewState.isCameraEnabled();
+        boolean isLocalMediaEnabled = isMicEnabled && isCameraEnabled;
+        localAudioImageButton.setEnabled(isLocalMediaEnabled);
+        localVideoImageButton.setEnabled(isLocalMediaEnabled);
+        int micDrawable =
+                isAudioMuted || !isLocalMediaEnabled
+                        ? R.drawable.ic_mic_off_gray_24px
+                        : R.drawable.ic_mic_white_24px;
+        int videoDrawable =
+                isVideoMuted || !isLocalMediaEnabled
+                        ? R.drawable.ic_videocam_off_gray_24px
+                        : R.drawable.ic_videocam_white_24px;
+        localAudioImageButton.setImageResource(micDrawable);
+        localVideoImageButton.setImageResource(videoDrawable);
 
         statsListAdapter = new StatsListAdapter(this);
         statsRecyclerView.setAdapter(statsListAdapter);
@@ -966,7 +982,9 @@ public class RoomActivity extends BaseActivity {
         if (statsScheduler.isRunning()) {
             statsScheduler.cancelStatsGathering();
         }
-        boolean enableStats = sharedPreferences.getBoolean(Preferences.ENABLE_STATS, false);
+        boolean enableStats =
+                sharedPreferences.getBoolean(
+                        Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT);
         if (enableStats && (room != null) && (room.getState() == CONNECTED)) {
             statsScheduler.scheduleStatsGathering(room, statsListener(), STATS_DELAY);
         }

@@ -5,6 +5,7 @@ import com.twilio.video.app.data.api.AuthServiceError
 
 sealed class RoomViewEffect {
 
+    object CheckLocalMedia : RoomViewEffect()
     // TODO Remove duplicated RoomEvents once all SDK code is decoupled from RoomActivity
     object Connecting : RoomViewEffect()
     data class Connected(val room: Room) : RoomViewEffect()

@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
+@E2ETest
 class BackgroundSupportTest : BaseE2ETest() {
 
     @get:Rule

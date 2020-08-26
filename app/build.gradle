@@ -18,7 +18,7 @@ apply plugin: 'kotlin-kapt'
 def videoAndroidSdkDepProp = "videoAppSdkDependency"
 def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
         project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:5.8.0")
+        "com.twilio:video-android:5.10.2")
 def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
@@ -107,11 +107,6 @@ android {
                     "\"${getLocalProperty("APPCENTER_APP_KEY")}\""
         }
 
-        twilio {
-            dimension "environment"
-            buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
-        }
-
         community {
             dimension "environment"
             applicationId "com.twilio.video.app.community"
@@ -119,15 +114,6 @@ android {
             buildConfigField("String",
                     "TWILIO_ACCESS_TOKEN",
                     "\"${getLocalProperty("TWILIO_ACCESS_TOKEN")}\"")
-        }
-    }
-
-    variantFilter { variant ->
-        def names = variant.flavors*.name
-
-        // Ignore twilio debug and community release builds
-        if ((names.contains("twilio") && variant.buildType.name == "debug")) {
-            setIgnore(true)
         }
     }
 }
@@ -156,7 +142,7 @@ dependencies {
     implementation videoAndroidSdkDep
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
+    implementation "androidx.preference:preference-ktx:1.1.1"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
     implementation "androidx.fragment:fragment:$fragmentVersion"
@@ -179,7 +165,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:0.1.3'
+    implementation 'com.twilio:audioswitch:1.0.0'
 
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:2.5.1"
 
