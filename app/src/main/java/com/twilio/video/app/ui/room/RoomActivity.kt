@@ -111,64 +111,64 @@ class RoomActivity : BaseActivity() {
     )
 
     @BindView(R.id.toolbar)
-    var toolbar: Toolbar? = null
+    lateinit var toolbar: Toolbar
 
     @BindView(R.id.connect)
-    var connect: Button? = null
+    lateinit var connect: Button
 
     @BindView(R.id.disconnect)
-    var disconnectButton: ImageButton? = null
+    lateinit var disconnectButton: ImageButton
 
     @BindView(R.id.primary_video)
-    var primaryVideoView: ParticipantPrimaryView? = null
+    lateinit var primaryVideoView: ParticipantPrimaryView
 
     @BindView(R.id.remote_video_thumbnails)
-    var thumbnailRecyclerView: RecyclerView? = null
+    lateinit var thumbnailRecyclerView: RecyclerView
 
     @BindView(R.id.local_video_image_button)
-    var localVideoImageButton: ImageButton? = null
+    lateinit var localVideoImageButton: ImageButton
 
     @BindView(R.id.local_audio_image_button)
-    var localAudioImageButton: ImageButton? = null
+    lateinit var localAudioImageButton: ImageButton
 
     @BindView(R.id.video_container)
-    var frameLayout: FrameLayout? = null
+    lateinit var frameLayout: FrameLayout
 
     @BindView(R.id.join_room_layout)
-    var joinRoomLayout: LinearLayout? = null
+    lateinit var joinRoomLayout: LinearLayout
 
     @BindView(R.id.room_edit_text)
-    var roomEditText: ClearableEditText? = null
+    lateinit var roomEditText: ClearableEditText
 
     @BindView(R.id.join_status_layout)
-    var joinStatusLayout: LinearLayout? = null
+    lateinit var joinStatusLayout: LinearLayout
 
     @BindView(R.id.join_status)
-    var joinStatusTextView: TextView? = null
+    lateinit var joinStatusTextView: TextView
 
     @BindView(R.id.join_room_name)
-    var joinRoomNameTextView: TextView? = null
+    lateinit var joinRoomNameTextView: TextView
 
     @BindView(R.id.recording_notice)
-    var recordingNoticeTextView: TextView? = null
+    lateinit var recordingNoticeTextView: TextView
 
     @BindView(R.id.stats_recycler_view)
-    var statsRecyclerView: RecyclerView? = null
+    lateinit var statsRecyclerView: RecyclerView
 
     @BindView(R.id.stats_disabled)
-    var statsDisabledLayout: LinearLayout? = null
+    lateinit var statsDisabledLayout: LinearLayout
 
     @BindView(R.id.stats_disabled_title)
-    var statsDisabledTitleTextView: TextView? = null
+    lateinit var statsDisabledTitleTextView: TextView
 
     @BindView(R.id.stats_disabled_description)
-    var statsDisabledDescTextView: TextView? = null
-    private var switchCameraMenuItem: MenuItem? = null
-    private var pauseVideoMenuItem: MenuItem? = null
-    private var pauseAudioMenuItem: MenuItem? = null
-    private var screenCaptureMenuItem: MenuItem? = null
-    private var settingsMenuItem: MenuItem? = null
-    private var deviceMenuItem: MenuItem? = null
+    lateinit var statsDisabledDescTextView: TextView
+    private lateinit var switchCameraMenuItem: MenuItem
+    private lateinit var pauseVideoMenuItem: MenuItem
+    private lateinit var pauseAudioMenuItem: MenuItem
+    private lateinit var screenCaptureMenuItem: MenuItem
+    private lateinit var settingsMenuItem: MenuItem
+    private lateinit var deviceMenuItem: MenuItem
     private val savedAudioMode = AudioManager.MODE_INVALID
     private var savedVolumeControlStream = 0
     private val savedIsMicrophoneMute = false
@@ -204,16 +204,16 @@ class RoomActivity : BaseActivity() {
     private val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     @Inject
-    var tokenService: TokenService? = null
+    lateinit var tokenService: TokenService
 
     @Inject
-    var sharedPreferences: SharedPreferences? = null
+    lateinit var sharedPreferences: SharedPreferences
 
     @Inject
-    var roomManager: RoomManager? = null
+    lateinit var roomManager: RoomManager
 
     @Inject
-    var audioSwitch: AudioSwitch? = null
+    lateinit var audioSwitch: AudioSwitch
 
     /** Coordinates participant thumbs and primary participant rendering.  */
     private var primaryParticipantController: PrimaryParticipantController? = null
