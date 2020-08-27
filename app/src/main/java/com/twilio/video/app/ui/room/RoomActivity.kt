@@ -169,10 +169,7 @@ class RoomActivity : BaseActivity() {
     private lateinit var screenCaptureMenuItem: MenuItem
     private lateinit var settingsMenuItem: MenuItem
     private lateinit var deviceMenuItem: MenuItem
-    private val savedAudioMode = AudioManager.MODE_INVALID
     private var savedVolumeControlStream = 0
-    private val savedIsMicrophoneMute = false
-    private val savedIsSpeakerPhoneOn = false
     private var displayName: String? = null
     private var localParticipant: LocalParticipant? = null
     private var localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
@@ -189,7 +186,7 @@ class RoomActivity : BaseActivity() {
             Timber.e("Screen capturer error: %s", errorDescription)
             stopScreenCapture()
             Snackbar.make(
-                    primaryVideoView!!,
+                    primaryVideoView,
                     R.string.screen_capture_error,
                     Snackbar.LENGTH_LONG)
                     .show()
@@ -199,8 +196,8 @@ class RoomActivity : BaseActivity() {
             Timber.d("First frame from screen capturer available")
         }
     }
-    private var statsScheduler: StatsScheduler? = null
-    private var statsListAdapter: StatsListAdapter? = null
+    private lateinit var statsScheduler: StatsScheduler
+    private lateinit var statsListAdapter: StatsListAdapter
     private val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     @Inject
@@ -216,14 +213,15 @@ class RoomActivity : BaseActivity() {
     lateinit var audioSwitch: AudioSwitch
 
     /** Coordinates participant thumbs and primary participant rendering.  */
-    private var primaryParticipantController: PrimaryParticipantController? = null
+    private lateinit var primaryParticipantController: PrimaryParticipantController
     private var isAudioMuted = false
     private var isVideoMuted = false
-    private var participantAdapter: ParticipantAdapter? = null
-    private var roomViewModel: RoomViewModel? = null
+    private lateinit var participantAdapter: ParticipantAdapter
+    private lateinit var roomViewModel: RoomViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val factory = RoomViewModelFactory(roomManager!!, audioSwitch!!, PermissionUtil(this))
+        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
         if (savedInstanceState != null) {
             isAudioMuted = savedInstanceState.getBoolean(IS_AUDIO_MUTED)
@@ -247,7 +245,7 @@ class RoomActivity : BaseActivity() {
         savedVolumeControlStream = volumeControlStream
 
         // setup participant controller
-        primaryParticipantController = PrimaryParticipantController(primaryVideoView!!)
+        primaryParticipantController = PrimaryParticipantController(primaryVideoView)
 
         // Setup Activity
         statsScheduler = StatsScheduler()
@@ -256,27 +254,25 @@ class RoomActivity : BaseActivity() {
 
     private fun setupThumbnailRecyclerView() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        thumbnailRecyclerView!!.layoutManager = layoutManager
+        thumbnailRecyclerView.layoutManager = layoutManager
         participantAdapter = ParticipantAdapter()
-        participantAdapter!!
+        participantAdapter
                 .viewHolderEvents
-                .observe(this, { viewEvent: RoomViewEvent? -> roomViewModel!!.processInput(viewEvent!!) })
-        thumbnailRecyclerView!!.adapter = participantAdapter
+                .observe(this, { viewEvent: RoomViewEvent -> roomViewModel.processInput(viewEvent) })
+        thumbnailRecyclerView.adapter = participantAdapter
     }
 
     override fun onStart() {
         super.onStart()
         checkIntentURI()
-        restoreCameraTrack()
-        roomViewModel!!.processInput(RefreshViewState)
-        roomViewModel!!.processInput(CheckPermissions)
-        publishLocalTracks()
+        roomViewModel.processInput(RefreshViewState)
+        roomViewModel.processInput(CheckPermissions)
         updateStats()
     }
 
     override fun onResume() {
         super.onResume()
-        displayName = sharedPreferences!!.getString(Preferences.DISPLAY_NAME, null)
+        displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
         setTitle(displayName)
     }
 
@@ -285,7 +281,7 @@ class RoomActivity : BaseActivity() {
         val uri = intent.data
         val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
         if (roomName != null) {
-            roomEditText!!.setText(roomName)
+            roomEditText.setText(roomName)
             isAppLinkProvided = true
         }
         return isAppLinkProvided
@@ -299,16 +295,16 @@ class RoomActivity : BaseActivity() {
 
     override fun onDestroy() {
         // Teardown tracks
-        if (localAudioTrack != null) {
-            localAudioTrack!!.release()
+        localAudioTrack?.let {
+            it.release()
             localAudioTrack = null
         }
-        if (cameraVideoTrack != null) {
-            cameraVideoTrack!!.release()
+        cameraVideoTrack?.let {
+            it.release()
             cameraVideoTrack = null
         }
-        if (screenVideoTrack != null) {
-            screenVideoTrack!!.release()
+        screenVideoTrack?.let {
+            it.release()
             screenVideoTrack = null
         }
         super.onDestroy()
@@ -327,10 +323,10 @@ class RoomActivity : BaseActivity() {
                     cameraPermissionGranted &&
                     writeExternalStoragePermissionGranted)
             if (permissionsGranted) {
-                roomViewModel!!.processInput(CheckPermissions)
+                roomViewModel.processInput(CheckPermissions)
                 setupLocalMedia()
             } else {
-                Snackbar.make(primaryVideoView!!, R.string.permissions_required, Snackbar.LENGTH_LONG)
+                Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
                         .show()
             }
         }
@@ -352,16 +348,16 @@ class RoomActivity : BaseActivity() {
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item)
         deviceMenuItem = menu.findItem(R.id.device_menu_item)
         requestPermissions()
-        roomViewModel!!.viewState.observe(this, { roomViewState: RoomViewState -> bindRoomViewState(roomViewState) })
-        roomViewModel!!.viewEffects.observe(this, { roomViewEffectWrapper: ViewEffect<RoomViewEffect> -> bindRoomViewEffects(roomViewEffectWrapper) })
+        roomViewModel.viewState.observe(this, { roomViewState: RoomViewState -> bindRoomViewState(roomViewState) })
+        roomViewModel.viewEffects.observe(this, { roomViewEffectWrapper: ViewEffect<RoomViewEffect> -> bindRoomViewEffects(roomViewEffectWrapper) })
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.switch_camera_menu_item -> {
-                if (cameraCapturer != null) {
-                    cameraCapturer!!.switchCamera()
+                cameraCapturer?.let {
+                    it.switchCamera()
                 }
                 true
             }
@@ -405,48 +401,50 @@ class RoomActivity : BaseActivity() {
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != RESULT_OK) {
                 Snackbar.make(
-                        primaryVideoView!!,
+                        primaryVideoView,
                         R.string.screen_capture_permission_not_granted,
                         Snackbar.LENGTH_LONG)
                         .show()
                 return
             }
-            screenCapturer = ScreenCapturer(this, resultCode, data!!, screenCapturerListener)
-            startScreenCapture()
+            data?.let { data ->
+                screenCapturer = ScreenCapturer(this, resultCode, data, screenCapturerListener)
+                startScreenCapture()
+            }
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        roomViewModel!!.processInput(Disconnect)
+        roomViewModel.processInput(Disconnect)
     }
 
     @OnTextChanged(value = [R.id.room_edit_text], callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     fun onTextChanged(text: CharSequence?) {
-        connect!!.isEnabled = !TextUtils.isEmpty(text)
+        connect.isEnabled = !TextUtils.isEmpty(text)
     }
 
     @OnClick(R.id.connect)
     fun connectButtonClick() {
         InputUtils.hideKeyboard(this)
         if (!didAcceptPermissions()) {
-            Snackbar.make(primaryVideoView!!, R.string.permissions_required, Snackbar.LENGTH_SHORT)
+            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
                     .show()
             return
         }
-        connect!!.isEnabled = false
+        connect.isEnabled = false
         // obtain room name
-        val text = roomEditText!!.text
+        val text = roomEditText.text
         if (text != null) {
             val roomName = text.toString()
-            val viewEvent = Connect(displayName!!, roomName)
-            roomViewModel!!.processInput(viewEvent)
+            val viewEvent = Connect(displayName ?: "", roomName)
+            roomViewModel.processInput(viewEvent)
         }
     }
 
     @OnClick(R.id.disconnect)
     fun disconnectButtonClick() {
-        roomViewModel!!.processInput(Disconnect)
+        roomViewModel.processInput(Disconnect)
         stopScreenCapture()
     }
 
@@ -460,68 +458,72 @@ class RoomActivity : BaseActivity() {
                 localParticipant?.publishTrack(localAudioTrack)
             }
             icon = R.drawable.ic_mic_white_24px
-            pauseAudioMenuItem!!.isVisible = true
-            pauseAudioMenuItem!!.setTitle(
-                    if (localAudioTrack!!.isEnabled) R.string.pause_audio else R.string.resume_audio)
+            pauseAudioMenuItem.isVisible = true
+            pauseAudioMenuItem.setTitle(
+                    if (localAudioTrack?.isEnabled == true) R.string.pause_audio else R.string.resume_audio)
         } else {
             isAudioMuted = true
-            if (localParticipant != null) {
-                localParticipant!!.unpublishTrack(localAudioTrack!!)
+
+            localAudioTrack?.let { localAudioTrack ->
+                localParticipant?.unpublishTrack(localAudioTrack)
+                localAudioTrack.release()
+                this.localAudioTrack = null
             }
-            localAudioTrack!!.release()
-            localAudioTrack = null
             icon = R.drawable.ic_mic_off_gray_24px
-            pauseAudioMenuItem!!.isVisible = false
+            pauseAudioMenuItem.isVisible = false
         }
-        localAudioImageButton!!.setImageResource(icon)
+        localAudioImageButton.setImageResource(icon)
     }
 
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
-        if (localParticipant != null) roomViewModel!!.processInput(ToggleLocalVideo(localParticipant!!.sid))
+        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid)) }
         if (cameraVideoTrack == null) {
             isVideoMuted = false
 
             // add local camera track
-            cameraVideoTrack = LocalVideoTrack.create(
-                    this,
-                    true,
-                    cameraCapturer!!.videoCapturer,
-                    videoConstraints,
-                    CAMERA_TRACK_NAME)
-            if (localParticipant != null && cameraVideoTrack != null) {
-                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW)
+            cameraCapturer?.let {
+                cameraVideoTrack = LocalVideoTrack.create(
+                        this,
+                        true,
+                        it.videoCapturer,
+                        videoConstraints,
+                        CAMERA_TRACK_NAME)
+            }
+            if (localParticipant != null) {
+                cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
 
                 // enable video settings
-                switchCameraMenuItem!!.isVisible = cameraVideoTrack!!.isEnabled
-                pauseVideoMenuItem!!.setTitle(
-                        if (cameraVideoTrack!!.isEnabled) R.string.pause_video else R.string.resume_video)
-                pauseVideoMenuItem!!.isVisible = true
+                val isCameraVideoTrackEnabled = cameraVideoTrack?.isEnabled == true
+                switchCameraMenuItem.isVisible = isCameraVideoTrackEnabled
+                pauseVideoMenuItem.setTitle(
+                        if (isCameraVideoTrackEnabled) R.string.pause_video else R.string.resume_video)
+                pauseVideoMenuItem.isVisible = true
             }
         } else {
             isVideoMuted = true
             // remove local camera track
-            cameraVideoTrack!!.removeRenderer(primaryVideoView!!)
-            if (localParticipant != null) {
-                localParticipant!!.unpublishTrack(cameraVideoTrack!!)
+            cameraVideoTrack?.let { cameraVideoTrack ->
+                cameraVideoTrack.removeRenderer(primaryVideoView)
+                localParticipant?.unpublishTrack(cameraVideoTrack)
+                cameraVideoTrack.release()
+                this.cameraVideoTrack = null
             }
-            cameraVideoTrack!!.release()
-            cameraVideoTrack = null
 
             // disable video settings
-            switchCameraMenuItem!!.isVisible = false
-            pauseVideoMenuItem!!.isVisible = false
+            switchCameraMenuItem.isVisible = false
+            pauseVideoMenuItem.isVisible = false
         }
 
         // update toggle button icon
-        localVideoImageButton!!.setImageResource(
+        localVideoImageButton.setImageResource(
                 if (cameraVideoTrack != null) R.drawable.ic_videocam_white_24px else R.drawable.ic_videocam_off_gray_24px)
-        roomViewModel!!.processInput(RefreshViewState)
+        roomViewModel.processInput(RefreshViewState)
     }
 
-    private fun publishVideoTrack(videoTrack: LocalVideoTrack?, trackPriority: TrackPriority) {
+    private fun publishVideoTrack(videoTrack: LocalVideoTrack, trackPriority: TrackPriority) {
         val localTrackPublicationOptions = LocalTrackPublicationOptions(trackPriority)
-        localParticipant!!.publishTrack(videoTrack!!, localTrackPublicationOptions)
+        localParticipant?.publishTrack(videoTrack, localTrackPublicationOptions)
     }
 
     private fun obtainVideoConstraints() {
@@ -529,7 +531,7 @@ class RoomActivity : BaseActivity() {
         val builder = VideoConstraints.Builder()
 
         // setup aspect ratio
-        val aspectRatio = sharedPreferences!!.getString(Preferences.ASPECT_RATIO, "0")
+        val aspectRatio = sharedPreferences.getString(Preferences.ASPECT_RATIO, "0")
         if (aspectRatio != null) {
             val aspectRatioIndex = aspectRatio.toInt()
             builder.aspectRatio(aspectRatios[aspectRatioIndex])
@@ -540,8 +542,8 @@ class RoomActivity : BaseActivity() {
         }
 
         // setup video dimensions
-        val minVideoDim = sharedPreferences!!.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0)
-        val maxVideoDim = sharedPreferences!!.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1)
+        val minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0)
+        val maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1)
         if (maxVideoDim != -1 && minVideoDim != -1) {
             builder.minVideoDimensions(videoDimensions[minVideoDim])
             builder.maxVideoDimensions(videoDimensions[maxVideoDim])
@@ -554,8 +556,8 @@ class RoomActivity : BaseActivity() {
                         .getStringArray(R.array.settings_screen_video_dimensions_array)[maxVideoDim])
 
         // setup fps
-        val minFps = sharedPreferences!!.getInt(Preferences.MIN_FPS, 0)
-        val maxFps = sharedPreferences!!.getInt(Preferences.MAX_FPS, 24)
+        val minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0)
+        val maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 24)
         if (maxFps != -1 && minFps != -1) {
             builder.minFps(minFps)
             builder.maxFps(maxFps)
@@ -594,13 +596,17 @@ class RoomActivity : BaseActivity() {
     private fun setupLocalMedia() {
         if (localAudioTrack == null && !isAudioMuted) {
             localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME)
-            if (room != null && localParticipant != null) localParticipant!!.publishTrack(localAudioTrack!!)
+            if (room != null && localParticipant != null) {
+                localAudioTrack?.let { localParticipant?.publishTrack(it) }
+            }
         }
-        if (cameraVideoTrack == null && !isVideoMuted) {
+        if (!isVideoMuted) {
             setupLocalVideoTrack()
-            if (room != null && localParticipant != null) publishVideoTrack(cameraVideoTrack, TrackPriority.LOW)
+            if (room != null && localParticipant != null) {
+                cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
+            }
         }
-        roomViewModel!!.processInput(RefreshViewState)
+        roomViewModel.processInput(RefreshViewState)
     }
 
     /** Create local video track  */
@@ -610,17 +616,19 @@ class RoomActivity : BaseActivity() {
         if (cameraCapturer == null) {
             cameraCapturer = CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA)
         }
-        cameraVideoTrack = LocalVideoTrack.create(
-                this,
-                true,
-                cameraCapturer!!.videoCapturer,
-                videoConstraints,
-                CAMERA_TRACK_NAME)
-        if (cameraVideoTrack != null) {
-            localVideoTrackNames[cameraVideoTrack!!.name] = getString(R.string.camera_video_track)
-        } else {
+        cameraCapturer?.let {
+            cameraVideoTrack = LocalVideoTrack.create(
+                    this,
+                    true,
+                    it.videoCapturer,
+                    videoConstraints,
+                    CAMERA_TRACK_NAME)
+        }
+        cameraVideoTrack?.let {
+            localVideoTrackNames[it.name] = getString(R.string.camera_video_track)
+        } ?: run {
             Snackbar.make(
-                    primaryVideoView!!,
+                    primaryVideoView,
                     R.string.failed_to_add_camera_video_track,
                     Snackbar.LENGTH_LONG)
                     .show()
@@ -635,16 +643,17 @@ class RoomActivity : BaseActivity() {
      * room.
      */
     private fun renderLocalParticipantStub() {
-        val cameraTrackViewState = if (cameraVideoTrack != null) VideoTrackViewState(cameraVideoTrack!!, false) else null
-        primaryParticipantController!!.renderAsPrimary(
-                localParticipantSid,
-                getString(R.string.you),
-                null,
-                cameraTrackViewState,
-                localAudioTrack == null, cameraCapturer != null &&
-                cameraCapturer!!.cameraSource
-                == CameraCapturer.CameraSource.FRONT_CAMERA)
-        primaryVideoView!!.showIdentityBadge(false)
+        val cameraTrackViewState = cameraVideoTrack?.let { VideoTrackViewState(it, false) }
+        cameraCapturer?.let { cameraCapturer ->
+            primaryParticipantController.renderAsPrimary(
+                    localParticipantSid,
+                    getString(R.string.you),
+                    null,
+                    cameraTrackViewState,
+                    localAudioTrack == null,
+                    cameraCapturer.cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA)
+        }
+        primaryVideoView.showIdentityBadge(false)
     }
 
     private fun updateLayout(roomViewState: RoomViewState) {
@@ -653,7 +662,7 @@ class RoomActivity : BaseActivity() {
         var joinStatusLayoutState = View.GONE
         var settingsMenuItemState = true
         var screenCaptureMenuItemState = false
-        val roomEditable = roomEditText!!.text
+        val roomEditable = roomEditText.text
         val isRoomTextNotEmpty = roomEditable != null && !roomEditable.toString().isEmpty()
         var connectButtonEnabled = isRoomTextNotEmpty
         var roomName = displayName
@@ -690,31 +699,28 @@ class RoomActivity : BaseActivity() {
         val isMicEnabled = roomViewState.isMicEnabled
         val isCameraEnabled = roomViewState.isCameraEnabled
         val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
-        localAudioImageButton!!.isEnabled = isLocalMediaEnabled
-        localVideoImageButton!!.isEnabled = isLocalMediaEnabled
+        localAudioImageButton.isEnabled = isLocalMediaEnabled
+        localVideoImageButton.isEnabled = isLocalMediaEnabled
         val micDrawable = if (isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
         val videoDrawable = if (isVideoMuted || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
-        localAudioImageButton!!.setImageResource(micDrawable)
-        localVideoImageButton!!.setImageResource(videoDrawable)
+        localAudioImageButton.setImageResource(micDrawable)
+        localVideoImageButton.setImageResource(videoDrawable)
         statsListAdapter = StatsListAdapter(this)
-        statsRecyclerView!!.adapter = statsListAdapter
-        statsRecyclerView!!.layoutManager = LinearLayoutManager(this)
-        disconnectButton!!.visibility = disconnectButtonState
-        joinRoomLayout!!.visibility = joinRoomLayoutState
-        joinStatusLayout!!.visibility = joinStatusLayoutState
-        connect!!.isEnabled = connectButtonEnabled
+        statsRecyclerView.adapter = statsListAdapter
+        statsRecyclerView.layoutManager = LinearLayoutManager(this)
+        disconnectButton.visibility = disconnectButtonState
+        joinRoomLayout.visibility = joinRoomLayoutState
+        joinStatusLayout.visibility = joinStatusLayoutState
+        connect.isEnabled = connectButtonEnabled
         setTitle(toolbarTitle)
-        joinStatusTextView!!.text = joinStatus
-        joinRoomNameTextView!!.text = roomName
-        recordingNoticeTextView!!.visibility = recordingWarningVisibility
+        joinStatusTextView.text = joinStatus
+        joinRoomNameTextView.text = roomName
+        recordingNoticeTextView.visibility = recordingWarningVisibility
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
-        if (settingsMenuItem != null) {
-            settingsMenuItem!!.isVisible = settingsMenuItemState
-        }
-        if (screenCaptureMenuItem != null &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            screenCaptureMenuItem!!.isVisible = screenCaptureMenuItemState
+        settingsMenuItem.isVisible = settingsMenuItemState
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
         }
     }
 
@@ -750,16 +756,16 @@ class RoomActivity : BaseActivity() {
         screenCapturer?.let { screenCapturer ->
             screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer,
                     SCREEN_TRACK_NAME)
-            if (screenVideoTrack != null) {
-                screenCaptureMenuItem!!.setIcon(R.drawable.ic_stop_screen_share_white_24dp)
-                screenCaptureMenuItem!!.setTitle(R.string.stop_screen_share)
-                localVideoTrackNames[screenVideoTrack!!.name] = getString(R.string.screen_video_track)
+            screenVideoTrack?.let { screenVideoTrack ->
+                screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp)
+                screenCaptureMenuItem.setTitle(R.string.stop_screen_share)
+                localVideoTrackNames[screenVideoTrack.name] = getString(R.string.screen_video_track)
                 if (localParticipant != null) {
                     publishVideoTrack(screenVideoTrack, TrackPriority.HIGH)
                 }
-            } else {
+            } ?: run {
                 Snackbar.make(
-                        primaryVideoView!!,
+                        primaryVideoView,
                         R.string.failed_to_add_screen_video_track,
                         Snackbar.LENGTH_LONG)
                         .setAction("Action", null)
@@ -769,34 +775,34 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun stopScreenCapture() {
-        if (screenVideoTrack != null) {
-            roomViewModel!!.processInput(ScreenTrackRemoved(localParticipant!!.sid))
-            if (localParticipant != null) {
-                localParticipant!!.unpublishTrack(screenVideoTrack!!)
+        screenVideoTrack?.let { screenVideoTrack ->
+            localParticipant?.let { localParticipant ->
+                roomViewModel.processInput(ScreenTrackRemoved(localParticipant.sid))
+                localParticipant.unpublishTrack(screenVideoTrack)
             }
-            screenVideoTrack!!.release()
-            localVideoTrackNames.remove(screenVideoTrack!!.name)
-            screenVideoTrack = null
-            screenCaptureMenuItem!!.setIcon(R.drawable.ic_screen_share_white_24dp)
-            screenCaptureMenuItem!!.setTitle(R.string.share_screen)
+            screenVideoTrack.release()
+            localVideoTrackNames.remove(screenVideoTrack.name)
+            this.screenVideoTrack = null
+            screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp)
+            screenCaptureMenuItem.setTitle(R.string.share_screen)
         }
     }
 
     private fun toggleLocalAudioTrackState() {
-        if (localAudioTrack != null) {
-            val enable = !localAudioTrack!!.isEnabled
-            localAudioTrack!!.enable(enable)
-            pauseAudioMenuItem!!.setTitle(
-                    if (localAudioTrack!!.isEnabled) R.string.pause_audio else R.string.resume_audio)
+        localAudioTrack?.let { localAudioTrack ->
+            val enable = !localAudioTrack.isEnabled
+            localAudioTrack.enable(enable)
+            pauseAudioMenuItem.setTitle(
+                    if (localAudioTrack.isEnabled) R.string.pause_audio else R.string.resume_audio)
         }
     }
 
     private fun toggleLocalVideoTrackState() {
-        if (cameraVideoTrack != null) {
-            val enable = !cameraVideoTrack!!.isEnabled
-            cameraVideoTrack!!.enable(enable)
-            pauseVideoMenuItem!!.setTitle(
-                    if (cameraVideoTrack!!.isEnabled) R.string.pause_video else R.string.resume_video)
+        cameraVideoTrack?.let { cameraVideoTrack ->
+            val enable = !cameraVideoTrack.isEnabled
+            cameraVideoTrack.enable(enable)
+            pauseVideoMenuItem.setTitle(
+                    if (cameraVideoTrack.isEnabled) R.string.pause_video else R.string.resume_video)
         }
     }
 
@@ -805,14 +811,14 @@ class RoomActivity : BaseActivity() {
      * going to the background
      */
     private fun removeCameraTrack() {
-        if (cameraVideoTrack != null) {
-            if (localParticipant != null) {
-                roomViewModel!!.processInput(VideoTrackRemoved(localParticipant!!.sid))
-                localParticipant!!.unpublishTrack(cameraVideoTrack!!)
+        cameraVideoTrack?.let { cameraVideoTrack ->
+            localParticipant?.let { localParticipant ->
+                roomViewModel.processInput(VideoTrackRemoved(localParticipant.sid))
+                localParticipant.unpublishTrack(cameraVideoTrack)
             }
-            cameraVideoTrack!!.release()
+            cameraVideoTrack.release()
             restoreLocalVideoCameraTrack = true
-            cameraVideoTrack = null
+            this.cameraVideoTrack = null
         }
     }
 
@@ -829,37 +835,37 @@ class RoomActivity : BaseActivity() {
         if (enabled) {
             if (room != null && room!!.remoteParticipants.size > 0) {
                 // show stats
-                statsRecyclerView!!.visibility = View.VISIBLE
-                statsDisabledLayout!!.visibility = View.GONE
+                statsRecyclerView.visibility = View.VISIBLE
+                statsDisabledLayout.visibility = View.GONE
             } else if (room != null) {
                 // disable stats when there is no room
-                statsDisabledTitleTextView!!.text = getString(R.string.stats_unavailable)
-                statsDisabledDescTextView!!.text = getString(R.string.stats_description_media_not_shared)
-                statsRecyclerView!!.visibility = View.GONE
-                statsDisabledLayout!!.visibility = View.VISIBLE
+                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
+                statsRecyclerView.visibility = View.GONE
+                statsDisabledLayout.visibility = View.VISIBLE
             } else {
                 // disable stats if there is room but no participants (no media)
-                statsDisabledTitleTextView!!.text = getString(R.string.stats_unavailable)
-                statsDisabledDescTextView!!.text = getString(R.string.stats_description_join_room)
-                statsRecyclerView!!.visibility = View.GONE
-                statsDisabledLayout!!.visibility = View.VISIBLE
+                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
+                statsRecyclerView.visibility = View.GONE
+                statsDisabledLayout.visibility = View.VISIBLE
             }
         } else {
-            statsDisabledTitleTextView!!.text = getString(R.string.stats_gathering_disabled)
-            statsDisabledDescTextView!!.text = getString(R.string.stats_enable_in_settings)
-            statsRecyclerView!!.visibility = View.GONE
-            statsDisabledLayout!!.visibility = View.VISIBLE
+            statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
+            statsDisabledDescTextView.text = getString(R.string.stats_enable_in_settings)
+            statsRecyclerView.visibility = View.GONE
+            statsDisabledLayout.visibility = View.VISIBLE
         }
     }
 
     private fun updateStats() {
-        if (statsScheduler!!.isRunning) {
-            statsScheduler!!.cancelStatsGathering()
+        if (statsScheduler.isRunning) {
+            statsScheduler.cancelStatsGathering()
         }
-        val enableStats = sharedPreferences!!.getBoolean(
+        val enableStats = sharedPreferences.getBoolean(
                 Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT)
         if (enableStats && room != null && room!!.state == Room.State.CONNECTED) {
-            statsScheduler!!.scheduleStatsGathering(room!!, statsListener(), STATS_DELAY.toLong())
+            statsScheduler.scheduleStatsGathering(room!!, statsListener(), STATS_DELAY.toLong())
         }
         updateStatsUI(enableStats)
     }
@@ -868,15 +874,15 @@ class RoomActivity : BaseActivity() {
         return StatsListener { statsReports: List<StatsReport> ->
             // Running on StatsScheduler thread
             room?.let { room ->
-                statsListAdapter?.updateStatsData(statsReports, room.remoteParticipants,
+                statsListAdapter.updateStatsData(statsReports, room.remoteParticipants,
                         localVideoTrackNames)
             }
         }
     }
 
     private fun initializeRoom() {
-        if (room != null) {
-            setupLocalParticipant(room!!)
+        room?.let {
+            setupLocalParticipant(it)
             publishLocalTracks()
             updateStats()
         }
@@ -884,32 +890,30 @@ class RoomActivity : BaseActivity() {
 
     private fun setupLocalParticipant(room: Room) {
         localParticipant = room.localParticipant
-        if (localParticipant != null) {
-            localParticipantSid = localParticipant!!.sid
+        localParticipant?.let {
+            localParticipantSid = it.sid
         }
     }
 
     private fun publishLocalTracks() {
         if (localParticipant != null) {
-            if (cameraVideoTrack != null) {
+            cameraVideoTrack?.let { cameraVideoTrack ->
                 Timber.d("Camera track: %s", cameraVideoTrack)
                 publishVideoTrack(cameraVideoTrack, TrackPriority.LOW)
             }
-            if (localAudioTrack != null) {
-                localParticipant!!.publishTrack(localAudioTrack!!)
-            }
+            localAudioTrack?.let { localParticipant?.publishTrack(it) }
         }
     }
 
     private fun toggleAudioDevice(enableAudioDevice: Boolean) {
         setVolumeControl(enableAudioDevice)
         val viewEvent = if (enableAudioDevice) ActivateAudioDevice else RoomViewEvent.DeactivateAudioDevice
-        roomViewModel!!.processInput(viewEvent)
+        roomViewModel.processInput(viewEvent)
     }
 
     private fun bindRoomViewState(roomViewState: RoomViewState) {
         Timber.d("RoomViewState: %s", roomViewState)
-        deviceMenuItem!!.isVisible = !roomViewState.availableAudioDevices!!.isEmpty()
+        deviceMenuItem.isVisible = roomViewState.availableAudioDevices?.isNotEmpty() ?: false
         renderPrimaryView(roomViewState.primaryParticipant)
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
@@ -949,7 +953,7 @@ class RoomActivity : BaseActivity() {
 
     private fun renderPrimaryView(primaryParticipant: ParticipantViewState?) {
         if (primaryParticipant != null) {
-            primaryParticipantController!!.renderAsPrimary(
+            primaryParticipantController.renderAsPrimary(
                     primaryParticipant.sid,
                     primaryParticipant.identity,
                     primaryParticipant.screenTrack,
@@ -962,29 +966,30 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        participantAdapter!!.submitList(roomViewState.participantThumbnails)
+        participantAdapter.submitList(roomViewState.participantThumbnails)
     }
 
     private fun displayAudioDeviceList() {
-        val viewState = roomViewModel!!.viewState.value
-        val selectedDevice = viewState!!.selectedDevice
-        val audioDevices = viewState.availableAudioDevices
-        if (selectedDevice != null && audioDevices != null) {
-            val index = audioDevices.indexOf(selectedDevice)
-            val audioDeviceNames = ArrayList<String>()
-            for (a in audioDevices) {
-                audioDeviceNames.add(a.name)
+        roomViewModel.viewState.value?.let { viewState ->
+            val selectedDevice = viewState.selectedDevice
+            val audioDevices = viewState.availableAudioDevices
+            if (selectedDevice != null && audioDevices != null) {
+                val index = audioDevices.indexOf(selectedDevice)
+                val audioDeviceNames = ArrayList<String>()
+                for (a in audioDevices) {
+                    audioDeviceNames.add(a.name)
+                }
+                createAudioDeviceDialog(
+                        this,
+                        index,
+                        audioDeviceNames
+                ) { dialogInterface: DialogInterface, i: Int ->
+                    dialogInterface.dismiss()
+                    val viewEvent = SelectAudioDevice(audioDevices[i])
+                    roomViewModel.processInput(viewEvent)
+                }
+                        .show()
             }
-            createAudioDeviceDialog(
-                    this,
-                    index,
-                    audioDeviceNames
-            ) { dialogInterface: DialogInterface, i: Int ->
-                dialogInterface.dismiss()
-                val viewEvent = SelectAudioDevice(audioDevices[i])
-                roomViewModel!!.processInput(viewEvent)
-            }
-                    .show()
         }
     }
 
