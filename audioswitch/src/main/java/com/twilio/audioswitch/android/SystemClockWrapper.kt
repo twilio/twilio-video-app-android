@@ -2,7 +2,7 @@ package com.twilio.audioswitch.android
 
 import android.os.SystemClock
 
-class SystemClockWrapper {
+internal class SystemClockWrapper {
 
     fun elapsedRealtime() = SystemClock.elapsedRealtime()
 }
