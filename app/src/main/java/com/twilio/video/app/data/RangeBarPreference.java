@@ -150,6 +150,14 @@ public class RangeBarPreference extends Preference {
                                 .apply());
     }
 
+    public String[] getEntries() {
+        return entries;
+    }
+
+    public void setEntries(String[] entries) {
+        this.entries = entries;
+    }
+
     private void init(Context context, @Nullable AttributeSet attrs) {
         // apply custom layout
         setLayoutResource(R.layout.range_bar_preference);

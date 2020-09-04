@@ -67,11 +67,15 @@ import com.twilio.video.StatsListener
 import com.twilio.video.StatsReport
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoConstraints
-import com.twilio.video.VideoDimensions
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS_DEFAULT
+import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS_DEFAULT
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
@@ -103,16 +107,6 @@ import timber.log.Timber
 
 class RoomActivity : BaseActivity() {
     private val aspectRatios = arrayOf(AspectRatio.ASPECT_RATIO_4_3, AspectRatio.ASPECT_RATIO_16_9, AspectRatio.ASPECT_RATIO_11_9)
-    private val videoDimensions = arrayOf(
-            VideoDimensions.CIF_VIDEO_DIMENSIONS,
-            VideoDimensions.VGA_VIDEO_DIMENSIONS,
-            VideoDimensions.WVGA_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
-    )
 
     @BindView(R.id.toolbar)
     lateinit var toolbar: Toolbar
@@ -546,12 +540,11 @@ class RoomActivity : BaseActivity() {
         }
 
         // setup video dimensions
-        val minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0)
-        val maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1)
-        if (maxVideoDim != -1 && minVideoDim != -1) {
-            builder.minVideoDimensions(videoDimensions[minVideoDim])
-            builder.maxVideoDimensions(videoDimensions[maxVideoDim])
-        }
+        val minVideoDim = sharedPreferences.getInt(MIN_VIDEO_DIMENSIONS, MIN_VIDEO_DIMENSIONS_DEFAULT)
+        val maxVideoDim = sharedPreferences.getInt(MAX_VIDEO_DIMENSIONS, MAX_VIDEO_DIMENSIONS_DEFAULT)
+        builder.minVideoDimensions(VIDEO_DIMENSIONS[minVideoDim])
+        builder.maxVideoDimensions(VIDEO_DIMENSIONS[maxVideoDim])
+
         Timber.d(
                 "Video dimensions: %s - %s",
                 resources
