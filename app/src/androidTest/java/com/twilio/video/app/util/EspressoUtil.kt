@@ -11,7 +11,11 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.hamcrest.CoreMatchers.not
 
-fun scrollAndClick(viewText: String, recyclerViewId: Int) {
+fun clickView(viewText: String) {
+    onView(withText(viewText)).perform(click())
+}
+
+fun scrollAndClickView(viewText: String, recyclerViewId: Int) {
     onView(withId(recyclerViewId))
             .perform(actionOnItem<RecyclerView.ViewHolder>(hasDescendant(withText(viewText)), click()))
 }
