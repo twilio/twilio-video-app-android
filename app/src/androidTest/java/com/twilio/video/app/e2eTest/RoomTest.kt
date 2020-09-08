@@ -96,7 +96,7 @@ class RoomTest : BaseE2ETest() {
     }
 
     private fun drawableIsDisplayed(earpieceDrawableMatcher: DrawableMatcher) {
-        retryEspressoAction(timeoutInMillis = 2000L) {
+        retryEspressoAction {
             onView(withId(R.id.device_menu_item)).check(matches(earpieceDrawableMatcher))
         }
     }
