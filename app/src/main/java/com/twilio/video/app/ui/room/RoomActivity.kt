@@ -50,6 +50,10 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.OnTextChanged
 import com.google.android.material.snackbar.Snackbar
+import com.twilio.audioswitch.AudioDevice
+import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
+import com.twilio.audioswitch.AudioDevice.Speakerphone
+import com.twilio.audioswitch.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.AspectRatio
 import com.twilio.video.CameraCapturer
@@ -917,6 +921,7 @@ class RoomActivity : BaseActivity() {
         renderPrimaryView(roomViewState.primaryParticipant)
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
+        updateAudioDeviceIcon(roomViewState.selectedDevice)
     }
 
     private fun bindRoomViewEffects(roomViewEffectWrapper: ViewEffect<RoomViewEffect>) {
@@ -949,6 +954,16 @@ class RoomActivity : BaseActivity() {
                 handleTokenError(error)
             }
         }
+    }
+
+    private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
+        val audioDeviceMenuIcon = when (selectedAudioDevice) {
+            is BluetoothHeadset -> R.drawable.ic_bluetooth_white_24dp
+            is WiredHeadset -> R.drawable.ic_headset_mic_white_24dp
+            is Speakerphone -> R.drawable.ic_volume_up_white_24dp
+            else -> R.drawable.ic_phonelink_ring_white_24dp
+        }
+        this.deviceMenuItem.setIcon(audioDeviceMenuIcon)
     }
 
     private fun renderPrimaryView(primaryParticipant: ParticipantViewState?) {
