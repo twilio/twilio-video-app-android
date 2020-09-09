@@ -18,6 +18,7 @@ package com.twilio.video.app.data
 import com.twilio.video.BandwidthProfileMode
 import com.twilio.video.OpusCodec
 import com.twilio.video.TrackPriority
+import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.data.api.model.Topology
@@ -33,8 +34,21 @@ object Preferences {
     val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     const val MIN_FPS = "pref_min_fps"
     const val MAX_FPS = "pref_max_fps"
+    const val VIDEO_DIMENSIONS_RANGE_BAR = "pref_video_dim_range_bar"
+    val VIDEO_DIMENSIONS = arrayOf(
+            VideoDimensions.CIF_VIDEO_DIMENSIONS,
+            VideoDimensions.VGA_VIDEO_DIMENSIONS,
+            VideoDimensions.WVGA_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
+    )
     const val MIN_VIDEO_DIMENSIONS = "pref_min_video_dim"
     const val MAX_VIDEO_DIMENSIONS = "pref_max_video_dim"
+    const val MIN_VIDEO_DIMENSIONS_DEFAULT = 0
+    val MAX_VIDEO_DIMENSIONS_DEFAULT = VIDEO_DIMENSIONS.lastIndex
     const val ASPECT_RATIO = "pref_aspect_ratio"
     const val VERSION_NAME = "pref_version_name"
     const val VIDEO_LIBRARY_VERSION = "pref_video_library_version"
