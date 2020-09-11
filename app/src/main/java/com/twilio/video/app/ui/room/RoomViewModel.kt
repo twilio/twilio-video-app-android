@@ -10,7 +10,6 @@ import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoTrackViewState
-import com.twilio.video.app.udf.BaseViewModel
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
@@ -44,6 +43,8 @@ import com.twilio.video.app.util.plus
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.uniflow.androidx.flow.AndroidDataFlow
+import io.uniflow.core.flow.actionOn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,13 +59,17 @@ class RoomViewModel(
     private val rxDisposables: CompositeDisposable = CompositeDisposable(),
     scheduler: Scheduler = AndroidSchedulers.mainThread(),
     initialViewState: RoomViewState = RoomViewState()
-) : BaseViewModel<RoomViewEvent, RoomViewState, RoomViewEffect>(initialViewState) {
+) : AndroidDataFlow(defaultState = initialViewState) {
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
-            updateState { it.copy(
-                selectedDevice = selectedDevice,
-                availableAudioDevices = audioDevices)
+            actionOn<RoomViewState> { currentState ->
+                setState {
+                    currentState.copy(
+                        selectedDevice = selectedDevice,
+                        availableAudioDevices = audioDevices
+                    )
+                }
             }
         }
 
@@ -83,10 +88,11 @@ class RoomViewModel(
         rxDisposables.clear()
     }
 
-    override fun processInput(viewEvent: RoomViewEvent) {
+    fun processInput(viewEvent: RoomViewEvent) {
         Timber.d("View Event: $viewEvent")
+
         when (viewEvent) {
-            is RefreshViewState -> updateState { it.copy() }
+            is RefreshViewState -> actionOn<RoomViewState> { it }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioSwitch.selectDevice(viewEvent.device)
@@ -119,8 +125,12 @@ class RoomViewModel(
         val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
         val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
 
-        updateState { it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled) }
-        if (isCameraEnabled && isMicEnabled) viewEffect { CheckLocalMedia }
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
+            }
+        }
+        if (isCameraEnabled && isMicEnabled) action { sendEvent { CheckLocalMedia } }
     }
 
     private fun observeRoomEvents(roomEvent: RoomEvent) {
@@ -132,23 +142,31 @@ class RoomViewModel(
             is Connected -> {
                 showConnectedViewState(roomEvent.roomName)
                 checkParticipants(roomEvent.participants)
-                viewEffect { RoomViewEffect.Connected(roomEvent.room) }
+                action { sendEvent { RoomViewEffect.Connected(roomEvent.room) } }
             }
             is Disconnected -> {
                 showLobbyViewState()
-                updateState { it.copy(participantThumbnails = null, primaryParticipant = null) }
+                actionOn<RoomViewState> { currentState ->
+                    setState {
+                        currentState.copy(participantThumbnails = null, primaryParticipant = null)
+                    }
+                }
             }
             is DominantSpeakerChanged -> {
                 participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
                 updateParticipantViewState()
             }
-            is ConnectFailure -> viewEffect {
-                showLobbyViewState()
-                ShowConnectFailureDialog
+            is ConnectFailure -> action {
+                sendEvent {
+                    showLobbyViewState()
+                    ShowConnectFailureDialog
+                }
             }
-            is TokenError -> viewEffect {
-                showLobbyViewState()
-                ShowTokenErrorDialog(roomEvent.serviceError)
+            is TokenError -> action {
+                sendEvent {
+                    showLobbyViewState()
+                    ShowTokenErrorDialog(roomEvent.serviceError)
+                }
             }
             is ParticipantEvent -> handleParticipantEvent(roomEvent)
         }
@@ -197,31 +215,40 @@ class RoomViewModel(
     }
 
     private fun showLobbyViewState() {
-        viewEffect { RoomViewEffect.Disconnected }
-        updateState { it.copy(
-                isLobbyLayoutVisible = true,
-                isConnectingLayoutVisible = false,
-                isConnectedLayoutVisible = false
-        ) }
+        action { sendEvent { RoomViewEffect.Disconnected } }
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(
+                        isLobbyLayoutVisible = true,
+                        isConnectingLayoutVisible = false,
+                        isConnectedLayoutVisible = false)
+            }
+        }
         participantManager.clearParticipants()
     }
 
     private fun showConnectingViewState() {
-        viewEffect { RoomViewEffect.Connecting }
-        updateState { it.copy(
-            isLobbyLayoutVisible = false,
-            isConnectingLayoutVisible = true,
-            isConnectedLayoutVisible = false
-        ) }
+        action { sendEvent { RoomViewEffect.Connecting } }
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(
+                    isLobbyLayoutVisible = false,
+                    isConnectingLayoutVisible = true,
+                    isConnectedLayoutVisible = false)
+            }
+        }
     }
 
     private fun showConnectedViewState(roomName: String) {
-        updateState { it.copy(
-                title = roomName,
-                isLobbyLayoutVisible = false,
-                isConnectingLayoutVisible = false,
-                isConnectedLayoutVisible = true
-        ) }
+            actionOn<RoomViewState> { currentState ->
+                setState {
+                    currentState.copy(
+                        title = roomName,
+                        isLobbyLayoutVisible = false,
+                        isConnectingLayoutVisible = false,
+                        isConnectedLayoutVisible = true)
+                }
+        }
     }
 
     private fun checkParticipants(participants: List<Participant>) {
@@ -235,11 +262,13 @@ class RoomViewModel(
     }
 
     private fun updateParticipantViewState() {
-        updateState {
-            it.copy(
-                participantThumbnails = participantManager.participantThumbnails,
-                primaryParticipant = participantManager.primaryParticipant
-            )
+        actionOn<RoomViewState> { currentState ->
+            setState {
+                currentState.copy(
+                        participantThumbnails = participantManager.participantThumbnails,
+                        primaryParticipant = participantManager.primaryParticipant
+                )
+            }
         }
     }
 
