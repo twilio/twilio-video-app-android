@@ -84,7 +84,6 @@ import com.twilio.video.app.sdk.MICROPHONE_TRACK_NAME
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.SCREEN_TRACK_NAME
 import com.twilio.video.app.sdk.VideoTrackViewState
-import com.twilio.video.app.udf.ViewEffect
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
@@ -102,6 +101,8 @@ import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
 import com.twilio.video.app.util.StatsScheduler
+import io.uniflow.androidx.flow.onEvents
+import io.uniflow.androidx.flow.onStates
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -346,8 +347,15 @@ class RoomActivity : BaseActivity() {
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item)
         deviceMenuItem = menu.findItem(R.id.device_menu_item)
         requestPermissions()
-        roomViewModel.viewState.observe(this, { roomViewState: RoomViewState -> bindRoomViewState(roomViewState) })
-        roomViewModel.viewEffects.observe(this, { roomViewEffectWrapper: ViewEffect<RoomViewEffect> -> bindRoomViewEffects(roomViewEffectWrapper) })
+
+        onStates(roomViewModel) { state ->
+            if (state is RoomViewState) bindRoomViewState(state)
+        }
+        onEvents(roomViewModel) { eventWrapper ->
+            eventWrapper.take()?.let { event ->
+                if (event is RoomViewEffect) bindRoomViewEffects(event)
+            }
+        }
         return true
     }
 
@@ -909,7 +917,6 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun bindRoomViewState(roomViewState: RoomViewState) {
-        Timber.d("RoomViewState: %s", roomViewState)
         deviceMenuItem.isVisible = roomViewState.availableAudioDevices?.isNotEmpty() ?: false
         renderPrimaryView(roomViewState.primaryParticipant)
         renderThumbnails(roomViewState)
@@ -917,10 +924,7 @@ class RoomActivity : BaseActivity() {
         updateAudioDeviceIcon(roomViewState.selectedDevice)
     }
 
-    private fun bindRoomViewEffects(roomViewEffectWrapper: ViewEffect<RoomViewEffect>) {
-        val roomViewEffect = roomViewEffectWrapper.getContentIfNotHandled()
-        if (roomViewEffect != null) {
-            Timber.d("RoomViewEffect: %s", roomViewEffect)
+    private fun bindRoomViewEffects(roomViewEffect: RoomViewEffect) {
             requestPermissions()
             if (roomViewEffect is RoomViewEffect.Connected) {
                 room = roomViewEffect.room
@@ -946,7 +950,6 @@ class RoomActivity : BaseActivity() {
                 val error = roomViewEffect.serviceError
                 handleTokenError(error)
             }
-        }
     }
 
     private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
@@ -978,7 +981,7 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun displayAudioDeviceList() {
-        roomViewModel.viewState.value?.let { viewState ->
+        (roomViewModel.getCurrentState() as RoomViewState).let { viewState ->
             val selectedDevice = viewState.selectedDevice
             val audioDevices = viewState.availableAudioDevices
             if (selectedDevice != null && audioDevices != null) {
