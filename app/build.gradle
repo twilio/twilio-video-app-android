@@ -15,11 +15,18 @@ apply plugin: 'kotlin-kapt'
  * SDK developers to iterate on SDK features within the application that is maintained in a separate
  * project.
  */
-def videoAndroidSdkDepProp = "videoAppSdkDependency"
-def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
-        project("${project.property(videoAndroidSdkDepProp)}") :
+def sdkModule = "videoAppSdkDependency"
+def ndkVersion = "ndkVersion"
+def videoAndroidSdkDep = (project.hasProperty(sdkModule) ?
+        project("${project.property(sdkModule)}") :
         "com.twilio:video-android:5.8.0")
 def versionCodeProperty = project.property('versionCode') as Integer
+
+afterEvaluate {
+    if (project.hasProperty(sdkModule) && project.hasProperty(ndkVersion)) {
+        android.ndkVersion = "${project.property(ndkVersion)}"
+    }
+}
 
 android {
     compileSdkVersion 29
