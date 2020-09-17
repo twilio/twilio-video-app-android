@@ -3,6 +3,7 @@ package com.twilio.video.app.ui.room
 import android.Manifest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
@@ -41,14 +42,11 @@ import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
-import com.twilio.video.app.util.plus
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.receiveOrNull
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -57,9 +55,6 @@ class RoomViewModel(
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
-    private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
-    private val rxDisposables: CompositeDisposable = CompositeDisposable(),
-    scheduler: Scheduler = AndroidSchedulers.mainThread(),
     initialViewState: RoomViewState = RoomViewState()
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
@@ -74,20 +69,11 @@ class RoomViewModel(
                 }
             }
         }
-
-        rxDisposables + roomManager.roomEvents
-                .observeOn(scheduler)
-                .subscribe({
-            observeRoomEvents(it)
-        }, {
-            Timber.e(it, "Error in RoomManager RoomEvent stream")
-        })
     }
 
     override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()
-        rxDisposables.clear()
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
@@ -284,11 +270,18 @@ class RoomViewModel(
         }
     }
 
+    @ExperimentalCoroutinesApi
     private fun connect(identity: String, roomName: String) =
-        backgroundScope.launch {
+        viewModelScope.launch {
             roomManager.connect(
                     identity,
-                    roomName)
+                    roomName).let { channel ->
+                while (isActive && !channel.isClosedForReceive) {
+                    Timber.d("Listening for RoomEvents")
+                    channel.receiveOrNull()?.let { observeRoomEvents(it) }
+                            ?: Timber.e("Cannot receive(), Channel is closed")
+                }
+            }
         }
 
     class RoomViewModelFactory(
