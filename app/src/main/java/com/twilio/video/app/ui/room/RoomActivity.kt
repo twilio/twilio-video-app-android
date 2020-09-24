@@ -55,7 +55,6 @@ import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.AudioSwitch
-import com.twilio.video.AspectRatio
 import com.twilio.video.CameraCapturer
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
@@ -66,7 +65,6 @@ import com.twilio.video.ScreenCapturer
 import com.twilio.video.StatsListener
 import com.twilio.video.StatsReport
 import com.twilio.video.TrackPriority
-import com.twilio.video.VideoConstraints
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
@@ -107,8 +105,6 @@ import javax.inject.Inject
 import timber.log.Timber
 
 class RoomActivity : BaseActivity() {
-    private val aspectRatios = arrayOf(AspectRatio.ASPECT_RATIO_4_3, AspectRatio.ASPECT_RATIO_16_9, AspectRatio.ASPECT_RATIO_11_9)
-
     @BindView(R.id.toolbar)
     lateinit var toolbar: Toolbar
 
@@ -173,7 +169,6 @@ class RoomActivity : BaseActivity() {
     private var localParticipant: LocalParticipant? = null
     private var localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
     private var room: Room? = null
-    private var videoConstraints: VideoConstraints? = null
     private var localAudioTrack: LocalAudioTrack? = null
     private var cameraVideoTrack: LocalVideoTrack? = null
     private var restoreLocalVideoCameraTrack = false
@@ -248,7 +243,6 @@ class RoomActivity : BaseActivity() {
 
         // Setup Activity
         statsScheduler = StatsScheduler()
-        obtainVideoConstraints()
     }
 
     private fun setupThumbnailRecyclerView() {
@@ -493,7 +487,6 @@ class RoomActivity : BaseActivity() {
                         this,
                         true,
                         it.videoCapturer,
-                        videoConstraints,
                         CAMERA_TRACK_NAME)
             }
             if (localParticipant != null) {
@@ -530,45 +523,6 @@ class RoomActivity : BaseActivity() {
     private fun publishVideoTrack(videoTrack: LocalVideoTrack, trackPriority: TrackPriority) {
         val localTrackPublicationOptions = LocalTrackPublicationOptions(trackPriority)
         localParticipant?.publishTrack(videoTrack, localTrackPublicationOptions)
-    }
-
-    private fun obtainVideoConstraints() {
-        Timber.d("Collecting video constraints...")
-        val builder = VideoConstraints.Builder()
-
-        // setup aspect ratio
-        val aspectRatio = sharedPreferences.getString(Preferences.ASPECT_RATIO, "0")
-        if (aspectRatio != null) {
-            val aspectRatioIndex = aspectRatio.toInt()
-            builder.aspectRatio(aspectRatios[aspectRatioIndex])
-            Timber.d(
-                    "Aspect ratio : %s",
-                    resources
-                            .getStringArray(R.array.settings_screen_aspect_ratio_array)[aspectRatioIndex])
-        }
-
-        // setup video dimensions
-        val minVideoDim = sharedPreferences.getInt(MIN_VIDEO_DIMENSIONS, MIN_VIDEO_DIMENSIONS_DEFAULT)
-        val maxVideoDim = sharedPreferences.getInt(MAX_VIDEO_DIMENSIONS, MAX_VIDEO_DIMENSIONS_DEFAULT)
-        builder.minVideoDimensions(VIDEO_DIMENSIONS[minVideoDim])
-        builder.maxVideoDimensions(VIDEO_DIMENSIONS[maxVideoDim])
-
-        Timber.d(
-                "Video dimensions: %s - %s",
-                resources
-                        .getStringArray(R.array.settings_screen_video_dimensions_array)[minVideoDim],
-                resources
-                        .getStringArray(R.array.settings_screen_video_dimensions_array)[maxVideoDim])
-
-        // setup fps
-        val minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0)
-        val maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 24)
-        if (maxFps != -1 && minFps != -1) {
-            builder.minFps(minFps)
-            builder.maxFps(maxFps)
-        }
-        Timber.d("Frames per second: %d - %d", minFps, maxFps)
-        videoConstraints = builder.build()
     }
 
     private fun requestPermissions() {
@@ -626,7 +580,6 @@ class RoomActivity : BaseActivity() {
                     this,
                     true,
                     it.videoCapturer,
-                    videoConstraints,
                     CAMERA_TRACK_NAME)
         }
         cameraVideoTrack?.let {
@@ -830,7 +783,6 @@ class RoomActivity : BaseActivity() {
     /** Try to restore camera video track after going to the settings screen or background  */
     private fun restoreCameraTrack() {
         if (restoreLocalVideoCameraTrack) {
-            obtainVideoConstraints()
             setupLocalVideoTrack()
             restoreLocalVideoCameraTrack = false
         }
