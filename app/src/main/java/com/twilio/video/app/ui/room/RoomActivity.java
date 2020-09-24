@@ -16,9 +16,6 @@
 
 package com.twilio.video.app.ui.room;
 
-import static com.twilio.video.AspectRatio.ASPECT_RATIO_11_9;
-import static com.twilio.video.AspectRatio.ASPECT_RATIO_16_9;
-import static com.twilio.video.AspectRatio.ASPECT_RATIO_4_3;
 import static com.twilio.video.Room.State.CONNECTED;
 import static com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR;
 import static com.twilio.video.app.sdk.RoomManagerKt.CAMERA_TRACK_NAME;
@@ -66,7 +63,6 @@ import butterknife.OnTextChanged;
 import com.google.android.material.snackbar.Snackbar;
 import com.twilio.audioswitch.selection.AudioDevice;
 import com.twilio.audioswitch.selection.AudioDeviceSelector;
-import com.twilio.video.AspectRatio;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalParticipant;
@@ -76,7 +72,6 @@ import com.twilio.video.Room;
 import com.twilio.video.ScreenCapturer;
 import com.twilio.video.StatsListener;
 import com.twilio.video.TrackPriority;
-import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.app.R;
 import com.twilio.video.app.adapter.StatsListAdapter;
@@ -122,9 +117,6 @@ public class RoomActivity extends BaseActivity {
     // This will be used instead of real local participant sid,
     // because that information is unknown until room connection is fully established
     private static final String LOCAL_PARTICIPANT_STUB_SID = "";
-
-    private AspectRatio[] aspectRatios =
-            new AspectRatio[] {ASPECT_RATIO_4_3, ASPECT_RATIO_16_9, ASPECT_RATIO_11_9};
 
     private VideoDimensions[] videoDimensions =
             new VideoDimensions[] {
@@ -208,7 +200,6 @@ public class RoomActivity extends BaseActivity {
     private LocalParticipant localParticipant;
     private String localParticipantSid = LOCAL_PARTICIPANT_STUB_SID;
     private Room room;
-    private VideoConstraints videoConstraints;
     private LocalAudioTrack localAudioTrack;
     private LocalVideoTrack cameraVideoTrack;
     private boolean restoreLocalVideoCameraTrack = false;
@@ -296,7 +287,6 @@ public class RoomActivity extends BaseActivity {
 
         // Setup Activity
         statsScheduler = new StatsScheduler();
-        obtainVideoConstraints();
     }
 
     private void setupThumbnailRecyclerView() {
@@ -553,11 +543,7 @@ public class RoomActivity extends BaseActivity {
             // add local camera track
             cameraVideoTrack =
                     LocalVideoTrack.create(
-                            this,
-                            true,
-                            cameraCapturer.getVideoCapturer(),
-                            videoConstraints,
-                            CAMERA_TRACK_NAME);
+                            this, true, cameraCapturer.getVideoCapturer(), CAMERA_TRACK_NAME);
             if (localParticipant != null && cameraVideoTrack != null) {
                 publishVideoTrack(cameraVideoTrack, TrackPriority.LOW);
 
@@ -596,55 +582,6 @@ public class RoomActivity extends BaseActivity {
         LocalTrackPublicationOptions localTrackPublicationOptions =
                 new LocalTrackPublicationOptions(trackPriority);
         localParticipant.publishTrack(videoTrack, localTrackPublicationOptions);
-    }
-
-    private void obtainVideoConstraints() {
-        Timber.d("Collecting video constraints...");
-
-        VideoConstraints.Builder builder = new VideoConstraints.Builder();
-
-        // setup aspect ratio
-        String aspectRatio = sharedPreferences.getString(Preferences.ASPECT_RATIO, "0");
-        if (aspectRatio != null) {
-            int aspectRatioIndex = Integer.parseInt(aspectRatio);
-            builder.aspectRatio(aspectRatios[aspectRatioIndex]);
-            Timber.d(
-                    "Aspect ratio : %s",
-                    getResources()
-                            .getStringArray(R.array.settings_screen_aspect_ratio_array)[
-                            aspectRatioIndex]);
-        }
-
-        // setup video dimensions
-        int minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, 0);
-        int maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, 1);
-
-        if (maxVideoDim != -1 && minVideoDim != -1) {
-            builder.minVideoDimensions(videoDimensions[minVideoDim]);
-            builder.maxVideoDimensions(videoDimensions[maxVideoDim]);
-        }
-
-        Timber.d(
-                "Video dimensions: %s - %s",
-                getResources()
-                        .getStringArray(R.array.settings_screen_video_dimensions_array)[
-                        minVideoDim],
-                getResources()
-                        .getStringArray(R.array.settings_screen_video_dimensions_array)[
-                        maxVideoDim]);
-
-        // setup fps
-        int minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0);
-        int maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 24);
-
-        if (maxFps != -1 && minFps != -1) {
-            builder.minFps(minFps);
-            builder.maxFps(maxFps);
-        }
-
-        Timber.d("Frames per second: %d - %d", minFps, maxFps);
-
-        videoConstraints = builder.build();
     }
 
     private void requestPermissions() {
@@ -702,11 +639,7 @@ public class RoomActivity extends BaseActivity {
 
         cameraVideoTrack =
                 LocalVideoTrack.create(
-                        this,
-                        true,
-                        cameraCapturer.getVideoCapturer(),
-                        videoConstraints,
-                        CAMERA_TRACK_NAME);
+                        this, true, cameraCapturer.getVideoCapturer(), CAMERA_TRACK_NAME);
         if (cameraVideoTrack != null) {
             localVideoTrackNames.put(
                     cameraVideoTrack.getName(), getString(R.string.camera_video_track));
@@ -928,7 +861,6 @@ public class RoomActivity extends BaseActivity {
     /** Try to restore camera video track after going to the settings screen or background */
     private void restoreCameraTrack() {
         if (restoreLocalVideoCameraTrack) {
-            obtainVideoConstraints();
             setupLocalVideoTrack();
             restoreLocalVideoCameraTrack = false;
         }
