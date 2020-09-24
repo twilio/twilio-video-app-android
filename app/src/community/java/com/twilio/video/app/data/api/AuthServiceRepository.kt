@@ -17,36 +17,43 @@ package com.twilio.video.app.data.api
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
+import com.twilio.video.Vp8Codec
+import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.TOPOLOGY
+import com.twilio.video.app.data.Preferences.VIDEO_CODEC
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
+import com.twilio.video.app.data.api.model.Topology.GROUP
+import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
+import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
 import com.twilio.video.app.security.SecurePreferences
 import retrofit2.HttpException
 import timber.log.Timber
 
+private const val LEGACY_PASSCODE_SIZE = 10
+private const val PASSCODE_SIZE = 14
+
 class AuthServiceRepository(
     private val authService: AuthService,
-    private val securePreferences: SecurePreferences
+    private val securePreferences: SecurePreferences,
+    private val sharedPreferences: SharedPreferencesWrapper
 ) : TokenService {
-
     override suspend fun getToken(identity: String?, roomName: String?): String {
         return getToken(identity, roomName, passcode = null)
     }
 
     override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
         getPasscode(passcode)?.let { passcode ->
-            val requestBody = AuthServiceRequestDTO(
-                    passcode,
-                    identity,
-                    roomName)
-            val appId = passcode.substring(6)
-            val url = URL_PREFIX + appId + URL_SUFFIX
+            val (requestBody, url) = buildRequest(passcode, identity, roomName)
 
             try {
                 authService.getToken(url, requestBody).let { response ->
-                    response.token?.let { token ->
-                        Timber.d("Token returned from Twilio auth service: %s", response)
-                        return token
-                    }
-                    throw AuthServiceException(message = "Token cannot be null")
+                    return handleResponse(response)
+                            ?: throw AuthServiceException(message = "Token cannot be null")
                 }
             } catch (httpException: HttpException) {
                 handleException(httpException)
@@ -56,8 +63,62 @@ class AuthServiceRepository(
         throw IllegalArgumentException("Passcode cannot be null")
     }
 
-    private fun getPasscode(passcode: String?) =
-        passcode ?: securePreferences.getSecureString(PASSCODE)
+    private fun buildRequest(
+        passcode: String,
+        identity: String?,
+        roomName: String?
+    ): Pair<AuthServiceRequestDTO, String> {
+        val requestBody = AuthServiceRequestDTO(
+            passcode,
+            identity,
+            roomName)
+        val appId = passcode.substring(6, 10)
+        val serverlessId = passcode.substring(10)
+        val url = if (passcode.length == PASSCODE_SIZE) {
+            "$URL_PREFIX$appId-$serverlessId$URL_SUFFIX"
+        } else {
+            "$URL_PREFIX$appId$URL_SUFFIX"
+        }
+        return Pair(requestBody, url)
+    }
+
+    private fun handleResponse(response: AuthServiceResponseDTO): String? {
+        return response.token?.let { token ->
+            Timber.d("Response successfully retrieved from the Twilio auth service: %s",
+                    response)
+            response.topology?.let { serverTopology ->
+                val isTopologyChange =
+                        sharedPreferences.getString(TOPOLOGY, null) != serverTopology.value
+                if (isTopologyChange) {
+                    sharedPreferences.edit { putString(TOPOLOGY, serverTopology.value) }
+                    val (enableSimulcast, minVideoDimensions) = when (serverTopology) {
+                        GROUP, GROUP_SMALL -> true to 0
+                        PEER_TO_PEER -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS)
+                    }
+                    Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
+                            serverTopology, enableSimulcast)
+                    sharedPreferences.edit { putString(VIDEO_CODEC, Vp8Codec.NAME) }
+                    sharedPreferences.edit { putBoolean(VP8_SIMULCAST, enableSimulcast) }
+                    sharedPreferences.edit { putInt(MIN_VIDEO_DIMENSIONS, minVideoDimensions) }
+                    sharedPreferences.edit { putInt(MAX_VIDEO_DIMENSIONS, VIDEO_DIMENSIONS.lastIndex) }
+                }
+            }
+            token
+        }
+    }
+
+    private fun getPasscode(passcode: String?): String? {
+        validatePasscode(passcode)
+        return passcode ?: securePreferences.getSecureString(PASSCODE)
+    }
+
+    private fun validatePasscode(passcode: String?) {
+        passcode?.let { passcode ->
+            require(passcode.isNotEmpty() &&
+                    (passcode.length == LEGACY_PASSCODE_SIZE ||
+                    passcode.length == PASSCODE_SIZE))
+        }
+    }
 
     private fun handleException(httpException: HttpException) {
         Timber.e(httpException)

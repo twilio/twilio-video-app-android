@@ -175,7 +175,7 @@ public class CommunityLoginActivity extends BaseActivity {
     }
 
     private void startLobbyActivity() {
-        RoomActivity.startActivity(this, getIntent().getData());
+        RoomActivity.Companion.startActivity(this, getIntent().getData());
         finish();
     }
 

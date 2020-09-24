@@ -18,6 +18,7 @@ class RoomNotification(private val context: Context) {
     private val pendingIntent
             get() =
                 Intent(context, RoomActivity::class.java).let { notificationIntent ->
+                    notificationIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                     PendingIntent.getActivity(context, 0, notificationIntent, 0)
                 }
 

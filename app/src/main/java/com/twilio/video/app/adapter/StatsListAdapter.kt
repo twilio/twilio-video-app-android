@@ -227,7 +227,7 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
 
         handler.post {
             statsListItems.clear()
-            statsListItems.addAll(statsListItems.toList())
+            statsListItems.addAll(statsItemList.toList())
             notifyDataSetChanged()
         }
     }

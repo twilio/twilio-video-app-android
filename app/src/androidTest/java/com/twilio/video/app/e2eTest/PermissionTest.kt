@@ -1,14 +1,16 @@
 package com.twilio.video.app.e2eTest
 
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.rule.GrantPermissionRule
-import com.twilio.video.app.HiddenView
-import com.twilio.video.app.R
+import com.twilio.video.app.screen.assertMicButtonIsDisabled
+import com.twilio.video.app.screen.assertMicButtonIsEnabled
+import com.twilio.video.app.screen.assertParticipantStubIsHidden
+import com.twilio.video.app.screen.assertVideoButtonIsDisabled
+import com.twilio.video.app.screen.assertVideoButtonIsEnabled
 import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.allowAllPermissions
+import com.twilio.video.app.util.denyAllPermissions
 import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.retryEspressoAction
 import com.twilio.video.app.util.uiDevice
@@ -33,7 +35,20 @@ class PermissionTest {
             allowAllPermissions()
         }
 
-        retryEspressoAction { onView(withId(R.id.participant_stub_image))
-                .check(HiddenView()) }
+        retryEspressoAction { assertParticipantStubIsHidden() }
+        assertVideoButtonIsEnabled()
+        assertMicButtonIsEnabled()
+    }
+
+    @Test
+    fun `it_should_display_disabled_mic_and_camera_buttons_when_permissions_are_denied`() {
+        loginWithEmail(retrieveEmailCredentials())
+
+        uiDevice().run {
+            denyAllPermissions()
+        }
+
+        retryEspressoAction { assertVideoButtonIsDisabled() }
+        assertMicButtonIsDisabled()
     }
 }
