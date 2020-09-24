@@ -17,6 +17,7 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginFailureResult
 import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginSuccessResult
 import com.twilio.video.app.data.PASSCODE
@@ -24,8 +25,6 @@ import com.twilio.video.app.data.Preferences.DISPLAY_NAME
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.security.SecurePreferences
-import com.twilio.video.app.util.putString
-import com.twilio.video.app.util.remove
 import io.reactivex.Observable
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +48,7 @@ class CommunityAuthenticator constructor(
                 try {
                     tokenService.getToken(identity = loginEvent.identity, passcode = loginEvent.passcode)
 
-                    sharedPreferences.putString(DISPLAY_NAME, loginEvent.identity)
+                    sharedPreferences.edit { putString(DISPLAY_NAME, loginEvent.identity) }
                     securePreferences.putSecureString(PASSCODE, loginEvent.passcode)
 
                     CommunityLoginSuccessResult
@@ -68,7 +67,7 @@ class CommunityAuthenticator constructor(
     }
 
     override fun logout() {
-        sharedPreferences.remove(DISPLAY_NAME)
-        sharedPreferences.remove(PASSCODE)
+        sharedPreferences.edit { remove(DISPLAY_NAME) }
+        sharedPreferences.edit { remove(PASSCODE) }
     }
 }

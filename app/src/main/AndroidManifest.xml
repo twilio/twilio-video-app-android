@@ -45,7 +45,7 @@
             android:theme="@style/AppTheme.LoginScreen"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:name=".ui.room.RoomActivity"
             android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|screenSize"
@@ -54,6 +54,8 @@
         <activity android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.room.RoomActivity"
             android:theme="@style/AppTheme.Settings" />
-        <service android:name=".ui.room.VideoService"/>
+        <service
+            android:foregroundServiceType="mediaProjection"
+            android:name=".ui.room.VideoService"/>
     </application>
 </manifest>

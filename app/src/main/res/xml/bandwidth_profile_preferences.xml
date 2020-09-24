@@ -1,57 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="@string/settings_screen_bandwidth_profile">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/settings_title_bandwidth_profile">
     <ListPreference
         android:key="pref_bandwidth_profile_mode"
         android:entries="@array/settings_screen_bandwidth_profile_modes"
         android:entryValues="@array/settings_screen_bandwidth_profile_mode_values"
         android:summary="%s"
         android:title="@string/settings_screen_bandwidth_profile_mode"
-        android:negativeButtonText="@null"/>
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
     <com.twilio.video.app.data.NumberPreference
         style="@style/AppTheme.Preference.DialogPreference"
         android:key="pref_bandwidth_profile_max_subscription_bitrate"
-        android:title="@string/settings_screen_max_subscription_bitrate" />
+        android:title="@string/settings_screen_max_subscription_bitrate"
+        app:iconSpaceReserved="false"/>
     <com.twilio.video.app.data.NumberPreference
         style="@style/AppTheme.Preference.DialogPreference"
         android:key="pref_bandwidth_profile_max_video_tracks"
-        android:title="@string/settings_screen_max_video_tracks" />
+        android:title="@string/settings_screen_max_video_tracks"
+        app:iconSpaceReserved="false"/>
     <ListPreference
         android:key="pref_bandwidth_profile_dominant_speaker_priority"
         android:entries="@array/settings_screen_bandwidth_profile_dominant_speaker_priorities"
         android:entryValues="@array/settings_screen_bandwidth_profile_dominant_speaker_priority_values"
         android:summary="%s"
         android:title="@string/settings_screen_bandwidth_profile_dominant_speaker_priority"
-        android:negativeButtonText="@null"/>
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
     <ListPreference
         android:key="pref_bandwidth_profile_track_switch_off_mode"
         android:entries="@array/settings_screen_bandwidth_profile_track_switch_modes"
         android:entryValues="@array/settings_screen_bandwidth_profile_track_switch_mode_values"
         android:summary="%s"
         android:title="@string/settings_screen_bandwidth_profile_track_switch_mode"
-        android:negativeButtonText="@null"/>
-    <PreferenceCategory android:title="@string/settings_screen_render_dimensions">
+        android:negativeButtonText="@null"
+        app:iconSpaceReserved="false"/>
+    <PreferenceCategory
+        android:title="@string/settings_screen_render_dimensions"
+        app:iconSpaceReserved="false">
         <ListPreference
             android:key="pref_bandwidth_profile_low_track_priority_dimensions"
             android:entries="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:entryValues="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:summary="%s"
             android:title="@string/settings_screen_bandwidth_profile_low_track_priority"
-            android:negativeButtonText="@null"/>
+            android:negativeButtonText="@null"
+            app:iconSpaceReserved="false"/>
         <ListPreference
             android:key="pref_bandwidth_profile_standard_track_priority_dimensions"
             android:entries="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:entryValues="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:summary="%s"
             android:title="@string/settings_screen_bandwidth_profile_standard_track_priority"
-            android:negativeButtonText="@null"/>
+            android:negativeButtonText="@null"
+            app:iconSpaceReserved="false"/>
         <ListPreference
             android:key="pref_bandwidth_profile_high_track_priority_dimensions"
             android:entries="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:entryValues="@array/settings_screen_bandwidth_profile_render_dimensions"
             android:summary="%s"
             android:title="@string/settings_screen_bandwidth_profile_high_track_priority"
-            android:negativeButtonText="@null"/>
+            android:negativeButtonText="@null"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

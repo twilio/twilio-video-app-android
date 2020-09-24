@@ -18,28 +18,43 @@ package com.twilio.video.app.data
 import com.twilio.video.BandwidthProfileMode
 import com.twilio.video.OpusCodec
 import com.twilio.video.TrackPriority
+import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.BuildConfig
 import com.twilio.video.app.data.api.model.Topology
 
 object Preferences {
+    const val INTERNAL = "pref_internal"
     const val SERVER_DEFAULT = "Server Default"
     const val EMAIL = "pref_email"
     const val DISPLAY_NAME = "pref_display_name"
     const val ENVIRONMENT = "pref_environment"
     const val ENVIRONMENT_DEFAULT = BuildConfig.ENVIRONMENT_DEFAULT
     const val TOPOLOGY = "pref_topology"
-    val TOPOLOGY_DEFAULT: String = Topology.GROUP.string
+    val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     const val MIN_FPS = "pref_min_fps"
     const val MAX_FPS = "pref_max_fps"
+    const val VIDEO_DIMENSIONS_RANGE_BAR = "pref_video_dim_range_bar"
+    val VIDEO_DIMENSIONS = arrayOf(
+            VideoDimensions.CIF_VIDEO_DIMENSIONS,
+            VideoDimensions.VGA_VIDEO_DIMENSIONS,
+            VideoDimensions.WVGA_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
+            VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
+    )
     const val MIN_VIDEO_DIMENSIONS = "pref_min_video_dim"
     const val MAX_VIDEO_DIMENSIONS = "pref_max_video_dim"
+    const val MIN_VIDEO_DIMENSIONS_DEFAULT = 0
+    val MAX_VIDEO_DIMENSIONS_DEFAULT = VIDEO_DIMENSIONS.lastIndex
     const val ASPECT_RATIO = "pref_aspect_ratio"
     const val VERSION_NAME = "pref_version_name"
-    const val VERSION_CODE = "pref_version_code"
     const val VIDEO_LIBRARY_VERSION = "pref_video_library_version"
     const val LOGOUT = "pref_logout"
     const val ENABLE_STATS = "pref_enable_stats"
+    const val ENABLE_STATS_DEFAULT = true
     const val ENABLE_INSIGHTS = "pref_enable_insights"
     const val ENABLE_NETWORK_QUALITY_LEVEL = "pref_enable_network_quality_level"
     const val ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT = true
