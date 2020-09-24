@@ -90,9 +90,9 @@
             app:startTick="0"
             app:iconSpaceReserved="false"/>
         <com.twilio.video.app.data.RangeBarPreference
+            app:key="pref_video_dim_range_bar"
             android:title="@string/settings_screen_video_dimensions"
             app:endKey="pref_max_video_dim"
-            app:entries="@array/settings_screen_video_dimensions_array"
             app:height="@dimen/preference_video_dimensions_height"
             app:pinRadius="36dp"
             app:startKey="pref_min_video_dim"

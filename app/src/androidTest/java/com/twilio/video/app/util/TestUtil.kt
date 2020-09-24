@@ -11,11 +11,11 @@ import java.io.InputStreamReader
 import java.util.UUID
 import junit.framework.AssertionFailedError
 
-fun retryEspressoAction(timeoutInSeconds: Long = 60000L, espressoAction: () -> Unit) {
+fun retryEspressoAction(timeoutInMillis: Long = 10000L, espressoAction: () -> Unit) {
     val startTime = System.currentTimeMillis()
     var currentTime = 0L
     var exception: Throwable? = null
-    while (currentTime <= timeoutInSeconds) {
+    while (currentTime <= timeoutInMillis) {
         currentTime = try {
             espressoAction()
             return

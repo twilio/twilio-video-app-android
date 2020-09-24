@@ -10,8 +10,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.twilio.video.app.HiddenView
 import com.twilio.video.app.R
+import com.twilio.video.app.espresso.HiddenView
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.getTargetContext
 import org.hamcrest.CoreMatchers.not

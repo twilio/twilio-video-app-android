@@ -1,4 +1,4 @@
-package com.twilio.video.app
+package com.twilio.video.app.espresso
 
 import android.view.View
 import androidx.test.espresso.NoMatchingViewException

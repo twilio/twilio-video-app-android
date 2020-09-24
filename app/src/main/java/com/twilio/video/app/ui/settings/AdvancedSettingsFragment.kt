@@ -16,6 +16,8 @@ import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS_RANGE_BAR
+import com.twilio.video.app.data.RangeBarPreference
 import com.twilio.video.app.util.isInternalFlavor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
@@ -30,6 +32,9 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
         findPreference<Preference>(Preferences.INTERNAL)?.isVisible = isInternalFlavor
 
         setHasOptionsMenu(true)
+
+        val videoDimensions = findPreference(VIDEO_DIMENSIONS_RANGE_BAR) as RangeBarPreference?
+        videoDimensions?.entries = Preferences.VIDEO_DIMENSIONS.map { "${it.width}x${it.height}" }.toTypedArray()
 
         setupCodecListPreference(
                 VideoCodec::class.java,

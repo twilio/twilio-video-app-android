@@ -6,11 +6,15 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.TOPOLOGY
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
 import com.twilio.video.app.data.api.model.Topology
 import com.twilio.video.app.data.api.model.Topology.GROUP
@@ -182,31 +186,34 @@ class AuthServiceRepositoryTest {
 
     fun videoCodecParams() =
             arrayOf(
-                    arrayOf(GROUP, GROUP_SMALL, true),
-                    arrayOf(PEER_TO_PEER, GROUP, true),
-                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false)
+                    arrayOf(GROUP, GROUP_SMALL, true, 0),
+                    arrayOf(PEER_TO_PEER, GROUP, true, 0),
+                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS))
             )
 
     @Parameters(method = "videoCodecParams")
     @Test
-    fun `it should update the video codec and room type if room type has changed`(
+    fun `it should update the video codec, room type, and video dimensions if the room type has changed`(
         oldRoomType: Topology,
         newRoomType: Topology,
-        enableSimulcast: Boolean
+        enableSimulcast: Boolean,
+        minVideoDimensionsIndex: Int
     ) {
         runBlockingTest {
-            val (editor, repository) = setupServerRoomTypeMock(newRoomType, oldRoomType)
+            val (editor, repository) = setupServerRoomTypeMock(oldRoomType, newRoomType)
 
             repository.getToken(passcode = "12345678901234")
 
             verify(editor).putString(TOPOLOGY, newRoomType.value)
             verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
             verify(editor).putBoolean(VP8_SIMULCAST, enableSimulcast)
+            verify(editor).putInt(MIN_VIDEO_DIMENSIONS, minVideoDimensionsIndex)
+            verify(editor).putInt(MAX_VIDEO_DIMENSIONS, VIDEO_DIMENSIONS.lastIndex)
         }
     }
 
     @Test
-    fun `it should not update the video codec nor the room type if the room type has not changed`() {
+    fun `it should not update the video codec, room type, and video dimensions if the room type has not changed`() {
         runBlockingTest {
             val (editor, repository) = setupServerRoomTypeMock(GROUP, GROUP)
 
@@ -223,7 +230,7 @@ class AuthServiceRepositoryTest {
 
             repository.getToken(passcode = "1234567890")
 
-            verify(editor).putString(TOPOLOGY, GROUP_SMALL.value)
+            verify(editor).putString(TOPOLOGY, GROUP.value)
             verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
             verify(editor).putBoolean(VP8_SIMULCAST, true)
         }
@@ -267,7 +274,7 @@ class AuthServiceRepositoryTest {
         }
     }
 
-    private suspend fun setupServerRoomTypeMock(newRoomType: Topology, oldRoomType: Topology): Pair<SharedPreferences.Editor, AuthServiceRepository> {
+    private suspend fun setupServerRoomTypeMock(oldRoomType: Topology, newRoomType: Topology): Pair<SharedPreferences.Editor, AuthServiceRepository> {
         authService = mock {
             whenever(mock.getToken(isA(), isA()))
                     .thenReturn(AuthServiceResponseDTO(token, newRoomType))

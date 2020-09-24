@@ -13,10 +13,14 @@ import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.util.PermissionUtil
 import io.reactivex.schedulers.TestScheduler
+import io.uniflow.android.test.TestViewObserver
+import io.uniflow.android.test.createTestObserver
+import io.uniflow.test.rule.TestDispatchersRule
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -27,6 +31,9 @@ class RoomViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val coroutineScope = TestDispatchersRule()
+
     private val roomManager = RoomManager(mock(),
             VideoClient(mock(), mock()))
     private val scheduler = TestScheduler()
@@ -35,12 +42,19 @@ class RoomViewModelTest {
         addParticipant(participantViewState)
     }
     val permissionUtil = mock<PermissionUtil>()
-    private var viewModel = RoomViewModel(
-            roomManager,
-            mock(),
-            permissionUtil,
-            participantManager,
-            scheduler = scheduler)
+    private lateinit var testObserver: TestViewObserver
+    private lateinit var viewModel: RoomViewModel
+
+    @Before
+    fun setUp() {
+        viewModel = RoomViewModel(
+                roomManager,
+                mock(),
+                permissionUtil,
+                participantManager,
+                scheduler = scheduler)
+        testObserver = viewModel.createTestObserver()
+    }
 
     @Test
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState`() {
@@ -52,7 +66,7 @@ class RoomViewModelTest {
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
         val expectedParticipantViewState = participantViewState.copy(
                 videoTrack = expectedTrackViewState)
-        val updatedParticipant = viewModel.viewState.value?.participantThumbnails?.find {
+        val updatedParticipant = (viewModel.getCurrentState() as RoomViewState).participantThumbnails?.find {
             it.sid == PARTICIPANT_SID
         }
         assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
@@ -68,7 +82,7 @@ class RoomViewModelTest {
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack, true)
         val expectedParticipantViewState = participantViewState.copy(
                 videoTrack = expectedTrackViewState)
-        val updatedParticipant = viewModel.viewState.value?.participantThumbnails?.find {
+        val updatedParticipant = (viewModel.getCurrentState() as RoomViewState).participantThumbnails?.find {
             it.sid == PARTICIPANT_SID
         }
         assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
@@ -82,7 +96,7 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        assertThat(viewModel.viewState.value, equalTo(expectedViewState))
+        testObserver.verifySequence(RoomViewState(), expectedViewState)
     }
 
     @Test
@@ -100,8 +114,9 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        assertThat(viewModel.viewState.value, equalTo(expectedViewState))
-        assertThat(viewModel.viewEffects.value, `is`(nullValue()))
+        testObserver.verifySequence(expectedViewState)
+
+        assertThat(testObserver.lastEventOrNull, `is`(nullValue()))
     }
 
     @Test
@@ -112,7 +127,7 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        assertThat(viewModel.viewState.value, equalTo(expectedViewState))
+        testObserver.verifySequence(RoomViewState(), expectedViewState)
     }
 
     @Test
@@ -130,8 +145,9 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        assertThat(viewModel.viewState.value, equalTo(expectedViewState))
-        assertThat(viewModel.viewEffects.value, `is`(nullValue()))
+        testObserver.verifySequence(expectedViewState)
+
+        assertThat(testObserver.lastEventOrNull, `is`(nullValue()))
     }
 
     @Test
@@ -143,8 +159,6 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        val expectedViewEffect = viewModel.viewEffects.value!!
-                .getContentIfNotHandled() is RoomViewEffect.CheckLocalMedia
-        assertThat(expectedViewEffect, equalTo(true))
+        assertThat(testObserver.lastEventOrNull is RoomViewEffect.CheckLocalMedia, equalTo(true))
     }
 }

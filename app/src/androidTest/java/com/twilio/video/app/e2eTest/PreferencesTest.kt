@@ -10,7 +10,7 @@ import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.retryEspressoAction
-import com.twilio.video.app.util.scrollAndClick
+import com.twilio.video.app.util.scrollAndClickView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,11 +29,11 @@ class PreferencesTest : BaseE2ETest() {
 
         assertTextIsDisplayedRetry(getString(R.string.settings_title))
 
-        scrollAndClick(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
 
         assertTextIsDisplayedRetry(getString(R.string.settings_title_advanced))
 
-        scrollAndClick(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
 
         assertTextIsDisplayedRetry(getString(R.string.settings_title_bandwidth_profile))
 
