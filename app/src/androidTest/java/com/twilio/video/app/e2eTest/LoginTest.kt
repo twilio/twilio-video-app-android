@@ -14,7 +14,7 @@ import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.retryEspressoAction
-import com.twilio.video.app.util.scrollAndClick
+import com.twilio.video.app.util.scrollAndClickView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +37,7 @@ class LoginTest {
         val emailCredentials = retrieveEmailCredentials()
         loginWithEmail(emailCredentials)
         retryEspressoAction { clickSettingsMenuItem() }
-        scrollAndClick(getString(R.string.settings_screen_logout), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_screen_logout), R.id.recycler_view)
 
         retryEspressoAction { assertGoogleSignInButtonIsVisible() }
     }

@@ -18,11 +18,12 @@ apply plugin: 'kotlin-kapt'
 def videoAndroidSdkDepProp = "videoAppSdkDependency"
 def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
         project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:5.10.2")
+        "com.twilio:video-android:5.11.1")
 def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
+    buildToolsVersion '30.0.2'
 
     lintOptions {
         disable 'GradleDependency'
@@ -39,7 +40,7 @@ android {
         applicationId "com.twilio.video.app"
 
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 30
 
         versionName "0.1.0"
         versionCode versionCodeProperty
@@ -124,14 +125,15 @@ dependencies {
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
     def retrofitVersion = '2.6.4'
-    def espressoVersion = '3.2.0'
+    def espressoVersion = '3.3.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
-    def androidXTest = '1.2.0'
+    def androidXTest = '1.3.0'
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.2.0'
-    def coroutinesAndroidVersion = '1.3.3'
-    def fragmentVersion = '1.2.2'
+    def coroutinesAndroidVersion = '1.3.9'
+    def fragmentVersion = '1.2.5'
+    def uniflowVersion = '0.11.2'
 
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
@@ -140,8 +142,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
     implementation 'com.twilio:twilio-android-env:1.0.0@aar'
     implementation videoAndroidSdkDep
-    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
+    implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
@@ -152,10 +154,10 @@ dependencies {
     implementation "com.appyvet:materialrangebar:1.3"
     implementation "com.jakewharton:butterknife:$butterknifeVersion"
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "com.google.firebase:firebase-core:17.2.2"
-    implementation 'com.google.firebase:firebase-auth:19.2.0'
+    implementation "com.google.firebase:firebase-core:17.5.0"
+    implementation 'com.google.firebase:firebase-auth:19.4.0'
     implementation "com.crashlytics.sdk.android:crashlytics:2.10.1"
-    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation "com.google.dagger:dagger-android:$daggerVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
@@ -165,7 +167,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.0.0'
+    implementation 'com.twilio:audioswitch:1.0.1'
+    implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:2.5.1"
 
@@ -177,11 +180,13 @@ dependencies {
     testImplementation espresso
     testImplementation junitExtensions
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
+    testImplementation "io.uniflow:uniflow-androidx-test:$uniflowVersion"
+    testImplementation "io.uniflow:uniflow-test:$uniflowVersion"
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
 
@@ -191,7 +196,7 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$androidXTest"
     androidTestImplementation "androidx.test:rules:$androidXTest"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 }
