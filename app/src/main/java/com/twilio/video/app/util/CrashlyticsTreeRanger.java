@@ -16,7 +16,8 @@
 
 package com.twilio.video.app.util;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import javax.inject.Inject;
 
 public class CrashlyticsTreeRanger implements TreeRanger {
@@ -31,11 +32,11 @@ public class CrashlyticsTreeRanger implements TreeRanger {
 
     @Override
     public void caution(String message) {
-        Crashlytics.log(message);
+        FirebaseCrashlytics.getInstance().log(message);
     }
 
     @Override
     public void alert(Throwable throwable) {
-        Crashlytics.logException(throwable);
+        FirebaseCrashlytics.getInstance().recordException(throwable);
     }
 }
