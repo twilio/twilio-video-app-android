@@ -17,7 +17,6 @@
 package com.twilio.video.app.util;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-
 import javax.inject.Inject;
 
 public class CrashlyticsTreeRanger implements TreeRanger {
