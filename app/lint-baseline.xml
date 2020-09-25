@@ -15,70 +15,6 @@
     </issue>
 
     <issue
-        id="AnnotationProcessorOnCompilePath"
-        message="Add annotation processor to processor path using `annotationProcessor` instead of `implementation`"
-        errorLine1="    implementation &quot;com.jakewharton:butterknife:$butterknifeVersion&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="156"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ObsoleteLintCustomCheck"
-        message="Lint found an issue registry (`butterknife.lint.LintRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 2 (3.2), current lint API level is 5 (3.5+)"
-        includedVariants="internalDebug"
-        excludedVariants="communityDebug,internalRelease,twilioRelease">
-        <location
-            file="../../../../../.gradle/caches/transforms-2/files-2.1/c7e74dea5b07108b2401d0743f373cab/butterknife-runtime-10.2.0/jars/lint.jar"/>
-    </issue>
-
-    <issue
-        id="ObsoleteLintCustomCheck"
-        message="Lint found an issue registry (`timber.lint.TimberIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 1 (3.1), current lint API level is 5 (3.5+)"
-        includedVariants="internalDebug"
-        excludedVariants="communityDebug,internalRelease,twilioRelease">
-        <location
-            file="../../../../../.gradle/caches/transforms-2/files-2.1/d0fd5c9689d0a1544b73d748b0dd5ecc/jetified-timber-4.7.1/jars/lint.jar"/>
-    </issue>
-
-    <issue
-        id="CheckResult"
-        message="The result of `subscribe` is not used"
-        errorLine1="        authenticator"
-        errorLine2="        ^"
-        includedVariants="communityDebug"
-        excludedVariants="internalDebug,internalRelease,twilioRelease">
-        <location
-            file="src/community/java/com/twilio/video/app/ui/login/CommunityLoginActivity.java"
-            line="85"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DefaultLocale"
-        message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                            iceTransPolicySpinner.getSelectedItem().toString().toLowerCase();"
-        errorLine2="                                                                               ~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/twilio/video/app/dialog/IceServersDialogFragment.java"
-            line="127"
-            column="80"/>
-    </issue>
-
-    <issue
-        id="OldTargetApi"
-        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details."
-        errorLine1="        targetSdkVersion 28"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="build.gradle"
-            line="41"
-            column="9"/>
-    </issue>
-
-    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;512dp&quot;"
@@ -272,17 +208,6 @@
         <location
             file="src/main/res/drawable/ic_pause_red_24px.xml"
             line="2"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.drawable.ic_phonelink_ring_white_24dp` appears to be unused"
-        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/ic_phonelink_ring_white_24dp.xml"
-            line="1"
             column="1"/>
     </issue>
 
@@ -596,19 +521,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.name` appears to be unused"
-        errorLine1="    &lt;string name=&quot;name&quot;>Name&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~"
-        includedVariants="internalDebug,internalRelease,twilioRelease"
-        excludedVariants="communityDebug">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="141"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.bitrate` appears to be unused"
         errorLine1="    &lt;string name=&quot;bitrate&quot;>bps&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~">
@@ -722,83 +634,6 @@
             file="src/main/res/layout/participant_view.xml"
             line="35"
             column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageView"
-        errorLine2="             ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view_primary.xml"
-            line="56"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Redundant attribute `layout_marginRight`; already defining `layout_marginEnd` with `targetSdkVersion` 28"
-        errorLine1="            android:layout_marginRight=&quot;@dimen/fab_margin&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-v21/activity_room.xml"
-            line="80"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Redundant attribute `layout_marginRight`; already defining `layout_marginEnd` with `targetSdkVersion` 28"
-        errorLine1="                android:layout_marginRight=&quot;@dimen/activity_horizontal_margin&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-v21/activity_room.xml"
-            line="139"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="            android:layout_gravity=&quot;bottom|left&quot;"
-        errorLine2="                                    ~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view.xml"
-            line="41"
-            column="37"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;8dp&quot;` to better support right-to-left layouts"
-        errorLine1="                android:layout_marginRight=&quot;8dp&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view_primary.xml"
-            line="48"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;10dp&quot;` to better support right-to-left layouts"
-        errorLine1="                android:layout_marginRight=&quot;10dp&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view_primary.xml"
-            line="72"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_marginStart=&quot;10dp&quot;` to better support right-to-left layouts"
-        errorLine1="                android:layout_marginLeft=&quot;10dp&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/participant_view_primary.xml"
-            line="60"
-            column="17"/>
     </issue>
 
     <issue
