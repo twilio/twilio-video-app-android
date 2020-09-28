@@ -181,10 +181,12 @@ internal constructor(
 
     fun hasActivationError() = headsetState == AudioActivationError
 
+    // TODO Remove bluetoothHeadsetName param
     fun getHeadset(bluetoothHeadsetName: String?) =
             if (headsetState != Disconnected) {
-                AudioDevice.BluetoothHeadset(bluetoothHeadsetName ?: getHeadsetName()
-                ?: "Bluetooth")
+                val headsetName = bluetoothHeadsetName ?: getHeadsetName()
+                headsetName?.let { AudioDevice.BluetoothHeadset(it) }
+                        ?: AudioDevice.BluetoothHeadset()
             } else null
 
     private fun isCorrectIntentAction(intentAction: String?) =
