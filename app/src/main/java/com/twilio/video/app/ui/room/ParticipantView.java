@@ -32,16 +32,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import butterknife.BindView;
-import com.twilio.video.I420Frame;
-import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTextureView;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import tvi.webrtc.VideoFrame;
+import tvi.webrtc.VideoSink;
 
-abstract class ParticipantView extends FrameLayout implements VideoRenderer {
+abstract class ParticipantView extends FrameLayout implements VideoSink {
 
     private static final VideoScaleType DEFAULT_VIDEO_SCALE_TYPE = VideoScaleType.ASPECT_FIT;
 
@@ -165,8 +165,8 @@ abstract class ParticipantView extends FrameLayout implements VideoRenderer {
     }
 
     @Override
-    public void renderFrame(@NonNull I420Frame frame) {
-        videoView.renderFrame(frame);
+    public void onFrame(VideoFrame videoFrame) {
+        videoView.onFrame(videoFrame);
     }
 
     void initParams(Context context, AttributeSet attrs) {

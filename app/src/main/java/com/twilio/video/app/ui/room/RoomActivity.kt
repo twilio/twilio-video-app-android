@@ -69,11 +69,6 @@ import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS
-import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS_DEFAULT
-import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS
-import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS_DEFAULT
-import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
@@ -503,7 +498,7 @@ class RoomActivity : BaseActivity() {
             isVideoMuted = true
             // remove local camera track
             cameraVideoTrack?.let { cameraVideoTrack ->
-                cameraVideoTrack.removeRenderer(primaryVideoView)
+                cameraVideoTrack.removeSink(primaryVideoView)
                 localParticipant?.unpublishTrack(cameraVideoTrack)
                 cameraVideoTrack.release()
                 this.cameraVideoTrack = null
