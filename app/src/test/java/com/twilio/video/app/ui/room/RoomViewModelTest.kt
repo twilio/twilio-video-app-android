@@ -17,6 +17,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
 import com.twilio.video.app.util.PermissionUtil
 import io.reactivex.schedulers.TestScheduler
 import io.uniflow.android.test.TestViewObserver
@@ -190,6 +191,16 @@ class RoomViewModelTest {
                 ShowMaxParticipantFailureDialog,
                 Disconnected,
                 lobbyState())
+    }
+
+    @Test
+    fun `The RefreshViewState event should refresh the view state`() {
+        viewModel.processInput(RefreshViewState)
+
+        testObserver.verifySequence(
+                RoomViewState(),
+                RoomViewState()
+        )
     }
 
     private fun lobbyState() =
