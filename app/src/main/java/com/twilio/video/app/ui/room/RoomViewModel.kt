@@ -15,6 +15,7 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.MuteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
@@ -26,6 +27,7 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
@@ -160,6 +162,12 @@ class RoomViewModel(
                 sendEvent {
                     showLobbyViewState()
                     ShowConnectFailureDialog
+                }
+            }
+            is MaxParticipantFailure -> action {
+                sendEvent {
+                    showLobbyViewState()
+                    ShowMaxParticipantFailureDialog
                 }
             }
             is TokenError -> action {

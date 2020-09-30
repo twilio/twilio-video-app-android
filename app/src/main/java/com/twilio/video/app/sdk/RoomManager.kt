@@ -5,6 +5,7 @@ import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 import com.twilio.video.TwilioException
+import com.twilio.video.TwilioException.ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.ui.room.RoomEvent
@@ -13,7 +14,7 @@ import com.twilio.video.app.ui.room.RoomEvent.Connected
 import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
@@ -51,8 +52,8 @@ class RoomManager(
         }
     }
 
-    fun sendParticipantEvent(participantEvent: ParticipantEvent) {
-        roomEventSubject.onNext(participantEvent)
+    fun sendRoomEvent(roomEvent: RoomEvent) {
+        roomEventSubject.onNext(roomEvent)
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
@@ -87,7 +88,12 @@ class RoomManager(
                     room.state,
                     twilioException.code,
                     twilioException.message)
-            roomEventSubject.onNext(ConnectFailure)
+
+            if (twilioException.code == ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION) {
+                roomEventSubject.onNext(MaxParticipantFailure)
+            } else {
+                roomEventSubject.onNext(ConnectFailure)
+            }
         }
 
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
@@ -95,14 +101,14 @@ class RoomManager(
                     room.sid, remoteParticipant.sid)
 
             remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
-            sendParticipantEvent(ParticipantConnected(remoteParticipant))
+            sendRoomEvent(ParticipantConnected(remoteParticipant))
         }
 
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
             Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant.sid)
 
-            sendParticipantEvent(ParticipantDisconnected(remoteParticipant.sid))
+            sendRoomEvent(ParticipantDisconnected(remoteParticipant.sid))
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {

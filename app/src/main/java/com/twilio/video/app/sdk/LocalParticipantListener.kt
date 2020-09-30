@@ -20,7 +20,7 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
         Timber.i("LocalParticipant NetworkQualityLevel changed for LocalParticipant sid: %s, NetworkQualityLevel: %s",
                 localParticipant.sid, networkQualityLevel)
 
-        roomManager.sendParticipantEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
+        roomManager.sendRoomEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
     }
 
     override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {
@@ -28,10 +28,10 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
                 localParticipant.sid, localVideoTrackPublication.localVideoTrack)
 
         if (localVideoTrackPublication.videoTrack.name.contains(SCREEN_TRACK_NAME)) {
-            roomManager.sendParticipantEvent(ScreenTrackUpdated(localParticipant.sid,
+            roomManager.sendRoomEvent(ScreenTrackUpdated(localParticipant.sid,
                     localVideoTrackPublication.videoTrack))
         } else {
-            roomManager.sendParticipantEvent(VideoTrackUpdated(localParticipant.sid,
+            roomManager.sendRoomEvent(VideoTrackUpdated(localParticipant.sid,
                     localVideoTrackPublication.videoTrack))
         }
     }

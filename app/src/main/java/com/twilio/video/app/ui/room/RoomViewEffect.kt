@@ -13,5 +13,6 @@ sealed class RoomViewEffect : UIEvent() {
     object Disconnected : RoomViewEffect()
 
     object ShowConnectFailureDialog : RoomViewEffect()
+    object ShowMaxParticipantFailureDialog : RoomViewEffect()
     data class ShowTokenErrorDialog(val serviceError: AuthServiceError? = null) : RoomViewEffect()
 }

@@ -10,7 +10,13 @@ import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoClient
 import com.twilio.video.app.sdk.VideoTrackViewState
+import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
+import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
+import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
+import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.util.PermissionUtil
 import io.reactivex.schedulers.TestScheduler
 import io.uniflow.android.test.TestViewObserver
@@ -60,7 +66,7 @@ class RoomViewModelTest {
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState`() {
         val expectedVideoTrack = mock<RemoteVideoTrack>()
 
-        roomManager.sendParticipantEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, false))
+        roomManager.sendRoomEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, false))
         scheduler.triggerActions()
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
@@ -76,7 +82,7 @@ class RoomViewModelTest {
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState with the switch off set to true`() {
         val expectedVideoTrack = mock<RemoteVideoTrack>()
 
-        roomManager.sendParticipantEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, true))
+        roomManager.sendRoomEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, true))
         scheduler.triggerActions()
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack, true)
@@ -159,6 +165,37 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        assertThat(testObserver.lastEventOrNull is RoomViewEffect.CheckLocalMedia, equalTo(true))
+        assertThat(testObserver.lastEventOrNull is CheckLocalMedia, equalTo(true))
     }
+
+    @Test
+    fun `The ConnectFailure event should send a ShowConnectFailureDialog ViewEffect`() {
+        roomManager.sendRoomEvent(ConnectFailure)
+        scheduler.triggerActions()
+
+        testObserver.verifySequence(
+                RoomViewState(),
+                ShowConnectFailureDialog,
+                Disconnected,
+                lobbyState())
+    }
+
+    @Test
+    fun `The MaxParticipantFailure event should send a ShowMaxParticipantFailureDialog ViewEffect`() {
+        roomManager.sendRoomEvent(MaxParticipantFailure)
+        scheduler.triggerActions()
+
+        testObserver.verifySequence(
+                RoomViewState(),
+                ShowMaxParticipantFailureDialog,
+                Disconnected,
+                lobbyState())
+    }
+
+    private fun lobbyState() =
+            RoomViewState(
+                    isLobbyLayoutVisible = true,
+                    isConnectingLayoutVisible = false,
+                    isConnectedLayoutVisible = false
+            )
 }

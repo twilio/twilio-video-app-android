@@ -16,6 +16,7 @@ sealed class RoomEvent {
     ) : RoomEvent()
     object Disconnected : RoomEvent()
     object ConnectFailure : RoomEvent()
+    object MaxParticipantFailure : RoomEvent()
     data class TokenError(val serviceError: AuthServiceError? = null) : RoomEvent()
     data class DominantSpeakerChanged(val newDominantSpeakerSid: String?) : RoomEvent()
 

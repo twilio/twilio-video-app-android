@@ -84,7 +84,10 @@ import com.twilio.video.app.sdk.MICROPHONE_TRACK_NAME
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.SCREEN_TRACK_NAME
 import com.twilio.video.app.sdk.VideoTrackViewState
+import com.twilio.video.app.ui.room.RoomViewEffect.Connected
+import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
@@ -926,31 +929,41 @@ class RoomActivity : BaseActivity() {
 
     private fun bindRoomViewEffects(roomViewEffect: RoomViewEffect) {
             requestPermissions()
-            if (roomViewEffect is RoomViewEffect.Connected) {
+        when (roomViewEffect) {
+            is Connected -> {
                 room = roomViewEffect.room
                 toggleAudioDevice(true)
                 initializeRoom()
             }
-            if (roomViewEffect is RoomViewEffect.Disconnected) {
+            Disconnected -> {
                 localParticipant = null
                 room = null
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
                 updateStats()
                 toggleAudioDevice(false)
             }
-            if (roomViewEffect is ShowConnectFailureDialog) {
+            ShowConnectFailureDialog, ShowMaxParticipantFailureDialog -> {
                 AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                        .setTitle(getString(R.string.room_screen_connection_failure_title))
-                        .setMessage(getString(R.string.room_screen_connection_failure_message))
-                        .setNeutralButton("OK", null)
-                        .show()
+                    .setTitle(getString(R.string.room_screen_connection_failure_title))
+                    .setMessage(getConnectFailureMessage(roomViewEffect))
+                    .setNeutralButton(getString(android.R.string.ok), null)
+                    .show()
                 toggleAudioDevice(false)
             }
-            if (roomViewEffect is ShowTokenErrorDialog) {
+            is ShowTokenErrorDialog -> {
                 val error = roomViewEffect.serviceError
                 handleTokenError(error)
             }
+        }
     }
+
+    private fun getConnectFailureMessage(roomViewEffect: RoomViewEffect) =
+            getString(
+                when (roomViewEffect) {
+                    ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
+                    else -> R.string.room_screen_connection_failure_message
+                }
+            )
 
     private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
         val audioDeviceMenuIcon = when (selectedAudioDevice) {
@@ -1024,7 +1037,7 @@ class RoomActivity : BaseActivity() {
         AlertDialog.Builder(this, R.style.AppTheme_Dialog)
                 .setTitle(getString(R.string.room_screen_connection_failure_title))
                 .setMessage(getString(errorMessage))
-                .setNeutralButton("OK", null)
+                .setNeutralButton(getString(android.R.string.ok), null)
                 .show()
     }
 
