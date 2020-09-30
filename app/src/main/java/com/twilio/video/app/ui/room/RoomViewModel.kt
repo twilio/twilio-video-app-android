@@ -94,7 +94,9 @@ class RoomViewModel(
         Timber.d("View Event: $viewEvent")
 
         when (viewEvent) {
-            is RefreshViewState -> actionOn<RoomViewState> { it }
+            is RefreshViewState -> actionOn<RoomViewState> { currentState ->
+                setState { currentState }
+            }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioSwitch.selectDevice(viewEvent.device)

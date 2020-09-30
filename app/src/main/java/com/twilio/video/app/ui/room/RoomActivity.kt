@@ -486,7 +486,6 @@ class RoomActivity : BaseActivity() {
 
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
-        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid)) }
         if (cameraVideoTrack == null) {
             isVideoMuted = false
 
@@ -510,6 +509,7 @@ class RoomActivity : BaseActivity() {
                 pauseVideoMenuItem.isVisible = true
             }
         } else {
+            localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid)) }
             isVideoMuted = true
             // remove local camera track
             cameraVideoTrack?.let { cameraVideoTrack ->
