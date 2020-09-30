@@ -65,10 +65,14 @@ import com.twilio.video.ScreenCapturer
 import com.twilio.video.StatsListener
 import com.twilio.video.StatsReport
 import com.twilio.video.TrackPriority
+import com.twilio.video.VideoFormat
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
@@ -94,6 +98,7 @@ import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
 import com.twilio.video.app.util.StatsScheduler
+import com.twilio.video.app.util.get
 import io.uniflow.androidx.flow.onEvents
 import io.uniflow.androidx.flow.onStates
 import javax.inject.Inject
@@ -207,6 +212,7 @@ class RoomActivity : BaseActivity() {
     private var isVideoMuted = false
     private lateinit var participantAdapter: ParticipantAdapter
     private lateinit var roomViewModel: RoomViewModel
+    private lateinit var videoFormat: VideoFormat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -261,6 +267,9 @@ class RoomActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
+        val dimensionsIndex = sharedPreferences.get(VIDEO_CAPTURE_RESOLUTION,
+                VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
+        videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
         setTitle(displayName)
     }
 
@@ -482,6 +491,7 @@ class RoomActivity : BaseActivity() {
                         this,
                         true,
                         it.videoCapturer,
+                        videoFormat,
                         CAMERA_TRACK_NAME)
             }
             if (localParticipant != null) {
@@ -575,6 +585,7 @@ class RoomActivity : BaseActivity() {
                     this,
                     true,
                     it.videoCapturer,
+                    videoFormat,
                     CAMERA_TRACK_NAME)
         }
         cameraVideoTrack?.let {
