@@ -21,9 +21,10 @@ import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
-import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS
-import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.TOPOLOGY
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
@@ -91,16 +92,15 @@ class AuthServiceRepository(
                         sharedPreferences.getString(TOPOLOGY, null) != serverTopology.value
                 if (isTopologyChange) {
                     sharedPreferences.edit { putString(TOPOLOGY, serverTopology.value) }
-                    val (enableSimulcast, minVideoDimensions) = when (serverTopology) {
-                        GROUP, GROUP_SMALL -> true to 0
-                        PEER_TO_PEER -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS)
+                    val (enableSimulcast, videoDimensionsIndex) = when (serverTopology) {
+                        GROUP, GROUP_SMALL -> true to VIDEO_CAPTURE_RESOLUTION_DEFAULT
+                        PEER_TO_PEER -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()
                     }
                     Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
                             serverTopology, enableSimulcast)
                     sharedPreferences.edit { putString(VIDEO_CODEC, Vp8Codec.NAME) }
                     sharedPreferences.edit { putBoolean(VP8_SIMULCAST, enableSimulcast) }
-                    sharedPreferences.edit { putInt(MIN_VIDEO_DIMENSIONS, minVideoDimensions) }
-                    sharedPreferences.edit { putInt(MAX_VIDEO_DIMENSIONS, VIDEO_DIMENSIONS.lastIndex) }
+                    sharedPreferences.edit { putString(VIDEO_CAPTURE_RESOLUTION, videoDimensionsIndex) }
                 }
             }
             token
