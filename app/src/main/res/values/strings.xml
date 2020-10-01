@@ -196,6 +196,7 @@
     <string name="audio_toggle">Audio toggle</string>
     <string name="video_logo">Video Logo</string>
     <string name="stats_disabled">Stats disabled</string>
+    <string name="primary_profile_picture">Primary view profile picture</string>
     <string name="profile_picture">Profile picture</string>
     <string name="number">Number</string>
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>
