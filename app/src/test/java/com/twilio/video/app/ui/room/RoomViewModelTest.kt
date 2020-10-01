@@ -18,6 +18,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.util.PermissionUtil
 import io.reactivex.schedulers.TestScheduler
 import io.uniflow.android.test.TestViewObserver
@@ -201,6 +202,21 @@ class RoomViewModelTest {
                 RoomViewState(),
                 RoomViewState()
         )
+    }
+
+    @Test
+    fun `The ToggleLocalVideo event should update the participant view state`() {
+        val expectedVideoTrack = mock<RemoteVideoTrack>()
+        val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
+
+        viewModel.processInput(ToggleLocalVideo(PARTICIPANT_SID, expectedTrackViewState))
+
+        val expectedParticipantViewState = participantViewState.copy(
+                videoTrack = expectedTrackViewState)
+        val updatedParticipant = (viewModel.getCurrentState() as RoomViewState).participantThumbnails?.find {
+            it.sid == PARTICIPANT_SID
+        }
+        assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
     }
 
     private fun lobbyState() =

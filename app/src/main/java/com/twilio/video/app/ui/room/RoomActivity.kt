@@ -67,6 +67,7 @@ import com.twilio.video.StatsListener
 import com.twilio.video.StatsReport
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoConstraints
+import com.twilio.video.VideoTrack
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
@@ -486,6 +487,7 @@ class RoomActivity : BaseActivity() {
 
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
+        var newLocalVideoTrack: LocalVideoTrack? = null
         if (cameraVideoTrack == null) {
             isVideoMuted = false
 
@@ -497,6 +499,7 @@ class RoomActivity : BaseActivity() {
                         it.videoCapturer,
                         videoConstraints,
                         CAMERA_TRACK_NAME)
+                newLocalVideoTrack = cameraVideoTrack
             }
             if (localParticipant != null) {
                 cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
@@ -509,7 +512,6 @@ class RoomActivity : BaseActivity() {
                 pauseVideoMenuItem.isVisible = true
             }
         } else {
-            localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid)) }
             isVideoMuted = true
             // remove local camera track
             cameraVideoTrack?.let { cameraVideoTrack ->
@@ -527,7 +529,9 @@ class RoomActivity : BaseActivity() {
         // update toggle button icon
         localVideoImageButton.setImageResource(
                 if (cameraVideoTrack != null) R.drawable.ic_videocam_white_24px else R.drawable.ic_videocam_off_gray_24px)
-        roomViewModel.processInput(RefreshViewState)
+
+        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid,
+                (newLocalVideoTrack as VideoTrack?)?.let { VideoTrackViewState(it) })) }
     }
 
     private fun publishVideoTrack(videoTrack: LocalVideoTrack, trackPriority: TrackPriority) {

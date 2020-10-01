@@ -111,7 +111,9 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
             is ToggleLocalVideo -> {
-                participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
+                participantManager.updateParticipantVideoTrack(viewEvent.sid,
+                        viewEvent.videoTrackViewState)
+                updateParticipantViewState()
             }
             is VideoTrackRemoved -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
