@@ -67,6 +67,7 @@ import com.twilio.video.StatsListener
 import com.twilio.video.StatsReport
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoConstraints
+import com.twilio.video.VideoTrack
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
@@ -486,7 +487,7 @@ class RoomActivity : BaseActivity() {
 
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
-        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid)) }
+        var newLocalVideoTrack: LocalVideoTrack? = null
         if (cameraVideoTrack == null) {
             isVideoMuted = false
 
@@ -498,6 +499,7 @@ class RoomActivity : BaseActivity() {
                         it.videoCapturer,
                         videoConstraints,
                         CAMERA_TRACK_NAME)
+                newLocalVideoTrack = cameraVideoTrack
             }
             if (localParticipant != null) {
                 cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
@@ -527,7 +529,12 @@ class RoomActivity : BaseActivity() {
         // update toggle button icon
         localVideoImageButton.setImageResource(
                 if (cameraVideoTrack != null) R.drawable.ic_videocam_white_24px else R.drawable.ic_videocam_off_gray_24px)
-        roomViewModel.processInput(RefreshViewState)
+
+        // Refresh view state
+        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid,
+                (newLocalVideoTrack as VideoTrack?)?.let { VideoTrackViewState(it) }))
+        }
+                ?: roomViewModel.processInput(RefreshViewState)
     }
 
     private fun publishVideoTrack(videoTrack: LocalVideoTrack, trackPriority: TrackPriority) {
@@ -643,14 +650,7 @@ class RoomActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Render local video track.
-     *
-     *
-     * NOTE: Stub participant is created in controller. Make sure to remove it when connected to
-     * room.
-     */
-    private fun renderLocalParticipantStub() {
+    private fun renderLocalParticipant() {
         val cameraTrackViewState = cameraVideoTrack?.let { VideoTrackViewState(it, false) }
         cameraCapturer?.let { cameraCapturer ->
             primaryParticipantController.renderAsPrimary(
@@ -985,7 +985,7 @@ class RoomActivity : BaseActivity() {
                     primaryParticipant.isMuted,
                     primaryParticipant.isMirrored)
         } else {
-            renderLocalParticipantStub()
+            renderLocalParticipant()
         }
     }
 
