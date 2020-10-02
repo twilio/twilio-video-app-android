@@ -5,7 +5,7 @@ e2e-tests:
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
     - {model: lucye, version: 24}
-    - {model: Pixel2, version: 29}
+    - {model: flame, version: 29}
   test-targets:
     - "annotation com.twilio.video.app.e2eTest.E2ETest"
 
@@ -16,6 +16,6 @@ integration-tests:
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
     - {model: lucye, version: 24}
-    - {model: Pixel2, version: 29}
+    - {model: flame, version: 29}
   test-targets:
     - "annotation com.twilio.video.app.integrationTest.IntegrationTest"
