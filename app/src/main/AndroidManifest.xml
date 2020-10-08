@@ -55,7 +55,7 @@
             android:parentActivityName=".ui.room.RoomActivity"
             android:theme="@style/AppTheme.Settings" />
         <service
-            android:foregroundServiceType="mediaProjection|camera|microphone"
+            android:foregroundServiceType="mediaProjection"
             android:name=".ui.room.VideoService"/>
     </application>
 </manifest>
