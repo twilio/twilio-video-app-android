@@ -44,6 +44,8 @@ import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.isActive
@@ -55,8 +57,12 @@ class RoomViewModel(
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
-    initialViewState: RoomViewState = RoomViewState()
+    initialViewState: RoomViewState = RoomViewState(),
+    coroutineDispatcher: CoroutineDispatcher? = null
 ) : AndroidDataFlow(defaultState = initialViewState) {
+
+    private val coroutineContext =
+            coroutineDispatcher?.let { CoroutineScope(it) } ?: viewModelScope
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
@@ -272,7 +278,7 @@ class RoomViewModel(
 
     @ExperimentalCoroutinesApi
     private fun connect(identity: String, roomName: String) =
-        viewModelScope.launch {
+        coroutineContext.launch {
             roomManager.connect(
                     identity,
                     roomName).let { channel ->

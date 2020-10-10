@@ -20,6 +20,7 @@ import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantConnec
 import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ParticipantDisconnected
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +38,8 @@ const val SCREEN_TRACK_NAME = "screen"
 
 class RoomManager(
     private val context: Context,
-    private val videoClient: VideoClient
+    private val videoClient: VideoClient,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private val roomListener = RoomListener()
@@ -68,7 +70,7 @@ class RoomManager(
 
     private fun setupChannel() {
         check(roomScope == null && roomChannel == null)
-        roomScope = CoroutineScope(Dispatchers.IO)
+        roomScope = CoroutineScope(coroutineDispatcher)
         roomChannel = Channel(Channel.BUFFERED)
         Timber.d("Setup new Room Coroutine Scope and Channel: \n$roomScope\n$roomChannel")
     }
