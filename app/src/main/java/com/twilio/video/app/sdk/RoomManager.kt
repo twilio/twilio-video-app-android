@@ -22,7 +22,6 @@ import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -48,7 +47,6 @@ class RoomManager(
         room?.disconnect()
     }
 
-    @ExperimentalCoroutinesApi
     suspend fun connect(identity: String, roomName: String): ReceiveChannel<RoomEvent> {
         setupChannel()
         sendToChannel(Connecting)
@@ -57,7 +55,6 @@ class RoomManager(
         return roomChannel as ReceiveChannel<RoomEvent>
     }
 
-    @ExperimentalCoroutinesApi
     private suspend fun connectToRoom(identity: String, roomName: String) {
         roomScope?.launch {
             room = try {
