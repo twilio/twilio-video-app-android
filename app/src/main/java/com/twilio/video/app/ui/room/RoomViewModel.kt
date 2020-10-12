@@ -161,10 +161,8 @@ class RoomViewModel(
                 }
             }
             is MaxParticipantFailure -> action {
-                sendEvent {
-                    showLobbyViewState()
-                    ShowMaxParticipantFailureDialog
-                }
+                sendEvent { ShowMaxParticipantFailureDialog }
+                showLobbyViewState()
             }
             is TokenError -> action {
                 sendEvent {

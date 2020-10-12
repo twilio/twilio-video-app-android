@@ -4,7 +4,6 @@ import android.content.Context
 import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
-import com.twilio.video.Room.State.DISCONNECTED
 import com.twilio.video.TwilioException
 import com.twilio.video.TwilioException.ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION
 import com.twilio.video.app.data.api.AuthServiceError
@@ -27,8 +26,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -69,14 +66,12 @@ class RoomManager(
                 handleTokenException(e, e.error)
             } catch (e: Exception) {
                 handleTokenException(e)
-            } finally {
-                setupChannelShutdownListener()
             }
         }
     }
 
     private fun setupChannel() {
-        check(roomScope == null && roomChannel == null)
+        roomChannel?.let { shutdownRoom() }
         roomScope = CoroutineScope(coroutineDispatcher)
         roomChannel = Channel(Channel.BUFFERED)
         Timber.d("Setup new Room Coroutine Scope and Channel: \n$roomScope\n$roomChannel")
@@ -102,19 +97,6 @@ class RoomManager(
         roomChannel?.close()
         roomScope = null
         roomChannel = null
-    }
-
-    @ExperimentalCoroutinesApi
-    private fun setupChannelShutdownListener() {
-        roomScope?.launch {
-            while (isActive) {
-                if ((roomChannel as ReceiveChannel<RoomEvent>).isEmpty &&
-                        (room == null || room?.state == DISCONNECTED)) {
-                    shutdownRoom()
-                }
-                delay(500)
-            }
-        }
     }
 
     inner class RoomListener : Room.Listener {
