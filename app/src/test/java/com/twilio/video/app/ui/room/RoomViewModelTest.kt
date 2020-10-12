@@ -72,8 +72,7 @@ class RoomViewModelTest {
                 roomManager,
                 mock(),
                 permissionUtil,
-                participantManager,
-                coroutineDispatcher = testDispatcher)
+                participantManager)
         testObserver = viewModel.createTestObserver()
     }
 
