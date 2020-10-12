@@ -51,21 +51,28 @@ class RoomManager(
         room?.disconnect()
     }
 
+    @ExperimentalCoroutinesApi
     suspend fun connect(identity: String, roomName: String): ReceiveChannel<RoomEvent> {
         setupChannel()
         sendToChannel(Connecting)
-
-        room = try {
-            videoClient.connect(identity, roomName, roomListener)
-        } catch (e: AuthServiceException) {
-            handleTokenException(e, e.error)
-        } catch (e: Exception) {
-            handleTokenException(e)
-        } finally {
-            setupChannelShutdownListener()
-        }
+        connectToRoom(identity, roomName)
 
         return roomChannel as ReceiveChannel<RoomEvent>
+    }
+
+    @ExperimentalCoroutinesApi
+    private suspend fun connectToRoom(identity: String, roomName: String) {
+        roomScope?.launch {
+            room = try {
+                videoClient.connect(identity, roomName, roomListener)
+            } catch (e: AuthServiceException) {
+                handleTokenException(e, e.error)
+            } catch (e: Exception) {
+                handleTokenException(e)
+            } finally {
+                setupChannelShutdownListener()
+            }
+        }
     }
 
     private fun setupChannel() {
