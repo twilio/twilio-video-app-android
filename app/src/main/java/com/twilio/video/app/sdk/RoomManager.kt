@@ -1,6 +1,7 @@
 package com.twilio.video.app.sdk
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
@@ -39,8 +40,13 @@ class RoomManager(
 ) {
 
     private val roomListener = RoomListener()
-    private var roomScope: CoroutineScope? = null
-    private var roomChannel: Channel<RoomEvent>? = null
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal var roomScope: CoroutineScope? = null
+    /*
+     * TODO Use SharedFlow instead once it becomes stable for automatic cancellation
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal var roomChannel: Channel<RoomEvent>? = null
     var room: Room? = null
 
     fun disconnect() {
@@ -88,7 +94,7 @@ class RoomManager(
         return null
     }
 
-    private fun shutdownRoom() {
+    internal fun shutdownRoom() {
         Timber.d("Shutting down Room Coroutine Scope and Channel: \n$roomScope\n$roomChannel")
         roomScope?.cancel()
         roomChannel?.close()

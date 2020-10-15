@@ -28,6 +28,7 @@ import io.uniflow.android.test.TestViewObserver
 import io.uniflow.android.test.createTestObserver
 import io.uniflow.test.rule.TestDispatchersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
@@ -229,6 +230,18 @@ class RoomViewModelTest {
             it.sid == PARTICIPANT_SID
         }
         assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
+    }
+
+    @Test
+    fun `OnCleared should shutdown the RoomManager`() {
+        connect()
+        assertThat(roomManager.roomChannel!!.isClosedForReceive, equalTo(false))
+        assertThat(roomManager.roomScope!!.isActive, equalTo(true))
+
+        viewModel.onCleared()
+
+        assertThat(roomManager.roomChannel, `is`(nullValue()))
+        assertThat(roomManager.roomScope, `is`(nullValue()))
     }
 
     private fun connect() =

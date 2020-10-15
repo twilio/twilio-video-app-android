@@ -1,6 +1,8 @@
 package com.twilio.video.app.ui.room
 
 import android.Manifest
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -71,9 +73,11 @@ class RoomViewModel(
         }
     }
 
-    override fun onCleared() {
+    @VisibleForTesting(otherwise = PROTECTED)
+    public override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()
+        roomManager.shutdownRoom()
     }
 
     @ExperimentalCoroutinesApi
