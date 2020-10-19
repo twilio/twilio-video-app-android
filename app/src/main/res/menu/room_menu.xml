@@ -19,14 +19,6 @@
           android:visible="false"
           app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/pause_audio_menu_item"
-          android:title="@string/pause_audio"
-          app:showAsAction="never"/>
-
-    <item android:id="@+id/pause_video_menu_item"
-          android:title="@string/pause_video"
-          app:showAsAction="never"/>
-
     <item android:id="@+id/settings_menu_item"
           android:title="@string/settings_title"
           android:enabled="true"
