@@ -19,17 +19,11 @@ import com.twilio.video.VideoTrack
 import com.twilio.video.app.sdk.VideoTrackViewState
 
 internal class PrimaryParticipantController(
-    /** Primary video track.  */
     private val primaryView: ParticipantPrimaryView
 ) {
-    /**
-     * Data container about primary participant - sid, identity, video track, audio state and
-     * mirroring state.
-     */
     private var primaryItem: Item? = null
 
     fun renderAsPrimary(
-        sid: String?,
         identity: String?,
         screenTrack: VideoTrackViewState?,
         videoTrack: VideoTrackViewState?,
@@ -39,7 +33,7 @@ internal class PrimaryParticipantController(
 
         val old = primaryItem
         val selectedTrack = screenTrack?.videoTrack ?: videoTrack?.videoTrack
-        val newItem = Item(sid, identity, selectedTrack, muted, mirror)
+        val newItem = Item(identity, selectedTrack, muted, mirror)
 
         // clean old primary video renderings
         old?.let { removeRender(it.videoTrack, primaryView) }
@@ -48,7 +42,7 @@ internal class PrimaryParticipantController(
         primaryView.setIdentity(newItem.identity)
         primaryView.showIdentityBadge(true)
         primaryView.setMuted(newItem.muted)
-        primaryView.setMirror(mirror)
+        primaryView.setMirror(newItem.mirror)
         newItem.videoTrack?.let { newVideoTrack ->
             newVideoTrack.addRenderer(primaryView)
             primaryView.setState(ParticipantView.State.VIDEO)
@@ -60,17 +54,10 @@ internal class PrimaryParticipantController(
         videoTrack.removeRenderer(view)
     }
 
-    /** RemoteParticipant information data holder.  */
     internal class Item(
-        /** RemoteParticipant unique identifier.  */
-        var sid: String?,
-        /** RemoteParticipant name.  */
         var identity: String?,
-        /** RemoteParticipant video track.  */
         var videoTrack: VideoTrack?,
-        /** RemoteParticipant audio state.  */
         var muted: Boolean,
-        /** Video track mirroring enabled/disabled.  */
         var mirror: Boolean
     )
 }

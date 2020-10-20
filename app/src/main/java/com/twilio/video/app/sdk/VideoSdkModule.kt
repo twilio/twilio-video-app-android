@@ -35,7 +35,8 @@ class VideoSdkModule {
     @ApplicationScope
     fun providesRoomManager(
         application: Application,
-        videoClient: VideoClient
+        videoClient: VideoClient,
+        sharedPreferences: SharedPreferences
     ): RoomManager =
-            RoomManager(application, videoClient)
+            RoomManager(application, videoClient, sharedPreferences)
 }

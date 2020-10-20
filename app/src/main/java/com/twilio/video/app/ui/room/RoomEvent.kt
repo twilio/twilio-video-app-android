@@ -20,20 +20,24 @@ sealed class RoomEvent {
     data class TokenError(val serviceError: AuthServiceError? = null) : RoomEvent()
     data class DominantSpeakerChanged(val newDominantSpeakerSid: String?) : RoomEvent()
 
-    sealed class ParticipantEvent : RoomEvent() {
+    sealed class RemoteParticipantEvent : RoomEvent() {
 
-        data class ParticipantConnected(val participant: Participant) : ParticipantEvent()
-        data class VideoTrackUpdated(val sid: String, val videoTrack: VideoTrack?) : ParticipantEvent()
-        data class TrackSwitchOff(val sid: String, val videoTrack: VideoTrack, val switchOff: Boolean) : ParticipantEvent()
+        data class RemoteParticipantConnected(val participant: Participant) : RemoteParticipantEvent()
+        data class VideoTrackUpdated(val sid: String, val videoTrack: VideoTrack?) : RemoteParticipantEvent()
+        data class TrackSwitchOff(val sid: String, val videoTrack: VideoTrack, val switchOff: Boolean) : RemoteParticipantEvent()
         data class ScreenTrackUpdated(
             val sid: String,
             val screenTrack: VideoTrack?
-        ) : ParticipantEvent()
-        data class MuteParticipant(val sid: String, val mute: Boolean) : ParticipantEvent()
+        ) : RemoteParticipantEvent()
+        data class MuteRemoteParticipant(val sid: String, val mute: Boolean) : RemoteParticipantEvent()
         data class NetworkQualityLevelChange(
             val sid: String,
             val networkQualityLevel: NetworkQualityLevel
-        ) : ParticipantEvent()
-        data class ParticipantDisconnected(val sid: String) : ParticipantEvent()
+        ) : RemoteParticipantEvent()
+        data class RemoteParticipantDisconnected(val sid: String) : RemoteParticipantEvent()
+    }
+
+    sealed class LocalParticipantEvent: RoomEvent() {
+        data class VideoTrackUpdated(val videoTrack: VideoTrack?): LocalParticipantEvent()
     }
 }

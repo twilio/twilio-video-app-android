@@ -8,8 +8,8 @@ import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.app.sdk.VideoTrackViewState
 
 data class ParticipantViewState(
-    val sid: String,
-    val identity: String,
+    val sid: String? = null,
+    val identity: String? = null,
     val videoTrack: VideoTrackViewState? = null,
     val screenTrack: VideoTrackViewState? = null,
     val isMuted: Boolean = false,

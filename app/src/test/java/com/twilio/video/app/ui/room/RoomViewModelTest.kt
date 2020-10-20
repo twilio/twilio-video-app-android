@@ -12,7 +12,7 @@ import com.twilio.video.app.sdk.VideoClient
 import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog

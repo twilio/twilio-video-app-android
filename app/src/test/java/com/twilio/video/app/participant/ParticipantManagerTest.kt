@@ -36,7 +36,7 @@ class ParticipantManagerTest {
 
         val thumbnails = participantManager.participantThumbnails
         assertThat(thumbnails.size, equalTo(3))
-        assertThat(thumbnails[1].sid, equalTo(dominantSpeaker.sid))
+        assertThat(thumbnails[1].sid, equalTo(dominantSpeaker.sid!!))
     }
 
     @Test
@@ -105,7 +105,7 @@ class ParticipantManagerTest {
     fun `primary participant VideoTrack priority should be high when pinned`() {
         val pinnedParticipant = setupThreeParticipantScenario()
 
-        participantManager.changePinnedParticipant(pinnedParticipant.sid)
+        participantManager.changePinnedParticipant(pinnedParticipant.sid!!)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
         verify(videoTrack).priority = HIGH
@@ -115,8 +115,8 @@ class ParticipantManagerTest {
     fun `primary participant VideoTrack priority should not be set when pinned with a null video track`() {
         val pinnedParticipant = setupThreeParticipantScenario()
 
-        participantManager.changePinnedParticipant(pinnedParticipant.sid)
-        participantManager.updateParticipantVideoTrack(pinnedParticipant.sid, null)
+        participantManager.changePinnedParticipant(pinnedParticipant.sid!!)
+        participantManager.updateParticipantVideoTrack(pinnedParticipant.sid!!, null)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack
         assertThat(videoTrack, `is`(nullValue()))
@@ -127,7 +127,7 @@ class ParticipantManagerTest {
         val screenTrack = mock<RemoteVideoTrack>()
         val screenSharingParticipant = setupThreeParticipantScenario()
 
-        participantManager.updateParticipantScreenTrack(screenSharingParticipant.sid,
+        participantManager.updateParticipantScreenTrack(screenSharingParticipant.sid!!,
                 VideoTrackViewState(videoTrack = screenTrack))
 
         verify(screenTrack).priority = HIGH
@@ -145,7 +145,7 @@ class ParticipantManagerTest {
         setupThreeParticipantScenario()
 
         val screenTrack = mock<VideoTrack>()
-        participantManager.updateParticipantScreenTrack(localParticipant.sid,
+        participantManager.updateParticipantScreenTrack(localParticipant.sid!!,
             VideoTrackViewState(screenTrack))
 
         verifyZeroInteractions(screenTrack)
@@ -155,7 +155,7 @@ class ParticipantManagerTest {
     fun `primary participant VideoTrack priority should not be set when the local participant is pinned`() {
         setupThreeParticipantScenario()
 
-        participantManager.changePinnedParticipant(localParticipant.sid)
+        participantManager.changePinnedParticipant(localParticipant.sid!!)
 
         verifyZeroInteractions(localParticipant.videoTrack!!.videoTrack)
     }
@@ -164,7 +164,7 @@ class ParticipantManagerTest {
     fun `primary participant VideoTrack priority should be null when dominant speaker is set`() {
         val dominantSpeaker = setupThreeParticipantScenario()
 
-        participantManager.changeDominantSpeaker(dominantSpeaker.sid)
+        participantManager.changeDominantSpeaker(dominantSpeaker.sid!!)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack!!.videoTrack as RemoteVideoTrack
         verify(videoTrack).priority = null
@@ -174,8 +174,8 @@ class ParticipantManagerTest {
     fun `primary participant VideoTrack priority should not be set when dominant speaker has a null video track`() {
         val dominantSpeaker = setupThreeParticipantScenario()
 
-        participantManager.changeDominantSpeaker(dominantSpeaker.sid)
-        participantManager.updateParticipantVideoTrack(dominantSpeaker.sid, null)
+        participantManager.changeDominantSpeaker(dominantSpeaker.sid!!)
+        participantManager.updateParticipantVideoTrack(dominantSpeaker.sid!!, null)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack
         assertThat(videoTrack, `is`(nullValue()))
@@ -199,7 +199,7 @@ class ParticipantManagerTest {
         participantManager.addParticipant(localParticipant)
         participantManager.addParticipant(participant2)
 
-        participantManager.updateParticipantVideoTrack(participant2.sid, null)
+        participantManager.updateParticipantVideoTrack(participant2.sid!!, null)
 
         val videoTrack = participantManager.primaryParticipant!!.videoTrack
         assertThat(videoTrack, `is`(nullValue()))
@@ -221,7 +221,7 @@ class ParticipantManagerTest {
     fun `the old primary participant VideoTrack priority should be reset to null when a new participant is assigned`() {
         val participant3 = setupThreeParticipantScenario()
 
-        participantManager.changePinnedParticipant(participant3.sid)
+        participantManager.changePinnedParticipant(participant3.sid!!)
         participantManager.changePinnedParticipant("2")
 
         val videoTrack = participant3.videoTrack!!.videoTrack as RemoteVideoTrack
@@ -236,7 +236,7 @@ class ParticipantManagerTest {
         val participant3 = setupThreeParticipantScenario()
         val screenTrack = mock<RemoteVideoTrack>()
 
-        participantManager.updateParticipantScreenTrack(participant3.sid,
+        participantManager.updateParticipantScreenTrack(participant3.sid!!,
                 VideoTrackViewState(screenTrack))
         participantManager.changePinnedParticipant("2")
 
@@ -250,8 +250,8 @@ class ParticipantManagerTest {
     fun `the old primary participant VideoTrack priority should be reset to null when the local participant is assigned`() {
         val participant3 = setupThreeParticipantScenario()
 
-        participantManager.changePinnedParticipant(participant3.sid)
-        participantManager.changePinnedParticipant(localParticipant.sid)
+        participantManager.changePinnedParticipant(participant3.sid!!)
+        participantManager.changePinnedParticipant(localParticipant.sid!!)
 
         val videoTrack = participant3.videoTrack!!.videoTrack as RemoteVideoTrack
         inOrder(videoTrack).run {
@@ -267,7 +267,7 @@ class ParticipantManagerTest {
 
         participantManager.updateParticipantScreenTrack("3",
                 VideoTrackViewState(screenTrack))
-        participantManager.changePinnedParticipant(localParticipant.sid)
+        participantManager.changePinnedParticipant(localParticipant.sid!!)
 
         inOrder(screenTrack).run {
             verify(screenTrack).priority = HIGH
@@ -289,7 +289,7 @@ class ParticipantManagerTest {
             videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
         val participant3 = ParticipantViewState("3", "Participant 3",
             videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
-        participantManager.addParticipant(localParticipant)
+        participantManager.updateLocalParticipant(localParticipant)
         participantManager.addParticipant(participant2)
         participantManager.addParticipant(participant3)
         return participant3

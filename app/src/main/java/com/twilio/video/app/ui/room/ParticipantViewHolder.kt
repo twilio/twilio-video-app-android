@@ -25,8 +25,10 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         Timber.d("thumb: %s", thumb)
 
         thumb.run {
-            setOnClickListener {
-                viewEventAction(PinParticipant(participantViewState.sid))
+            participantViewState.sid?.let { sid ->
+                setOnClickListener {
+                    viewEventAction(PinParticipant(sid))
+                }
             }
             setIdentity(participantViewState.identity)
             setMuted(participantViewState.isMuted)

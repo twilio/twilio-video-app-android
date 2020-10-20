@@ -4,6 +4,8 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.video.app.sdk.VideoTrackViewState
 
 sealed class RoomViewEvent {
+    object OnResume: RoomViewEvent()
+    object OnPause: RoomViewEvent()
     object RefreshViewState : RoomViewEvent()
     object CheckPermissions : RoomViewEvent()
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()

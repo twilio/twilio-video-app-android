@@ -55,6 +55,7 @@ import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.AudioSwitch
+import com.twilio.video.CameraCapturer
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
@@ -72,6 +73,8 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
+import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
+import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
@@ -83,7 +86,8 @@ import io.uniflow.androidx.flow.onStates
 import timber.log.Timber
 import javax.inject.Inject
 
-class RoomActivity : BaseActivity() {
+class
+RoomActivity : BaseActivity() {
     @BindView(R.id.toolbar)
     lateinit var toolbar: Toolbar
 
@@ -145,7 +149,6 @@ class RoomActivity : BaseActivity() {
     private var displayName: String? = null
     private var localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
     private lateinit var statsListAdapter: StatsListAdapter
-    private val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     @Inject
     lateinit var tokenService: TokenService
@@ -202,15 +205,18 @@ class RoomActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         checkIntentURI()
-        roomViewModel.processInput(RefreshViewState)
-        roomViewModel.processInput(CheckPermissions)
-        // TODO Update stats
     }
 
     override fun onResume() {
         super.onResume()
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
         setTitle(displayName)
+        roomViewModel.processInput(OnResume)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        roomViewModel.processInput(OnPause)
     }
 
     private fun checkIntentURI(): Boolean {
@@ -382,20 +388,6 @@ class RoomActivity : BaseActivity() {
         return (resultCamera == PackageManager.PERMISSION_GRANTED &&
                 resultMic == PackageManager.PERMISSION_GRANTED &&
                 resultStorage == PackageManager.PERMISSION_GRANTED)
-    }
-
-    private fun renderLocalParticipant() {
-//        val cameraTrackViewState = cameraVideoTrack?.let { VideoTrackViewState(it, false) }
-//        cameraCapturer?.let { cameraCapturer ->
-//            primaryParticipantController.renderAsPrimary(
-//                    localParticipantSid,
-//                    getString(R.string.you),
-//                    null,
-//                    cameraTrackViewState,
-//                    localAudioTrack == null,
-//                    cameraCapturer.cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA)
-//        }
-        primaryVideoView.showIdentityBadge(false)
     }
 
     private fun updateLayout(roomViewState: RoomViewState) {
@@ -585,22 +577,21 @@ class RoomActivity : BaseActivity() {
         this.deviceMenuItem.setIcon(audioDeviceMenuIcon)
     }
 
-    private fun renderPrimaryView(primaryParticipant: ParticipantViewState?) {
-        if (primaryParticipant != null) {
+    private fun renderPrimaryView(primaryParticipant: ParticipantViewState) {
+        primaryParticipant.run {
             primaryParticipantController.renderAsPrimary(
-                    primaryParticipant.sid,
-                    primaryParticipant.identity,
-                    primaryParticipant.screenTrack,
-                    primaryParticipant.videoTrack,
-                    primaryParticipant.isMuted,
-                    primaryParticipant.isMirrored)
-        } else {
-            renderLocalParticipant()
+                    if(isLocalParticipant) identity else getString(R.string.you),
+                    screenTrack,
+                    videoTrack,
+                    isMuted,
+                    isMirrored)
+            primaryVideoView.showIdentityBadge(!primaryParticipant.isLocalParticipant)
         }
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        participantAdapter.submitList(roomViewState.participantThumbnails)
+        if(roomViewState.isConnectedLayoutVisible)
+            participantAdapter.submitList(roomViewState.participantThumbnails)
     }
 
     private fun displayAudioDeviceList() {
