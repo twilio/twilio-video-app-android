@@ -94,9 +94,8 @@ class RoomViewModel(
         Timber.d("View Event: $viewEvent")
 
         when (viewEvent) {
-            is RefreshViewState -> actionOn<RoomViewState> { currentState ->
-                setState { currentState }
-            }
+            SetupLocalMedia -> { roomManager.onResume() }
+            is RefreshViewState -> setState { it }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioSwitch.selectDevice(viewEvent.device)
@@ -131,10 +130,8 @@ class RoomViewModel(
         val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
         val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
 
-        actionOn<RoomViewState> { currentState ->
-            setState {
-                currentState.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
-            }
+        setState {
+            it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
         }
         if (isCameraEnabled && isMicEnabled) action { sendEvent { CheckLocalMedia } }
     }
@@ -152,11 +149,7 @@ class RoomViewModel(
             }
             is Disconnected -> {
                 showLobbyViewState()
-                actionOn<RoomViewState> { currentState ->
-                    setState {
-                        currentState.copy(participantThumbnails = null, primaryParticipant = null)
-                    }
-                }
+                setState { it.copy(participantThumbnails = null, primaryParticipant = null) }
             }
             is DominantSpeakerChanged -> {
                 participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
@@ -180,41 +173,48 @@ class RoomViewModel(
                     ShowTokenErrorDialog(roomEvent.serviceError)
                 }
             }
-            is ParticipantEvent -> handleParticipantEvent(roomEvent)
+            is RemoteParticipantEvent -> handleParticipantEvent(roomEvent)
+            is LocalParticipantEvent.VideoTrackUpdated -> {
+                setState {
+                    it.copy(localVideoTrack = roomEvent.videoTrack?.let { videoTrack ->
+                        VideoTrackViewState(videoTrack)
+                    })
+                }
+            }
         }
     }
 
-    private fun handleParticipantEvent(participantEvent: ParticipantEvent) {
-        when (participantEvent) {
-            is ParticipantConnected -> addParticipant(participantEvent.participant)
+    private fun handleParticipantEvent(remoteParticipantEvent: RemoteParticipantEvent) {
+        when (remoteParticipantEvent) {
+            is RemoteParticipantConnected -> addParticipant(remoteParticipantEvent.participant)
             is VideoTrackUpdated -> {
-                participantManager.updateParticipantVideoTrack(participantEvent.sid,
-                        participantEvent.videoTrack?.let { VideoTrackViewState(it) })
+                participantManager.updateParticipantVideoTrack(remoteParticipantEvent.sid,
+                        remoteParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
             }
             is TrackSwitchOff -> {
-                participantManager.updateParticipantVideoTrack(participantEvent.sid,
-                        VideoTrackViewState(participantEvent.videoTrack,
-                                participantEvent.switchOff))
+                participantManager.updateParticipantVideoTrack(remoteParticipantEvent.sid,
+                        VideoTrackViewState(remoteParticipantEvent.videoTrack,
+                                remoteParticipantEvent.switchOff))
                 updateParticipantViewState()
             }
             is ScreenTrackUpdated -> {
-                participantManager.updateParticipantScreenTrack(participantEvent.sid,
-                        participantEvent.screenTrack?.let { VideoTrackViewState(it) })
+                participantManager.updateParticipantScreenTrack(remoteParticipantEvent.sid,
+                        remoteParticipantEvent.screenTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
             }
-            is MuteParticipant -> {
-                participantManager.muteParticipant(participantEvent.sid,
-                        participantEvent.mute)
+            is MuteRemoteParticipant -> {
+                participantManager.muteParticipant(remoteParticipantEvent.sid,
+                        remoteParticipantEvent.mute)
                 updateParticipantViewState()
             }
             is NetworkQualityLevelChange -> {
-                participantManager.updateNetworkQuality(participantEvent.sid,
-                        participantEvent.networkQualityLevel)
+                participantManager.updateNetworkQuality(remoteParticipantEvent.sid,
+                        remoteParticipantEvent.networkQualityLevel)
                 updateParticipantViewState()
             }
-            is ParticipantDisconnected -> {
-                participantManager.removeParticipant(participantEvent.sid)
+            is RemoteParticipantDisconnected -> {
+                participantManager.removeParticipant(remoteParticipantEvent.sid)
                 updateParticipantViewState()
             }
         }
@@ -228,38 +228,32 @@ class RoomViewModel(
 
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
-        actionOn<RoomViewState> { currentState ->
-            setState {
-                currentState.copy(
-                        isLobbyLayoutVisible = true,
-                        isConnectingLayoutVisible = false,
-                        isConnectedLayoutVisible = false)
-            }
+        setState {
+            it.copy(
+                isLobbyLayoutVisible = true,
+                isConnectingLayoutVisible = false,
+                isConnectedLayoutVisible = false)
         }
         participantManager.clearParticipants()
     }
 
     private fun showConnectingViewState() {
         action { sendEvent { RoomViewEffect.Connecting } }
-        actionOn<RoomViewState> { currentState ->
-            setState {
-                currentState.copy(
-                    isLobbyLayoutVisible = false,
-                    isConnectingLayoutVisible = true,
-                    isConnectedLayoutVisible = false)
-            }
+        setState {
+           it.copy(
+            isLobbyLayoutVisible = false,
+            isConnectingLayoutVisible = true,
+            isConnectedLayoutVisible = false)
         }
     }
 
     private fun showConnectedViewState(roomName: String) {
-            actionOn<RoomViewState> { currentState ->
-                setState {
-                    currentState.copy(
-                        title = roomName,
-                        isLobbyLayoutVisible = false,
-                        isConnectingLayoutVisible = false,
-                        isConnectedLayoutVisible = true)
-                }
+        setState {
+            it.copy(
+                    title = roomName,
+                    isLobbyLayoutVisible = false,
+                    isConnectingLayoutVisible = false,
+                    isConnectedLayoutVisible = true)
         }
     }
 
@@ -274,13 +268,11 @@ class RoomViewModel(
     }
 
     private fun updateParticipantViewState() {
-        actionOn<RoomViewState> { currentState ->
-            setState {
-                currentState.copy(
-                        participantThumbnails = participantManager.participantThumbnails,
-                        primaryParticipant = participantManager.primaryParticipant
-                )
-            }
+        setState {
+            it.copy(
+                    participantThumbnails = participantManager.participantThumbnails,
+                    primaryParticipant = participantManager.primaryParticipant
+            )
         }
     }
 
@@ -290,6 +282,9 @@ class RoomViewModel(
                     identity,
                     roomName)
         }
+
+    private fun setState(action: (currentState: RoomViewState) -> UIState) =
+        actionOn<RoomViewState> { currentState -> setState { action(currentState) } }
 
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
