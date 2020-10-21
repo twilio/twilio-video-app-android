@@ -14,8 +14,6 @@ import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOff
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOn
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
@@ -39,6 +37,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
@@ -111,9 +110,8 @@ class RoomViewModel(
                 participantManager.changePinnedParticipant(viewEvent.sid)
                 updateParticipantViewState()
             }
-            is ToggleLocalVideo -> {
-                roomManager.toggleLocalVideo()
-            }
+            ToggleLocalVideo -> roomManager.toggleLocalVideo()
+            ToggleLocalAudio -> roomManager.toggleLocalAudio()
             is VideoTrackRemoved -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
                 updateParticipantViewState()
@@ -218,9 +216,10 @@ class RoomViewModel(
                 participantManager.updateLocalParticipantVideoTrack(
                         localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
+                setState { it.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
             }
-            VideoToggledOn -> { setState { it.copy(isVideoOff = false) } }
-            VideoToggledOff -> { setState { it.copy(isVideoOff = true) } }
+            LocalParticipantEvent.AudioOn -> setState { it.copy(isAudioMuted = false) }
+            LocalParticipantEvent.AudioOff -> setState { it.copy(isAudioMuted = true) }
         }
     }
 

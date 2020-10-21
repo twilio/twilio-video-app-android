@@ -8,6 +8,7 @@ sealed class RoomViewEvent {
     object OnPause: RoomViewEvent()
     object CheckPermissions : RoomViewEvent()
     object ToggleLocalVideo : RoomViewEvent()
+    object ToggleLocalAudio : RoomViewEvent()
     data class SelectAudioDevice(val device: AudioDevice) : RoomViewEvent()
     object ActivateAudioDevice : RoomViewEvent()
     object DeactivateAudioDevice : RoomViewEvent()

@@ -11,8 +11,9 @@ import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.ASPECT_RATIO
 import com.twilio.video.app.data.Preferences.ASPECT_RATIOS
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOff
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOn
+import com.twilio.video.app.ui.room.RoomEvent
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import timber.log.Timber
@@ -25,6 +26,10 @@ class LocalParticipantManager(
 ) {
 
     private var localAudioTrack: LocalAudioTrack? = null
+        set(value) {
+            field = value
+            roomManager.sendRoomEvent(if(value == null) AudioOff else AudioOn)
+        }
     internal var localParticipant: LocalParticipant? = null
     private var cameraVideoTrack: LocalVideoTrack? = null
         set(value) {
@@ -59,10 +64,6 @@ class LocalParticipantManager(
 //    }
     private var isAudioMuted = false
     private var isVideoMuted = false
-        set(value) {
-            field = value
-            roomManager.sendRoomEvent(if(value) VideoToggledOff else VideoToggledOn)
-        }
 
     fun onResume() {
         // TODO Check media permission before loading
@@ -75,12 +76,22 @@ class LocalParticipantManager(
     }
 
     fun toggleLocalVideo() {
-        isVideoMuted = if (!isVideoMuted) {
+        if (!isVideoMuted) {
+            isVideoMuted = true
             removeCameraTrack()
-            true
         } else {
+            isVideoMuted = false
             setupLocalVideoTrack()
-            false
+        }
+    }
+
+    fun toggleLocalAudio() {
+         if (!isAudioMuted) {
+             isAudioMuted = true
+             removeAudioTrack()
+        } else {
+             isAudioMuted = false
+             setupLocalAudioTrack()
         }
     }
 
@@ -108,6 +119,12 @@ class LocalParticipantManager(
             localAudioTrack?.let { localParticipant?.publishTrack(it) }
         }
     }
+
+    private fun unpublishTrack(localVideoTrack: LocalVideoTrack?) =
+            localVideoTrack?.let { localParticipant?.unpublishTrack(it) }
+
+    private fun unpublishTrack(localAudioTrack: LocalAudioTrack?) =
+            localAudioTrack?.let { localParticipant?.unpublishTrack(it) }
 
     private fun setupLocalVideoTrack() {
         cameraVideoTrack = LocalVideoTrack.create(
@@ -163,12 +180,18 @@ class LocalParticipantManager(
 
     private fun removeCameraTrack() {
         cameraVideoTrack?.let { cameraVideoTrack ->
-            localParticipant?.let { localParticipant ->
-                localParticipant.unpublishTrack(cameraVideoTrack)
-            }
+            unpublishTrack(cameraVideoTrack)
             localVideoTrackNames.remove(cameraVideoTrack.name)
             cameraVideoTrack.release()
             this.cameraVideoTrack = null
+        }
+    }
+
+    private fun removeAudioTrack() {
+        localAudioTrack?.let { localAudioTrack ->
+            unpublishTrack(localAudioTrack)
+            localAudioTrack.release()
+            this.localAudioTrack = null
         }
     }
 

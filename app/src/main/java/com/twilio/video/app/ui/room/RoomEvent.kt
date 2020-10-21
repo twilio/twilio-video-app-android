@@ -39,7 +39,7 @@ sealed class RoomEvent {
 
     sealed class LocalParticipantEvent: RoomEvent() {
         data class VideoTrackUpdated(val videoTrack: VideoTrack?): LocalParticipantEvent()
-        object VideoToggledOn: LocalParticipantEvent()
-        object VideoToggledOff: LocalParticipantEvent()
+        object AudioOn: LocalParticipantEvent()
+        object AudioOff: LocalParticipantEvent()
     }
 }

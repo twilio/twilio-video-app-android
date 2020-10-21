@@ -75,6 +75,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
 import com.twilio.video.app.ui.settings.SettingsActivity
@@ -353,14 +354,14 @@ RoomActivity : BaseActivity() {
         // TODO Handle screen share
     }
 
-    @OnClick(R.id.local_audio_image_button)
-    fun toggleLocalAudio() {
-        // TODO Toggle local audio
-    }
-
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
         roomViewModel.processInput(ToggleLocalVideo)
+    }
+
+    @OnClick(R.id.local_audio_image_button)
+    fun toggleLocalAudio() {
+        roomViewModel.processInput(ToggleLocalAudio)
     }
 
     private fun requestPermissions() {
