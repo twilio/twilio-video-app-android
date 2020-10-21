@@ -23,18 +23,7 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
         roomManager.sendRoomEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
     }
 
-    override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {
-        Timber.i("New LocalParticipant VideoTrack published for LocalParticipant sid: %s, LocalVideoTrack: %s",
-                localParticipant.sid, localVideoTrackPublication.localVideoTrack)
-
-        if (localVideoTrackPublication.videoTrack.name.contains(SCREEN_TRACK_NAME)) {
-            roomManager.sendRoomEvent(ScreenTrackUpdated(localParticipant.sid,
-                    localVideoTrackPublication.videoTrack))
-        } else {
-            roomManager.sendRoomEvent(VideoTrackUpdated(localParticipant.sid,
-                    localVideoTrackPublication.videoTrack))
-        }
-    }
+    override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {}
 
     override fun onVideoTrackPublicationFailed(localParticipant: LocalParticipant, localVideoTrack: LocalVideoTrack, twilioException: TwilioException) {}
 
