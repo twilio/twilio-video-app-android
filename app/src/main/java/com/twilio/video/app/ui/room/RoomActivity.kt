@@ -581,7 +581,7 @@ RoomActivity : BaseActivity() {
     private fun renderPrimaryView(primaryParticipant: ParticipantViewState) {
         primaryParticipant.run {
             primaryParticipantController.renderAsPrimary(
-                    if(isLocalParticipant) identity else getString(R.string.you),
+                    if(isLocalParticipant) getString(R.string.you) else identity,
                     screenTrack,
                     videoTrack,
                     isMuted,

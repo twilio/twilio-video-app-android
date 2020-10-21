@@ -195,14 +195,6 @@ class LocalParticipantManager(
         }
     }
 
-    // TODO Publish local tracks
-
-    // TODO Save audio muted state upon config changes
-
-    // TODO Teardown all tracks - i.e. call release and set to null
-
-    // TODO Remove camera track when activity is in background
-
     // TODO Switch camera
 
     // TODO Handle screen share
@@ -210,85 +202,6 @@ class LocalParticipantManager(
      * screenCapturer = ScreenCapturer(this, resultCode, data, screenCapturerListener)
      * startScreenCapture()
      */
-
-    // TODO Toggle local audio
-    /*
-     *         if (localAudioTrack == null) {
-            isAudioMuted = false
-            LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME)?.let { localAudioTrack ->
-                this.localAudioTrack = localAudioTrack
-                localParticipant?.publishTrack(localAudioTrack)
-            }
-            icon = R.drawable.ic_mic_white_24px
-            pauseAudioMenuItem.isVisible = true
-            pauseAudioMenuItem.setTitle(
-                    if (localAudioTrack?.isEnabled == true) R.string.pause_audio else R.string.resume_audio)
-        } else {
-            isAudioMuted = true
-
-            localAudioTrack?.let { localAudioTrack ->
-                localParticipant?.unpublishTrack(localAudioTrack)
-                localAudioTrack.release()
-                this.localAudioTrack = null
-            }
-            icon = R.drawable.ic_mic_off_gray_24px
-            pauseAudioMenuItem.isVisible = false
-        }
-     */
-
-    // TODO Toggle local video
-    /*
-     *        var newLocalVideoTrack: LocalVideoTrack? = null
-        if (cameraVideoTrack == null) {
-            isVideoMuted = false
-
-            // add local camera track
-            cameraCapturer?.let {
-                cameraVideoTrack = LocalVideoTrack.create(
-                        this,
-                        true,
-                        it.videoCapturer,
-                        videoConstraints,
-                        CAMERA_TRACK_NAME)
-                newLocalVideoTrack = cameraVideoTrack
-            }
-            if (localParticipant != null) {
-                cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
-
-                // enable video settings
-                val isCameraVideoTrackEnabled = cameraVideoTrack?.isEnabled == true
-                switchCameraMenuItem.isVisible = isCameraVideoTrackEnabled
-                pauseVideoMenuItem.setTitle(
-                        if (isCameraVideoTrackEnabled) R.string.pause_video else R.string.resume_video)
-                pauseVideoMenuItem.isVisible = true
-            }
-        } else {
-            isVideoMuted = true
-            // remove local camera track
-            cameraVideoTrack?.let { cameraVideoTrack ->
-                cameraVideoTrack.removeRenderer(primaryVideoView)
-                localParticipant?.unpublishTrack(cameraVideoTrack)
-                cameraVideoTrack.release()
-                this.cameraVideoTrack = null
-            }
-
-            // disable video settings
-            switchCameraMenuItem.isVisible = false
-            pauseVideoMenuItem.isVisible = false
-        }
-
-        // update toggle button icon
-        localVideoImageButton.setImageResource(
-                if (cameraVideoTrack != null) R.drawable.ic_videocam_white_24px else R.drawable.ic_videocam_off_gray_24px)
-
-        // Refresh view state
-        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid,
-                (newLocalVideoTrack as VideoTrack?)?.let { VideoTrackViewState(it) }))
-        }
-                ?: roomViewModel.processInput(RefreshViewState)
-     */
-
-    // TODO Publish local tracks after connected to room
 
 //
 //
