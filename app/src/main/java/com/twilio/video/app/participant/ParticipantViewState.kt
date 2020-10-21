@@ -38,16 +38,3 @@ fun buildParticipantViewState(participant: Participant): ParticipantViewState {
             isMuted = participant.audioTracks.firstOrNull() == null
     )
 }
-
-fun buildLocalParticipantViewState(
-    localParticipant: Participant,
-    identity: String,
-    videoTrack: LocalVideoTrack? = null
-) =
-        ParticipantViewState(
-                localParticipant.sid,
-                identity,
-                videoTrack?.let { VideoTrackViewState(it) },
-                isLocalParticipant = true,
-                networkQualityLevel = localParticipant.networkQualityLevel
-        )

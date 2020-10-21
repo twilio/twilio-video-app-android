@@ -114,6 +114,7 @@ class ParticipantManager {
         mutableParticipants.forEach {
             if (!it.isLocalParticipant) mutableParticipants.remove(it)
         }
+        updatePrimaryParticipant()
     }
 
     private fun updatePrimaryParticipant() {

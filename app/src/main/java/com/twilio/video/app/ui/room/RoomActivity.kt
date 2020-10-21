@@ -590,8 +590,9 @@ RoomActivity : BaseActivity() {
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        if(roomViewState.isConnectedLayoutVisible)
-            participantAdapter.submitList(roomViewState.participantThumbnails)
+        val newThumbnails =
+                if (roomViewState.isConnectedLayoutVisible) roomViewState.participantThumbnails else null
+        participantAdapter.submitList(newThumbnails)
     }
 
     private fun displayAudioDeviceList() {

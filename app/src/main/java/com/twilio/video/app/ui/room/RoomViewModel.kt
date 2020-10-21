@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
-import com.twilio.video.app.participant.buildLocalParticipantViewState
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoTrackViewState
@@ -149,10 +148,7 @@ class RoomViewModel(
                 checkParticipants(roomEvent.participants)
                 action { sendEvent { RoomViewEffect.Connected(roomEvent.room) } }
             }
-            is Disconnected -> {
-                showLobbyViewState()
-                setState { it.copy(participantThumbnails = null) }
-            }
+            is Disconnected -> showLobbyViewState()
             is DominantSpeakerChanged -> {
                 participantManager.changeDominantSpeaker(roomEvent.newDominantSpeakerSid)
                 updateParticipantViewState()
@@ -243,6 +239,7 @@ class RoomViewModel(
                 isConnectedLayoutVisible = false)
         }
         participantManager.clearRemoteParticipants()
+        updateParticipantViewState()
     }
 
     private fun showConnectingViewState() {
@@ -267,10 +264,9 @@ class RoomViewModel(
 
     private fun checkParticipants(participants: List<Participant>) {
         for ((index, participant) in participants.withIndex()) {
-            val participantViewState = if (index == 0) {
-                buildLocalParticipantViewState(participant, participant.identity)
-            } else buildParticipantViewState(participant)
-            participantManager.addParticipant(participantViewState)
+            if(index > 0) { // Skip local participant
+                participantManager.addParticipant(buildParticipantViewState(participant))
+            }
         }
         updateParticipantViewState()
     }

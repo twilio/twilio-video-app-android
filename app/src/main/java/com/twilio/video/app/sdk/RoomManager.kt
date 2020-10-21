@@ -95,6 +95,8 @@ class RoomManager(
             stopService(context)
 
             roomEventSubject.onNext(Disconnected)
+
+            localParticipantManager.localParticipant = null
         }
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {
@@ -148,6 +150,7 @@ class RoomManager(
 
         private fun setupParticipants(room: Room) {
             room.localParticipant?.let { localParticipant ->
+                localParticipantManager.localParticipant = localParticipant
                 val participants = mutableListOf<Participant>()
                 participants.add(localParticipant)
                 localParticipant.setListener(LocalParticipantListener(this@RoomManager))
@@ -158,6 +161,7 @@ class RoomManager(
                 }
 
                 roomEventSubject.onNext(Connected(participants, room, room.name))
+                localParticipantManager.publishLocalTracks()
             }
         }
     }
