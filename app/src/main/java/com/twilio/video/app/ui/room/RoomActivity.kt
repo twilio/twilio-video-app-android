@@ -55,7 +55,6 @@ import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.AudioSwitch
-import com.twilio.video.CameraCapturer
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
@@ -75,8 +74,8 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
-import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.InputUtils
@@ -361,7 +360,7 @@ RoomActivity : BaseActivity() {
 
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
-        // TODO Toggle local video
+        roomViewModel.processInput(ToggleLocalVideo)
     }
 
     private fun requestPermissions() {
@@ -430,13 +429,14 @@ RoomActivity : BaseActivity() {
             connectButtonEnabled = isRoomTextNotEmpty
             screenCaptureMenuItemState = false
         }
-        val isMicEnabled = roomViewState.isMicEnabled
-        val isCameraEnabled = roomViewState.isCameraEnabled
-        val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
+        // TODO Disable local media if permission check fails on either mic or camera
+//        val isMicEnabled = roomViewState.isMicEnabled
+//        val isCameraEnabled = roomViewState.isCameraEnabled
+        val isLocalMediaEnabled = true
         localAudioImageButton.isEnabled = isLocalMediaEnabled
         localVideoImageButton.isEnabled = isLocalMediaEnabled
         val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
-        val videoDrawable = if (roomViewState.isVideoMuted || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
+        val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
         localAudioImageButton.setImageResource(micDrawable)
         localVideoImageButton.setImageResource(videoDrawable)
         statsListAdapter = StatsListAdapter(this)

@@ -74,6 +74,10 @@ class RoomManager(
         localParticipantManager.onPause()
     }
 
+    fun toggleLocalVideo() {
+        localParticipantManager.toggleLocalVideo()
+    }
+
     inner class RoomListener : Room.Listener {
         override fun onConnected(room: Room) {
             Timber.i("onConnected -> room sid: %s",

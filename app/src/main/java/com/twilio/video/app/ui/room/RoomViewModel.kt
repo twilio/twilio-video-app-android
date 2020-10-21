@@ -1,6 +1,5 @@
 package com.twilio.video.app.ui.room
 
-import android.Manifest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.twilio.audioswitch.AudioSwitch
@@ -16,6 +15,8 @@ import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOn
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
@@ -36,7 +37,6 @@ import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
-import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
@@ -99,7 +99,6 @@ class RoomViewModel(
         when (viewEvent) {
             OnResume -> { roomManager.onResume() }
             OnPause -> { roomManager.onPause() }
-            is RefreshViewState -> setState { it }
             is CheckPermissions -> checkLocalMedia()
             is SelectAudioDevice -> {
                 audioSwitch.selectDevice(viewEvent.device)
@@ -114,9 +113,7 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
             is ToggleLocalVideo -> {
-                participantManager.updateParticipantVideoTrack(viewEvent.sid,
-                        viewEvent.videoTrackViewState)
-                updateParticipantViewState()
+                roomManager.toggleLocalVideo()
             }
             is VideoTrackRemoved -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
@@ -178,16 +175,12 @@ class RoomViewModel(
                     ShowTokenErrorDialog(roomEvent.serviceError)
                 }
             }
-            is RemoteParticipantEvent -> handleParticipantEvent(roomEvent)
-            is LocalParticipantEvent.VideoTrackUpdated -> {
-                participantManager.updateLocalParticipantVideoTrack(
-                        roomEvent.videoTrack?.let { VideoTrackViewState(it) })
-                updateParticipantViewState()
-            }
+            is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
+            is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
         }
     }
 
-    private fun handleParticipantEvent(remoteParticipantEvent: RemoteParticipantEvent) {
+    private fun handleRemoteParticipantEvent(remoteParticipantEvent: RemoteParticipantEvent) {
         when (remoteParticipantEvent) {
             is RemoteParticipantConnected -> addParticipant(remoteParticipantEvent.participant)
             is VideoTrackUpdated -> {
@@ -220,6 +213,18 @@ class RoomViewModel(
                 participantManager.removeParticipant(remoteParticipantEvent.sid)
                 updateParticipantViewState()
             }
+        }
+    }
+
+    private fun handleLocalParticipantEvent(localParticipantEvent: LocalParticipantEvent) {
+        when(localParticipantEvent) {
+            is LocalParticipantEvent.VideoTrackUpdated -> {
+                participantManager.updateLocalParticipantVideoTrack(
+                        localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
+                updateParticipantViewState()
+            }
+            VideoToggledOn -> { setState { it.copy(isVideoOff = false) } }
+            VideoToggledOff -> { setState { it.copy(isVideoOff = true) } }
         }
     }
 

@@ -11,6 +11,9 @@ import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.ASPECT_RATIO
 import com.twilio.video.app.data.Preferences.ASPECT_RATIOS
+import com.twilio.video.app.ui.room.RoomEvent
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoToggledOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import timber.log.Timber
@@ -57,16 +60,30 @@ class LocalParticipantManager(
 //    }
     private var isAudioMuted = false
     private var isVideoMuted = false
+        set(value) {
+            field = value
+            roomManager.sendRoomEvent(if(value) VideoToggledOff else VideoToggledOn)
+        }
 
     fun onResume() {
         // TODO Check media permission before loading
-        setupLocalAudioTrack()
-        setupLocalVideoTrack()
+        if(!isAudioMuted) setupLocalAudioTrack()
+        if (!isVideoMuted) setupLocalVideoTrack()
         publishMediaTracks()
     }
 
     fun onPause() {
         removeCameraTrack()
+    }
+
+    fun toggleLocalVideo() {
+        isVideoMuted = if (!isVideoMuted) {
+            removeCameraTrack()
+            true
+        } else {
+            setupLocalVideoTrack()
+            false
+        }
     }
 
     private fun setupLocalAudioTrack() {
@@ -79,18 +96,16 @@ class LocalParticipantManager(
     }
 
     private fun setupLocalVideoTrack() {
-        if (!isVideoMuted) {
-            cameraVideoTrack = LocalVideoTrack.create(
-                    context,
-                    true,
-                    cameraCapturer.videoCapturer,
-                    videoConstraints,
-                    CAMERA_TRACK_NAME)
-            cameraVideoTrack?.let {
-                localVideoTrackNames[it.name] = context.getString(R.string.camera_video_track)
-            } ?: run {
-                Timber.e(RuntimeException(), "Failed to create local camera video track")
-            }
+        cameraVideoTrack = LocalVideoTrack.create(
+                context,
+                true,
+                cameraCapturer.videoCapturer,
+                videoConstraints,
+                CAMERA_TRACK_NAME)
+        cameraVideoTrack?.let {
+            localVideoTrackNames[it.name] = context.getString(R.string.camera_video_track)
+        } ?: run {
+            Timber.e(RuntimeException(), "Failed to create local camera video track")
         }
     }
 
@@ -143,6 +158,7 @@ class LocalParticipantManager(
             localParticipant?.let { localParticipant ->
                 localParticipant.unpublishTrack(cameraVideoTrack)
             }
+            localVideoTrackNames.remove(cameraVideoTrack.name)
             cameraVideoTrack.release()
             this.cameraVideoTrack = null
         }
