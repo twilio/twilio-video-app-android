@@ -515,10 +515,6 @@ RoomActivity : BaseActivity() {
 //        }
     }
 
-    private fun initializeRoom() {
-        // TODO Publish local tracks and stats after connected to room
-    }
-
     private fun toggleAudioDevice(enableAudioDevice: Boolean) {
         setVolumeControl(enableAudioDevice)
         val viewEvent = if (enableAudioDevice) ActivateAudioDevice else RoomViewEvent.DeactivateAudioDevice
@@ -538,7 +534,6 @@ RoomActivity : BaseActivity() {
         when (roomViewEffect) {
             is Connected -> {
                 toggleAudioDevice(true)
-                initializeRoom()
             }
             Disconnected -> {
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
