@@ -6,14 +6,15 @@ import android.content.SharedPreferences
 import com.twilio.video.CameraCapturer
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
+import com.twilio.video.LocalTrackPublicationOptions
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.ScreenCapturer
+import com.twilio.video.TrackPriority
 import com.twilio.video.VideoConstraints
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.ASPECT_RATIO
 import com.twilio.video.app.data.Preferences.ASPECT_RATIOS
-import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
@@ -103,7 +104,8 @@ class LocalParticipantManager(
             screenVideoTrack?.let { screenVideoTrack ->
                 localVideoTrackNames[screenVideoTrack.name] =
                         context.getString(R.string.screen_video_track)
-                localParticipant?.publishTrack(screenVideoTrack)
+                localParticipant?.publishTrack(screenVideoTrack,
+                        LocalTrackPublicationOptions(TrackPriority.HIGH))
             } ?: Timber.e(RuntimeException(), "Failed to add screen video track")
         }
     }
@@ -118,25 +120,27 @@ class LocalParticipantManager(
     }
 
     fun publishLocalTracks() {
-        publishTrack(localAudioTrack)
-        publishTrack(cameraVideoTrack)
+        publishAudioTrack(localAudioTrack)
+        publishCameraTrack(cameraVideoTrack)
     }
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
             localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
-            localAudioTrack?.let { publishTrack(it) }
+            localAudioTrack?.let { publishAudioTrack(it) }
                     ?: Timber.e(RuntimeException(), "Failed to create local audio track")
         }
     }
 
-    private fun publishTrack(localVideoTrack: LocalVideoTrack?) {
+    private fun publishCameraTrack(localVideoTrack: LocalVideoTrack?) {
         if(!isVideoMuted) {
-            localVideoTrack?.let { localParticipant?.publishTrack(it) }
+            localVideoTrack?.let { localParticipant?.publishTrack(it,
+                    LocalTrackPublicationOptions(TrackPriority.LOW))
+            }
         }
     }
 
-    private fun publishTrack(localAudioTrack: LocalAudioTrack?) {
+    private fun publishAudioTrack(localAudioTrack: LocalAudioTrack?) {
         if(!isAudioMuted) {
             localAudioTrack?.let { localParticipant?.publishTrack(it) }
         }
@@ -157,7 +161,7 @@ class LocalParticipantManager(
                 CAMERA_TRACK_NAME)
         cameraVideoTrack?.let { cameraVideoTrack ->
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
-            publishTrack(cameraVideoTrack)
+            publishCameraTrack(cameraVideoTrack)
         } ?: run {
             Timber.e(RuntimeException(), "Failed to create local camera video track")
         }
