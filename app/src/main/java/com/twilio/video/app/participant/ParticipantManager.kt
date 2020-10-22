@@ -26,8 +26,9 @@ class ParticipantManager {
             mutableParticipants.find { it.isLocalParticipant }?.copy(
                     videoTrack = videoTrack)?.let { updateLocalParticipant(it) }
 
-    fun updateLocalParticipant(participantViewState: ParticipantViewState) =
-        updateParticipant(participantViewState) { it.isLocalParticipant }
+    fun updateLocalParticipantSid(sid: String) =
+            mutableParticipants.find { it.isLocalParticipant }?.copy(
+                    sid = sid)?.let { updateLocalParticipant(it) }
 
     fun updateParticipant(
             participantViewState: ParticipantViewState,
@@ -96,6 +97,9 @@ class ParticipantManager {
             clearDominantSpeaker()
         }
     }
+
+    private fun updateLocalParticipant(participantViewState: ParticipantViewState) =
+            updateParticipant(participantViewState) { it.isLocalParticipant }
 
     private fun moveDominantSpeakerToTop(newDominantSpeaker: ParticipantViewState) {
         if (mutableParticipants.size > 1) {

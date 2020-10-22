@@ -263,7 +263,9 @@ class RoomViewModel(
 
     private fun checkParticipants(participants: List<Participant>) {
         for ((index, participant) in participants.withIndex()) {
-            if(index > 0) { // Skip local participant
+            if(index == 0) { // local participant
+                participantManager.updateLocalParticipantSid(participant.sid)
+            } else {
                 participantManager.addParticipant(buildParticipantViewState(participant))
             }
         }
