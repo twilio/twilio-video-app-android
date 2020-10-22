@@ -37,11 +37,11 @@ sealed class RoomEvent {
         data class RemoteParticipantDisconnected(val sid: String) : RemoteParticipantEvent()
     }
 
-    sealed class LocalParticipantEvent: RoomEvent() {
-        data class VideoTrackUpdated(val videoTrack: VideoTrack?): LocalParticipantEvent()
-        object AudioOn: LocalParticipantEvent()
-        object AudioOff: LocalParticipantEvent()
-        object ScreenCaptureOn: LocalParticipantEvent()
-        object ScreenCaptureOff: LocalParticipantEvent()
+    sealed class LocalParticipantEvent : RoomEvent() {
+        data class VideoTrackUpdated(val videoTrack: VideoTrack?) : LocalParticipantEvent()
+        object AudioOn : LocalParticipantEvent()
+        object AudioOff : LocalParticipantEvent()
+        object ScreenCaptureOn : LocalParticipantEvent()
+        object ScreenCaptureOff : LocalParticipantEvent()
     }
 }

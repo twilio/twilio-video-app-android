@@ -22,18 +22,17 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptur
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import timber.log.Timber
-import java.lang.RuntimeException
 
 class LocalParticipantManager(
-        private val context: Context,
-        private val roomManager: RoomManager,
-        private val sharedPreferences: SharedPreferences
+    private val context: Context,
+    private val roomManager: RoomManager,
+    private val sharedPreferences: SharedPreferences
 ) {
 
     private var localAudioTrack: LocalAudioTrack? = null
         set(value) {
             field = value
-            roomManager.sendRoomEvent(if(value == null) AudioOff else AudioOn)
+            roomManager.sendRoomEvent(if (value == null) AudioOff else AudioOn)
         }
     internal var localParticipant: LocalParticipant? = null
     private var cameraVideoTrack: LocalVideoTrack? = null
@@ -60,13 +59,13 @@ class LocalParticipantManager(
     private var screenVideoTrack: LocalVideoTrack? = null
         set(value) {
             field = value
-            roomManager.sendRoomEvent(if(value == null) ScreenCaptureOff else ScreenCaptureOn)
+            roomManager.sendRoomEvent(if (value == null) ScreenCaptureOff else ScreenCaptureOn)
         }
     private var isAudioMuted = false
     private var isVideoMuted = false
 
     fun onResume() {
-        if(!isAudioMuted) setupLocalAudioTrack()
+        if (!isAudioMuted) setupLocalAudioTrack()
         if (!isVideoMuted) setupLocalVideoTrack()
     }
 
@@ -85,12 +84,12 @@ class LocalParticipantManager(
     }
 
     fun toggleLocalAudio() {
-         if (!isAudioMuted) {
-             isAudioMuted = true
-             removeAudioTrack()
+        if (!isAudioMuted) {
+            isAudioMuted = true
+            removeAudioTrack()
         } else {
-             isAudioMuted = false
-             setupLocalAudioTrack()
+            isAudioMuted = false
+            setupLocalAudioTrack()
         }
     }
 
@@ -134,15 +133,16 @@ class LocalParticipantManager(
     }
 
     private fun publishCameraTrack(localVideoTrack: LocalVideoTrack?) {
-        if(!isVideoMuted) {
-            localVideoTrack?.let { localParticipant?.publishTrack(it,
-                    LocalTrackPublicationOptions(TrackPriority.LOW))
+        if (!isVideoMuted) {
+            localVideoTrack?.let {
+                localParticipant?.publishTrack(it,
+                        LocalTrackPublicationOptions(TrackPriority.LOW))
             }
         }
     }
 
     private fun publishAudioTrack(localAudioTrack: LocalAudioTrack?) {
-        if(!isAudioMuted) {
+        if (!isAudioMuted) {
             localAudioTrack?.let { localParticipant?.publishTrack(it) }
         }
     }

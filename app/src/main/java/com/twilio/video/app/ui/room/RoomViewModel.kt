@@ -39,10 +39,10 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
+import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
@@ -237,7 +237,7 @@ class RoomViewModel(
     }
 
     private fun handleLocalParticipantEvent(localParticipantEvent: LocalParticipantEvent) {
-        when(localParticipantEvent) {
+        when (localParticipantEvent) {
             is LocalParticipantEvent.VideoTrackUpdated -> {
                 participantManager.updateLocalParticipantVideoTrack(
                         localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
@@ -271,10 +271,10 @@ class RoomViewModel(
 
     private fun showConnectingViewState() {
         setState {
-           it.copy(
-            isLobbyLayoutVisible = false,
-            isConnectingLayoutVisible = true,
-            isConnectedLayoutVisible = false)
+            it.copy(
+                    isLobbyLayoutVisible = false,
+                    isConnectingLayoutVisible = true,
+                    isConnectedLayoutVisible = false)
         }
     }
 
@@ -290,7 +290,7 @@ class RoomViewModel(
 
     private fun checkParticipants(participants: List<Participant>) {
         for ((index, participant) in participants.withIndex()) {
-            if(index == 0) { // local participant
+            if (index == 0) { // local participant
                 participantManager.updateLocalParticipantSid(participant.sid)
             } else {
                 participantManager.addParticipant(buildParticipantViewState(participant))

@@ -1,9 +1,5 @@
 package com.twilio.video.app.sdk
 
-import com.twilio.video.StatsListener
-import com.twilio.video.StatsReport
-import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.StatsScheduler
 
 class StatsManager(private val roomManager: RoomManager) {

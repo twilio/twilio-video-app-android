@@ -13,8 +13,8 @@ import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
-import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsGranted
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsGranted
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState

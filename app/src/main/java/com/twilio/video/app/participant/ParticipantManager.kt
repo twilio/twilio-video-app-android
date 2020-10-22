@@ -31,9 +31,10 @@ class ParticipantManager {
                     sid = sid)?.let { updateLocalParticipant(it) }
 
     fun updateParticipant(
-            participantViewState: ParticipantViewState,
-            participantMatchPredicate: (ParticipantViewState) -> Boolean = {
-                it.sid == participantViewState.sid }) {
+        participantViewState: ParticipantViewState,
+        participantMatchPredicate: (ParticipantViewState) -> Boolean = {
+            it.sid == participantViewState.sid }
+    ) {
 
         mutableParticipants.indexOfFirst(participantMatchPredicate).let { index ->
             if (index > -1) {

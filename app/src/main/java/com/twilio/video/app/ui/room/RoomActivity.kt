@@ -72,6 +72,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDial
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
+import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
@@ -87,11 +88,10 @@ import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.androidx.flow.onEvents
 import io.uniflow.androidx.flow.onStates
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
-class
-RoomActivity : BaseActivity() {
+class RoomActivity : BaseActivity() {
     @BindView(R.id.toolbar)
     lateinit var toolbar: Toolbar
 
@@ -283,7 +283,7 @@ RoomActivity : BaseActivity() {
                 true
             }
             R.id.share_screen_menu_item -> {
-                if(item.title == getString(R.string.share_screen)) {
+                if (item.title == getString(R.string.share_screen)) {
                     requestScreenCapturePermission()
                 } else {
                     roomViewModel.processInput(StopScreenCapture)
@@ -442,8 +442,7 @@ RoomActivity : BaseActivity() {
             screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
             val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
                 R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
-            }
-            else {
+            } else {
                 R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
             }
             screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
@@ -510,7 +509,7 @@ RoomActivity : BaseActivity() {
 
     private fun toggleAudioDevice(enableAudioDevice: Boolean) {
         setVolumeControl(enableAudioDevice)
-        val viewEvent = if (enableAudioDevice) ActivateAudioDevice else RoomViewEvent.DeactivateAudioDevice
+        val viewEvent = if (enableAudioDevice) ActivateAudioDevice else DeactivateAudioDevice
         roomViewModel.processInput(viewEvent)
     }
 
@@ -573,7 +572,7 @@ RoomActivity : BaseActivity() {
     private fun renderPrimaryView(primaryParticipant: ParticipantViewState) {
         primaryParticipant.run {
             primaryParticipantController.renderAsPrimary(
-                    if(isLocalParticipant) getString(R.string.you) else identity,
+                    if (isLocalParticipant) getString(R.string.you) else identity,
                     screenTrack,
                     videoTrack,
                     isMuted,

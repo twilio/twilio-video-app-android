@@ -10,8 +10,6 @@ import com.twilio.video.LocalVideoTrackPublication
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.TwilioException
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrackUpdated
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
 import timber.log.Timber
 
 class LocalParticipantListener(private val roomManager: RoomManager) : LocalParticipant.Listener {

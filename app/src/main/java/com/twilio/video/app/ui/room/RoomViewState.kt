@@ -1,7 +1,6 @@
 package com.twilio.video.app.ui.room
 
 import com.twilio.audioswitch.AudioDevice
-import com.twilio.video.LocalAudioTrack
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.VideoTrackViewState
 import io.uniflow.core.flow.data.UIState
