@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.room
 
+import android.Manifest.permission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.twilio.audioswitch.AudioSwitch
@@ -28,11 +29,12 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrack
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDeniedRetry
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
@@ -71,6 +73,8 @@ class RoomViewModel(
     initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
+    private var permissionCheckRetry = false
+
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
             actionOn<RoomViewState> { currentState ->
@@ -102,9 +106,8 @@ class RoomViewModel(
         Timber.d("View Event: $viewEvent")
 
         when (viewEvent) {
-            OnResume -> { roomManager.onResume() }
-            OnPause -> { roomManager.onPause() }
-            is CheckPermissions -> checkLocalMedia()
+            OnResume -> checkPermissions()
+            OnPause -> roomManager.onPause()
             is SelectAudioDevice -> {
                 audioSwitch.selectDevice(viewEvent.device)
             }
@@ -135,15 +138,27 @@ class RoomViewModel(
         }
     }
 
-    private fun checkLocalMedia() {
-        // TODO Check media permission before loading
-//        val isCameraEnabled = permissionUtil.isPermissionGranted(Manifest.permission.CAMERA)
-//        val isMicEnabled = permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO)
-//
-//        setState {
-//            it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
-//        }
-//        if (isCameraEnabled && isMicEnabled) action { sendEvent { CheckLocalMedia } }
+    private fun checkPermissions() {
+        val isCameraEnabled = permissionUtil.isPermissionGranted(permission.CAMERA)
+        val isMicEnabled = permissionUtil.isPermissionGranted(permission.RECORD_AUDIO)
+
+        setState {
+            it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
+        }
+        if (isCameraEnabled && isMicEnabled) {
+            roomManager.onResume()
+        } else {
+            action {
+                sendEvent {
+                    if (permissionCheckRetry) {
+                        PermissionsDeniedRetry
+                    } else {
+                        permissionCheckRetry = true
+                        PermissionsDenied
+                    }
+                }
+            }
+        }
     }
 
     private fun observeRoomEvents(roomEvent: RoomEvent) {
@@ -255,7 +270,6 @@ class RoomViewModel(
     }
 
     private fun showConnectingViewState() {
-        action { sendEvent { RoomViewEffect.Connecting } }
         setState {
            it.copy(
             isLobbyLayoutVisible = false,

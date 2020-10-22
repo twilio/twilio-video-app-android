@@ -66,7 +66,6 @@ class LocalParticipantManager(
     private var isVideoMuted = false
 
     fun onResume() {
-        // TODO Check media permission before loading
         if(!isAudioMuted) setupLocalAudioTrack()
         if (!isVideoMuted) setupLocalVideoTrack()
     }
@@ -222,65 +221,4 @@ class LocalParticipantManager(
             this.localAudioTrack = null
         }
     }
-
-//
-//
-//    /** Try to restore camera video track after going to the settings screen or background  */
-//    private fun restoreCameraTrack() {
-//        if (restoreLocalVideoCameraTrack) {
-//            obtainVideoConstraints()
-//            setupLocalVideoTrack()
-//            restoreLocalVideoCameraTrack = false
-//        }
-//    }
-//
-//    private fun setupLocalParticipant(room: Room) {
-//        localParticipant = room.localParticipant
-//        localParticipant?.let {
-//            localParticipantSid = it.sid
-//        }
-//    }
-//
-//    private fun publishLocalTracks() {
-//        if (localParticipant != null) {
-//            cameraVideoTrack?.let { cameraVideoTrack ->
-//                Timber.d("Camera track: %s", cameraVideoTrack)
-//                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW)
-//            }
-//            localAudioTrack?.let { localParticipant?.publishTrack(it) }
-//        }
-//    }
-//
-//    private fun publishVideoTrack(videoTrack: LocalVideoTrack, trackPriority: TrackPriority) {
-//        val localTrackPublicationOptions = LocalTrackPublicationOptions(trackPriority)
-//        localParticipant?.publishTrack(videoTrack, localTrackPublicationOptions)
-//    }
-//
-//
-//    /** Create local video track  */
-//    private fun setupLocalVideoTrack() {
-//
-//        // initialize capturer only once if needed
-//        if (cameraCapturer == null) {
-//            cameraCapturer = CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA)
-//        }
-//        cameraCapturer?.let {
-//            cameraVideoTrack = LocalVideoTrack.create(
-//                    this,
-//                    true,
-//                    it.videoCapturer,
-//                    videoConstraints,
-//                    CAMERA_TRACK_NAME)
-//        }
-//        cameraVideoTrack?.let {
-//            localVideoTrackNames[it.name] = getString(R.string.camera_video_track)
-//        } ?: run {
-//            Snackbar.make(
-//                    primaryVideoView,
-//                    R.string.failed_to_add_camera_video_track,
-//                    Snackbar.LENGTH_LONG)
-//                    .show()
-//        }
-//    }
-
 }

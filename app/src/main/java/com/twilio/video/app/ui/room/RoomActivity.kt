@@ -65,11 +65,12 @@ import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDeniedRetry
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
@@ -250,11 +251,7 @@ RoomActivity : BaseActivity() {
                     cameraPermissionGranted &&
                     writeExternalStoragePermissionGranted)
             if (permissionsGranted) {
-                roomViewModel.processInput(CheckPermissions)
-                // TODO Setup local media
-            } else {
-                Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
-                        .show()
+                roomViewModel.processInput(OnResume)
             }
         }
     }
@@ -267,7 +264,6 @@ RoomActivity : BaseActivity() {
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item)
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item)
         deviceMenuItem = menu.findItem(R.id.device_menu_item)
-        requestPermissions()
 
         onStates(roomViewModel) { state ->
             if (state is RoomViewState) bindRoomViewState(state)
@@ -370,28 +366,13 @@ RoomActivity : BaseActivity() {
 
     private fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!permissionsGranted()) {
-                requestPermissions(arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ),
-                        PERMISSIONS_REQUEST_CODE)
-            } else {
-                // TODO Setup local media
-            }
-        } else {
-            // TODO Setup local media
+            requestPermissions(arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ),
+                    PERMISSIONS_REQUEST_CODE)
         }
-    }
-
-    private fun permissionsGranted(): Boolean {
-        val resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        val resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-        val resultStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        return (resultCamera == PackageManager.PERMISSION_GRANTED &&
-                resultMic == PackageManager.PERMISSION_GRANTED &&
-                resultStorage == PackageManager.PERMISSION_GRANTED)
     }
 
     private fun updateLayout(roomViewState: RoomViewState) {
@@ -434,10 +415,9 @@ RoomActivity : BaseActivity() {
             connectButtonEnabled = isRoomTextNotEmpty
             screenCaptureMenuItemState = false
         }
-        // TODO Disable local media if permission check fails on either mic or camera
-//        val isMicEnabled = roomViewState.isMicEnabled
-//        val isCameraEnabled = roomViewState.isCameraEnabled
-        val isLocalMediaEnabled = true
+        val isMicEnabled = roomViewState.isMicEnabled
+        val isCameraEnabled = roomViewState.isCameraEnabled
+        val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
         localAudioImageButton.isEnabled = isLocalMediaEnabled
         localVideoImageButton.isEnabled = isLocalMediaEnabled
         val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
@@ -543,7 +523,6 @@ RoomActivity : BaseActivity() {
     }
 
     private fun bindRoomViewEffects(roomViewEffect: RoomViewEffect) {
-            requestPermissions()
         when (roomViewEffect) {
             is Connected -> {
                 toggleAudioDevice(true)
@@ -565,6 +544,11 @@ RoomActivity : BaseActivity() {
                 val error = roomViewEffect.serviceError
                 handleTokenError(error)
             }
+            PermissionsDenied -> requestPermissions()
+            PermissionsDeniedRetry ->
+                Snackbar
+                    .make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
+                    .show()
         }
     }
 

@@ -13,12 +13,11 @@ import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
-import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsGranted
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
-import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.util.PermissionUtil
 import io.reactivex.schedulers.TestScheduler
 import io.uniflow.android.test.TestViewObserver
@@ -167,7 +166,7 @@ class RoomViewModelTest {
 
         viewModel.processInput(RoomViewEvent.CheckPermissions)
 
-        assertThat(testObserver.lastEventOrNull is CheckLocalMedia, equalTo(true))
+        assertThat(testObserver.lastEventOrNull is PermissionsGranted, equalTo(true))
     }
 
     @Test

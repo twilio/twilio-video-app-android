@@ -7,7 +7,6 @@ import com.twilio.video.app.sdk.VideoTrackViewState
 sealed class RoomViewEvent {
     object OnResume: RoomViewEvent()
     object OnPause: RoomViewEvent()
-    object CheckPermissions: RoomViewEvent()
     object ToggleLocalVideo: RoomViewEvent()
     object ToggleLocalAudio: RoomViewEvent()
     data class StartScreenCapture(val captureResultCode: Int, val captureIntent: Intent): RoomViewEvent()
