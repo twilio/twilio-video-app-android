@@ -124,6 +124,8 @@ class LocalParticipantManager(
         publishCameraTrack(cameraVideoTrack)
     }
 
+    fun switchCamera() = cameraCapturer.switchCamera()
+
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
             localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
@@ -220,8 +222,6 @@ class LocalParticipantManager(
             this.localAudioTrack = null
         }
     }
-
-    // TODO Switch camera
 
 //
 //

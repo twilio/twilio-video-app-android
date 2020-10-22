@@ -43,6 +43,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
@@ -121,6 +122,7 @@ class RoomViewModel(
             is StartScreenCapture -> roomManager.startScreenCapture(
                     viewEvent.captureResultCode, viewEvent.captureIntent)
             StopScreenCapture -> roomManager.stopScreenCapture()
+            SwitchCamera -> roomManager.switchCamera()
             is VideoTrackRemoved -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
                 updateParticipantViewState()

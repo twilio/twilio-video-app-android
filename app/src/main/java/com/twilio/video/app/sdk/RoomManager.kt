@@ -91,6 +91,9 @@ class RoomManager(
         localParticipantManager.stopScreenCapture()
     }
 
+    fun switchCamera() = localParticipantManager.switchCamera()
+
+
     inner class RoomListener : Room.Listener {
         override fun onConnected(room: Room) {
             Timber.i("onConnected -> room sid: %s",

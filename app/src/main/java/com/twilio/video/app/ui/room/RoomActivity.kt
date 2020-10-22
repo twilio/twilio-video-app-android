@@ -77,6 +77,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
@@ -282,7 +283,7 @@ RoomActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.switch_camera_menu_item -> {
-                // TODO Switch camera
+                roomViewModel.processInput(SwitchCamera)
                 true
             }
             R.id.share_screen_menu_item -> {

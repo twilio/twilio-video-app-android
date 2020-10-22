@@ -12,6 +12,7 @@ sealed class RoomViewEvent {
     object ToggleLocalAudio: RoomViewEvent()
     data class StartScreenCapture(val captureResultCode: Int, val captureIntent: Intent): RoomViewEvent()
     object StopScreenCapture: RoomViewEvent()
+    object SwitchCamera: RoomViewEvent()
     data class SelectAudioDevice(val device: AudioDevice): RoomViewEvent()
     object ActivateAudioDevice: RoomViewEvent()
     object DeactivateAudioDevice: RoomViewEvent()
