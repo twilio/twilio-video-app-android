@@ -1,11 +1,13 @@
 package com.twilio.video.app.sdk
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import com.twilio.video.CameraCapturer
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalVideoTrack
+import com.twilio.video.ScreenCapturer
 import com.twilio.video.VideoConstraints
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
@@ -14,6 +16,8 @@ import com.twilio.video.app.data.Preferences.ASPECT_RATIOS
 import com.twilio.video.app.ui.room.RoomEvent
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import timber.log.Timber
@@ -43,25 +47,20 @@ class LocalParticipantManager(
         obtainVideoConstraints()
     }
     private val localVideoTrackNames: MutableMap<String, String> = HashMap()
-//    private var screenVideoTrack: LocalVideoTrack? = null
-//    private var restoreLocalVideoCameraTrack = false
-//    private var screenVideoTrack: LocalVideoTrack? = null
-//    private var screenCapturer: ScreenCapturer? = null
-//    private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
-//        override fun onScreenCaptureError(errorDescription: String) {
-//            Timber.e("Screen capturer error: %s", errorDescription)
-//            stopScreenCapture()
-//            Snackbar.make(
-//                    primaryVideoView,
-//                    R.string.screen_capture_error,
-//                    Snackbar.LENGTH_LONG)
-//                    .show()
-//        }
-//
-//        override fun onFirstFrameAvailable() {
-//            Timber.d("First frame from screen capturer available")
-//        }
-//    }
+    private var screenCapturer: ScreenCapturer? = null
+    private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
+        override fun onScreenCaptureError(errorDescription: String) {
+            Timber.e(RuntimeException(), "Screen capturer error: %s", errorDescription)
+            stopScreenCapture()
+        }
+
+        override fun onFirstFrameAvailable() {}
+    }
+    private var screenVideoTrack: LocalVideoTrack? = null
+        set(value) {
+            field = value
+            roomManager.sendRoomEvent(if(value == null) ScreenCaptureOff else ScreenCaptureOn)
+        }
     private var isAudioMuted = false
     private var isVideoMuted = false
 
@@ -92,6 +91,29 @@ class LocalParticipantManager(
         } else {
              isAudioMuted = false
              setupLocalAudioTrack()
+        }
+    }
+
+    fun startScreenCapture(captureResultCode: Int, captureIntent: Intent) {
+        screenCapturer = ScreenCapturer(context, captureResultCode, captureIntent,
+                screenCapturerListener)
+        screenCapturer?.let { screenCapturer ->
+            screenVideoTrack = LocalVideoTrack.create(context, true, screenCapturer,
+                    SCREEN_TRACK_NAME)
+            screenVideoTrack?.let { screenVideoTrack ->
+                localVideoTrackNames[screenVideoTrack.name] =
+                        context.getString(R.string.screen_video_track)
+                localParticipant?.publishTrack(screenVideoTrack)
+            } ?: Timber.e(RuntimeException(), "Failed to add screen video track")
+        }
+    }
+
+    fun stopScreenCapture() {
+        screenVideoTrack?.let { screenVideoTrack ->
+            localParticipant?.unpublishTrack(screenVideoTrack)
+            screenVideoTrack.release()
+            localVideoTrackNames.remove(screenVideoTrack.name)
+            this.screenVideoTrack = null
         }
     }
 
@@ -197,49 +219,6 @@ class LocalParticipantManager(
 
     // TODO Switch camera
 
-    // TODO Handle screen share
-    /*
-     * screenCapturer = ScreenCapturer(this, resultCode, data, screenCapturerListener)
-     * startScreenCapture()
-     */
-
-//
-//
-//    private fun startScreenCapture() {
-//        screenCapturer?.let { screenCapturer ->
-//            screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer,
-//                    SCREEN_TRACK_NAME)
-//            screenVideoTrack?.let { screenVideoTrack ->
-//                screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp)
-//                screenCaptureMenuItem.setTitle(R.string.stop_screen_share)
-//                localVideoTrackNames[screenVideoTrack.name] = getString(R.string.screen_video_track)
-//                if (localParticipant != null) {
-//                    publishVideoTrack(screenVideoTrack, TrackPriority.HIGH)
-//                }
-//            } ?: run {
-//                Snackbar.make(
-//                        primaryVideoView,
-//                        R.string.failed_to_add_screen_video_track,
-//                        Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null)
-//                        .show()
-//            }
-//        }
-//    }
-//
-//    private fun stopScreenCapture() {
-//        screenVideoTrack?.let { screenVideoTrack ->
-//            localParticipant?.let { localParticipant ->
-//                roomViewModel.processInput(RoomViewEvent.ScreenTrackRemoved(localParticipant.sid))
-//                localParticipant.unpublishTrack(screenVideoTrack)
-//            }
-//            screenVideoTrack.release()
-//            localVideoTrackNames.remove(screenVideoTrack.name)
-//            this.screenVideoTrack = null
-//            screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp)
-//            screenCaptureMenuItem.setTitle(R.string.share_screen)
-//        }
-//    }
 //
 //
 //    /** Try to restore camera video track after going to the settings screen or background  */

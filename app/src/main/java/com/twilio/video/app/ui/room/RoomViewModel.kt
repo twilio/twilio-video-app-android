@@ -14,6 +14,10 @@ import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
@@ -37,6 +41,8 @@ import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
+import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
@@ -112,6 +118,9 @@ class RoomViewModel(
             }
             ToggleLocalVideo -> roomManager.toggleLocalVideo()
             ToggleLocalAudio -> roomManager.toggleLocalAudio()
+            is StartScreenCapture -> roomManager.startScreenCapture(
+                    viewEvent.captureResultCode, viewEvent.captureIntent)
+            StopScreenCapture -> roomManager.stopScreenCapture()
             is VideoTrackRemoved -> {
                 participantManager.updateParticipantVideoTrack(viewEvent.sid, null)
                 updateParticipantViewState()
@@ -218,8 +227,10 @@ class RoomViewModel(
                 updateParticipantViewState()
                 setState { it.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
             }
-            LocalParticipantEvent.AudioOn -> setState { it.copy(isAudioMuted = false) }
-            LocalParticipantEvent.AudioOff -> setState { it.copy(isAudioMuted = true) }
+            AudioOn -> setState { it.copy(isAudioMuted = false) }
+            AudioOff -> setState { it.copy(isAudioMuted = true) }
+            ScreenCaptureOn -> setState { it.copy(isScreenCaptureOn = true) }
+            ScreenCaptureOff -> setState { it.copy(isScreenCaptureOn = false) }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.twilio.video.app.sdk
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
@@ -80,6 +81,14 @@ class RoomManager(
 
     fun toggleLocalAudio() {
         localParticipantManager.toggleLocalAudio()
+    }
+
+    fun startScreenCapture(captureResultCode: Int, captureIntent: Intent) {
+        localParticipantManager.startScreenCapture(captureResultCode, captureIntent)
+    }
+
+    fun stopScreenCapture() {
+        localParticipantManager.stopScreenCapture()
     }
 
     inner class RoomListener : Room.Listener {

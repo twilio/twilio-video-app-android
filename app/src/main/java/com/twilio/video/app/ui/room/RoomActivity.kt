@@ -75,6 +75,8 @@ import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
@@ -284,10 +286,11 @@ RoomActivity : BaseActivity() {
                 true
             }
             R.id.share_screen_menu_item -> {
-                val shareScreen = getString(R.string.share_screen)
-//                if (item.title == shareScreen)
-                    // TODO Handle screen share and permission
-//                    requestScreenCapturePermission()
+                if(item.title == getString(R.string.share_screen)) {
+                    requestScreenCapturePermission()
+                } else {
+                    roomViewModel.processInput(StopScreenCapture)
+                }
                 true
             }
             R.id.device_menu_item -> {
@@ -315,7 +318,7 @@ RoomActivity : BaseActivity() {
                 return
             }
             data?.let { data ->
-                // TODO Handle screen share
+                roomViewModel.processInput(StartScreenCapture(resultCode, data))
             }
         }
     }
@@ -456,6 +459,15 @@ RoomActivity : BaseActivity() {
         settingsMenuItem.isVisible = settingsMenuItemState
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
+            val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
+                R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
+            }
+            else {
+                R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
+            }
+            screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
+                    screenCaptureResources.first)
+            screenCaptureMenuItem.title = screenCaptureResources.second
         }
     }
 
