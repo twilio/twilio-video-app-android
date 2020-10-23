@@ -28,6 +28,7 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParti
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
@@ -194,6 +195,7 @@ class RoomViewModel(
             }
             is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
             is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
+            is StatsUpdate -> setState { it.copy(roomStats = roomEvent.roomStats) }
         }
     }
 

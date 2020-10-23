@@ -474,32 +474,40 @@ class RoomActivity : BaseActivity() {
                 mediaProjectionManager.createScreenCaptureIntent(), MEDIA_PROJECTION_REQUEST_CODE)
     }
 
-    private fun updateStatsUI(enabled: Boolean) {
-        // TODO Update stats UI
-//        if (enabled) {
-//            if (room != null && room!!.remoteParticipants.size > 0) {
-//                // show stats
-//                statsRecyclerView.visibility = View.VISIBLE
-//                statsDisabledLayout.visibility = View.GONE
-//            } else if (room != null) {
-//                // disable stats when there is no room
-//                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-//                statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
-//                statsRecyclerView.visibility = View.GONE
-//                statsDisabledLayout.visibility = View.VISIBLE
-//            } else {
-//                // disable stats if there is room but no participants (no media)
-//                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-//                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
-//                statsRecyclerView.visibility = View.GONE
-//                statsDisabledLayout.visibility = View.VISIBLE
-//            }
-//        } else {
-//            statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
-//            statsDisabledDescTextView.text = getString(R.string.stats_enable_in_settings)
-//            statsRecyclerView.visibility = View.GONE
-//            statsDisabledLayout.visibility = View.VISIBLE
-//        }
+    private fun updateStatsUI(roomViewState: RoomViewState) {
+        val enableStats = sharedPreferences.getBoolean(
+                Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT)
+        if (enableStats) {
+            when (roomViewState.layoutState) {
+                LayoutState.Connected -> {
+                    statsListAdapter.updateStatsData(roomViewState.roomStats)
+                    statsRecyclerView.visibility = View.VISIBLE
+                    statsDisabledLayout.visibility = View.GONE
+
+                    // disable stats if there is room but no participants (no media)
+                    val isStreamingMedia = roomViewState.participantThumbnails?.let { thumbnails ->
+                        thumbnails.size > 1
+                    } ?: false
+                    if (!isStreamingMedia) {
+                        statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                        statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
+                        statsRecyclerView.visibility = View.GONE
+                        statsDisabledLayout.visibility = View.VISIBLE
+                    }
+                }
+                else -> {
+                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
+                statsRecyclerView.visibility = View.GONE
+                statsDisabledLayout.visibility = View.VISIBLE
+                }
+            }
+        } else {
+            statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
+            statsDisabledDescTextView.text = getString(R.string.stats_enable_in_settings)
+            statsRecyclerView.visibility = View.GONE
+            statsDisabledLayout.visibility = View.VISIBLE
+        }
     }
 
     private fun toggleAudioDevice(enableAudioDevice: Boolean) {
@@ -514,6 +522,7 @@ class RoomActivity : BaseActivity() {
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
         updateAudioDeviceIcon(roomViewState.selectedDevice)
+        updateStatsUI(roomViewState)
     }
 
     private fun bindRoomViewEffects(roomViewEffect: RoomViewEffect) {

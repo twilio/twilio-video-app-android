@@ -21,11 +21,11 @@ import com.twilio.video.Room
 import com.twilio.video.StatsListener
 import timber.log.Timber
 
-class StatsScheduler(private val room: Room) {
+class StatsScheduler(private val roomManager: RoomManager, private val room: Room) {
     private var handlerThread: HandlerThread? = null
     private var handler: Handler? = null
     private val statsListener: StatsListener = StatsListener { statsReports ->
-        // TODO Update UI
+        roomManager.sendStatsUpdate(statsReports)
     }
     private val isRunning: Boolean
         get() = handlerThread?.isAlive ?: false
