@@ -99,7 +99,7 @@ class ParticipantManager {
         }
     }
 
-    private fun updateLocalParticipant(participantViewState: ParticipantViewState) =
+    internal fun updateLocalParticipant(participantViewState: ParticipantViewState) =
             updateParticipant(participantViewState) { it.isLocalParticipant }
 
     private fun moveDominantSpeakerToTop(newDominantSpeaker: ParticipantViewState) {

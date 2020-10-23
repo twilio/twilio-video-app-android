@@ -3,6 +3,8 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
@@ -37,11 +39,12 @@ class RoomManager(
     sharedPreferences: SharedPreferences
 ) {
 
-    private val localParticipantManager: LocalParticipantManager =
-            LocalParticipantManager(context, this, sharedPreferences)
     private var statsScheduler: StatsScheduler? = null
     private val roomListener = RoomListener()
     private val roomEventSubject = PublishSubject.create<RoomEvent>()
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal var localParticipantManager: LocalParticipantManager =
+            LocalParticipantManager(context, this, sharedPreferences)
     var room: Room? = null
     val roomEvents: Observable<RoomEvent> = roomEventSubject
 
