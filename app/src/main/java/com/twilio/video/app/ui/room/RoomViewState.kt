@@ -3,6 +3,7 @@ package com.twilio.video.app.ui.room
 import com.twilio.audioswitch.AudioDevice
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.VideoTrackViewState
+import com.twilio.video.app.ui.room.LayoutState.Lobby
 import io.uniflow.core.flow.data.UIState
 
 data class RoomViewState(
@@ -11,9 +12,7 @@ data class RoomViewState(
     val participantThumbnails: List<ParticipantViewState>? = null,
     val selectedDevice: AudioDevice? = null,
     val availableAudioDevices: List<AudioDevice>? = null,
-    val isLobbyLayoutVisible: Boolean = true,
-    val isConnectingLayoutVisible: Boolean = false,
-    val isConnectedLayoutVisible: Boolean = false,
+    val layoutState: LayoutState = Lobby,
     val isCameraEnabled: Boolean = false,
     val localVideoTrack: VideoTrackViewState? = null,
     val isMicEnabled: Boolean = false,
@@ -21,3 +20,9 @@ data class RoomViewState(
     val isVideoOff: Boolean = false,
     val isScreenCaptureOn: Boolean = false
 ) : UIState()
+
+sealed class LayoutState {
+    object Connecting : LayoutState()
+    object Connected : LayoutState()
+    object Lobby : LayoutState()
+}

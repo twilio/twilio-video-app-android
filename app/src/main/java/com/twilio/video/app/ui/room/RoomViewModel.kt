@@ -257,10 +257,7 @@ class RoomViewModel(
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
         setState {
-            it.copy(
-                isLobbyLayoutVisible = true,
-                isConnectingLayoutVisible = false,
-                isConnectedLayoutVisible = false)
+            it.copy(layoutState = LayoutState.Lobby)
         }
         participantManager.clearRemoteParticipants()
         updateParticipantViewState()
@@ -268,20 +265,13 @@ class RoomViewModel(
 
     private fun showConnectingViewState() {
         setState {
-            it.copy(
-                    isLobbyLayoutVisible = false,
-                    isConnectingLayoutVisible = true,
-                    isConnectedLayoutVisible = false)
+            it.copy(layoutState = LayoutState.Connecting)
         }
     }
 
     private fun showConnectedViewState(roomName: String) {
         setState {
-            it.copy(
-                    title = roomName,
-                    isLobbyLayoutVisible = false,
-                    isConnectingLayoutVisible = false,
-                    isConnectedLayoutVisible = true)
+            it.copy(layoutState = LayoutState.Connected)
         }
     }
 

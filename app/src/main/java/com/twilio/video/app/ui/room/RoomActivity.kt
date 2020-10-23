@@ -381,32 +381,34 @@ class RoomActivity : BaseActivity() {
         var toolbarTitle = displayName
         var joinStatus = ""
         var recordingWarningVisibility = View.GONE
-        if (roomViewState.isConnectingLayoutVisible) {
-            disconnectButtonState = View.VISIBLE
-            joinRoomLayoutState = View.GONE
-            joinStatusLayoutState = View.VISIBLE
-            recordingWarningVisibility = View.VISIBLE
-            settingsMenuItemState = false
-            connectButtonEnabled = false
-            if (roomEditable != null) {
-                roomName = roomEditable.toString()
+        when (roomViewState.layoutState) {
+            LayoutState.Connecting -> {
+                disconnectButtonState = View.VISIBLE
+                joinRoomLayoutState = View.GONE
+                joinStatusLayoutState = View.VISIBLE
+                recordingWarningVisibility = View.VISIBLE
+                settingsMenuItemState = false
+                connectButtonEnabled = false
+                if (roomEditable != null) {
+                    roomName = roomEditable.toString()
+                }
+                joinStatus = "Joining..."
             }
-            joinStatus = "Joining..."
-        }
-        if (roomViewState.isConnectedLayoutVisible) {
-            disconnectButtonState = View.VISIBLE
-            joinRoomLayoutState = View.GONE
-            joinStatusLayoutState = View.GONE
-            settingsMenuItemState = false
-            screenCaptureMenuItemState = true
-            connectButtonEnabled = false
-            roomName = roomViewState.title
-            toolbarTitle = roomName
-            joinStatus = ""
-        }
-        if (roomViewState.isLobbyLayoutVisible) {
-            connectButtonEnabled = isRoomTextNotEmpty
-            screenCaptureMenuItemState = false
+            LayoutState.Connected -> {
+                disconnectButtonState = View.VISIBLE
+                joinRoomLayoutState = View.GONE
+                joinStatusLayoutState = View.GONE
+                settingsMenuItemState = false
+                screenCaptureMenuItemState = true
+                connectButtonEnabled = false
+                roomName = roomViewState.title
+                toolbarTitle = roomName
+                joinStatus = ""
+            }
+            LayoutState.Lobby -> {
+                connectButtonEnabled = isRoomTextNotEmpty
+                screenCaptureMenuItemState = false
+            }
         }
         val isMicEnabled = roomViewState.isMicEnabled
         val isCameraEnabled = roomViewState.isCameraEnabled
@@ -571,8 +573,8 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        val newThumbnails =
-                if (roomViewState.isConnectedLayoutVisible) roomViewState.participantThumbnails else null
+        val newThumbnails = if (roomViewState.layoutState is LayoutState.Connected)
+                    roomViewState.participantThumbnails else null
         participantAdapter.submitList(newThumbnails)
     }
 
