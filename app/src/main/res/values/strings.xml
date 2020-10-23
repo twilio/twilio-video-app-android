@@ -157,6 +157,7 @@
     <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
+    <string name="screen_capture_error">Screen capturer error occurred.</string>
     <string name="join">Join</string>
     <string name="room">Room</string>
     <string name="stats_track_sid">sid</string>
@@ -165,6 +166,9 @@
     <string name="stats_bytes_sent">bytes sent</string>
     <string name="stats_bytes_received">bytes received</string>
     <string name="stats_gathering_disabled">Statistics Gathering Disabled</string>
+    <string name="stats_unavailable">Statistics Unavailable</string>
+    <string name="stats_description_join_room">Join a Room to View Statistics</string>
+    <string name="stats_description_media_not_shared">Media is Not Being Shared</string>
     <string name="stats_rtt">round trip time</string>
     <string name="stats_jitter">jitter</string>
     <string name="stats_audio_level">audio level</string>
