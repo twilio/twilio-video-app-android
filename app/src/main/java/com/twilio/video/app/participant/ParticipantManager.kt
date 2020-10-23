@@ -116,9 +116,7 @@ class ParticipantManager {
     }
 
     fun clearRemoteParticipants() {
-        mutableParticipants.forEach {
-            if (!it.isLocalParticipant) mutableParticipants.remove(it)
-        }
+        mutableParticipants.removeAll { !it.isLocalParticipant }
         updatePrimaryParticipant()
     }
 
