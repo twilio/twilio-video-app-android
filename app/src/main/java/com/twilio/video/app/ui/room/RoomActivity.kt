@@ -41,7 +41,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -66,7 +65,6 @@ import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
-import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDeniedRetry
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
@@ -333,11 +331,6 @@ class RoomActivity : BaseActivity() {
     @OnClick(R.id.connect)
     fun connectButtonClick() {
         InputUtils.hideKeyboard(this)
-        if (!didAcceptPermissions()) {
-            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
-                    .show()
-            return
-        }
         connect.isEnabled = false
         // obtain room name
         val text = roomEditText.text
@@ -544,10 +537,6 @@ class RoomActivity : BaseActivity() {
                 handleTokenError(error)
             }
             PermissionsDenied -> requestPermissions()
-            PermissionsDeniedRetry ->
-                Snackbar
-                    .make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
-                    .show()
         }
     }
 
@@ -633,14 +622,6 @@ class RoomActivity : BaseActivity() {
                 .setMessage(getString(errorMessage))
                 .setNeutralButton(getString(android.R.string.ok), null)
                 .show()
-    }
-
-    private fun didAcceptPermissions(): Boolean {
-        return (PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                == PermissionChecker.PERMISSION_GRANTED) && (PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PermissionChecker.PERMISSION_GRANTED) && (PermissionChecker.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PermissionChecker.PERMISSION_GRANTED)
     }
 
     companion object {

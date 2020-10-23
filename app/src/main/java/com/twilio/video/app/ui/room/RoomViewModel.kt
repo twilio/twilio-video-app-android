@@ -30,7 +30,6 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitch
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
-import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDeniedRetry
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
@@ -148,11 +147,9 @@ class RoomViewModel(
         if (isCameraEnabled && isMicEnabled) {
             roomManager.onResume()
         } else {
-            action {
-                sendEvent {
-                    if (permissionCheckRetry) {
-                        PermissionsDeniedRetry
-                    } else {
+            if (!permissionCheckRetry) {
+                action {
+                    sendEvent {
                         permissionCheckRetry = true
                         PermissionsDenied
                     }
