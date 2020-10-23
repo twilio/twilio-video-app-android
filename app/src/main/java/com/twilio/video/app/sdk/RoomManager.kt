@@ -37,6 +37,7 @@ class RoomManager(
 
     private val localParticipantManager: LocalParticipantManager =
             LocalParticipantManager(context, this, sharedPreferences)
+    private var statsScheduler: StatsScheduler? = null
     private val roomListener = RoomListener()
     private val roomEventSubject = PublishSubject.create<RoomEvent>()
     var room: Room? = null
@@ -101,6 +102,8 @@ class RoomManager(
             startService(context, room.name)
 
             setupParticipants(room)
+
+            statsScheduler = StatsScheduler(room).apply { start() }
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
@@ -112,6 +115,9 @@ class RoomManager(
             roomEventSubject.onNext(Disconnected)
 
             localParticipantManager.localParticipant = null
+
+            statsScheduler?.stop()
+            statsScheduler = null
         }
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {

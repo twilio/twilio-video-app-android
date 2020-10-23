@@ -627,7 +627,6 @@ class RoomActivity : BaseActivity() {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 100
         private const val MEDIA_PROJECTION_REQUEST_CODE = 101
-        private const val STATS_DELAY = 1000 // milliseconds
 
         // This will be used instead of real local participant sid,
         // because that information is unknown until room connection is fully established
