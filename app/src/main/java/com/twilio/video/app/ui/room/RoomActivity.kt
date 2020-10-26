@@ -62,6 +62,8 @@ import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Connecting
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
@@ -381,32 +383,34 @@ class RoomActivity : BaseActivity() {
         var toolbarTitle = displayName
         var joinStatus = ""
         var recordingWarningVisibility = View.GONE
-        if (roomViewState.isConnectingLayoutVisible) {
-            disconnectButtonState = View.VISIBLE
-            joinRoomLayoutState = View.GONE
-            joinStatusLayoutState = View.VISIBLE
-            recordingWarningVisibility = View.VISIBLE
-            settingsMenuItemState = false
-            connectButtonEnabled = false
-            if (roomEditable != null) {
-                roomName = roomEditable.toString()
+        when (roomViewState.configuration) {
+            Connecting -> {
+                disconnectButtonState = View.VISIBLE
+                joinRoomLayoutState = View.GONE
+                joinStatusLayoutState = View.VISIBLE
+                recordingWarningVisibility = View.VISIBLE
+                settingsMenuItemState = false
+                connectButtonEnabled = false
+                if (roomEditable != null) {
+                    roomName = roomEditable.toString()
+                }
+                joinStatus = "Joining..."
             }
-            joinStatus = "Joining..."
-        }
-        if (roomViewState.isConnectedLayoutVisible) {
-            disconnectButtonState = View.VISIBLE
-            joinRoomLayoutState = View.GONE
-            joinStatusLayoutState = View.GONE
-            settingsMenuItemState = false
-            screenCaptureMenuItemState = true
-            connectButtonEnabled = false
-            roomName = roomViewState.title
-            toolbarTitle = roomName
-            joinStatus = ""
-        }
-        if (roomViewState.isLobbyLayoutVisible) {
-            connectButtonEnabled = isRoomTextNotEmpty
-            screenCaptureMenuItemState = false
+            RoomViewConfiguration.Connected -> {
+                disconnectButtonState = View.VISIBLE
+                joinRoomLayoutState = View.GONE
+                joinStatusLayoutState = View.GONE
+                settingsMenuItemState = false
+                screenCaptureMenuItemState = true
+                connectButtonEnabled = false
+                roomName = roomViewState.title
+                toolbarTitle = roomName
+                joinStatus = ""
+            }
+            Lobby -> {
+                connectButtonEnabled = isRoomTextNotEmpty
+                screenCaptureMenuItemState = false
+            }
         }
         val isMicEnabled = roomViewState.isMicEnabled
         val isCameraEnabled = roomViewState.isCameraEnabled
@@ -472,32 +476,40 @@ class RoomActivity : BaseActivity() {
                 mediaProjectionManager.createScreenCaptureIntent(), MEDIA_PROJECTION_REQUEST_CODE)
     }
 
-    private fun updateStatsUI(enabled: Boolean) {
-        // TODO Update stats UI
-//        if (enabled) {
-//            if (room != null && room!!.remoteParticipants.size > 0) {
-//                // show stats
-//                statsRecyclerView.visibility = View.VISIBLE
-//                statsDisabledLayout.visibility = View.GONE
-//            } else if (room != null) {
-//                // disable stats when there is no room
-//                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-//                statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
-//                statsRecyclerView.visibility = View.GONE
-//                statsDisabledLayout.visibility = View.VISIBLE
-//            } else {
-//                // disable stats if there is room but no participants (no media)
-//                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-//                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
-//                statsRecyclerView.visibility = View.GONE
-//                statsDisabledLayout.visibility = View.VISIBLE
-//            }
-//        } else {
-//            statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
-//            statsDisabledDescTextView.text = getString(R.string.stats_enable_in_settings)
-//            statsRecyclerView.visibility = View.GONE
-//            statsDisabledLayout.visibility = View.VISIBLE
-//        }
+    private fun updateStatsUI(roomViewState: RoomViewState) {
+        val enableStats = sharedPreferences.getBoolean(
+                Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT)
+        if (enableStats) {
+            when (roomViewState.configuration) {
+                RoomViewConfiguration.Connected -> {
+                    statsListAdapter.updateStatsData(roomViewState.roomStats)
+                    statsRecyclerView.visibility = View.VISIBLE
+                    statsDisabledLayout.visibility = View.GONE
+
+                    // disable stats if there is room but no participants (no media)
+                    val isStreamingMedia = roomViewState.participantThumbnails?.let { thumbnails ->
+                        thumbnails.size > 1
+                    } ?: false
+                    if (!isStreamingMedia) {
+                        statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                        statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
+                        statsRecyclerView.visibility = View.GONE
+                        statsDisabledLayout.visibility = View.VISIBLE
+                    }
+                }
+                else -> {
+                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
+                statsRecyclerView.visibility = View.GONE
+                statsDisabledLayout.visibility = View.VISIBLE
+                }
+            }
+        } else {
+            statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
+            statsDisabledDescTextView.text = getString(R.string.stats_enable_in_settings)
+            statsRecyclerView.visibility = View.GONE
+            statsDisabledLayout.visibility = View.VISIBLE
+        }
     }
 
     private fun toggleAudioDevice(enableAudioDevice: Boolean) {
@@ -512,6 +524,7 @@ class RoomActivity : BaseActivity() {
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
         updateAudioDeviceIcon(roomViewState.selectedDevice)
+        updateStatsUI(roomViewState)
     }
 
     private fun bindRoomViewEffects(roomViewEffect: RoomViewEffect) {
@@ -571,8 +584,8 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        val newThumbnails =
-                if (roomViewState.isConnectedLayoutVisible) roomViewState.participantThumbnails else null
+        val newThumbnails = if (roomViewState.configuration is RoomViewConfiguration.Connected)
+                    roomViewState.participantThumbnails else null
         participantAdapter.submitList(newThumbnails)
     }
 
@@ -627,7 +640,6 @@ class RoomActivity : BaseActivity() {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 100
         private const val MEDIA_PROJECTION_REQUEST_CODE = 101
-        private const val STATS_DELAY = 1000 // milliseconds
 
         // This will be used instead of real local participant sid,
         // because that information is unknown until room connection is fully established

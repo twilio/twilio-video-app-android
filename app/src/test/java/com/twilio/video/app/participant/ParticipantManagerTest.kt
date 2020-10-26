@@ -9,6 +9,7 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.TrackPriority.HIGH
 import com.twilio.video.VideoTrack
+import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.sdk.VideoTrackViewState
 import junitparams.JUnitParamsRunner
 import org.hamcrest.CoreMatchers.`is`
@@ -20,7 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(JUnitParamsRunner::class)
-class ParticipantManagerTest {
+class ParticipantManagerTest : BaseUnitTest() {
 
     val participantManager = ParticipantManager()
     private val localParticipant = ParticipantViewState("1", "Local Participant",
@@ -134,10 +135,10 @@ class ParticipantManagerTest {
     }
 
     @Test
-    fun `primary participant VideoTrack priority should not be set when there is only a local participant`() {
-        participantManager.addParticipant(localParticipant)
-
-        assertThat(participantManager.primaryParticipant, `is`(nullValue()))
+    fun `primary participant and thumbnails should be initialized with the local participant`() {
+        val localParticipantViewState = ParticipantViewState(isLocalParticipant = true)
+        assertThat(participantManager.primaryParticipant, equalTo(localParticipantViewState))
+        assertThat(participantManager.participantThumbnails.first(), equalTo(localParticipantViewState))
     }
 
     @Test
@@ -146,7 +147,7 @@ class ParticipantManagerTest {
 
         val screenTrack = mock<VideoTrack>()
         participantManager.updateParticipantScreenTrack(localParticipant.sid!!,
-            VideoTrackViewState(screenTrack))
+                VideoTrackViewState(screenTrack))
 
         verifyZeroInteractions(screenTrack)
     }
@@ -207,10 +208,10 @@ class ParticipantManagerTest {
 
     @Test
     fun `primary participant VideoTrack priority should not be set for the same previous participant`() {
-        val participant3 = setupThreeParticipantScenario()
+        setupThreeParticipantScenario()
         val participant2 = participantManager.getParticipant("2")
 
-        participantManager.updateParticipant(participant3.copy(isMuted = true))
+        participantManager.updateParticipant(participant2!!.copy(isMuted = true))
 
         val videoTrack = participant2!!.getRemoteVideoTrack()
         verify(videoTrack)!!.priority = HIGH
@@ -286,9 +287,9 @@ class ParticipantManagerTest {
 
     private fun setupThreeParticipantScenario(): ParticipantViewState {
         val participant2 = ParticipantViewState("2", "Participant 2",
-            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
         val participant3 = ParticipantViewState("3", "Participant 3",
-            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
         participantManager.updateLocalParticipant(localParticipant)
         participantManager.addParticipant(participant2)
         participantManager.addParticipant(participant3)

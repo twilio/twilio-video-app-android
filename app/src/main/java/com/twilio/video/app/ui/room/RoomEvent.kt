@@ -5,6 +5,7 @@ import com.twilio.video.Participant
 import com.twilio.video.Room
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.data.api.AuthServiceError
+import com.twilio.video.app.sdk.RoomStats
 
 sealed class RoomEvent {
 
@@ -19,6 +20,7 @@ sealed class RoomEvent {
     object MaxParticipantFailure : RoomEvent()
     data class TokenError(val serviceError: AuthServiceError? = null) : RoomEvent()
     data class DominantSpeakerChanged(val newDominantSpeakerSid: String?) : RoomEvent()
+    data class StatsUpdate(val roomStats: RoomStats) : RoomEvent()
 
     sealed class RemoteParticipantEvent : RoomEvent() {
 

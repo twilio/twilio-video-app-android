@@ -3,9 +3,12 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
+import com.twilio.video.StatsReport
 import com.twilio.video.TwilioException
 import com.twilio.video.TwilioException.ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION
 import com.twilio.video.app.data.api.AuthServiceError
@@ -19,6 +22,7 @@ import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import io.reactivex.Observable
@@ -35,10 +39,12 @@ class RoomManager(
     sharedPreferences: SharedPreferences
 ) {
 
-    private val localParticipantManager: LocalParticipantManager =
-            LocalParticipantManager(context, this, sharedPreferences)
+    private var statsScheduler: StatsScheduler? = null
     private val roomListener = RoomListener()
     private val roomEventSubject = PublishSubject.create<RoomEvent>()
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal var localParticipantManager: LocalParticipantManager =
+            LocalParticipantManager(context, this, sharedPreferences)
     var room: Room? = null
     val roomEvents: Observable<RoomEvent> = roomEventSubject
 
@@ -93,6 +99,17 @@ class RoomManager(
 
     fun switchCamera() = localParticipantManager.switchCamera()
 
+    fun sendStatsUpdate(statsReports: List<StatsReport>) {
+        room?.let { room ->
+            val roomStats = RoomStats(
+                    room.remoteParticipants,
+                    localParticipantManager.localVideoTrackNames,
+                    statsReports
+            )
+            sendRoomEvent(StatsUpdate(roomStats))
+        }
+    }
+
     inner class RoomListener : Room.Listener {
         override fun onConnected(room: Room) {
             Timber.i("onConnected -> room sid: %s",
@@ -101,6 +118,8 @@ class RoomManager(
             startService(context, room.name)
 
             setupParticipants(room)
+
+            statsScheduler = StatsScheduler(this@RoomManager, room).apply { start() }
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
@@ -112,6 +131,9 @@ class RoomManager(
             roomEventSubject.onNext(Disconnected)
 
             localParticipantManager.localParticipant = null
+
+            statsScheduler?.stop()
+            statsScheduler = null
         }
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {

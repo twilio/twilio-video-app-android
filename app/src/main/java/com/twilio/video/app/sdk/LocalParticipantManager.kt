@@ -46,7 +46,6 @@ class LocalParticipantManager(
     private val videoConstraints: VideoConstraints by lazy {
         obtainVideoConstraints()
     }
-    private val localVideoTrackNames: MutableMap<String, String> = HashMap()
     private var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
@@ -63,6 +62,7 @@ class LocalParticipantManager(
         }
     private var isAudioMuted = false
     private var isVideoMuted = false
+    internal val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     fun onResume() {
         if (!isAudioMuted) setupLocalAudioTrack()

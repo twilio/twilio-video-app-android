@@ -165,6 +165,9 @@
     <string name="stats_bytes_sent">bytes sent</string>
     <string name="stats_bytes_received">bytes received</string>
     <string name="stats_gathering_disabled">Statistics Gathering Disabled</string>
+    <string name="stats_unavailable">Statistics Unavailable</string>
+    <string name="stats_description_join_room">Join a Room to View Statistics</string>
+    <string name="stats_description_media_not_shared">Media is Not Being Shared</string>
     <string name="stats_rtt">round trip time</string>
     <string name="stats_jitter">jitter</string>
     <string name="stats_audio_level">audio level</string>

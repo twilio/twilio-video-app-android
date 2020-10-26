@@ -28,7 +28,9 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParti
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
@@ -194,6 +196,7 @@ class RoomViewModel(
             }
             is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
             is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
+            is StatsUpdate -> setState { it.copy(roomStats = roomEvent.roomStats) }
         }
     }
 
@@ -257,10 +260,7 @@ class RoomViewModel(
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
         setState {
-            it.copy(
-                isLobbyLayoutVisible = true,
-                isConnectingLayoutVisible = false,
-                isConnectedLayoutVisible = false)
+            it.copy(configuration = Lobby)
         }
         participantManager.clearRemoteParticipants()
         updateParticipantViewState()
@@ -268,20 +268,13 @@ class RoomViewModel(
 
     private fun showConnectingViewState() {
         setState {
-            it.copy(
-                    isLobbyLayoutVisible = false,
-                    isConnectingLayoutVisible = true,
-                    isConnectedLayoutVisible = false)
+            it.copy(configuration = RoomViewConfiguration.Connecting)
         }
     }
 
     private fun showConnectedViewState(roomName: String) {
         setState {
-            it.copy(
-                    title = roomName,
-                    isLobbyLayoutVisible = false,
-                    isConnectingLayoutVisible = false,
-                    isConnectedLayoutVisible = true)
+            it.copy(configuration = RoomViewConfiguration.Connected)
         }
     }
 
