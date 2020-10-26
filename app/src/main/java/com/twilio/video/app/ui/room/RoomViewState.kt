@@ -18,6 +18,8 @@ data class RoomViewState(
     val localVideoTrack: VideoTrackViewState? = null,
     val isMicEnabled: Boolean = false,
     val isAudioMuted: Boolean = true,
+    val isAudioEnabled: Boolean = true,
+    val isVideoEnabled: Boolean = true,
     val isVideoOff: Boolean = false,
     val isScreenCaptureOn: Boolean = false,
     val roomStats: RoomStats? = null

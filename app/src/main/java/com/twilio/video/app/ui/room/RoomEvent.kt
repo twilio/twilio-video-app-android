@@ -41,8 +41,12 @@ sealed class RoomEvent {
 
     sealed class LocalParticipantEvent : RoomEvent() {
         data class VideoTrackUpdated(val videoTrack: VideoTrack?) : LocalParticipantEvent()
+        object VideoEnabled : LocalParticipantEvent()
+        object VideoDisabled : LocalParticipantEvent()
         object AudioOn : LocalParticipantEvent()
         object AudioOff : LocalParticipantEvent()
+        object AudioEnabled : LocalParticipantEvent()
+        object AudioDisabled : LocalParticipantEvent()
         object ScreenCaptureOn : LocalParticipantEvent()
         object ScreenCaptureOff : LocalParticipantEvent()
     }

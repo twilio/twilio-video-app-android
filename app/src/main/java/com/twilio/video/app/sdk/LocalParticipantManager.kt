@@ -15,10 +15,14 @@ import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.ASPECT_RATIO
 import com.twilio.video.app.data.Preferences.ASPECT_RATIOS
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioDisabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import timber.log.Timber
@@ -81,6 +85,26 @@ class LocalParticipantManager(
             isVideoMuted = false
             setupLocalVideoTrack()
         }
+    }
+
+    fun enableLocalVideo() {
+        cameraVideoTrack?.enable(true)
+        roomManager.sendRoomEvent(VideoEnabled)
+    }
+
+    fun disableLocalVideo() {
+        cameraVideoTrack?.enable(false)
+        roomManager.sendRoomEvent(VideoDisabled)
+    }
+
+    fun enableLocalAudio() {
+        localAudioTrack?.enable(true)
+        roomManager.sendRoomEvent(AudioEnabled)
+    }
+
+    fun disableLocalAudio() {
+        localAudioTrack?.enable(false)
+        roomManager.sendRoomEvent(AudioDisabled)
     }
 
     fun toggleLocalAudio() {

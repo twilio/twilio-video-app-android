@@ -110,6 +110,14 @@ class RoomManager(
         }
     }
 
+    fun enableLocalAudio() = localParticipantManager.enableLocalAudio()
+
+    fun disableLocalAudio() = localParticipantManager.disableLocalAudio()
+
+    fun enableLocalVideo() = localParticipantManager.enableLocalVideo()
+
+    fun disableLocalVideo() = localParticipantManager.disableLocalVideo()
+
     inner class RoomListener : Room.Listener {
         override fun onConnected(room: Room) {
             Timber.i("onConnected -> room sid: %s",

@@ -15,10 +15,14 @@ import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioDisabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
@@ -38,7 +42,11 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
@@ -122,7 +130,11 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
             ToggleLocalVideo -> roomManager.toggleLocalVideo()
+            EnableLocalVideo -> roomManager.enableLocalVideo()
+            DisableLocalVideo -> roomManager.disableLocalVideo()
             ToggleLocalAudio -> roomManager.toggleLocalAudio()
+            EnableLocalAudio -> roomManager.enableLocalAudio()
+            DisableLocalAudio -> roomManager.disableLocalAudio()
             is StartScreenCapture -> roomManager.startScreenCapture(
                     viewEvent.captureResultCode, viewEvent.captureIntent)
             StopScreenCapture -> roomManager.stopScreenCapture()
@@ -246,8 +258,12 @@ class RoomViewModel(
             }
             AudioOn -> setState { it.copy(isAudioMuted = false) }
             AudioOff -> setState { it.copy(isAudioMuted = true) }
+            AudioEnabled -> setState { it.copy(isAudioEnabled = true) }
+            AudioDisabled -> setState { it.copy(isAudioEnabled = false) }
             ScreenCaptureOn -> setState { it.copy(isScreenCaptureOn = true) }
             ScreenCaptureOff -> setState { it.copy(isScreenCaptureOn = false) }
+            VideoEnabled -> setState { it.copy(isVideoEnabled = true) }
+            VideoDisabled -> setState { it.copy(isVideoEnabled = false) }
         }
     }
 

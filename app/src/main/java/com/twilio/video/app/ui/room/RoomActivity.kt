@@ -73,7 +73,11 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
@@ -146,6 +150,8 @@ class RoomActivity : BaseActivity() {
     @BindView(R.id.stats_disabled_description)
     lateinit var statsDisabledDescTextView: TextView
     private lateinit var switchCameraMenuItem: MenuItem
+    private lateinit var pauseVideoMenuItem: MenuItem
+    private lateinit var pauseAudioMenuItem: MenuItem
     private lateinit var screenCaptureMenuItem: MenuItem
     private lateinit var settingsMenuItem: MenuItem
     private lateinit var deviceMenuItem: MenuItem
@@ -262,6 +268,8 @@ class RoomActivity : BaseActivity() {
         settingsMenuItem = menu.findItem(R.id.settings_menu_item)
         // Grab menu items for updating later
         switchCameraMenuItem = menu.findItem(R.id.switch_camera_menu_item)
+        pauseVideoMenuItem = menu.findItem(R.id.pause_video_menu_item)
+        pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item)
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item)
         deviceMenuItem = menu.findItem(R.id.device_menu_item)
 
@@ -292,6 +300,20 @@ class RoomActivity : BaseActivity() {
             }
             R.id.device_menu_item -> {
                 displayAudioDeviceList()
+                true
+            }
+            R.id.pause_audio_menu_item -> {
+                if (item.title == getString(R.string.pause_audio))
+                    roomViewModel.processInput(DisableLocalAudio)
+                else
+                    roomViewModel.processInput(EnableLocalAudio)
+                true
+            }
+            R.id.pause_video_menu_item -> {
+                if (item.title == getString(R.string.pause_video))
+                    roomViewModel.processInput(DisableLocalVideo)
+                else
+                    roomViewModel.processInput(EnableLocalVideo)
                 true
             }
             R.id.settings_menu_item -> {
@@ -432,6 +454,10 @@ class RoomActivity : BaseActivity() {
         joinStatusTextView.text = joinStatus
         joinRoomNameTextView.text = roomName
         recordingNoticeTextView.visibility = recordingWarningVisibility
+        val pauseAudioTitle = getString(if (roomViewState.isAudioEnabled) R.string.pause_audio else R.string.resume_audio)
+        val pauseVideoTitle = getString(if (roomViewState.isVideoEnabled) R.string.pause_video else R.string.resume_video)
+        pauseAudioMenuItem.title = pauseAudioTitle
+        pauseVideoMenuItem.title = pauseVideoTitle
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         settingsMenuItem.isVisible = settingsMenuItemState
