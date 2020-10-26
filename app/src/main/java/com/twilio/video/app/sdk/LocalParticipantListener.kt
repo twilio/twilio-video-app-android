@@ -9,9 +9,7 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.LocalVideoTrackPublication
 import com.twilio.video.NetworkQualityLevel
 import com.twilio.video.TwilioException
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.ScreenTrackUpdated
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.VideoTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.NetworkQualityLevelChange
 import timber.log.Timber
 
 class LocalParticipantListener(private val roomManager: RoomManager) : LocalParticipant.Listener {
@@ -23,18 +21,7 @@ class LocalParticipantListener(private val roomManager: RoomManager) : LocalPart
         roomManager.sendRoomEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
     }
 
-    override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {
-        Timber.i("New LocalParticipant VideoTrack published for LocalParticipant sid: %s, LocalVideoTrack: %s",
-                localParticipant.sid, localVideoTrackPublication.localVideoTrack)
-
-        if (localVideoTrackPublication.videoTrack.name.contains(SCREEN_TRACK_NAME)) {
-            roomManager.sendRoomEvent(ScreenTrackUpdated(localParticipant.sid,
-                    localVideoTrackPublication.videoTrack))
-        } else {
-            roomManager.sendRoomEvent(VideoTrackUpdated(localParticipant.sid,
-                    localVideoTrackPublication.videoTrack))
-        }
-    }
+    override fun onVideoTrackPublished(localParticipant: LocalParticipant, localVideoTrackPublication: LocalVideoTrackPublication) {}
 
     override fun onVideoTrackPublicationFailed(localParticipant: LocalParticipant, localVideoTrack: LocalVideoTrack, twilioException: TwilioException) {}
 

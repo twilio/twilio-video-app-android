@@ -161,12 +161,8 @@
     <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
-    <string name="screen_capture_error">Screen capturer error occurred.</string>
     <string name="join">Join</string>
     <string name="room">Room</string>
-    <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
-    <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
-    <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
     <string name="stats_track_sid">sid</string>
     <string name="stats_codec">codec</string>
     <string name="stats_packets">packets lost</string>

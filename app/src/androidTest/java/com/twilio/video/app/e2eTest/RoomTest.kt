@@ -25,7 +25,6 @@ import com.twilio.video.app.util.clickView
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.randomUUID
-import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.retryEspressoAction
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Rule
@@ -57,7 +56,7 @@ class RoomTest : BaseE2ETest() {
 
         retryEspressoAction { assertRoomIsConnected() }
 
-        onView(allOf(withText(retrieveEmailCredentials().email), isDisplayed()))
+        onView(allOf(withText(getString(R.string.you)), isDisplayed()))
                 .perform(click())
         clickView(R.id.local_video_image_button)
         onView(allOf(withId(R.id.participant_stub_image),

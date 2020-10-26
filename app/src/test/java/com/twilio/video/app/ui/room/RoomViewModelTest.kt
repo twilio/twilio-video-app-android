@@ -3,27 +3,30 @@ package com.twilio.video.app.ui.room
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
+import com.twilio.video.app.sdk.LocalParticipantManager
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoClient
 import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
-import com.twilio.video.app.ui.room.RoomEvent.ParticipantEvent.TrackSwitchOff
-import com.twilio.video.app.ui.room.RoomViewEffect.CheckLocalMedia
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
-import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
-import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
-import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
+import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.util.PermissionUtil
 import io.reactivex.schedulers.TestScheduler
 import io.uniflow.android.test.TestViewObserver
 import io.uniflow.android.test.createTestObserver
 import io.uniflow.test.rule.TestDispatchersRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
@@ -34,16 +37,20 @@ import org.junit.Test
 
 private const val PARTICIPANT_SID = "123"
 
-class RoomViewModelTest {
+class RoomViewModelTest : BaseUnitTest() {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @ExperimentalCoroutinesApi
     @get:Rule
     val coroutineScope = TestDispatchersRule()
 
+    val localParticipantManager = mock<LocalParticipantManager>()
     private val roomManager = RoomManager(mock(),
-            VideoClient(mock(), mock()))
+            VideoClient(mock(), mock()), mock()).apply {
+        localParticipantManager = this@RoomViewModelTest.localParticipantManager
+    }
     private val scheduler = TestScheduler()
     private val participantViewState = ParticipantViewState(PARTICIPANT_SID, "Test Participant")
     private val participantManager = ParticipantManager().apply {
@@ -52,6 +59,8 @@ class RoomViewModelTest {
     val permissionUtil = mock<PermissionUtil>()
     private lateinit var testObserver: TestViewObserver
     private lateinit var viewModel: RoomViewModel
+    private val localParticipantViewState = ParticipantViewState(isLocalParticipant = true)
+    private val initialRoomViewState = RoomViewState(participantManager.primaryParticipant)
 
     @Before
     fun setUp() {
@@ -97,30 +106,29 @@ class RoomViewModelTest {
     }
 
     @Test
-    fun `The CheckLocalMedia event should set the isCameraEnabled view state property to true if camera permission is allowed`() {
+    fun `The OnResume event should set the isCameraEnabled view state property to true if camera permission is allowed`() {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
                 .thenReturn(true)
-        val expectedViewState = RoomViewState(isCameraEnabled = true)
+        val expectedViewState = initialRoomViewState.copy(isCameraEnabled = true)
+        viewModel.processInput(OnResume)
 
-        viewModel.processInput(RoomViewEvent.CheckPermissions)
-
-        testObserver.verifySequence(RoomViewState(), expectedViewState)
+        testObserver.verifySequence(initialRoomViewState, expectedViewState, PermissionsDenied)
     }
 
     @Test
-    fun `The CheckLocalMedia event should set the isCameraEnabled view state property to false if camera permission is denied`() {
+    fun `The OnResume event should set the isCameraEnabled view state property to false if camera permission is denied`() {
         viewModel = RoomViewModel(
                 roomManager,
                 mock(),
                 permissionUtil,
                 participantManager,
                 scheduler = scheduler,
-                initialViewState = RoomViewState(isCameraEnabled = true))
+                initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
                 .thenReturn(false)
-        val expectedViewState = RoomViewState(isCameraEnabled = false)
+        val expectedViewState = initialRoomViewState.copy(isCameraEnabled = false)
 
-        viewModel.processInput(RoomViewEvent.CheckPermissions)
+        viewModel.processInput(OnResume)
 
         testObserver.verifySequence(expectedViewState)
 
@@ -128,30 +136,30 @@ class RoomViewModelTest {
     }
 
     @Test
-    fun `The CheckLocalMedia event should set the isMicEnabled view state property to true if camera permission is allowed`() {
+    fun `The OnResume event should set the isMicEnabled view state property to true if camera permission is allowed`() {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
                 .thenReturn(true)
-        val expectedViewState = RoomViewState(isMicEnabled = true)
+        val expectedViewState = initialRoomViewState.copy(isMicEnabled = true)
 
-        viewModel.processInput(RoomViewEvent.CheckPermissions)
+        viewModel.processInput(OnResume)
 
-        testObserver.verifySequence(RoomViewState(), expectedViewState)
+        testObserver.verifySequence(initialRoomViewState, expectedViewState, PermissionsDenied)
     }
 
     @Test
-    fun `The CheckLocalMedia event should set the isMicEnabled view state property to false if camera permission is denied`() {
+    fun `The OnResume event should set the isMicEnabled view state property to false if camera permission is denied`() {
         viewModel = RoomViewModel(
                 roomManager,
                 mock(),
                 permissionUtil,
                 participantManager,
                 scheduler = scheduler,
-                initialViewState = RoomViewState(isMicEnabled = true))
+                initialViewState = initialRoomViewState.copy(isMicEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
                 .thenReturn(false)
-        val expectedViewState = RoomViewState(isMicEnabled = false)
+        val expectedViewState = initialRoomViewState.copy(isMicEnabled = false)
 
-        viewModel.processInput(RoomViewEvent.CheckPermissions)
+        viewModel.processInput(OnResume)
 
         testObserver.verifySequence(expectedViewState)
 
@@ -159,15 +167,15 @@ class RoomViewModelTest {
     }
 
     @Test
-    fun `The CheckLocalMedia event should send a CheckLocalMedia ViewEffect if camera and mic permissions are allowed`() {
+    fun `The OnResume event should invoke RoomManager onResume if camera and mic permissions are allowed`() {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
                 .thenReturn(true)
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
                 .thenReturn(true)
 
-        viewModel.processInput(RoomViewEvent.CheckPermissions)
+        viewModel.processInput(OnResume)
 
-        assertThat(testObserver.lastEventOrNull is CheckLocalMedia, equalTo(true))
+        verify(localParticipantManager).onResume()
     }
 
     @Test
@@ -176,10 +184,13 @@ class RoomViewModelTest {
         scheduler.triggerActions()
 
         testObserver.verifySequence(
-                RoomViewState(),
+                initialRoomViewState,
                 ShowConnectFailureDialog,
                 Disconnected,
-                lobbyState())
+                initialRoomViewState.copy(configuration = Lobby),
+                initialRoomViewState.copy(configuration = Lobby,
+                primaryParticipant = localParticipantViewState,
+                participantThumbnails = listOf(localParticipantViewState)))
     }
 
     @Test
@@ -188,41 +199,12 @@ class RoomViewModelTest {
         scheduler.triggerActions()
 
         testObserver.verifySequence(
-                RoomViewState(),
-                ShowMaxParticipantFailureDialog,
+                initialRoomViewState,
+                RoomViewEffect.ShowMaxParticipantFailureDialog,
                 Disconnected,
-                lobbyState())
+                initialRoomViewState.copy(configuration = Lobby),
+                initialRoomViewState.copy(configuration = Lobby,
+                        primaryParticipant = localParticipantViewState,
+                        participantThumbnails = listOf(localParticipantViewState)))
     }
-
-    @Test
-    fun `The RefreshViewState event should refresh the view state`() {
-        viewModel.processInput(RefreshViewState)
-
-        testObserver.verifySequence(
-                RoomViewState(),
-                RoomViewState()
-        )
-    }
-
-    @Test
-    fun `The ToggleLocalVideo event should update the participant view state`() {
-        val expectedVideoTrack = mock<RemoteVideoTrack>()
-        val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
-
-        viewModel.processInput(ToggleLocalVideo(PARTICIPANT_SID, expectedTrackViewState))
-
-        val expectedParticipantViewState = participantViewState.copy(
-                videoTrack = expectedTrackViewState)
-        val updatedParticipant = (viewModel.getCurrentState() as RoomViewState).participantThumbnails?.find {
-            it.sid == PARTICIPANT_SID
-        }
-        assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
-    }
-
-    private fun lobbyState() =
-            RoomViewState(
-                    isLobbyLayoutVisible = true,
-                    isConnectingLayoutVisible = false,
-                    isConnectedLayoutVisible = false
-            )
 }
