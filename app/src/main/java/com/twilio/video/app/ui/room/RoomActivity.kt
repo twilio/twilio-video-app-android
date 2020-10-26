@@ -62,6 +62,8 @@ import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Connecting
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
@@ -381,8 +383,8 @@ class RoomActivity : BaseActivity() {
         var toolbarTitle = displayName
         var joinStatus = ""
         var recordingWarningVisibility = View.GONE
-        when (roomViewState.layoutState) {
-            LayoutState.Connecting -> {
+        when (roomViewState.configuration) {
+            Connecting -> {
                 disconnectButtonState = View.VISIBLE
                 joinRoomLayoutState = View.GONE
                 joinStatusLayoutState = View.VISIBLE
@@ -394,7 +396,7 @@ class RoomActivity : BaseActivity() {
                 }
                 joinStatus = "Joining..."
             }
-            LayoutState.Connected -> {
+            RoomViewConfiguration.Connected -> {
                 disconnectButtonState = View.VISIBLE
                 joinRoomLayoutState = View.GONE
                 joinStatusLayoutState = View.GONE
@@ -405,7 +407,7 @@ class RoomActivity : BaseActivity() {
                 toolbarTitle = roomName
                 joinStatus = ""
             }
-            LayoutState.Lobby -> {
+            Lobby -> {
                 connectButtonEnabled = isRoomTextNotEmpty
                 screenCaptureMenuItemState = false
             }
@@ -478,8 +480,8 @@ class RoomActivity : BaseActivity() {
         val enableStats = sharedPreferences.getBoolean(
                 Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT)
         if (enableStats) {
-            when (roomViewState.layoutState) {
-                LayoutState.Connected -> {
+            when (roomViewState.configuration) {
+                RoomViewConfiguration.Connected -> {
                     statsListAdapter.updateStatsData(roomViewState.roomStats)
                     statsRecyclerView.visibility = View.VISIBLE
                     statsDisabledLayout.visibility = View.GONE
@@ -582,7 +584,7 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        val newThumbnails = if (roomViewState.layoutState is LayoutState.Connected)
+        val newThumbnails = if (roomViewState.configuration is RoomViewConfiguration.Connected)
                     roomViewState.participantThumbnails else null
         participantAdapter.submitList(newThumbnails)
     }

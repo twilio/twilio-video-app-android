@@ -13,10 +13,10 @@ import com.twilio.video.app.sdk.LocalParticipantManager
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoClient
 import com.twilio.video.app.sdk.VideoTrackViewState
-import com.twilio.video.app.ui.room.LayoutState.Lobby
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
@@ -187,8 +187,8 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState,
                 ShowConnectFailureDialog,
                 Disconnected,
-                initialRoomViewState.copy(layoutState = Lobby),
-                initialRoomViewState.copy(layoutState = Lobby,
+                initialRoomViewState.copy(configuration = Lobby),
+                initialRoomViewState.copy(configuration = Lobby,
                 primaryParticipant = localParticipantViewState,
                 participantThumbnails = listOf(localParticipantViewState)))
     }
@@ -202,8 +202,8 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState,
                 RoomViewEffect.ShowMaxParticipantFailureDialog,
                 Disconnected,
-                initialRoomViewState.copy(layoutState = Lobby),
-                initialRoomViewState.copy(layoutState = Lobby,
+                initialRoomViewState.copy(configuration = Lobby),
+                initialRoomViewState.copy(configuration = Lobby,
                         primaryParticipant = localParticipantViewState,
                         participantThumbnails = listOf(localParticipantViewState)))
     }

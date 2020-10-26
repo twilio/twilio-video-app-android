@@ -30,6 +30,7 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitch
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
@@ -259,7 +260,7 @@ class RoomViewModel(
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
         setState {
-            it.copy(layoutState = LayoutState.Lobby)
+            it.copy(configuration = Lobby)
         }
         participantManager.clearRemoteParticipants()
         updateParticipantViewState()
@@ -267,13 +268,13 @@ class RoomViewModel(
 
     private fun showConnectingViewState() {
         setState {
-            it.copy(layoutState = LayoutState.Connecting)
+            it.copy(configuration = RoomViewConfiguration.Connecting)
         }
     }
 
     private fun showConnectedViewState(roomName: String) {
         setState {
-            it.copy(layoutState = LayoutState.Connected)
+            it.copy(configuration = RoomViewConfiguration.Connected)
         }
     }
 
