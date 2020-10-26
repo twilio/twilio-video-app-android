@@ -134,10 +134,10 @@ class ParticipantManagerTest {
     }
 
     @Test
-    fun `primary participant VideoTrack priority should not be set when there is only a local participant`() {
-        participantManager.addParticipant(localParticipant)
-
-        assertThat(participantManager.primaryParticipant, `is`(nullValue()))
+    fun `primary participant and thumbnails should be initialized with the local participant`() {
+        val localParticipantViewState = ParticipantViewState(isLocalParticipant = true)
+        assertThat(participantManager.primaryParticipant, equalTo(localParticipantViewState))
+        assertThat(participantManager.participantThumbnails.first(), equalTo(localParticipantViewState))
     }
 
     @Test

@@ -9,11 +9,13 @@ class ParticipantManager {
 
     private val mutableParticipants = mutableListOf<ParticipantViewState>()
     val participantThumbnails: List<ParticipantViewState> get() = mutableParticipants.toList()
-    lateinit var primaryParticipant: ParticipantViewState
+    var primaryParticipant: ParticipantViewState
         private set
 
     init {
-        addParticipant(ParticipantViewState(isLocalParticipant = true))
+        val localParticipant = ParticipantViewState(isLocalParticipant = true)
+        mutableParticipants.add(localParticipant)
+        primaryParticipant = localParticipant
     }
 
     fun addParticipant(participantViewState: ParticipantViewState) {
@@ -153,9 +155,8 @@ class ParticipantManager {
                     Timber.d("Setting video track priority to high for participant with sid: ${participant.sid}")
                 }
             }
-
-            clearOldTrackPriorities()
         }
+        clearOldTrackPriorities()
     }
 
     private fun clearOldTrackPriorities() {
