@@ -6,6 +6,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.LocalParticipantManager
@@ -36,7 +37,7 @@ import org.junit.Test
 
 private const val PARTICIPANT_SID = "123"
 
-class RoomViewModelTest {
+class RoomViewModelTest : BaseUnitTest() {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
