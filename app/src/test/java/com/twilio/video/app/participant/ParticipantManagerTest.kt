@@ -207,10 +207,10 @@ class ParticipantManagerTest {
 
     @Test
     fun `primary participant VideoTrack priority should not be set for the same previous participant`() {
-        val participant3 = setupThreeParticipantScenario()
+        setupThreeParticipantScenario()
         val participant2 = participantManager.getParticipant("2")
 
-        participantManager.updateParticipant(participant3.copy(isMuted = true))
+        participantManager.updateParticipant(participant2!!.copy(isMuted = true))
 
         val videoTrack = participant2!!.getRemoteVideoTrack()
         verify(videoTrack)!!.priority = HIGH
