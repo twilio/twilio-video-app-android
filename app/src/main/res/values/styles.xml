@@ -10,7 +10,7 @@
     </style>
 
     <style name="MyAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/dialogAccentColor</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
