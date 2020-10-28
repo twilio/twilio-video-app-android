@@ -21,21 +21,23 @@ import javax.inject.Inject;
 
 public class CrashlyticsTreeRanger implements TreeRanger {
 
+    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+
     @Inject
     public CrashlyticsTreeRanger() {}
 
     @Override
     public void inform(String message) {
-        // No inform implementation for now. We could potentially use Firebase Analytics
+        crashlytics.log(message);
     }
 
     @Override
     public void caution(String message) {
-        FirebaseCrashlytics.getInstance().log(message);
+        crashlytics.log(message);
     }
 
     @Override
     public void alert(Throwable throwable) {
-        FirebaseCrashlytics.getInstance().recordException(throwable);
+        crashlytics.recordException(throwable);
     }
 }
