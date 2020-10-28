@@ -59,13 +59,19 @@ class RoomTest : BaseE2ETest() {
         onView(allOf(withText(getString(R.string.you)), isDisplayed()))
                 .perform(click())
         clickView(R.id.local_video_image_button)
-        onView(allOf(withId(R.id.participant_stub_image),
-                withContentDescription(getString(R.string.primary_profile_picture)))).check(matches(isDisplayed()))
+        retryEspressoAction {
+            onView(allOf(withId(R.id.participant_stub_image),
+                    withContentDescription(getString(R.string.primary_profile_picture))))
+                        .check(matches(isDisplayed()))
+        }
         onView(allOf(withId(R.id.participant_stub_image),
                 withContentDescription(getString(R.string.profile_picture)))).check(matches(isDisplayed()))
         clickView(R.id.local_video_image_button)
-        onView(allOf(withId(R.id.participant_stub_image),
-                withContentDescription(getString(R.string.primary_profile_picture)))).check(HiddenView())
+        retryEspressoAction {
+            onView(allOf(withId(R.id.participant_stub_image),
+                    withContentDescription(getString(R.string.primary_profile_picture))))
+                        .check(HiddenView())
+        }
         onView(allOf(withId(R.id.participant_stub_image),
                 withContentDescription(getString(R.string.profile_picture)))).check(HiddenView())
 
