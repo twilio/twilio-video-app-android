@@ -10,9 +10,9 @@
     </style>
 
     <style name="MyAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:textColorPrimary">@color/primary_text_default_material_light</item>
-        <item name="android:textColorSecondary">@color/secondary_text_default_material_light</item>
-        <item name="colorAccent">@color/secondary_text_default_material_light</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+        <item name="colorAccent">@color/textColorSecondary</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
