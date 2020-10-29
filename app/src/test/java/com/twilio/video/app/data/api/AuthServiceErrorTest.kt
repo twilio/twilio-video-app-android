@@ -1,6 +1,5 @@
 package com.twilio.video.app.data.api
 
-import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.data.api.AuthServiceError.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.data.api.AuthServiceError.INVALID_PASSCODE_ERROR
 import junitparams.JUnitParamsRunner
@@ -11,7 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(JUnitParamsRunner::class)
-class AuthServiceErrorTest : BaseUnitTest() {
+class AuthServiceErrorTest {
 
     fun params() =
             arrayOf(

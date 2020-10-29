@@ -1,6 +1,5 @@
 package com.twilio.video.app.util
 
-import androidx.annotation.IdRes
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -16,17 +15,9 @@ fun clickView(viewText: String) {
     onView(withText(viewText)).perform(click())
 }
 
-fun clickView(@IdRes id: Int) {
-    onView(withId(id)).perform(click())
-}
-
 fun scrollAndClickView(viewText: String, recyclerViewId: Int) {
     onView(withId(recyclerViewId))
             .perform(actionOnItem<RecyclerView.ViewHolder>(hasDescendant(withText(viewText)), click()))
-}
-
-fun assertTextIsDisplayed(text: String) {
-    onView(withText(text)).check(matches(isDisplayed()))
 }
 
 fun assertTextIsDisplayedRetry(text: String) {
