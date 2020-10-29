@@ -10,6 +10,7 @@
     <!--  Room Screen  -->
     <string name="room_screen_connection_failure_title">Connection Failure</string>
     <string name="room_screen_connection_failure_message">Failed to connect to the room.</string>
+    <string name="room_screen_max_participant_failure_message">Room contains too many participants.</string>
     <string name="room_screen_token_retrieval_failure_message">Failed to retrieve the room token.</string>
     <string name="room_screen_token_expired_message">Passcode expired. Please sign in with a new passcode.</string>
     <string name="room_screen_select_device">Select Device</string>
@@ -136,12 +137,8 @@
     <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>
     <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
-    <string name="screen_capture_error">Screen capturer error occurred.</string>
     <string name="join">Join</string>
     <string name="room">Room</string>
-    <string name="permissions_required">Camera, Microphone, and Writing to External Storage permissions are required. Please enable them in App Settings.</string>
-    <string name="failed_to_add_camera_video_track">Failed to add camera video track</string>
-    <string name="failed_to_add_screen_video_track">Failed to add screen video track</string>
     <string name="stats_track_sid">sid</string>
     <string name="stats_codec">codec</string>
     <string name="stats_packets">packets lost</string>
@@ -171,6 +168,7 @@
     <string name="audio_toggle">Audio toggle</string>
     <string name="video_logo">Video Logo</string>
     <string name="stats_disabled">Stats disabled</string>
+    <string name="primary_profile_picture">Primary view profile picture</string>
     <string name="profile_picture">Profile picture</string>
     <string name="number">Number</string>
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>

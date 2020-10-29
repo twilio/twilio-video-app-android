@@ -28,6 +28,7 @@ import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
+import com.twilio.video.app.data.api.model.Topology.GO
 import com.twilio.video.app.data.api.model.Topology.GROUP
 import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
 import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
@@ -39,9 +40,9 @@ private const val LEGACY_PASSCODE_SIZE = 10
 private const val PASSCODE_SIZE = 14
 
 class AuthServiceRepository(
-    private val authService: AuthService,
-    private val securePreferences: SecurePreferences,
-    private val sharedPreferences: SharedPreferencesWrapper
+        private val authService: AuthService,
+        private val securePreferences: SecurePreferences,
+        private val sharedPreferences: SharedPreferencesWrapper
 ) : TokenService {
     override suspend fun getToken(identity: String?, roomName: String?): String {
         return getToken(identity, roomName, passcode = null)
@@ -65,14 +66,14 @@ class AuthServiceRepository(
     }
 
     private fun buildRequest(
-        passcode: String,
-        identity: String?,
-        roomName: String?
+            passcode: String,
+            identity: String?,
+            roomName: String?
     ): Pair<AuthServiceRequestDTO, String> {
         val requestBody = AuthServiceRequestDTO(
-            passcode,
-            identity,
-            roomName)
+                passcode,
+                identity,
+                roomName)
         val appId = passcode.substring(6, 10)
         val serverlessId = passcode.substring(10)
         val url = if (passcode.length == PASSCODE_SIZE) {
@@ -94,7 +95,7 @@ class AuthServiceRepository(
                     sharedPreferences.edit { putString(TOPOLOGY, serverTopology.value) }
                     val (enableSimulcast, videoDimensionsIndex) = when (serverTopology) {
                         GROUP, GROUP_SMALL -> true to VIDEO_CAPTURE_RESOLUTION_DEFAULT
-                        PEER_TO_PEER -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()
+                        PEER_TO_PEER, GO -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()
                     }
                     Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
                             serverTopology, enableSimulcast)
@@ -116,7 +117,7 @@ class AuthServiceRepository(
         passcode?.let { passcode ->
             require(passcode.isNotEmpty() &&
                     (passcode.length == LEGACY_PASSCODE_SIZE ||
-                    passcode.length == PASSCODE_SIZE))
+                            passcode.length == PASSCODE_SIZE))
         }
     }
 
