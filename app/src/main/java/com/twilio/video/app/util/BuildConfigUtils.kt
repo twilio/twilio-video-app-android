@@ -20,5 +20,3 @@ import com.twilio.video.app.BuildConfig
 val isCommunityFlavor: Boolean get() = BuildConfig.FLAVOR == "community"
 
 val isInternalFlavor: Boolean get() = BuildConfig.FLAVOR == "internal"
-
-val isReleaseBuildType: Boolean get() = BuildConfig.BUILD_TYPE == "release"

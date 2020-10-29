@@ -3,7 +3,6 @@ package com.twilio.video.app.data.api
 import android.content.SharedPreferences
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT
 import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT
@@ -22,7 +21,7 @@ private const val devTestToken = "DevTestToken"
 private const val stageTestToken = "StageTestToken"
 private const val prodTestToken = "ProdTestToken"
 
-class VideoAppServiceDelegateTest : BaseUnitTest() {
+class VideoAppServiceDelegateTest {
 
     @get:Rule
     val coroutineScope = MainCoroutineScopeRule()
