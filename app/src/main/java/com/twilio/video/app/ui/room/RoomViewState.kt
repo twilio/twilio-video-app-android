@@ -17,7 +17,7 @@ data class RoomViewState(
     val isCameraEnabled: Boolean = false,
     val localVideoTrack: VideoTrackViewState? = null,
     val isMicEnabled: Boolean = false,
-    val isAudioMuted: Boolean = true,
+    val isAudioMuted: Boolean = false,
     val isAudioEnabled: Boolean = true,
     val isVideoEnabled: Boolean = true,
     val isVideoOff: Boolean = false,
