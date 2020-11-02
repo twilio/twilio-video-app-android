@@ -1,7 +1,6 @@
 package com.twilio.video.app.ui.login
 
 import android.content.Intent
-import android.preference.PreferenceManager
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.textfield.TextInputEditText
@@ -41,6 +40,7 @@ import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import com.twilio.video.app.util.getMockHttpException
+import com.twilio.video.app.util.getSharedPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -69,7 +69,7 @@ class CommunityLoginActivityTest {
     private lateinit var scenario: ActivityScenario<CommunityLoginActivity>
     private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
     private val authService: AuthService = mock()
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(testApp)
+    private val preferences = getSharedPreferences(testApp)
     private val securePreferences = SecurePreferencesFake()
     private val authServiceRepository = AuthServiceRepository(authService,
             securePreferences, SharedPreferencesWrapper(preferences))
