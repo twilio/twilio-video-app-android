@@ -10,9 +10,9 @@ import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
-import com.twilio.video.app.data.Preferences.MAX_VIDEO_DIMENSIONS
-import com.twilio.video.app.data.Preferences.MIN_VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.TOPOLOGY
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
@@ -187,11 +187,12 @@ class AuthServiceRepositoryTest {
 
     fun videoCodecParams() =
             arrayOf(
-                    arrayOf(GROUP, GROUP_SMALL, true, 0),
-                    arrayOf(PEER_TO_PEER, GROUP, true, 0),
-                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS)),
-                    arrayOf(GROUP, GO, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS))
-            )
+                    arrayOf(GROUP, GROUP_SMALL, true, VIDEO_CAPTURE_RESOLUTION_DEFAULT),
+                    arrayOf(PEER_TO_PEER, GROUP, true, VIDEO_CAPTURE_RESOLUTION_DEFAULT),
+                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false,
+                            VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()),
+                    arrayOf(GROUP, GO, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString())
+    )
 
     @Parameters(method = "videoCodecParams")
     @Test
@@ -199,7 +200,7 @@ class AuthServiceRepositoryTest {
         oldRoomType: Topology,
         newRoomType: Topology,
         enableSimulcast: Boolean,
-        minVideoDimensionsIndex: Int
+        videoDimensionsIndex: String
     ) {
         runBlockingTest {
             val (editor, repository) = setupServerRoomTypeMock(oldRoomType, newRoomType)
@@ -209,8 +210,7 @@ class AuthServiceRepositoryTest {
             verify(editor).putString(TOPOLOGY, newRoomType.value)
             verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
             verify(editor).putBoolean(VP8_SIMULCAST, enableSimulcast)
-            verify(editor).putInt(MIN_VIDEO_DIMENSIONS, minVideoDimensionsIndex)
-            verify(editor).putInt(MAX_VIDEO_DIMENSIONS, VIDEO_DIMENSIONS.lastIndex)
+            verify(editor).putString(VIDEO_CAPTURE_RESOLUTION, videoDimensionsIndex)
         }
     }
 
