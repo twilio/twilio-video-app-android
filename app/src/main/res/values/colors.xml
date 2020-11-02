@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#a52229</color>
     <color name="colorAccent">#b0bec5</color>
     <color name="colorButtonText">#80fffffe</color>
+    <color name="textColorPrimary">#de000000</color>
+    <color name="textColorSecondary">#8a000000</color>
 
     <!-- Login Screen Colors -->
     <color name="login_hint">#80ffffff</color>
