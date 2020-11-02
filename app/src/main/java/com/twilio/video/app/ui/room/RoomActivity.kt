@@ -41,7 +41,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -55,50 +54,42 @@ import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.AudioSwitch
-import com.twilio.video.CameraCapturer
-import com.twilio.video.LocalAudioTrack
-import com.twilio.video.LocalParticipant
-import com.twilio.video.LocalTrackPublicationOptions
-import com.twilio.video.LocalVideoTrack
-import com.twilio.video.Room
-import com.twilio.video.ScreenCapturer
-import com.twilio.video.StatsListener
-import com.twilio.video.StatsReport
-import com.twilio.video.TrackPriority
-import com.twilio.video.VideoFormat
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
-import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
-import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.participant.ParticipantViewState
-import com.twilio.video.app.sdk.CAMERA_TRACK_NAME
-import com.twilio.video.app.sdk.MICROPHONE_TRACK_NAME
 import com.twilio.video.app.sdk.RoomManager
-import com.twilio.video.app.sdk.SCREEN_TRACK_NAME
-import com.twilio.video.app.sdk.VideoTrackViewState
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Connecting
+import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
+import com.twilio.video.app.ui.room.RoomViewEffect.Connected
+import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.CheckPermissions
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
+import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
-import com.twilio.video.app.ui.room.RoomViewEvent.RefreshViewState
-import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
+import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
+import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
-import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
 import com.twilio.video.app.ui.settings.SettingsActivity
-import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
-import com.twilio.video.app.util.StatsScheduler
-import com.twilio.video.app.util.get
 import io.uniflow.androidx.flow.onEvents
 import io.uniflow.androidx.flow.onStates
 import javax.inject.Inject
@@ -166,33 +157,8 @@ class RoomActivity : BaseActivity() {
     private lateinit var deviceMenuItem: MenuItem
     private var savedVolumeControlStream = 0
     private var displayName: String? = null
-    private var localParticipant: LocalParticipant? = null
     private var localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
-    private var room: Room? = null
-    private var localAudioTrack: LocalAudioTrack? = null
-    private var cameraVideoTrack: LocalVideoTrack? = null
-    private var restoreLocalVideoCameraTrack = false
-    private var screenVideoTrack: LocalVideoTrack? = null
-    private var cameraCapturer: CameraCapturerCompat? = null
-    private var screenCapturer: ScreenCapturer? = null
-    private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
-        override fun onScreenCaptureError(errorDescription: String) {
-            Timber.e("Screen capturer error: %s", errorDescription)
-            stopScreenCapture()
-            Snackbar.make(
-                    primaryVideoView,
-                    R.string.screen_capture_error,
-                    Snackbar.LENGTH_LONG)
-                    .show()
-        }
-
-        override fun onFirstFrameAvailable() {
-            Timber.d("First frame from screen capturer available")
-        }
-    }
-    private lateinit var statsScheduler: StatsScheduler
     private lateinit var statsListAdapter: StatsListAdapter
-    private val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     @Inject
     lateinit var tokenService: TokenService
@@ -208,20 +174,13 @@ class RoomActivity : BaseActivity() {
 
     /** Coordinates participant thumbs and primary participant rendering.  */
     private lateinit var primaryParticipantController: PrimaryParticipantController
-    private var isAudioMuted = false
-    private var isVideoMuted = false
     private lateinit var participantAdapter: ParticipantAdapter
     private lateinit var roomViewModel: RoomViewModel
-    private lateinit var videoFormat: VideoFormat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
-        if (savedInstanceState != null) {
-            isAudioMuted = savedInstanceState.getBoolean(IS_AUDIO_MUTED)
-            isVideoMuted = savedInstanceState.getBoolean(IS_VIDEO_MUTED)
-        }
 
         // So calls can be answered when screen is locked
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
@@ -241,9 +200,6 @@ class RoomActivity : BaseActivity() {
 
         // setup participant controller
         primaryParticipantController = PrimaryParticipantController(primaryVideoView)
-
-        // Setup Activity
-        statsScheduler = StatsScheduler()
     }
 
     private fun setupThumbnailRecyclerView() {
@@ -259,18 +215,18 @@ class RoomActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         checkIntentURI()
-        roomViewModel.processInput(RefreshViewState)
-        roomViewModel.processInput(CheckPermissions)
-        updateStats()
     }
 
     override fun onResume() {
         super.onResume()
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
-        val dimensionsIndex = sharedPreferences.get(VIDEO_CAPTURE_RESOLUTION,
-                VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
-        videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
         setTitle(displayName)
+        roomViewModel.processInput(OnResume)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        roomViewModel.processInput(OnPause)
     }
 
     private fun checkIntentURI(): Boolean {
@@ -285,32 +241,13 @@ class RoomActivity : BaseActivity() {
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(IS_AUDIO_MUTED, isAudioMuted)
-        outState.putBoolean(IS_VIDEO_MUTED, isVideoMuted)
         super.onSaveInstanceState(outState)
     }
 
-    override fun onDestroy() {
-        // Teardown tracks
-        localAudioTrack?.let {
-            it.release()
-            localAudioTrack = null
-        }
-        cameraVideoTrack?.let {
-            it.release()
-            cameraVideoTrack = null
-        }
-        screenVideoTrack?.let {
-            it.release()
-            screenVideoTrack = null
-        }
-        super.onDestroy()
-    }
-
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<String>,
+            grantResults: IntArray
     ) {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             val recordAudioPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
@@ -320,18 +257,9 @@ class RoomActivity : BaseActivity() {
                     cameraPermissionGranted &&
                     writeExternalStoragePermissionGranted)
             if (permissionsGranted) {
-                roomViewModel.processInput(CheckPermissions)
-                setupLocalMedia()
-            } else {
-                Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_LONG)
-                        .show()
+                roomViewModel.processInput(OnResume)
             }
         }
-    }
-
-    override fun onStop() {
-        removeCameraTrack()
-        super.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -344,7 +272,6 @@ class RoomActivity : BaseActivity() {
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item)
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item)
         deviceMenuItem = menu.findItem(R.id.device_menu_item)
-        requestPermissions()
 
         onStates(roomViewModel) { state ->
             if (state is RoomViewState) bindRoomViewState(state)
@@ -360,21 +287,14 @@ class RoomActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.switch_camera_menu_item -> {
-                cameraCapturer?.let {
-                    it.switchCamera()
-                }
+                roomViewModel.processInput(SwitchCamera)
                 true
             }
             R.id.share_screen_menu_item -> {
-                val shareScreen = getString(R.string.share_screen)
-                if (item.title == shareScreen) {
-                    if (screenCapturer == null) {
-                        requestScreenCapturePermission()
-                    } else {
-                        startScreenCapture()
-                    }
+                if (item.title == getString(R.string.share_screen)) {
+                    requestScreenCapturePermission()
                 } else {
-                    stopScreenCapture()
+                    roomViewModel.processInput(StopScreenCapture)
                 }
                 true
             }
@@ -383,15 +303,20 @@ class RoomActivity : BaseActivity() {
                 true
             }
             R.id.pause_audio_menu_item -> {
-                toggleLocalAudioTrackState()
+                if (item.title == getString(R.string.pause_audio))
+                    roomViewModel.processInput(DisableLocalAudio)
+                else
+                    roomViewModel.processInput(EnableLocalAudio)
                 true
             }
             R.id.pause_video_menu_item -> {
-                toggleLocalVideoTrackState()
+                if (item.title == getString(R.string.pause_video))
+                    roomViewModel.processInput(DisableLocalVideo)
+                else
+                    roomViewModel.processInput(EnableLocalVideo)
                 true
             }
             R.id.settings_menu_item -> {
-                removeCameraTrack()
                 val intent = Intent(this@RoomActivity, SettingsActivity::class.java)
                 startActivity(intent)
                 true
@@ -412,8 +337,7 @@ class RoomActivity : BaseActivity() {
                 return
             }
             data?.let { data ->
-                screenCapturer = ScreenCapturer(this, resultCode, data, screenCapturerListener)
-                startScreenCapture()
+                roomViewModel.processInput(StartScreenCapture(resultCode, data))
             }
         }
     }
@@ -431,11 +355,6 @@ class RoomActivity : BaseActivity() {
     @OnClick(R.id.connect)
     fun connectButtonClick() {
         InputUtils.hideKeyboard(this)
-        if (!didAcceptPermissions()) {
-            Snackbar.make(primaryVideoView, R.string.permissions_required, Snackbar.LENGTH_SHORT)
-                    .show()
-            return
-        }
         connect.isEnabled = false
         // obtain room name
         val text = roomEditText.text
@@ -449,175 +368,28 @@ class RoomActivity : BaseActivity() {
     @OnClick(R.id.disconnect)
     fun disconnectButtonClick() {
         roomViewModel.processInput(Disconnect)
-        stopScreenCapture()
-    }
-
-    @OnClick(R.id.local_audio_image_button)
-    fun toggleLocalAudio() {
-        val icon: Int
-        if (localAudioTrack == null) {
-            isAudioMuted = false
-            LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME)?.let { localAudioTrack ->
-                this.localAudioTrack = localAudioTrack
-                localParticipant?.publishTrack(localAudioTrack)
-            }
-            icon = R.drawable.ic_mic_white_24px
-            pauseAudioMenuItem.isVisible = true
-            pauseAudioMenuItem.setTitle(
-                    if (localAudioTrack?.isEnabled == true) R.string.pause_audio else R.string.resume_audio)
-        } else {
-            isAudioMuted = true
-
-            localAudioTrack?.let { localAudioTrack ->
-                localParticipant?.unpublishTrack(localAudioTrack)
-                localAudioTrack.release()
-                this.localAudioTrack = null
-            }
-            icon = R.drawable.ic_mic_off_gray_24px
-            pauseAudioMenuItem.isVisible = false
-        }
-        localAudioImageButton.setImageResource(icon)
+        // TODO Handle screen share
     }
 
     @OnClick(R.id.local_video_image_button)
     fun toggleLocalVideo() {
-        localParticipant?.let { roomViewModel.processInput(ToggleLocalVideo(it.sid)) }
-        if (cameraVideoTrack == null) {
-            isVideoMuted = false
-
-            // add local camera track
-            cameraCapturer?.let {
-                cameraVideoTrack = LocalVideoTrack.create(
-                        this,
-                        true,
-                        it.videoCapturer,
-                        videoFormat,
-                        CAMERA_TRACK_NAME)
-            }
-            if (localParticipant != null) {
-                cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
-
-                // enable video settings
-                val isCameraVideoTrackEnabled = cameraVideoTrack?.isEnabled == true
-                switchCameraMenuItem.isVisible = isCameraVideoTrackEnabled
-                pauseVideoMenuItem.setTitle(
-                        if (isCameraVideoTrackEnabled) R.string.pause_video else R.string.resume_video)
-                pauseVideoMenuItem.isVisible = true
-            }
-        } else {
-            isVideoMuted = true
-            // remove local camera track
-            cameraVideoTrack?.let { cameraVideoTrack ->
-                cameraVideoTrack.removeSink(primaryVideoView)
-                localParticipant?.unpublishTrack(cameraVideoTrack)
-                cameraVideoTrack.release()
-                this.cameraVideoTrack = null
-            }
-
-            // disable video settings
-            switchCameraMenuItem.isVisible = false
-            pauseVideoMenuItem.isVisible = false
-        }
-
-        // update toggle button icon
-        localVideoImageButton.setImageResource(
-                if (cameraVideoTrack != null) R.drawable.ic_videocam_white_24px else R.drawable.ic_videocam_off_gray_24px)
-        roomViewModel.processInput(RefreshViewState)
+        roomViewModel.processInput(ToggleLocalVideo)
     }
 
-    private fun publishVideoTrack(videoTrack: LocalVideoTrack, trackPriority: TrackPriority) {
-        val localTrackPublicationOptions = LocalTrackPublicationOptions(trackPriority)
-        localParticipant?.publishTrack(videoTrack, localTrackPublicationOptions)
+    @OnClick(R.id.local_audio_image_button)
+    fun toggleLocalAudio() {
+        roomViewModel.processInput(ToggleLocalAudio)
     }
 
     private fun requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!permissionsGranted()) {
-                requestPermissions(arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ),
-                        PERMISSIONS_REQUEST_CODE)
-            } else {
-                setupLocalMedia()
-            }
-        } else {
-            setupLocalMedia()
+            requestPermissions(arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ),
+                    PERMISSIONS_REQUEST_CODE)
         }
-    }
-
-    private fun permissionsGranted(): Boolean {
-        val resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-        val resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-        val resultStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        return (resultCamera == PackageManager.PERMISSION_GRANTED &&
-                resultMic == PackageManager.PERMISSION_GRANTED &&
-                resultStorage == PackageManager.PERMISSION_GRANTED)
-    }
-
-    /** Initialize local media and provide stub participant for primary view.  */
-    private fun setupLocalMedia() {
-        if (localAudioTrack == null && !isAudioMuted) {
-            localAudioTrack = LocalAudioTrack.create(this, true, MICROPHONE_TRACK_NAME)
-            if (room != null && localParticipant != null) {
-                localAudioTrack?.let { localParticipant?.publishTrack(it) }
-            }
-        }
-        if (!isVideoMuted) {
-            setupLocalVideoTrack()
-            if (room != null && localParticipant != null) {
-                cameraVideoTrack?.let { publishVideoTrack(it, TrackPriority.LOW) }
-            }
-        }
-        roomViewModel.processInput(RefreshViewState)
-    }
-
-    /** Create local video track  */
-    private fun setupLocalVideoTrack() {
-
-        // initialize capturer only once if needed
-        if (cameraCapturer == null) {
-            cameraCapturer = CameraCapturerCompat(this, CameraCapturer.CameraSource.FRONT_CAMERA)
-        }
-        cameraCapturer?.let {
-            cameraVideoTrack = LocalVideoTrack.create(
-                    this,
-                    true,
-                    it.videoCapturer,
-                    videoFormat,
-                    CAMERA_TRACK_NAME)
-        }
-        cameraVideoTrack?.let {
-            localVideoTrackNames[it.name] = getString(R.string.camera_video_track)
-        } ?: run {
-            Snackbar.make(
-                    primaryVideoView,
-                    R.string.failed_to_add_camera_video_track,
-                    Snackbar.LENGTH_LONG)
-                    .show()
-        }
-    }
-
-    /**
-     * Render local video track.
-     *
-     *
-     * NOTE: Stub participant is created in controller. Make sure to remove it when connected to
-     * room.
-     */
-    private fun renderLocalParticipantStub() {
-        val cameraTrackViewState = cameraVideoTrack?.let { VideoTrackViewState(it, false) }
-        cameraCapturer?.let { cameraCapturer ->
-            primaryParticipantController.renderAsPrimary(
-                    localParticipantSid,
-                    getString(R.string.you),
-                    null,
-                    cameraTrackViewState,
-                    localAudioTrack == null,
-                    cameraCapturer.cameraSource == CameraCapturer.CameraSource.FRONT_CAMERA)
-        }
-        primaryVideoView.showIdentityBadge(false)
     }
 
     private fun updateLayout(roomViewState: RoomViewState) {
@@ -633,40 +405,42 @@ class RoomActivity : BaseActivity() {
         var toolbarTitle = displayName
         var joinStatus = ""
         var recordingWarningVisibility = View.GONE
-        if (roomViewState.isConnectingLayoutVisible) {
-            disconnectButtonState = View.VISIBLE
-            joinRoomLayoutState = View.GONE
-            joinStatusLayoutState = View.VISIBLE
-            recordingWarningVisibility = View.VISIBLE
-            settingsMenuItemState = false
-            connectButtonEnabled = false
-            if (roomEditable != null) {
-                roomName = roomEditable.toString()
+        when (roomViewState.configuration) {
+            Connecting -> {
+                disconnectButtonState = View.VISIBLE
+                joinRoomLayoutState = View.GONE
+                joinStatusLayoutState = View.VISIBLE
+                recordingWarningVisibility = View.VISIBLE
+                settingsMenuItemState = false
+                connectButtonEnabled = false
+                if (roomEditable != null) {
+                    roomName = roomEditable.toString()
+                }
+                joinStatus = "Joining..."
             }
-            joinStatus = "Joining..."
-        }
-        if (roomViewState.isConnectedLayoutVisible) {
-            disconnectButtonState = View.VISIBLE
-            joinRoomLayoutState = View.GONE
-            joinStatusLayoutState = View.GONE
-            settingsMenuItemState = false
-            screenCaptureMenuItemState = true
-            connectButtonEnabled = false
-            roomName = roomViewState.title
-            toolbarTitle = roomName
-            joinStatus = ""
-        }
-        if (roomViewState.isLobbyLayoutVisible) {
-            connectButtonEnabled = isRoomTextNotEmpty
-            screenCaptureMenuItemState = false
+            RoomViewConfiguration.Connected -> {
+                disconnectButtonState = View.VISIBLE
+                joinRoomLayoutState = View.GONE
+                joinStatusLayoutState = View.GONE
+                settingsMenuItemState = false
+                screenCaptureMenuItemState = true
+                connectButtonEnabled = false
+                roomName = roomViewState.title
+                toolbarTitle = roomName
+                joinStatus = ""
+            }
+            Lobby -> {
+                connectButtonEnabled = isRoomTextNotEmpty
+                screenCaptureMenuItemState = false
+            }
         }
         val isMicEnabled = roomViewState.isMicEnabled
         val isCameraEnabled = roomViewState.isCameraEnabled
         val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
         localAudioImageButton.isEnabled = isLocalMediaEnabled
         localVideoImageButton.isEnabled = isLocalMediaEnabled
-        val micDrawable = if (isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
-        val videoDrawable = if (isVideoMuted || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
+        val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
+        val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
         localAudioImageButton.setImageResource(micDrawable)
         localVideoImageButton.setImageResource(videoDrawable)
         statsListAdapter = StatsListAdapter(this)
@@ -680,11 +454,23 @@ class RoomActivity : BaseActivity() {
         joinStatusTextView.text = joinStatus
         joinRoomNameTextView.text = roomName
         recordingNoticeTextView.visibility = recordingWarningVisibility
+        val pauseAudioTitle = getString(if (roomViewState.isAudioEnabled) R.string.pause_audio else R.string.resume_audio)
+        val pauseVideoTitle = getString(if (roomViewState.isVideoEnabled) R.string.pause_video else R.string.resume_video)
+        pauseAudioMenuItem.title = pauseAudioTitle
+        pauseVideoMenuItem.title = pauseVideoTitle
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         settingsMenuItem.isVisible = settingsMenuItemState
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
+            val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
+                R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
+            } else {
+                R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
+            }
+            screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
+                    screenCaptureResources.first)
+            screenCaptureMenuItem.title = screenCaptureResources.second
         }
     }
 
@@ -716,102 +502,33 @@ class RoomActivity : BaseActivity() {
                 mediaProjectionManager.createScreenCaptureIntent(), MEDIA_PROJECTION_REQUEST_CODE)
     }
 
-    private fun startScreenCapture() {
-        screenCapturer?.let { screenCapturer ->
-            screenVideoTrack = LocalVideoTrack.create(this, true, screenCapturer,
-                    SCREEN_TRACK_NAME)
-            screenVideoTrack?.let { screenVideoTrack ->
-                screenCaptureMenuItem.setIcon(R.drawable.ic_stop_screen_share_white_24dp)
-                screenCaptureMenuItem.setTitle(R.string.stop_screen_share)
-                localVideoTrackNames[screenVideoTrack.name] = getString(R.string.screen_video_track)
-                if (localParticipant != null) {
-                    publishVideoTrack(screenVideoTrack, TrackPriority.HIGH)
+    private fun updateStatsUI(roomViewState: RoomViewState) {
+        val enableStats = sharedPreferences.getBoolean(
+                Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT)
+        if (enableStats) {
+            when (roomViewState.configuration) {
+                RoomViewConfiguration.Connected -> {
+                    statsListAdapter.updateStatsData(roomViewState.roomStats)
+                    statsRecyclerView.visibility = View.VISIBLE
+                    statsDisabledLayout.visibility = View.GONE
+
+                    // disable stats if there is room but no participants (no media)
+                    val isStreamingMedia = roomViewState.participantThumbnails?.let { thumbnails ->
+                        thumbnails.size > 1
+                    } ?: false
+                    if (!isStreamingMedia) {
+                        statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                        statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
+                        statsRecyclerView.visibility = View.GONE
+                        statsDisabledLayout.visibility = View.VISIBLE
+                    }
                 }
-            } ?: run {
-                Snackbar.make(
-                        primaryVideoView,
-                        R.string.failed_to_add_screen_video_track,
-                        Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show()
-            }
-        }
-    }
-
-    private fun stopScreenCapture() {
-        screenVideoTrack?.let { screenVideoTrack ->
-            localParticipant?.let { localParticipant ->
-                roomViewModel.processInput(ScreenTrackRemoved(localParticipant.sid))
-                localParticipant.unpublishTrack(screenVideoTrack)
-            }
-            screenVideoTrack.release()
-            localVideoTrackNames.remove(screenVideoTrack.name)
-            this.screenVideoTrack = null
-            screenCaptureMenuItem.setIcon(R.drawable.ic_screen_share_white_24dp)
-            screenCaptureMenuItem.setTitle(R.string.share_screen)
-        }
-    }
-
-    private fun toggleLocalAudioTrackState() {
-        localAudioTrack?.let { localAudioTrack ->
-            val enable = !localAudioTrack.isEnabled
-            localAudioTrack.enable(enable)
-            pauseAudioMenuItem.setTitle(
-                    if (localAudioTrack.isEnabled) R.string.pause_audio else R.string.resume_audio)
-        }
-    }
-
-    private fun toggleLocalVideoTrackState() {
-        cameraVideoTrack?.let { cameraVideoTrack ->
-            val enable = !cameraVideoTrack.isEnabled
-            cameraVideoTrack.enable(enable)
-            pauseVideoMenuItem.setTitle(
-                    if (cameraVideoTrack.isEnabled) R.string.pause_video else R.string.resume_video)
-        }
-    }
-
-    /**
-     * Remove the video track and mark the track to be restored when going to the settings screen or
-     * going to the background
-     */
-    private fun removeCameraTrack() {
-        cameraVideoTrack?.let { cameraVideoTrack ->
-            localParticipant?.let { localParticipant ->
-                roomViewModel.processInput(VideoTrackRemoved(localParticipant.sid))
-                localParticipant.unpublishTrack(cameraVideoTrack)
-            }
-            cameraVideoTrack.release()
-            restoreLocalVideoCameraTrack = true
-            this.cameraVideoTrack = null
-        }
-    }
-
-    /** Try to restore camera video track after going to the settings screen or background  */
-    private fun restoreCameraTrack() {
-        if (restoreLocalVideoCameraTrack) {
-            setupLocalVideoTrack()
-            restoreLocalVideoCameraTrack = false
-        }
-    }
-
-    private fun updateStatsUI(enabled: Boolean) {
-        if (enabled) {
-            if (room != null && room!!.remoteParticipants.size > 0) {
-                // show stats
-                statsRecyclerView.visibility = View.VISIBLE
-                statsDisabledLayout.visibility = View.GONE
-            } else if (room != null) {
-                // disable stats when there is no room
-                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-                statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
-                statsRecyclerView.visibility = View.GONE
-                statsDisabledLayout.visibility = View.VISIBLE
-            } else {
-                // disable stats if there is room but no participants (no media)
-                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
-                statsRecyclerView.visibility = View.GONE
-                statsDisabledLayout.visibility = View.VISIBLE
+                else -> {
+                    statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                    statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
+                    statsRecyclerView.visibility = View.GONE
+                    statsDisabledLayout.visibility = View.VISIBLE
+                }
             }
         } else {
             statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
@@ -821,56 +538,9 @@ class RoomActivity : BaseActivity() {
         }
     }
 
-    private fun updateStats() {
-        if (statsScheduler.isRunning) {
-            statsScheduler.cancelStatsGathering()
-        }
-        val enableStats = sharedPreferences.getBoolean(
-                Preferences.ENABLE_STATS, Preferences.ENABLE_STATS_DEFAULT)
-        if (enableStats && room != null && room!!.state == Room.State.CONNECTED) {
-            statsScheduler.scheduleStatsGathering(room!!, statsListener(), STATS_DELAY.toLong())
-        }
-        updateStatsUI(enableStats)
-    }
-
-    private fun statsListener(): StatsListener {
-        return StatsListener { statsReports: List<StatsReport> ->
-            // Running on StatsScheduler thread
-            room?.let { room ->
-                statsListAdapter.updateStatsData(statsReports, room.remoteParticipants,
-                        localVideoTrackNames)
-            }
-        }
-    }
-
-    private fun initializeRoom() {
-        room?.let {
-            setupLocalParticipant(it)
-            publishLocalTracks()
-            updateStats()
-        }
-    }
-
-    private fun setupLocalParticipant(room: Room) {
-        localParticipant = room.localParticipant
-        localParticipant?.let {
-            localParticipantSid = it.sid
-        }
-    }
-
-    private fun publishLocalTracks() {
-        if (localParticipant != null) {
-            cameraVideoTrack?.let { cameraVideoTrack ->
-                Timber.d("Camera track: %s", cameraVideoTrack)
-                publishVideoTrack(cameraVideoTrack, TrackPriority.LOW)
-            }
-            localAudioTrack?.let { localParticipant?.publishTrack(it) }
-        }
-    }
-
     private fun toggleAudioDevice(enableAudioDevice: Boolean) {
         setVolumeControl(enableAudioDevice)
-        val viewEvent = if (enableAudioDevice) ActivateAudioDevice else RoomViewEvent.DeactivateAudioDevice
+        val viewEvent = if (enableAudioDevice) ActivateAudioDevice else DeactivateAudioDevice
         roomViewModel.processInput(viewEvent)
     }
 
@@ -880,35 +550,42 @@ class RoomActivity : BaseActivity() {
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
         updateAudioDeviceIcon(roomViewState.selectedDevice)
+        updateStatsUI(roomViewState)
     }
 
     private fun bindRoomViewEffects(roomViewEffect: RoomViewEffect) {
-            requestPermissions()
-            if (roomViewEffect is RoomViewEffect.Connected) {
-                room = roomViewEffect.room
+        when (roomViewEffect) {
+            is Connected -> {
                 toggleAudioDevice(true)
-                initializeRoom()
             }
-            if (roomViewEffect is RoomViewEffect.Disconnected) {
-                localParticipant = null
-                room = null
+            Disconnected -> {
                 localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
-                updateStats()
+                // TODO Update stats
                 toggleAudioDevice(false)
             }
-            if (roomViewEffect is ShowConnectFailureDialog) {
+            ShowConnectFailureDialog, ShowMaxParticipantFailureDialog -> {
                 AlertDialog.Builder(this, R.style.AppTheme_Dialog)
                         .setTitle(getString(R.string.room_screen_connection_failure_title))
-                        .setMessage(getString(R.string.room_screen_connection_failure_message))
-                        .setNeutralButton("OK", null)
+                        .setMessage(getConnectFailureMessage(roomViewEffect))
+                        .setNeutralButton(getString(android.R.string.ok), null)
                         .show()
                 toggleAudioDevice(false)
             }
-            if (roomViewEffect is ShowTokenErrorDialog) {
+            is ShowTokenErrorDialog -> {
                 val error = roomViewEffect.serviceError
                 handleTokenError(error)
             }
+            PermissionsDenied -> requestPermissions()
+        }
     }
+
+    private fun getConnectFailureMessage(roomViewEffect: RoomViewEffect) =
+            getString(
+                    when (roomViewEffect) {
+                        ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
+                        else -> R.string.room_screen_connection_failure_message
+                    }
+            )
 
     private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
         val audioDeviceMenuIcon = when (selectedAudioDevice) {
@@ -920,22 +597,22 @@ class RoomActivity : BaseActivity() {
         this.deviceMenuItem.setIcon(audioDeviceMenuIcon)
     }
 
-    private fun renderPrimaryView(primaryParticipant: ParticipantViewState?) {
-        if (primaryParticipant != null) {
+    private fun renderPrimaryView(primaryParticipant: ParticipantViewState) {
+        primaryParticipant.run {
             primaryParticipantController.renderAsPrimary(
-                    primaryParticipant.sid,
-                    primaryParticipant.identity,
-                    primaryParticipant.screenTrack,
-                    primaryParticipant.videoTrack,
-                    primaryParticipant.isMuted,
-                    primaryParticipant.isMirrored)
-        } else {
-            renderLocalParticipantStub()
+                    if (isLocalParticipant) getString(R.string.you) else identity,
+                    screenTrack,
+                    videoTrack,
+                    isMuted,
+                    isMirrored)
+            primaryVideoView.showIdentityBadge(!primaryParticipant.isLocalParticipant)
         }
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
-        participantAdapter.submitList(roomViewState.participantThumbnails)
+        val newThumbnails = if (roomViewState.configuration is RoomViewConfiguration.Connected)
+            roomViewState.participantThumbnails else null
+        participantAdapter.submitList(newThumbnails)
     }
 
     private fun displayAudioDeviceList() {
@@ -963,10 +640,10 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun createAudioDeviceDialog(
-        activity: Activity,
-        currentDevice: Int,
-        availableDevices: ArrayList<String>,
-        audioDeviceClickListener: DialogInterface.OnClickListener
+            activity: Activity,
+            currentDevice: Int,
+            availableDevices: ArrayList<String>,
+            audioDeviceClickListener: DialogInterface.OnClickListener
     ): AlertDialog {
         val builder = AlertDialog.Builder(activity, R.style.AppTheme_Dialog)
         builder.setTitle(activity.getString(R.string.room_screen_select_device))
@@ -982,24 +659,13 @@ class RoomActivity : BaseActivity() {
         AlertDialog.Builder(this, R.style.AppTheme_Dialog)
                 .setTitle(getString(R.string.room_screen_connection_failure_title))
                 .setMessage(getString(errorMessage))
-                .setNeutralButton("OK", null)
+                .setNeutralButton(getString(android.R.string.ok), null)
                 .show()
-    }
-
-    private fun didAcceptPermissions(): Boolean {
-        return (PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                == PermissionChecker.PERMISSION_GRANTED) && (PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PermissionChecker.PERMISSION_GRANTED) && (PermissionChecker.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PermissionChecker.PERMISSION_GRANTED)
     }
 
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 100
         private const val MEDIA_PROJECTION_REQUEST_CODE = 101
-        private const val STATS_DELAY = 1000 // milliseconds
-        private const val IS_AUDIO_MUTED = "IS_AUDIO_MUTED"
-        private const val IS_VIDEO_MUTED = "IS_VIDEO_MUTED"
 
         // This will be used instead of real local participant sid,
         // because that information is unknown until room connection is fully established

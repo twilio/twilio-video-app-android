@@ -16,12 +16,16 @@
 
 package com.twilio.video.app.data.api;
 
+import static com.twilio.video.app.util.BuildConfigUtilsKt.isReleaseBuildType;
+
 import android.content.SharedPreferences;
 import com.twilio.video.app.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
@@ -37,7 +41,16 @@ public class VideoAppServiceModule {
     @ApplicationScope
     @Named("VideoAppService")
     OkHttpClient providesOkHttpClient() {
-        return new OkHttpClient.Builder().addInterceptor(new FirebaseAuthInterceptor()).build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        if (!isReleaseBuildType()) {
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            builder.addInterceptor(interceptor);
+        }
+        return builder.readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(new FirebaseAuthInterceptor())
+                .build();
     }
 
     @Provides

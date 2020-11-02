@@ -3,13 +3,14 @@ package com.twilio.video.app.ui.room
 import android.net.Uri
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import com.twilio.video.app.BaseUnitTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-class UriRoomParserTest {
+class UriRoomParserTest : BaseUnitTest() {
 
     @Test
     fun `parseRoom should return the room name`() {
