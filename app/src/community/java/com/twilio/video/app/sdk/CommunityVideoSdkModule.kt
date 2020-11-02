@@ -35,8 +35,7 @@ class CommunityVideoSdkModule {
     @ApplicationScope
     fun providesRoomManager(
         application: Application,
-        videoClient: VideoClient,
-        sharedPreferences: SharedPreferences
+        videoClient: VideoClient
     ): RoomManager =
-            RoomManager(application, videoClient, sharedPreferences)
+            RoomManager(application, videoClient)
 }

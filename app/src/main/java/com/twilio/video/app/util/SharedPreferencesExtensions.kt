@@ -1,8 +1,6 @@
 package com.twilio.video.app.util
 
-import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 
 /*
  * Utility method that allows getting a shared preference with a default value. The return value
@@ -18,5 +16,3 @@ inline fun <reified T> SharedPreferences.get(key: String, defaultValue: T): T {
         else -> throw IllegalArgumentException("Attempted to get preference with unsupported type")
     }
 }
-
-fun getSharedPreferences(context: Context) = PreferenceManager.getDefaultSharedPreferences(context)

@@ -53,7 +53,7 @@
             android:layout_width="107dp"
             android:layout_height="107dp"
             android:layout_centerInParent="true"
-            android:contentDescription="@string/primary_profile_picture"
+            android:contentDescription="@string/profile_picture"
             app:srcCompat="@drawable/ic_account_circle_white_48px" />
 
         <TextView

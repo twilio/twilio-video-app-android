@@ -30,9 +30,10 @@ import butterknife.ButterKnife
 import com.twilio.video.RemoteAudioTrack
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.StatsReport
 import com.twilio.video.app.R
 import com.twilio.video.app.model.StatsListItem
-import com.twilio.video.app.sdk.RoomStats
+import java.util.ArrayList
 
 class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<StatsListAdapter.ViewHolder>() {
 
@@ -135,7 +136,11 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
         return statsListItems.size
     }
 
-    fun updateStatsData(roomStats: RoomStats?) {
+    fun updateStatsData(
+        statsReports: List<StatsReport>,
+        remoteParticipants: List<RemoteParticipant>,
+        localVideoTrackNames: Map<String, String>
+    ) {
         /*
          * Generate new items on a separate list to ensure statsListItems changes are only
          * performed on the UI thread to meet the threading requirement of RecyclerView.Adapter.
@@ -144,81 +149,79 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
 
         // Generate stats items list from reports
         var localTracksAdded = false
-        roomStats?.statsReports?.let { statsReports ->
-            for (report in statsReports) {
-                if (!localTracksAdded) {
-                    // go trough local tracks
-                    for (localAudioTrackStats in report.localAudioTrackStats) {
-                        val item = StatsListItem.Builder()
-                                .baseTrackInfo(localAudioTrackStats)
-                                .bytes(localAudioTrackStats.bytesSent)
-                                .rtt(localAudioTrackStats.roundTripTime)
-                                .jitter(localAudioTrackStats.jitter)
-                                .audioLevel(localAudioTrackStats.audioLevel)
-                                .trackName(context.getString(R.string.local_audio_track))
-                                .isAudioTrack(true)
-                                .isLocalTrack(true)
-                                .build()
-                        statsItemList.add(item)
-                    }
-                    for (localVideoTrackStats in report.localVideoTrackStats) {
-                        var localVideoTrackName = roomStats.localVideoTrackNames[localVideoTrackStats.trackSid]
-                        if (localVideoTrackName == null) {
-                            localVideoTrackName = context.getString(R.string.local_video_track)
-                        }
-                        val item = StatsListItem.Builder()
-                                .baseTrackInfo(localVideoTrackStats)
-                                .bytes(localVideoTrackStats.bytesSent)
-                                .rtt(localVideoTrackStats.roundTripTime)
-                                .dimensions(localVideoTrackStats.dimensions.toString())
-                                .framerate(localVideoTrackStats.frameRate)
-                                .trackName(localVideoTrackName)
-                                .isAudioTrack(false)
-                                .isLocalTrack(true)
-                                .build()
-                        statsItemList.add(item)
-                    }
-                    localTracksAdded = true
-                }
-                var trackCount = 0
-                for (remoteAudioTrackStats in report.remoteAudioTrackStats) {
-                    val trackName = (getParticipantName(remoteAudioTrackStats.trackSid, true, roomStats.remoteParticipants) +
-                            " " +
-                            context.getString(R.string.audio_track) +
-                            " " +
-                            trackCount)
+        for (report in statsReports) {
+            if (!localTracksAdded) {
+                // go trough local tracks
+                for (localAudioTrackStats in report.localAudioTrackStats) {
                     val item = StatsListItem.Builder()
-                            .baseTrackInfo(remoteAudioTrackStats)
-                            .bytes(remoteAudioTrackStats.bytesReceived)
-                            .jitter(remoteAudioTrackStats.jitter)
-                            .audioLevel(remoteAudioTrackStats.audioLevel)
-                            .trackName(trackName)
+                            .baseTrackInfo(localAudioTrackStats)
+                            .bytes(localAudioTrackStats.bytesSent)
+                            .rtt(localAudioTrackStats.roundTripTime)
+                            .jitter(localAudioTrackStats.jitter)
+                            .audioLevel(localAudioTrackStats.audioLevel)
+                            .trackName(context.getString(R.string.local_audio_track))
                             .isAudioTrack(true)
-                            .isLocalTrack(false)
+                            .isLocalTrack(true)
                             .build()
                     statsItemList.add(item)
-                    trackCount++
                 }
-                trackCount = 0
-                for (remoteVideoTrackStats in report.remoteVideoTrackStats) {
-                    val trackName = (getParticipantName(
-                            remoteVideoTrackStats.trackSid, false, roomStats.remoteParticipants) +
-                            " " +
-                            context.getString(R.string.video_track) +
-                            " " +
-                            trackCount)
+                for (localVideoTrackStats in report.localVideoTrackStats) {
+                    var localVideoTrackName = localVideoTrackNames[localVideoTrackStats.trackSid]
+                    if (localVideoTrackName == null) {
+                        localVideoTrackName = context.getString(R.string.local_video_track)
+                    }
                     val item = StatsListItem.Builder()
-                            .baseTrackInfo(remoteVideoTrackStats)
-                            .bytes(remoteVideoTrackStats.bytesReceived)
-                            .dimensions(remoteVideoTrackStats.dimensions.toString())
-                            .framerate(remoteVideoTrackStats.frameRate)
-                            .trackName(trackName)
+                            .baseTrackInfo(localVideoTrackStats)
+                            .bytes(localVideoTrackStats.bytesSent)
+                            .rtt(localVideoTrackStats.roundTripTime)
+                            .dimensions(localVideoTrackStats.dimensions.toString())
+                            .framerate(localVideoTrackStats.frameRate)
+                            .trackName(localVideoTrackName)
                             .isAudioTrack(false)
-                            .isLocalTrack(false)
+                            .isLocalTrack(true)
                             .build()
                     statsItemList.add(item)
-                    trackCount++
                 }
+                localTracksAdded = true
+            }
+            var trackCount = 0
+            for (remoteAudioTrackStats in report.remoteAudioTrackStats) {
+                val trackName = (getParticipantName(remoteAudioTrackStats.trackSid, true, remoteParticipants) +
+                        " " +
+                        context.getString(R.string.audio_track) +
+                        " " +
+                        trackCount)
+                val item = StatsListItem.Builder()
+                        .baseTrackInfo(remoteAudioTrackStats)
+                        .bytes(remoteAudioTrackStats.bytesReceived)
+                        .jitter(remoteAudioTrackStats.jitter)
+                        .audioLevel(remoteAudioTrackStats.audioLevel)
+                        .trackName(trackName)
+                        .isAudioTrack(true)
+                        .isLocalTrack(false)
+                        .build()
+                statsItemList.add(item)
+                trackCount++
+            }
+            trackCount = 0
+            for (remoteVideoTrackStats in report.remoteVideoTrackStats) {
+                val trackName = (getParticipantName(
+                        remoteVideoTrackStats.trackSid, false, remoteParticipants) +
+                        " " +
+                        context.getString(R.string.video_track) +
+                        " " +
+                        trackCount)
+                val item = StatsListItem.Builder()
+                        .baseTrackInfo(remoteVideoTrackStats)
+                        .bytes(remoteVideoTrackStats.bytesReceived)
+                        .dimensions(remoteVideoTrackStats.dimensions.toString())
+                        .framerate(remoteVideoTrackStats.frameRate)
+                        .trackName(trackName)
+                        .isAudioTrack(false)
+                        .isLocalTrack(false)
+                        .build()
+                statsItemList.add(item)
+                trackCount++
             }
         }
 
