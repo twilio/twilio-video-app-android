@@ -20,21 +20,15 @@ import timber.log.Timber
 internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         RecyclerView.ViewHolder(thumb) {
 
-    private val localParticipantIdentity = thumb.context.getString(R.string.you)
-
     fun bind(participantViewState: ParticipantViewState, viewEventAction: (RoomViewEvent) -> Unit) {
         Timber.d("bind ParticipantViewHolder with data item: %s", participantViewState)
         Timber.d("thumb: %s", thumb)
 
         thumb.run {
-            participantViewState.sid?.let { sid ->
-                setOnClickListener {
-                    viewEventAction(PinParticipant(sid))
-                }
+            setOnClickListener {
+                viewEventAction(PinParticipant(participantViewState.sid))
             }
-            val identity = if (participantViewState.isLocalParticipant)
-                localParticipantIdentity else participantViewState.identity
-            setIdentity(identity)
+            setIdentity(participantViewState.identity)
             setMuted(participantViewState.isMuted)
             setPinned(participantViewState.isPinned)
 

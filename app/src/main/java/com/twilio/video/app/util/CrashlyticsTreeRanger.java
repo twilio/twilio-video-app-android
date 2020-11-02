@@ -16,28 +16,26 @@
 
 package com.twilio.video.app.util;
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.crashlytics.android.Crashlytics;
 import javax.inject.Inject;
 
 public class CrashlyticsTreeRanger implements TreeRanger {
-
-    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
 
     @Inject
     public CrashlyticsTreeRanger() {}
 
     @Override
     public void inform(String message) {
-        crashlytics.log(message);
+        // No inform implementation for now. We could potentially use Firebase Analytics
     }
 
     @Override
     public void caution(String message) {
-        crashlytics.log(message);
+        Crashlytics.log(message);
     }
 
     @Override
     public void alert(Throwable throwable) {
-        crashlytics.recordException(throwable);
+        Crashlytics.logException(throwable);
     }
 }
