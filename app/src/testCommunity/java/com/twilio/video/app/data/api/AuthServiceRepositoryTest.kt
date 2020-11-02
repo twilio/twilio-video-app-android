@@ -10,7 +10,6 @@ import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
-import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.TOPOLOGY
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
@@ -198,10 +197,10 @@ class AuthServiceRepositoryTest {
     @Parameters(method = "videoCodecParams")
     @Test
     fun `it should update the video codec, room type, and video dimensions if the room type has changed`(
-            oldRoomType: Topology,
-            newRoomType: Topology,
-            enableSimulcast: Boolean,
-            videoDimensionsIndex: String
+        oldRoomType: Topology,
+        newRoomType: Topology,
+        enableSimulcast: Boolean,
+        videoDimensionsIndex: String
     ) {
         runBlockingTest {
             val (editor, repository) = setupServerRoomTypeMock(oldRoomType, newRoomType)
