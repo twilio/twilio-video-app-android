@@ -15,18 +15,11 @@ apply plugin: 'kotlin-kapt'
  * SDK developers to iterate on SDK features within the application that is maintained in a separate
  * project.
  */
-def sdkModule = "videoAppSdkDependency"
-def ndkVersion = "ndkVersion"
-def videoAndroidSdkDep = (project.hasProperty(sdkModule) ?
-        project("${project.property(sdkModule)}") :
+def videoAndroidSdkDepProp = "videoAppSdkDependency"
+def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
+        project("${project.property(videoAndroidSdkDepProp)}") :
         "com.twilio:video-android:5.12.0")
 def versionCodeProperty = project.property('versionCode') as Integer
-
-afterEvaluate {
-    if (project.hasProperty(sdkModule) && project.hasProperty(ndkVersion)) {
-        android.ndkVersion = "${project.property(ndkVersion)}"
-    }
-}
 
 android {
     compileSdkVersion 30
@@ -147,7 +140,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
+    implementation 'com.twilio:twilio-android-env:1.0.0'
     implementation videoAndroidSdkDep
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'com.google.android.material:material:1.2.1'
