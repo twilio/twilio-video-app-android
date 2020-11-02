@@ -5,6 +5,7 @@ import com.twilio.video.Participant
 import com.twilio.video.Room
 import com.twilio.video.VideoTrack
 import com.twilio.video.app.data.api.AuthServiceError
+import com.twilio.video.app.sdk.RoomStats
 
 sealed class RoomEvent {
 
@@ -16,23 +17,37 @@ sealed class RoomEvent {
     ) : RoomEvent()
     object Disconnected : RoomEvent()
     object ConnectFailure : RoomEvent()
+    object MaxParticipantFailure : RoomEvent()
     data class TokenError(val serviceError: AuthServiceError? = null) : RoomEvent()
     data class DominantSpeakerChanged(val newDominantSpeakerSid: String?) : RoomEvent()
+    data class StatsUpdate(val roomStats: RoomStats) : RoomEvent()
 
-    sealed class ParticipantEvent : RoomEvent() {
+    sealed class RemoteParticipantEvent : RoomEvent() {
 
-        data class ParticipantConnected(val participant: Participant) : ParticipantEvent()
-        data class VideoTrackUpdated(val sid: String, val videoTrack: VideoTrack?) : ParticipantEvent()
-        data class TrackSwitchOff(val sid: String, val videoTrack: VideoTrack, val switchOff: Boolean) : ParticipantEvent()
+        data class RemoteParticipantConnected(val participant: Participant) : RemoteParticipantEvent()
+        data class VideoTrackUpdated(val sid: String, val videoTrack: VideoTrack?) : RemoteParticipantEvent()
+        data class TrackSwitchOff(val sid: String, val videoTrack: VideoTrack, val switchOff: Boolean) : RemoteParticipantEvent()
         data class ScreenTrackUpdated(
             val sid: String,
             val screenTrack: VideoTrack?
-        ) : ParticipantEvent()
-        data class MuteParticipant(val sid: String, val mute: Boolean) : ParticipantEvent()
+        ) : RemoteParticipantEvent()
+        data class MuteRemoteParticipant(val sid: String, val mute: Boolean) : RemoteParticipantEvent()
         data class NetworkQualityLevelChange(
             val sid: String,
             val networkQualityLevel: NetworkQualityLevel
-        ) : ParticipantEvent()
-        data class ParticipantDisconnected(val sid: String) : ParticipantEvent()
+        ) : RemoteParticipantEvent()
+        data class RemoteParticipantDisconnected(val sid: String) : RemoteParticipantEvent()
+    }
+
+    sealed class LocalParticipantEvent : RoomEvent() {
+        data class VideoTrackUpdated(val videoTrack: VideoTrack?) : LocalParticipantEvent()
+        object VideoEnabled : LocalParticipantEvent()
+        object VideoDisabled : LocalParticipantEvent()
+        object AudioOn : LocalParticipantEvent()
+        object AudioOff : LocalParticipantEvent()
+        object AudioEnabled : LocalParticipantEvent()
+        object AudioDisabled : LocalParticipantEvent()
+        object ScreenCaptureOn : LocalParticipantEvent()
+        object ScreenCaptureOff : LocalParticipantEvent()
     }
 }
