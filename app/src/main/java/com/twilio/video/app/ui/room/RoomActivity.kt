@@ -227,8 +227,6 @@ class RoomActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         roomViewModel.processInput(OnPause)
-        participantAdapter.submitList(null)
-        clearPrimaryView()
     }
 
     private fun checkIntentURI(): Boolean {
@@ -609,15 +607,6 @@ class RoomActivity : BaseActivity() {
                     isMirrored)
             primaryVideoView.showIdentityBadge(!primaryParticipant.isLocalParticipant)
         }
-    }
-
-    private fun clearPrimaryView() {
-            primaryParticipantController.renderAsPrimary(
-                    null,
-                    null,
-                    null,
-                    muted = false,
-                    mirror = false)
     }
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
