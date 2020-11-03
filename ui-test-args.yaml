@@ -4,6 +4,7 @@ e2e-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
+    - {model: hwALE-H, version: 21}
     - {model: lucye, version: 24}
     - {model: flame, version: 29}
   test-targets:
@@ -15,6 +16,7 @@ integration-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
+    - {model: hwALE-H, version: 21}
     - {model: lucye, version: 24}
     - {model: flame, version: 29}
   test-targets:
