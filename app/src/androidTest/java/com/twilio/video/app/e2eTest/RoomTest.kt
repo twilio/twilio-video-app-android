@@ -1,5 +1,6 @@
 package com.twilio.video.app.e2eTest
 
+import androidx.annotation.IdRes
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -27,6 +28,7 @@ import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,13 +61,19 @@ class RoomTest : BaseE2ETest() {
         onView(allOf(withText(getString(R.string.you)), isDisplayed()))
                 .perform(click())
         clickView(R.id.local_video_image_button)
-        onView(allOf(withId(R.id.participant_stub_image),
-                withContentDescription(getString(R.string.primary_profile_picture)))).check(matches(isDisplayed()))
+        retryEspressoAction {
+            onView(allOf(withId(R.id.participant_stub_image),
+                    withContentDescription(getString(R.string.primary_profile_picture))))
+                        .check(matches(isDisplayed()))
+        }
         onView(allOf(withId(R.id.participant_stub_image),
                 withContentDescription(getString(R.string.profile_picture)))).check(matches(isDisplayed()))
         clickView(R.id.local_video_image_button)
-        onView(allOf(withId(R.id.participant_stub_image),
-                withContentDescription(getString(R.string.primary_profile_picture)))).check(HiddenView())
+        retryEspressoAction {
+            onView(allOf(withId(R.id.participant_stub_image),
+                    withContentDescription(getString(R.string.primary_profile_picture))))
+                        .check(HiddenView())
+        }
         onView(allOf(withId(R.id.participant_stub_image),
                 withContentDescription(getString(R.string.profile_picture)))).check(HiddenView())
 
@@ -73,26 +81,48 @@ class RoomTest : BaseE2ETest() {
     }
 
     @Test
-    fun it_should_toggle_the_local_video_correctly_in_lobby() {
+    fun it_should_toggle_the_local_tracks_correctly_in_lobby() {
+        drawableIsDisplayed(R.id.local_video_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
+        drawableIsDisplayed(R.id.local_audio_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_mic_white_24px))
+
         clickView(R.id.local_video_image_button)
 
+        drawableIsDisplayed(R.id.local_video_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_off_gray_24px))
         onView(withId(R.id.participant_stub_image)).check(matches(isDisplayed()))
         onView(withId(R.id.participant_video)).check(HiddenView())
 
         clickView(R.id.local_video_image_button)
 
+        drawableIsDisplayed(R.id.local_video_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
         onView(withId(R.id.participant_stub_image)).check(HiddenView())
         onView(withId(R.id.participant_video)).check(matches(isDisplayed()))
+
+        clickView(R.id.local_audio_image_button)
+
+        drawableIsDisplayed(R.id.local_audio_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_mic_off_gray_24px))
+
+        clickView(R.id.local_audio_image_button)
+
+        drawableIsDisplayed(R.id.local_audio_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_mic_white_24px))
     }
 
     @Test
     fun it_should_connect_to_a_room_successfully_with_mic_and_video_muted() {
         clickVideoButton()
         clickMicButton()
-        enterRoomName(randomUUID())
+        val roomName = randomUUID()
+        enterRoomName(roomName)
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
+        onView(allOf(withText(roomName), isDisplayed()))
+                .check(matches(isDisplayed()))
 
         clickDisconnectButton()
     }
@@ -108,20 +138,20 @@ class RoomTest : BaseE2ETest() {
         assertTextIsDisplayedRetry(speakerphoneName)
 
         clickView(speakerphoneName)
-        retryEspressoAction { drawableIsDisplayed(speakerphoneDrawableMatcher) }
+        retryEspressoAction { drawableIsDisplayed(R.id.device_menu_item, speakerphoneDrawableMatcher) }
 
         enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
-        drawableIsDisplayed(speakerphoneDrawableMatcher)
+        drawableIsDisplayed(R.id.device_menu_item, speakerphoneDrawableMatcher)
 
         clickDisconnectButton()
     }
 
-    private fun drawableIsDisplayed(earpieceDrawableMatcher: DrawableMatcher) {
+    private fun drawableIsDisplayed(@IdRes id: Int, earpieceDrawableMatcher: DrawableMatcher) {
         retryEspressoAction {
-            onView(withId(R.id.device_menu_item)).check(matches(earpieceDrawableMatcher))
+            onView(withId(id)).check(matches(earpieceDrawableMatcher))
         }
     }
 }
