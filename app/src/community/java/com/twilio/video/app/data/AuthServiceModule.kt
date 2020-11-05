@@ -22,6 +22,7 @@ import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.security.SecurityModule
+import com.twilio.video.app.util.isReleaseBuildType
 import dagger.Module
 import dagger.Provides
 import java.util.concurrent.TimeUnit
@@ -34,10 +35,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 class AuthServiceModule {
     @Provides
     fun providesOkHttpClient(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        return OkHttpClient.Builder()
-                .addInterceptor(interceptor)
+        val builder = OkHttpClient.Builder()
+        if (!isReleaseBuildType) {
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            builder.addInterceptor(interceptor)
+        }
+        return builder
                 .readTimeout(30, TimeUnit.SECONDS)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .build()
