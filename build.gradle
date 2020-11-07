@@ -1,4 +1,7 @@
 buildscript {
+    ext {
+        kotlin_version = '1.4.10'
+    }
     ext.versions = [
             'butterknife' : '10.2.0',
     ]
