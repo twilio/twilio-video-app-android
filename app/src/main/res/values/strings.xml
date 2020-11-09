@@ -160,7 +160,7 @@
     <string name="camera_video_track">Camera Video Track</string>
     <string name="screen_video_track">Screen Video Track</string>
     <string name="you">You</string>
-    <string name="sign_in_with_existing_account">Sign in with Existing Account</string>
+    <string name="log_in">Log In</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="bitrate">bps</string>
