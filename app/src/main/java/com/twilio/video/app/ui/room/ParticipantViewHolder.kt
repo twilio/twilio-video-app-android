@@ -55,7 +55,7 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
                 videoTrack = newVideoTrack
                 videoTrack?.let { videoTrack ->
                     setVideoState(videoTrackViewState)
-                    if (videoTrack.isEnabled) videoTrack.addSink(this)
+                    if (videoTrack.isEnabled) videoTrack.addRenderer(this)
                 } ?: setState(ParticipantView.State.NO_VIDEO)
             } else {
                 setVideoState(videoTrackViewState)
@@ -73,8 +73,8 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
     }
 
     private fun removeRender(videoTrack: VideoTrack?, view: ParticipantView) {
-        if (videoTrack == null || !videoTrack.sinks.contains(view)) return
-        videoTrack.removeSink(view)
+        if (videoTrack == null || !videoTrack.renderers.contains(view)) return
+        videoTrack.removeRenderer(view)
     }
 
     private fun setNetworkQualityLevelImage(

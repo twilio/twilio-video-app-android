@@ -524,10 +524,10 @@ class RoomActivity : BaseActivity() {
                     }
                 }
                 else -> {
-                    statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-                    statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
-                    statsRecyclerView.visibility = View.GONE
-                    statsDisabledLayout.visibility = View.VISIBLE
+                statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
+                statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
+                statsRecyclerView.visibility = View.GONE
+                statsDisabledLayout.visibility = View.VISIBLE
                 }
             }
         } else {
@@ -565,10 +565,10 @@ class RoomActivity : BaseActivity() {
             }
             ShowConnectFailureDialog, ShowMaxParticipantFailureDialog -> {
                 AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                        .setTitle(getString(R.string.room_screen_connection_failure_title))
-                        .setMessage(getConnectFailureMessage(roomViewEffect))
-                        .setNeutralButton(getString(android.R.string.ok), null)
-                        .show()
+                    .setTitle(getString(R.string.room_screen_connection_failure_title))
+                    .setMessage(getConnectFailureMessage(roomViewEffect))
+                    .setNeutralButton(getString(android.R.string.ok), null)
+                    .show()
                 toggleAudioDevice(false)
             }
             is ShowTokenErrorDialog -> {
@@ -581,10 +581,10 @@ class RoomActivity : BaseActivity() {
 
     private fun getConnectFailureMessage(roomViewEffect: RoomViewEffect) =
             getString(
-                    when (roomViewEffect) {
-                        ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
-                        else -> R.string.room_screen_connection_failure_message
-                    }
+                when (roomViewEffect) {
+                    ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
+                    else -> R.string.room_screen_connection_failure_message
+                }
             )
 
     private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
@@ -611,7 +611,7 @@ class RoomActivity : BaseActivity() {
 
     private fun renderThumbnails(roomViewState: RoomViewState) {
         val newThumbnails = if (roomViewState.configuration is RoomViewConfiguration.Connected)
-            roomViewState.participantThumbnails else null
+                    roomViewState.participantThumbnails else null
         participantAdapter.submitList(newThumbnails)
     }
 

@@ -37,11 +37,13 @@
     <string name="settings_screen_max_video_bitrate">Video Bitrate (Kbps)</string>
     <string name="settings_screen_max_audio_bitrate">Audio Bitrate (Kbps)</string>
     <string name="settings_screen_vp8_simulcast">VP8 Simulcast</string>
+    <string name="settings_screen_aspect_ratio">Aspect Ratio</string>
+    <string name="settings_screen_fps">Frames per second</string>
     <string name="settings_screen_identity">User Identity</string>
     <string name="settings_screen_version">App Version</string>
     <string name="settings_screen_video_library_version">SDK Version</string>
     <string name="settings_screen_logout">Log Out</string>
-    <string name="settings_screen_video_resolution">Video Resolution</string>
+    <string name="settings_screen_video_dimensions">Video dimensions</string>
     <string-array name="settings_screen_environment_array">
         <item>Production</item>
         <item>Staging</item>
@@ -52,6 +54,28 @@
         <item>production</item>
         <item>stage</item>
         <item>dev</item>
+    </string-array>
+
+    <string-array name="settings_screen_aspect_ratio_array">
+        <item>4:3</item>
+        <item>16:9</item>
+        <item>11:9</item>
+    </string-array>
+
+    <string-array name="settings_screen_aspect_ratio_array_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="settings_screen_video_dimensions_array">
+        <item>352x288</item>
+        <item>640x480</item>
+        <item>800x480</item>
+        <item>960x540</item>
+        <item>1280x720</item>
+        <item>1280x960</item>
+        <item>1440x1080</item>
+        <item>1920x1080</item>
     </string-array>
 
     <string-array name="settings_screen_bandwidth_profile_modes">
