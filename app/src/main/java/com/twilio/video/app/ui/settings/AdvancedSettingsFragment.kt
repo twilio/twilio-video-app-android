@@ -16,8 +16,8 @@ import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
-import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS_RANGE_BAR
+import com.twilio.video.app.data.RangeBarPreference
 import com.twilio.video.app.util.isInternalFlavor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
@@ -33,17 +33,8 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
 
         setHasOptionsMenu(true)
 
-        (findPreference(VIDEO_CAPTURE_RESOLUTION) as ListPreference?)?.run {
-            entries = VIDEO_DIMENSIONS.map { "${it.width}x${it.height}" }.toTypedArray()
-            entryValues = (0..VIDEO_DIMENSIONS.lastIndex).map { it.toString() }.toTypedArray()
-            setSummaryProvider { preference ->
-                (preference as ListPreference).let { listPreference ->
-                    VIDEO_DIMENSIONS[listPreference.value.toInt()].let { dimensions ->
-                        entries.find { it == "${dimensions.width}x${dimensions.height}" }
-                    }
-                }
-            }
-        }
+        val videoDimensions = findPreference(VIDEO_DIMENSIONS_RANGE_BAR) as RangeBarPreference?
+        videoDimensions?.entries = Preferences.VIDEO_DIMENSIONS.map { "${it.width}x${it.height}" }.toTypedArray()
 
         setupCodecListPreference(
                 VideoCodec::class.java,
