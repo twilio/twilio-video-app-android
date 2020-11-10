@@ -44,14 +44,14 @@ internal class PrimaryParticipantController(
         primaryView.setMuted(newItem.muted)
         primaryView.setMirror(newItem.mirror)
         newItem.videoTrack?.let { newVideoTrack ->
-            if (newVideoTrack.isEnabled) newVideoTrack.addRenderer(primaryView)
+            if (newVideoTrack.isEnabled) newVideoTrack.addSink(primaryView)
             primaryView.setState(ParticipantView.State.VIDEO)
         } ?: primaryView.setState(ParticipantView.State.NO_VIDEO)
     }
 
     private fun removeRender(videoTrack: VideoTrack?, view: ParticipantView) {
-        if (videoTrack == null || !videoTrack.renderers.contains(view)) return
-        videoTrack.removeRenderer(view)
+        if (videoTrack == null || !videoTrack.sinks.contains(view)) return
+        videoTrack.removeSink(view)
     }
 
     internal class Item(
