@@ -580,12 +580,12 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun getConnectFailureMessage(roomViewEffect: RoomViewEffect) =
-            getString(
-                    when (roomViewEffect) {
-                        ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
-                        else -> R.string.room_screen_connection_failure_message
-                    }
-            )
+        getString(
+            when (roomViewEffect) {
+                ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
+                else -> R.string.room_screen_connection_failure_message
+            }
+        )
 
     private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
         val audioDeviceMenuIcon = when (selectedAudioDevice) {

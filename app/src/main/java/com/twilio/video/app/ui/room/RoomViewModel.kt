@@ -290,7 +290,7 @@ class RoomViewModel(
 
     private fun showConnectedViewState(roomName: String) {
         setState {
-            it.copy(configuration = RoomViewConfiguration.Connected)
+            it.copy(configuration = RoomViewConfiguration.Connected, title = roomName)
         }
     }
 

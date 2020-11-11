@@ -161,7 +161,7 @@ jobs:
       - run:
           name: E2E Tests
           command: >
-            gcloud firebase test android run --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
+            gcloud firebase test android run --num-flaky-test-attempts=1 --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
             ui-test-args.yaml:e2e-tests
 
   integration-tests:

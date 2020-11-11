@@ -38,7 +38,6 @@ public class CrashlyticsTreeRanger implements TreeRanger {
 
     @Override
     public void alert(Throwable throwable) {
-
         crashlytics.recordException(throwable);
     }
 }

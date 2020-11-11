@@ -8,7 +8,6 @@ import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
 import com.twilio.video.app.R
 import com.twilio.video.app.screen.assertRoomIsConnected
-import com.twilio.video.app.screen.assertScreenIsDisplayed
 import com.twilio.video.app.screen.clickDisconnectButton
 import com.twilio.video.app.screen.clickJoinRoomButton
 import com.twilio.video.app.screen.enterRoomName
@@ -31,8 +30,6 @@ class BackgroundSupportTest : BaseE2ETest() {
 
     @Test
     fun it_should_show_a_notification_when_the_app_is_in_the_background() {
-        retryEspressoAction { assertScreenIsDisplayed() }
-
         enterRoomName(randomUUID())
         clickJoinRoomButton()
 

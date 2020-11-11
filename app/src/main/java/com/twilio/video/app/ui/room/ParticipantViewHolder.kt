@@ -55,7 +55,7 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
                 videoTrack = newVideoTrack
                 videoTrack?.let { videoTrack ->
                     setVideoState(videoTrackViewState)
-                    videoTrack.addSink(this)
+                    if (videoTrack.isEnabled) videoTrack.addSink(this)
                 } ?: setState(ParticipantView.State.NO_VIDEO)
             } else {
                 setVideoState(videoTrackViewState)
