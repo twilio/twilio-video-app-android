@@ -180,7 +180,6 @@ class LocalParticipantManager(
         val dimensionsIndex = sharedPreferences.get(VIDEO_CAPTURE_RESOLUTION,
                 VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
         val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
-
         cameraVideoTrack = LocalVideoTrack.create(
                 context,
                 true,
