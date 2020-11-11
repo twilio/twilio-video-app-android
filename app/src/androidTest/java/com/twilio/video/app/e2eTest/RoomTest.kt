@@ -1,18 +1,19 @@
 package com.twilio.video.app.e2eTest
 
-import android.content.Context
-import android.media.AudioDeviceInfo.TYPE_WIRED_HEADSET
-import android.media.AudioManager
-import android.media.AudioManager.GET_DEVICES_INPUTS
+import androidx.annotation.IdRes
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.twilio.video.app.R
 import com.twilio.video.app.espresso.DrawableMatcher
+import com.twilio.video.app.espresso.HiddenView
 import com.twilio.video.app.screen.assertRoomIsConnected
 import com.twilio.video.app.screen.clickDisconnectButton
 import com.twilio.video.app.screen.clickJoinRoomButton
@@ -22,9 +23,12 @@ import com.twilio.video.app.screen.enterRoomName
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.clickView
+import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,37 +52,85 @@ class RoomTest : BaseE2ETest() {
     }
 
     @Test
-    fun it_should_connect_to_a_room_successfully_with_mic_and_video_muted() {
-        clickVideoButton()
-        clickMicButton()
+    fun it_should_toggle_the_local_video_correctly_while_pinned() {
         enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
+
+        onView(allOf(withText(getString(R.string.you)), isDisplayed()))
+                .perform(click())
+        clickView(R.id.local_video_image_button)
+        retryEspressoAction {
+            onView(allOf(withId(R.id.participant_stub_image),
+                    withContentDescription(getString(R.string.primary_profile_picture))))
+                        .check(matches(isDisplayed()))
+        }
+        onView(allOf(withId(R.id.participant_stub_image),
+                withContentDescription(getString(R.string.profile_picture)))).check(matches(isDisplayed()))
+        clickView(R.id.local_video_image_button)
+        retryEspressoAction {
+            onView(allOf(withId(R.id.participant_stub_image),
+                    withContentDescription(getString(R.string.primary_profile_picture))))
+                        .check(HiddenView())
+        }
+        onView(allOf(withId(R.id.participant_stub_image),
+                withContentDescription(getString(R.string.profile_picture)))).check(HiddenView())
 
         clickDisconnectButton()
     }
 
     @Test
-    fun it_should_display_the_earpiece_icon_by_default() {
-        val defaultDrawableMatcher = getDefaultDrawableMatcher()
-        drawableIsDisplayed(defaultDrawableMatcher)
+    fun it_should_toggle_the_local_tracks_correctly_in_lobby() {
+        drawableIsDisplayed(R.id.local_video_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
+        drawableIsDisplayed(R.id.local_audio_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_mic_white_24px))
 
-        enterRoomName(randomUUID())
+        clickView(R.id.local_video_image_button)
+
+        drawableIsDisplayed(R.id.local_video_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_off_gray_24px))
+        onView(withId(R.id.participant_stub_image)).check(matches(isDisplayed()))
+        onView(withId(R.id.participant_video)).check(HiddenView())
+
+        clickView(R.id.local_video_image_button)
+
+        drawableIsDisplayed(R.id.local_video_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
+        onView(withId(R.id.participant_stub_image)).check(HiddenView())
+        onView(withId(R.id.participant_video)).check(matches(isDisplayed()))
+
+        clickView(R.id.local_audio_image_button)
+
+        drawableIsDisplayed(R.id.local_audio_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_mic_off_gray_24px))
+
+        clickView(R.id.local_audio_image_button)
+
+        drawableIsDisplayed(R.id.local_audio_image_button,
+                DrawableMatcher(getTargetContext(), R.drawable.ic_mic_white_24px))
+    }
+
+    @Test
+    fun it_should_connect_to_a_room_successfully_with_mic_and_video_muted() {
+        clickVideoButton()
+        clickMicButton()
+        val roomName = randomUUID()
+        enterRoomName(roomName)
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
-        drawableIsDisplayed(defaultDrawableMatcher)
+        onView(allOf(withText(roomName), isDisplayed()))
+                .check(matches(isDisplayed()))
 
         clickDisconnectButton()
     }
 
     @Test
     fun it_should_display_the_speakerphone_icon_when_selected() {
-        val defaultDrawableMatcher = getDefaultDrawableMatcher()
         val speakerphoneDrawableMatcher = DrawableMatcher(getTargetContext(),
                 R.drawable.ic_volume_up_white_24dp)
-        drawableIsDisplayed(defaultDrawableMatcher)
 
         onView(withId(R.id.device_menu_item)).perform(click())
 
@@ -86,33 +138,20 @@ class RoomTest : BaseE2ETest() {
         assertTextIsDisplayedRetry(speakerphoneName)
 
         clickView(speakerphoneName)
-        retryEspressoAction { drawableIsDisplayed(speakerphoneDrawableMatcher) }
+        retryEspressoAction { drawableIsDisplayed(R.id.device_menu_item, speakerphoneDrawableMatcher) }
 
         enterRoomName(randomUUID())
         clickJoinRoomButton()
 
         retryEspressoAction { assertRoomIsConnected() }
-        drawableIsDisplayed(speakerphoneDrawableMatcher)
+        drawableIsDisplayed(R.id.device_menu_item, speakerphoneDrawableMatcher)
 
         clickDisconnectButton()
     }
 
-    private fun getDefaultDrawableMatcher(): DrawableMatcher {
-        /*
-         * Some FTL devices have headsets plugged in so we need to check for the default audio device
-         */
-        val audioManager = getTargetContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-        requireNotNull(audioManager)
-        val drawable = audioManager.getDevices(GET_DEVICES_INPUTS)
-                .find { it.type == TYPE_WIRED_HEADSET }
-                ?.let { R.drawable.ic_headset_mic_white_24dp }
-                ?: R.drawable.ic_phonelink_ring_white_24dp
-        return DrawableMatcher(getTargetContext(), drawable)
-    }
-
-    private fun drawableIsDisplayed(earpieceDrawableMatcher: DrawableMatcher) {
+    private fun drawableIsDisplayed(@IdRes id: Int, earpieceDrawableMatcher: DrawableMatcher) {
         retryEspressoAction {
-            onView(withId(R.id.device_menu_item)).check(matches(earpieceDrawableMatcher))
+            onView(withId(id)).check(matches(earpieceDrawableMatcher))
         }
     }
 }

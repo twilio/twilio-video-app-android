@@ -18,7 +18,7 @@ apply plugin: 'kotlin-kapt'
 def videoAndroidSdkDepProp = "videoAppSdkDependency"
 def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
         project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:5.11.1")
+        "com.twilio:video-android:5.13.0")
 def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
@@ -156,7 +156,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.5.0"
     implementation 'com.google.firebase:firebase-auth:19.4.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation "com.google.dagger:dagger-android:$daggerVersion"
@@ -168,10 +168,10 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.0.1'
+    implementation 'com.twilio:audioswitch:1.1.0'
     implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
-    internalImplementation "com.microsoft.appcenter:appcenter-distribute:2.5.1"
+    internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
@@ -188,6 +188,7 @@ dependencies {
     testImplementation 'android.arch.core:core-testing:1.1.1'
     testImplementation "io.uniflow:uniflow-androidx-test:$uniflowVersion"
     testImplementation "io.uniflow:uniflow-test:$uniflowVersion"
+    testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
 
