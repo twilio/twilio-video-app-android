@@ -27,6 +27,7 @@ import com.twilio.video.app.data.Preferences.TOPOLOGY
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
+import com.twilio.video.app.data.api.model.Topology.GO
 import com.twilio.video.app.data.api.model.Topology.GROUP
 import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
 import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
@@ -93,7 +94,7 @@ class AuthServiceRepository(
                     sharedPreferences.edit { putString(TOPOLOGY, serverTopology.value) }
                     val (enableSimulcast, minVideoDimensions) = when (serverTopology) {
                         GROUP, GROUP_SMALL -> true to 0
-                        PEER_TO_PEER -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS)
+                        PEER_TO_PEER, GO -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS)
                     }
                     Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
                             serverTopology, enableSimulcast)

@@ -20,15 +20,21 @@ import timber.log.Timber
 internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         RecyclerView.ViewHolder(thumb) {
 
+    private val localParticipantIdentity = thumb.context.getString(R.string.you)
+
     fun bind(participantViewState: ParticipantViewState, viewEventAction: (RoomViewEvent) -> Unit) {
         Timber.d("bind ParticipantViewHolder with data item: %s", participantViewState)
         Timber.d("thumb: %s", thumb)
 
         thumb.run {
-            setOnClickListener {
-                viewEventAction(PinParticipant(participantViewState.sid))
+            participantViewState.sid?.let { sid ->
+                setOnClickListener {
+                    viewEventAction(PinParticipant(sid))
+                }
             }
-            setIdentity(participantViewState.identity)
+            val identity = if (participantViewState.isLocalParticipant)
+                localParticipantIdentity else participantViewState.identity
+            setIdentity(identity)
             setMuted(participantViewState.isMuted)
             setPinned(participantViewState.isPinned)
 
@@ -49,7 +55,7 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
                 videoTrack = newVideoTrack
                 videoTrack?.let { videoTrack ->
                     setVideoState(videoTrackViewState)
-                    videoTrack.addRenderer(this)
+                    if (videoTrack.isEnabled) videoTrack.addRenderer(this)
                 } ?: setState(ParticipantView.State.NO_VIDEO)
             } else {
                 setVideoState(videoTrackViewState)

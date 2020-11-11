@@ -15,6 +15,7 @@
  */
 package com.twilio.video.app.data
 
+import com.twilio.video.AspectRatio
 import com.twilio.video.BandwidthProfileMode
 import com.twilio.video.OpusCodec
 import com.twilio.video.TrackPriority
@@ -44,6 +45,11 @@ object Preferences {
             VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
             VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
             VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
+    )
+    val ASPECT_RATIOS = arrayOf(
+            AspectRatio.ASPECT_RATIO_4_3,
+            AspectRatio.ASPECT_RATIO_16_9,
+            AspectRatio.ASPECT_RATIO_11_9
     )
     const val MIN_VIDEO_DIMENSIONS = "pref_min_video_dim"
     const val MAX_VIDEO_DIMENSIONS = "pref_max_video_dim"

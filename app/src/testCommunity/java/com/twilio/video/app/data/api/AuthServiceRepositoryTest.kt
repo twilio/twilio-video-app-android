@@ -17,6 +17,7 @@ import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
 import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.data.api.model.Topology.GO
 import com.twilio.video.app.data.api.model.Topology.GROUP
 import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
 import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
@@ -188,7 +189,8 @@ class AuthServiceRepositoryTest {
             arrayOf(
                     arrayOf(GROUP, GROUP_SMALL, true, 0),
                     arrayOf(PEER_TO_PEER, GROUP, true, 0),
-                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS))
+                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS)),
+                    arrayOf(GROUP, GO, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS))
             )
 
     @Parameters(method = "videoCodecParams")

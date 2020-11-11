@@ -6,12 +6,11 @@ import io.uniflow.core.flow.data.UIEvent
 
 sealed class RoomViewEffect : UIEvent() {
 
-    object CheckLocalMedia : RoomViewEffect()
-    // TODO Remove duplicated RoomEvents once all SDK code is decoupled from RoomActivity
-    object Connecting : RoomViewEffect()
+    object PermissionsDenied : RoomViewEffect()
     data class Connected(val room: Room) : RoomViewEffect()
     object Disconnected : RoomViewEffect()
 
     object ShowConnectFailureDialog : RoomViewEffect()
+    object ShowMaxParticipantFailureDialog : RoomViewEffect()
     data class ShowTokenErrorDialog(val serviceError: AuthServiceError? = null) : RoomViewEffect()
 }
