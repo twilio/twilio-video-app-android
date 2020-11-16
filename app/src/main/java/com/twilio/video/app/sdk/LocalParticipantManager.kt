@@ -46,7 +46,7 @@ class LocalParticipantManager(
             roomManager.sendRoomEvent(VideoTrackUpdated(value))
         }
     private val cameraCapturer: CameraCapturerCompat by lazy {
-        CameraCapturerCompat(context, CameraCapturer.CameraSource.FRONT_CAMERA)
+        CameraCapturerCompat(context, CameraCapturerCompat.Source.FRONT_CAMERA)
     }
     private lateinit var videoFormat: VideoFormat
     private var screenCapturer: ScreenCapturer? = null
@@ -183,7 +183,7 @@ class LocalParticipantManager(
         cameraVideoTrack = LocalVideoTrack.create(
                 context,
                 true,
-                cameraCapturer.videoCapturer,
+                cameraCapturer,
                 videoFormat,
                 CAMERA_TRACK_NAME)
         cameraVideoTrack?.let { cameraVideoTrack ->
