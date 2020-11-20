@@ -28,7 +28,6 @@ import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
 import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

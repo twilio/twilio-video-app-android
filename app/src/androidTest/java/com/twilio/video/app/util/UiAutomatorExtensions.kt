@@ -19,7 +19,7 @@ fun UiDevice.denyAllPermissions() {
 private fun UiDevice.clickThroughDialogs(text: String) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         var allowPermissions = findObject(UiSelector().textMatches(text))
-        if (allowPermissions.waitForExists(5000)) {
+        if (allowPermissions.waitForExists(60000)) {
             while (allowPermissions.exists()) {
                 allowPermissions.click()
                 allowPermissions = findObject(UiSelector().textMatches(text))

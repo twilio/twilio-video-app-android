@@ -45,7 +45,7 @@ class AppLinkRoomTest {
 
         loginWithEmail(emailCredentials)
 
-        retryEspressoAction { assertRoomNameIsDisplayed(roomName) }
+        retryEspressoAction(espressoAction = { assertRoomNameIsDisplayed(roomName) }, timeoutInMillis = 20000L)
 
         restartActivity(intent)
 
