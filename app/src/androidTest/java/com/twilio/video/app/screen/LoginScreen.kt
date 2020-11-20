@@ -2,8 +2,9 @@ package com.twilio.video.app.screen
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
+import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.scrollTo
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -33,7 +34,7 @@ fun loginWithWrongEmailCreds(emailCredentials: EmailCredentials) {
 
 private fun loginWithEmail(email: String, password: String) {
     onView(withId(R.id.email_sign_in_button)).perform(click())
-    onView(withId(R.id.email_edittext)).perform(typeText(email))
-    onView(withId(R.id.password_edittext)).perform(scrollTo(), typeText(password))
+    onView(withId(R.id.email_edittext)).perform(replaceText(email), closeSoftKeyboard())
+    onView(withId(R.id.password_edittext)).perform(scrollTo(), replaceText(password), closeSoftKeyboard())
     onView(withId(R.id.login_button)).perform(click())
 }

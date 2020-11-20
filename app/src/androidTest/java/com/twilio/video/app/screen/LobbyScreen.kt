@@ -3,7 +3,7 @@ package com.twilio.video.app.screen
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasChildCount
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -32,7 +32,7 @@ fun assertRoomNameIsDisplayed(roomName: String) {
 }
 
 fun enterRoomName(roomName: String) {
-    onView(withId(R.id.room_edit_text)).perform(typeText(roomName))
+    onView(withId(R.id.room_edit_text)).perform(replaceText(roomName))
 }
 
 fun clickVideoButton() {
