@@ -23,14 +23,14 @@ import com.twilio.video.Camera2Capturer
 import com.twilio.video.CameraCapturer
 import com.twilio.video.VideoCapturer
 import timber.log.Timber
+import tvi.webrtc.Camera1Enumerator
 import tvi.webrtc.Camera2Enumerator
+import tvi.webrtc.CameraEnumerator
 
 /*
  * Simple wrapper class that uses Camera2Capturer with supported devices.
  */
 class CameraCapturerCompat {
-    private var camera1Capturer: CameraCapturer? = null
-    private var camera2Capturer: Camera2Capturer? = null
     private var cameraManager: CameraManager? = null
     private val camera2Listener: Camera2Capturer.Listener = object : Camera2Capturer.Listener {
         override fun onFirstFrameAvailable() {
@@ -75,23 +75,25 @@ class CameraCapturerCompat {
      * this method instead of writing a custom capturer so that camera capturers are properly
      * initialized.
      */
-    val videoCapturer: VideoCapturer = camera2Capturer!!
-//        get() = if (usingCamera1()) {
-//            camera1Capturer
-//        } else {
-//            camera2Capturer
-//        }
+    lateinit var videoCapturer: VideoCapturer
 
     companion object {
         fun newInstance(context: Context): CameraCapturerCompat? {
-            return if (Camera2Capturer.isSupported(context) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val cameraId = Camera2Enumerator(context).run {
-                    deviceNames.find { isFrontFacing(it) } ?: deviceNames.find { isBackFacing(it) }
+            return if (Camera2Capturer.isSupported(context)) {
+                val cameraId = Camera2Enumerator(context).run { getFrontOrBackCameraId() }
+                cameraId?.let {
+                    CameraCapturerCompat().apply {
+                        videoCapturer = Camera2Capturer(context, it, camera2Listener)
+                    }
                 }
-                return cameraId?.let {
-                    CameraCapturerCompat().apply { Camera2Capturer(context, it, camera2Listener) }
+            } else {
+                val cameraId = Camera1Enumerator().run { getFrontOrBackCameraId() }
+                cameraId?.let {
+                    CameraCapturerCompat().apply {
+                        videoCapturer = CameraCapturer(context, it)
+                    }
                 }
-            } else null
+            }
 //            if (Camera2Capturer.isSupported(context) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //                val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 //                val camera2Listener: Camera2Capturer.Listener = object : Camera2Capturer.Listener {
@@ -119,6 +121,9 @@ class CameraCapturerCompat {
 //
 //        }
         }
+
+        private fun CameraEnumerator.getFrontOrBackCameraId() =
+                deviceNames.find { isFrontFacing(it) } ?: deviceNames.find { isBackFacing(it) }
     }
 
 //    private fun usingCamera1(): Boolean {
