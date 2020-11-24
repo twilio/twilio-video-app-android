@@ -3,7 +3,6 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import com.twilio.video.CameraCapturer
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalTrackPublicationOptions
@@ -45,8 +44,8 @@ class LocalParticipantManager(
             field = value
             roomManager.sendRoomEvent(VideoTrackUpdated(value))
         }
-    private val cameraCapturer: CameraCapturerCompat by lazy {
-        CameraCapturerCompat(context, CameraCapturer.CameraSource.FRONT_CAMERA)
+    private val cameraCapturer: CameraCapturerCompat? by lazy {
+        CameraCapturerCompat.newInstance(context)
     }
     private lateinit var videoFormat: VideoFormat
     private var screenCapturer: ScreenCapturer? = null
@@ -145,7 +144,7 @@ class LocalParticipantManager(
         publishCameraTrack(cameraVideoTrack)
     }
 
-    fun switchCamera() = cameraCapturer.switchCamera()
+    fun switchCamera() = cameraCapturer?.switchCamera()
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
@@ -181,12 +180,14 @@ class LocalParticipantManager(
                 VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
         val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
 
-        cameraVideoTrack = LocalVideoTrack.create(
-                context,
-                true,
-                cameraCapturer.videoCapturer,
-                videoFormat,
-                CAMERA_TRACK_NAME)
+        cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
+            LocalVideoTrack.create(
+                    context,
+                    true,
+                    cameraCapturer.videoCapturer,
+                    videoFormat,
+                    CAMERA_TRACK_NAME)
+        }
         cameraVideoTrack?.let { cameraVideoTrack ->
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
             publishCameraTrack(cameraVideoTrack)
