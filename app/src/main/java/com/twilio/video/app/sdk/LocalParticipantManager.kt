@@ -47,7 +47,6 @@ class LocalParticipantManager(
     private val cameraCapturer: CameraCapturerCompat? by lazy {
         CameraCapturerCompat.newInstance(context)
     }
-    private lateinit var videoFormat: VideoFormat
     private var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
@@ -192,7 +191,7 @@ class LocalParticipantManager(
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
             publishCameraTrack(cameraVideoTrack)
         } ?: run {
-            Timber.e(RuntimeException(), "Failed to create local camera video track")
+            Timber.e(RuntimeException(), "Failed to create the local camera video track")
         }
     }
 

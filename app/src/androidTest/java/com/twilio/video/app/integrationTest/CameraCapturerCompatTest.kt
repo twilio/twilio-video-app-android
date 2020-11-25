@@ -3,9 +3,11 @@ package com.twilio.video.app.integrationTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.twilio.video.Camera2Capturer
+import com.twilio.video.app.util.Camera2CapturerCompat
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.getTargetContext
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
@@ -34,10 +36,22 @@ class CameraCapturerCompatTest {
     }
 
     @Test
-    fun it_should_return_a_camera_capturer() {
+    fun it_should_switch_the_camera() {
         assumeTrue(cameraEnumerator.deviceNames.isNotEmpty())
-        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext())
+        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext()) as Camera2CapturerCompat?
+        assertThat(capturerCompat, `is`(not(nullValue())))
 
-        assertThat(capturerCompat!!.videoCapturer, `is`(not(nullValue())))
+        capturerCompat?.run {
+            val enumerator = Camera2Enumerator(getTargetContext())
+            val camera2Capturer = (videoCapturer as Camera2Capturer)
+            var isFrontFacing = enumerator.isFrontFacing(camera2Capturer.cameraId)
+            assertThat(isFrontFacing, equalTo(true))
+            switchCamera()
+            val isBackFacing = enumerator.isBackFacing(camera2Capturer.cameraId)
+            assertThat(isBackFacing, equalTo(true))
+            switchCamera()
+            isFrontFacing = enumerator.isFrontFacing(camera2Capturer.cameraId)
+            assertThat(isFrontFacing, equalTo(true))
+        }
     }
 }
