@@ -23,7 +23,7 @@ class CameraCapturerCompat(
     private val camera2Capturer: Camera2Capturer? = null
 ) : VideoCapturer {
 
-    internal val cameraId: String
+    val cameraId: String
         get() = cameraCapturer?.cameraId
                 ?: camera2Capturer?.cameraId
                 ?: throw IllegalStateException("At least one camera capturer must not be null")
