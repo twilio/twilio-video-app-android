@@ -94,21 +94,21 @@ class CameraCapturerCompat(
                     e.printStackTrace()
                     return false
                 }
-            /*
-             * This is a temporary work around for a RuntimeException that occurs on devices which contain cameras
-             * that do not support ImageFormat.PRIVATE output formats. A long term fix is currently in development.
-             * https://github.com/twilio/video-quickstart-android/issues/431
-             */
+                /*
+                 * This is a temporary work around for a RuntimeException that occurs on devices which contain cameras
+                 * that do not support ImageFormat.PRIVATE output formats. A long term fix is currently in development.
+                 * https://github.com/twilio/video-quickstart-android/issues/431
+                 */
                 val streamMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                 if (streamMap != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     isPrivateImageFormatSupported = streamMap.isOutputSupportedFor(ImageFormat.PRIVATE)
                 }
 
-            /*
-             * Read the color filter arrangements of the camera to filter out the ones that support
-             * SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO or SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR.
-             * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
-             */
+                /*
+                 * Read the color filter arrangements of the camera to filter out the ones that support
+                 * SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO or SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR.
+                 * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
+                 */
                 val colorFilterArrangement = cameraCharacteristics.get(
                         CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && colorFilterArrangement != null) {
