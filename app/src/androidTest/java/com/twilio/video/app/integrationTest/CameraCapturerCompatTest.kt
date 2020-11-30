@@ -3,7 +3,6 @@ package com.twilio.video.app.integrationTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.twilio.video.Camera2Capturer
-import com.twilio.video.app.util.Camera2CapturerCompat
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.getTargetContext
 import org.hamcrest.CoreMatchers.`is`
@@ -38,7 +37,7 @@ class CameraCapturerCompatTest {
     @Test
     fun it_should_switch_the_camera() {
         assumeTrue(cameraEnumerator.deviceNames.isNotEmpty())
-        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext()) as Camera2CapturerCompat?
+        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext())
         assertThat(capturerCompat, `is`(not(nullValue())))
 
         capturerCompat?.run {

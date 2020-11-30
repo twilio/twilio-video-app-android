@@ -7,25 +7,45 @@ import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.os.Build
 import com.twilio.video.Camera2Capturer
+import com.twilio.video.CameraCapturer
 import com.twilio.video.VideoCapturer
 import timber.log.Timber
 import tvi.webrtc.Camera1Enumerator
 import tvi.webrtc.Camera2Enumerator
 import tvi.webrtc.CameraEnumerator
 
-interface CameraCapturerCompat {
-    val videoCapturer: VideoCapturer
-    fun switchCamera()
+class CameraCapturerCompat(
+    private val frontCameraId: String?,
+    private val backCameraId: String?,
+    private val cameraCapturer: CameraCapturer? = null,
+    private val camera2Capturer: Camera2Capturer? = null
+) {
+
+    private val illegalStateException
+        get() = IllegalStateException("At least one camera capturer must not be null")
+    val videoCapturer: VideoCapturer = cameraCapturer ?: camera2Capturer ?: throw illegalStateException
+    private val cameraId: String
+        get() = cameraCapturer?.cameraId ?: camera2Capturer?.cameraId ?: throw illegalStateException
+
+    fun switchCamera() {
+        if (frontCameraId != null && backCameraId != null) {
+            val newCameraId = if (cameraId == frontCameraId) backCameraId else frontCameraId
+            cameraCapturer?.switchCamera(newCameraId)
+            camera2Capturer?.switchCamera(newCameraId)
+        } else Timber.w("Front and back cameras need to both be available in order to switch between them")
+    }
 
     companion object {
         fun newInstance(context: Context): CameraCapturerCompat? {
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
-                    Camera2CapturerCompat(context, cameraIds.first, cameraIds.second)
+                    val cameraCapturer = Camera2Capturer(context, cameraIds.first ?: cameraIds.second ?: "")
+                    CameraCapturerCompat(cameraIds.first, cameraIds.second, camera2Capturer = cameraCapturer)
                 }
             } else {
                 Camera1Enumerator().getFrontAndBackCameraIds(context)?.let { cameraIds ->
-                    LegacyCameraCapturerCompat(context, cameraIds.first, cameraIds.second)
+                    val cameraCapturer = CameraCapturer(context, cameraIds.first ?: cameraIds.second ?: "")
+                    CameraCapturerCompat(cameraIds.first, cameraIds.second, cameraCapturer = cameraCapturer)
                 }
             }
         }
