@@ -44,9 +44,7 @@ class LocalParticipantManager(
             field = value
             roomManager.sendRoomEvent(VideoTrackUpdated(value))
         }
-    private val cameraCapturer: CameraCapturerCompat? by lazy {
-        CameraCapturerCompat.newInstance(context)
-    }
+    private var cameraCapturer: CameraCapturerCompat? = null
     private var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
@@ -179,6 +177,7 @@ class LocalParticipantManager(
                 VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
         val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
 
+        cameraCapturer = CameraCapturerCompat.newInstance(context)
         cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
             LocalVideoTrack.create(
                     context,
