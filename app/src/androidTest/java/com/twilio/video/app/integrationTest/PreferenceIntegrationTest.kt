@@ -31,7 +31,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @IntegrationTest
-class PreferenceIntegrationTest {
+class PreferenceIntegrationTest : BaseIntegrationTest() {
 
     @get:Rule
     var scenario = activityScenarioRule<SettingsActivity>()
