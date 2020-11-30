@@ -182,7 +182,7 @@ class LocalParticipantManager(
             LocalVideoTrack.create(
                     context,
                     true,
-                    cameraCapturer.videoCapturer,
+                    cameraCapturer,
                     videoFormat,
                     CAMERA_TRACK_NAME)
         }

@@ -42,14 +42,13 @@ class CameraCapturerCompatTest {
 
         capturerCompat?.run {
             val enumerator = Camera2Enumerator(getTargetContext())
-            val camera2Capturer = (videoCapturer as Camera2Capturer)
-            var isFrontFacing = enumerator.isFrontFacing(camera2Capturer.cameraId)
+            var isFrontFacing = enumerator.isFrontFacing(cameraId)
             assertThat(isFrontFacing, equalTo(true))
             switchCamera()
-            val isBackFacing = enumerator.isBackFacing(camera2Capturer.cameraId)
+            val isBackFacing = enumerator.isBackFacing(cameraId)
             assertThat(isBackFacing, equalTo(true))
             switchCamera()
-            isFrontFacing = enumerator.isFrontFacing(camera2Capturer.cameraId)
+            isFrontFacing = enumerator.isFrontFacing(cameraId)
             assertThat(isFrontFacing, equalTo(true))
         }
     }
