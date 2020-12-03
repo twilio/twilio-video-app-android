@@ -66,6 +66,7 @@ import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.receiveOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -103,7 +104,6 @@ class RoomViewModel(
         roomManager.shutdownRoom()
     }
 
-    @ExperimentalCoroutinesApi
     fun processInput(viewEvent: RoomViewEvent) {
         Timber.d("View Event: $viewEvent")
 
@@ -317,7 +317,6 @@ class RoomViewModel(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun connect(identity: String, roomName: String) =
         viewModelScope.launch {
             roomManager.connect(
