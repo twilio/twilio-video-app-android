@@ -3,18 +3,17 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import com.twilio.video.CameraCapturer
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalTrackPublicationOptions
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.ScreenCapturer
 import com.twilio.video.TrackPriority
-import com.twilio.video.VideoConstraints
+import com.twilio.video.VideoFormat
 import com.twilio.video.app.R
-import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.Preferences.ASPECT_RATIO
-import com.twilio.video.app.data.Preferences.ASPECT_RATIOS
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
+import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
+import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioDisabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
@@ -25,6 +24,7 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisable
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
+import com.twilio.video.app.util.get
 import timber.log.Timber
 
 class LocalParticipantManager(
@@ -44,12 +44,7 @@ class LocalParticipantManager(
             field = value
             roomManager.sendRoomEvent(VideoTrackUpdated(value))
         }
-    private val cameraCapturer: CameraCapturerCompat by lazy {
-        CameraCapturerCompat(context, CameraCapturer.CameraSource.FRONT_CAMERA)
-    }
-    private val videoConstraints: VideoConstraints by lazy {
-        obtainVideoConstraints()
-    }
+    private var cameraCapturer: CameraCapturerCompat? = null
     private var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
@@ -146,7 +141,7 @@ class LocalParticipantManager(
         publishCameraTrack(cameraVideoTrack)
     }
 
-    fun switchCamera() = cameraCapturer.switchCamera()
+    fun switchCamera() = cameraCapturer?.switchCamera()
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
@@ -178,55 +173,25 @@ class LocalParticipantManager(
             localAudioTrack?.let { localParticipant?.unpublishTrack(it) }
 
     private fun setupLocalVideoTrack() {
-        cameraVideoTrack = LocalVideoTrack.create(
-                context,
-                true,
-                cameraCapturer.videoCapturer,
-                videoConstraints,
-                CAMERA_TRACK_NAME)
+        val dimensionsIndex = sharedPreferences.get(VIDEO_CAPTURE_RESOLUTION,
+                VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
+        val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
+
+        cameraCapturer = CameraCapturerCompat.newInstance(context)
+        cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
+            LocalVideoTrack.create(
+                    context,
+                    true,
+                    cameraCapturer,
+                    videoFormat,
+                    CAMERA_TRACK_NAME)
+        }
         cameraVideoTrack?.let { cameraVideoTrack ->
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
             publishCameraTrack(cameraVideoTrack)
         } ?: run {
-            Timber.e(RuntimeException(), "Failed to create local camera video track")
+            Timber.e(RuntimeException(), "Failed to create the local camera video track")
         }
-    }
-
-    private fun obtainVideoConstraints(): VideoConstraints {
-        Timber.d("Collecting video constraints...")
-        val builder = VideoConstraints.Builder()
-
-        // setup aspect ratio
-        sharedPreferences.getString(ASPECT_RATIO, "0")?.let { aspectRatio ->
-            val aspectRatioIndex = aspectRatio.toInt()
-            builder.aspectRatio(ASPECT_RATIOS[aspectRatioIndex])
-            Timber.d("Aspect ratio : %s",
-                    context.resources.getStringArray(
-                            R.array.settings_screen_aspect_ratio_array)[aspectRatioIndex])
-        }
-
-        // setup video dimensions
-        val minVideoDim = sharedPreferences.getInt(Preferences.MIN_VIDEO_DIMENSIONS, Preferences.MIN_VIDEO_DIMENSIONS_DEFAULT)
-        val maxVideoDim = sharedPreferences.getInt(Preferences.MAX_VIDEO_DIMENSIONS, Preferences.MAX_VIDEO_DIMENSIONS_DEFAULT)
-        builder.minVideoDimensions(Preferences.VIDEO_DIMENSIONS[minVideoDim])
-        builder.maxVideoDimensions(Preferences.VIDEO_DIMENSIONS[maxVideoDim])
-
-        Timber.d(
-                "Video dimensions: %s - %s",
-                context.resources
-                        .getStringArray(R.array.settings_screen_video_dimensions_array)[minVideoDim],
-                context.resources
-                        .getStringArray(R.array.settings_screen_video_dimensions_array)[maxVideoDim])
-
-        // setup fps
-        val minFps = sharedPreferences.getInt(Preferences.MIN_FPS, 0)
-        val maxFps = sharedPreferences.getInt(Preferences.MAX_FPS, 24)
-        if (maxFps != -1 && minFps != -1) {
-            builder.minFps(minFps)
-            builder.maxFps(maxFps)
-        }
-        Timber.d("Frames per second: %d - %d", minFps, maxFps)
-        return builder.build()
     }
 
     private fun removeCameraTrack() {
