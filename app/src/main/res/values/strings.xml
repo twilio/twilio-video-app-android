@@ -4,8 +4,8 @@
     <string name="web_app_domain">twilio-video-react.appspot.com</string>
 
     <!--  Login Screen  -->
-    <string name="login_screen_auth_error_title">Login Error</string>
-    <string name="login_screen_auth_error_desc">There was an issue logging in.</string>
+    <string name="login_screen_auth_error_title">Sign in Error</string>
+    <string name="login_screen_auth_error_desc">There was an issue signing in.</string>
 
     <!--  Room Screen  -->
     <string name="room_screen_connection_failure_title">Connection Failure</string>
