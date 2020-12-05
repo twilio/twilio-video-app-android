@@ -3,7 +3,6 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import com.twilio.video.CameraCapturer
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalTrackPublicationOptions
@@ -45,10 +44,7 @@ class LocalParticipantManager(
             field = value
             roomManager.sendRoomEvent(VideoTrackUpdated(value))
         }
-    private val cameraCapturer: CameraCapturerCompat by lazy {
-        CameraCapturerCompat(context, CameraCapturerCompat.Source.FRONT_CAMERA)
-    }
-    private lateinit var videoFormat: VideoFormat
+    private var cameraCapturer: CameraCapturerCompat? = null
     private var screenCapturer: ScreenCapturer? = null
     private val screenCapturerListener: ScreenCapturer.Listener = object : ScreenCapturer.Listener {
         override fun onScreenCaptureError(errorDescription: String) {
@@ -145,7 +141,7 @@ class LocalParticipantManager(
         publishCameraTrack(cameraVideoTrack)
     }
 
-    fun switchCamera() = cameraCapturer.switchCamera()
+    fun switchCamera() = cameraCapturer?.switchCamera()
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
@@ -180,17 +176,21 @@ class LocalParticipantManager(
         val dimensionsIndex = sharedPreferences.get(VIDEO_CAPTURE_RESOLUTION,
                 VIDEO_CAPTURE_RESOLUTION_DEFAULT).toInt()
         val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
-        cameraVideoTrack = LocalVideoTrack.create(
-                context,
-                true,
-                cameraCapturer,
-                videoFormat,
-                CAMERA_TRACK_NAME)
+
+        cameraCapturer = CameraCapturerCompat.newInstance(context)
+        cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
+            LocalVideoTrack.create(
+                    context,
+                    true,
+                    cameraCapturer,
+                    videoFormat,
+                    CAMERA_TRACK_NAME)
+        }
         cameraVideoTrack?.let { cameraVideoTrack ->
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
             publishCameraTrack(cameraVideoTrack)
         } ?: run {
-            Timber.e(RuntimeException(), "Failed to create local camera video track")
+            Timber.e(RuntimeException(), "Failed to create the local camera video track")
         }
     }
 
