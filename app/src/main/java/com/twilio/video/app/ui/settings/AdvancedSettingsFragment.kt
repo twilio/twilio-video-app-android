@@ -17,7 +17,6 @@ import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
-import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.util.isInternalFlavor
 

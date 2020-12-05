@@ -245,9 +245,9 @@ class RoomActivity : BaseActivity() {
     }
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
     ) {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             val recordAudioPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
@@ -580,12 +580,12 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun getConnectFailureMessage(roomViewEffect: RoomViewEffect) =
-        getString(
-            when (roomViewEffect) {
-                ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
-                else -> R.string.room_screen_connection_failure_message
-            }
-        )
+            getString(
+                    when (roomViewEffect) {
+                        ShowMaxParticipantFailureDialog -> R.string.room_screen_max_participant_failure_message
+                        else -> R.string.room_screen_connection_failure_message
+                    }
+            )
 
     private fun updateAudioDeviceIcon(selectedAudioDevice: AudioDevice?) {
         val audioDeviceMenuIcon = when (selectedAudioDevice) {
@@ -640,10 +640,10 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun createAudioDeviceDialog(
-            activity: Activity,
-            currentDevice: Int,
-            availableDevices: ArrayList<String>,
-            audioDeviceClickListener: DialogInterface.OnClickListener
+        activity: Activity,
+        currentDevice: Int,
+        availableDevices: ArrayList<String>,
+        audioDeviceClickListener: DialogInterface.OnClickListener
     ): AlertDialog {
         val builder = AlertDialog.Builder(activity, R.style.AppTheme_Dialog)
         builder.setTitle(activity.getString(R.string.room_screen_select_device))

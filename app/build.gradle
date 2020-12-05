@@ -19,7 +19,7 @@ def sdkModule = "videoAppSdkDependency"
 def ndkVersion = "ndkVersion"
 def videoAndroidSdkDep = (project.hasProperty(sdkModule) ?
         project("${project.property(sdkModule)}") :
-        "com.twilio:video-android:6.0.0-preview2")
+        "com.twilio:video-android:6.0.0")
 def versionCodeProperty = project.property('versionCode') as Integer
 
 afterEvaluate {

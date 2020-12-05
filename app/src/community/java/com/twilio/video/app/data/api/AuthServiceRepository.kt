@@ -21,7 +21,6 @@ import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.PASSCODE
-import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.TOPOLOGY
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
@@ -40,9 +39,9 @@ private const val LEGACY_PASSCODE_SIZE = 10
 private const val PASSCODE_SIZE = 14
 
 class AuthServiceRepository(
-        private val authService: AuthService,
-        private val securePreferences: SecurePreferences,
-        private val sharedPreferences: SharedPreferencesWrapper
+    private val authService: AuthService,
+    private val securePreferences: SecurePreferences,
+    private val sharedPreferences: SharedPreferencesWrapper
 ) : TokenService {
     override suspend fun getToken(identity: String?, roomName: String?): String {
         return getToken(identity, roomName, passcode = null)
@@ -66,9 +65,9 @@ class AuthServiceRepository(
     }
 
     private fun buildRequest(
-            passcode: String,
-            identity: String?,
-            roomName: String?
+        passcode: String,
+        identity: String?,
+        roomName: String?
     ): Pair<AuthServiceRequestDTO, String> {
         val requestBody = AuthServiceRequestDTO(
                 passcode,
