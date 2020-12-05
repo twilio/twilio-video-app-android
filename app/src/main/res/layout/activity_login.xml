@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/textColorPrimary"
                 android:background="@android:color/white"
-                android:text="@string/log_in"/>
+                android:text="@string/sign_in"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>

@@ -35,7 +35,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/white"
             android:background="?attr/colorPrimaryDark"
-            android:text="@string/log_in"/>
+            android:text="@string/sign_in"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
