@@ -48,6 +48,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.OnTextChanged
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
@@ -332,7 +333,7 @@ class RoomActivity : BaseActivity() {
                 Snackbar.make(
                         primaryVideoView,
                         R.string.screen_capture_permission_not_granted,
-                        Snackbar.LENGTH_LONG)
+                        BaseTransientBottomBar.LENGTH_LONG)
                         .show()
                 return
             }
