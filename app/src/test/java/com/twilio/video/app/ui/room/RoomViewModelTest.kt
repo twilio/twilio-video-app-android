@@ -27,7 +27,6 @@ import io.uniflow.android.test.TestViewObserver
 import io.uniflow.android.test.createTestObserver
 import io.uniflow.test.rule.TestDispatchersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
@@ -204,18 +203,6 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState.copy(configuration = Lobby,
                         primaryParticipant = localParticipantViewState,
                         participantThumbnails = listOf(localParticipantViewState)))
-    }
-
-    @Test
-    fun `OnCleared should shutdown the RoomManager`() {
-        connect()
-        assertThat(roomManager.roomReceiveChannel.isClosedForReceive, equalTo(false))
-        assertThat(roomManager.roomScope.isActive, equalTo(true))
-
-        viewModel.onCleared()
-
-        assertThat(roomManager.roomReceiveChannel.isClosedForReceive, equalTo(true))
-        assertThat(roomManager.roomScope.isActive, equalTo(false))
     }
 
     private fun connect() =

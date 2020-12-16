@@ -28,7 +28,6 @@ import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
@@ -92,12 +91,6 @@ class RoomManager(
         Timber.e(e, "Failed to retrieve token")
         sendToChannel(RoomEvent.TokenError(serviceError = error))
         return null
-    }
-
-    internal fun shutdownRoom() {
-        Timber.d("Shutting down Room Coroutine Scope and Channel: \n$roomScope\n$roomChannel")
-        roomScope.cancel()
-        roomChannel.close()
     }
 
     fun onResume() {

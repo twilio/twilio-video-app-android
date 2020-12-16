@@ -101,7 +101,6 @@ class RoomViewModel(
     public override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()
-        roomManager.shutdownRoom()
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
