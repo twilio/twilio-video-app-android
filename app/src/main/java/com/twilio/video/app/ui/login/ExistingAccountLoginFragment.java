@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -34,17 +35,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.FragmentExistingAccountLoginBinding;
+
+import org.jetbrains.annotations.NotNull;
 
 public class ExistingAccountLoginFragment extends Fragment {
 
-    @BindView(R.id.email_edittext)
-    EditText emailEditText;
-
-    @BindView(R.id.password_edittext)
-    EditText passwordEditText;
-
-    @BindView(R.id.login_button)
-    Button loginButton;
+    private FragmentExistingAccountLoginBinding binding;
 
     private Listener mListener;
 
@@ -62,30 +59,48 @@ public class ExistingAccountLoginFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_existing_account_login, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+            @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentExistingAccountLoginBinding.inflate(inflater, container, false);
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                handleTextChange(s);
+            }
+        };
+        binding.emailEdittext.addTextChangedListener(textWatcher);
+        binding.passwordEdittext.addTextChangedListener(textWatcher);
+        binding.loginButton.setOnClickListener(this::onLoginButton);
+        return binding.getRoot();
     }
 
-    @OnTextChanged({R.id.email_edittext, R.id.password_edittext})
-    public void onTextChanged(Editable editable) {
-        if (passwordEditText.length() != 0
-                && emailEditText.length() != 0
-                && Patterns.EMAIL_ADDRESS.matcher(emailEditText.getText()).matches()) {
-            loginButton.setTextColor(Color.WHITE);
-            loginButton.setEnabled(true);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    public void handleTextChange(Editable editable) {
+        if (binding.passwordEdittext.length() != 0
+                && binding.emailEdittext.length() != 0
+                && Patterns.EMAIL_ADDRESS.matcher(binding.emailEdittext.getText()).matches()) {
+            binding.loginButton.setTextColor(Color.WHITE);
+            binding.loginButton.setEnabled(true);
         } else {
-            loginButton.setTextColor(
+            binding.loginButton.setTextColor(
                     ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null));
-            loginButton.setEnabled(false);
+            binding.loginButton.setEnabled(false);
         }
     }
 
-    @OnClick(R.id.login_button)
     public void onLoginButton(View view) {
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
+        String email = binding.emailEdittext.getText().toString();
+        String password = binding.passwordEdittext.getText().toString();
         if (email.length() > 0
                 && password.length() > 0
                 && Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -97,7 +112,7 @@ public class ExistingAccountLoginFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         if (context instanceof Listener) {
             mListener = (Listener) context;
