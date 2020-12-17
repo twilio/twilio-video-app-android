@@ -4,21 +4,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-/*
- * Enable the application to consume the Video Android SDK directly from source
- * instead of from Bintray.
- *
- * The property is not defined by default when consuming the
- * application as a stand-alone project, but is defined by default in the Video Android SDK project.
- * This property enables the Video Android SDK project to build the application as a git subtree
- * with the contents of the source itself as a dependency. This coupling is intentional as it allows
- * SDK developers to iterate on SDK features within the application that is maintained in a separate
- * project.
- */
-def videoAndroidSdkDepProp = "videoAppSdkDependency"
-def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
-        project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:6.0.0")
 def versionCodeProperty = project.property('versionCode') as Integer
 
 android {
@@ -141,7 +126,7 @@ dependencies {
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
     implementation 'com.twilio:twilio-android-env:1.0.0'
-    implementation videoAndroidSdkDep
+    implementation 'com.twilio:video-android-ktx:6.1.0'
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
