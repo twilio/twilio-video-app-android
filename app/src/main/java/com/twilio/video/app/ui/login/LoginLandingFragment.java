@@ -21,15 +21,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import com.google.android.gms.common.SignInButton;
-import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.FragmentLoginLandingBinding;
+
+import org.jetbrains.annotations.NotNull;
 
 public class LoginLandingFragment extends Fragment {
+    private FragmentLoginLandingBinding binding;
 
     public interface Listener {
         void onSignInWithGoogle();
@@ -38,12 +37,6 @@ public class LoginLandingFragment extends Fragment {
     }
 
     private Listener mListener;
-
-    @BindView(R.id.google_sign_in_button)
-    SignInButton googleSignInButton;
-
-    @BindView(R.id.email_sign_in_button)
-    Button emailSignInButton;
 
     public LoginLandingFragment() {}
 
@@ -58,22 +51,28 @@ public class LoginLandingFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_login_landing, container, false);
-        ButterKnife.bind(this, view);
-        googleSignInButton.setSize(SignInButton.SIZE_WIDE);
-        googleSignInButton.setColorScheme(SignInButton.COLOR_LIGHT);
+            @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentLoginLandingBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+        binding.googleSignInButton.setSize(SignInButton.SIZE_WIDE);
+        binding.googleSignInButton.setColorScheme(SignInButton.COLOR_LIGHT);
+        binding.googleSignInButton.setOnClickListener(v -> onGoogleSignInButton());
+        binding.emailSignInButton.setOnClickListener(v -> onEmailSignInButton());
         return view;
     }
 
-    @OnClick(R.id.google_sign_in_button)
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
     public void onGoogleSignInButton() {
         if (mListener != null) {
             mListener.onSignInWithGoogle();
         }
     }
 
-    @OnClick(R.id.email_sign_in_button)
     public void onEmailSignInButton() {
         if (mListener != null) {
             mListener.onSignInWithEmail();
@@ -81,7 +80,7 @@ public class LoginLandingFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         if (context instanceof Listener) {
             mListener = (Listener) context;
