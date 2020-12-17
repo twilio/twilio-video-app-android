@@ -65,13 +65,12 @@ import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.receiveOrNull
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ExperimentalCoroutinesApi
 class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioSwitch: AudioSwitch,
@@ -146,10 +145,15 @@ class RoomViewModel(
     private fun subscribeToRoomChannel() {
         roomManager.roomReceiveChannel.let { channel ->
             viewModelScope.launch {
-                while (isActive && !channel.isClosedForReceive) {
+                while (isActive) {
                     Timber.d("Listening for RoomEvents")
-                    channel.receiveOrNull()?.let { observeRoomEvents(it) }
-                            ?: Timber.e("Cannot receive(), Channel is closed")
+                    try {
+                        observeRoomEvents(channel.receive())
+                    } catch (e: CancellationException) {
+                        Timber.e("Cannot receive(), Receiving coroutine has been canceled")
+                    } catch (e: ClosedReceiveChannelException) {
+                        Timber.e("Cannot receive(), Channel has been closed")
+                    }
                 }
             }
         }
