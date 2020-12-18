@@ -634,7 +634,7 @@
         errorLine1="                &lt;ImageView"
         errorLine2="                 ~~~~~~~~~">
         <location
-            file="src/main/res/layout-v21/activity_room.xml"
+            file="src/main/res/layout-v21/room_activity.xml"
             line="153"
             column="18"/>
     </issue>
