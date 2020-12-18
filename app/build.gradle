@@ -3,17 +3,6 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-/*
- * Enable the application to consume the Video Android SDK directly from source
- * instead of from Bintray.
- *
- * The property is not defined by default when consuming the
- * application as a stand-alone project, but is defined by default in the Video Android SDK project.
- * This property enables the Video Android SDK project to build the application as a git subtree
- * with the contents of the source itself as a dependency. This coupling is intentional as it allows
- * SDK developers to iterate on SDK features within the application that is maintained in a separate
- * project.
- */
 def versionCodeProperty = project.property('versionCode') as Integer
 def includeSdkFromSourceProperty = 'includeSdkFromSource'
 def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
