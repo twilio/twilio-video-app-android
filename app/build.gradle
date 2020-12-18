@@ -9,6 +9,7 @@ def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
         project.property(includeSdkFromSourceProperty) as Boolean
 
 afterEvaluate {
+    def ndkVersion = 'ndkVersion'
     if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
         android.ndkVersion = "${project.property(ndkVersion)}"
     }
@@ -157,7 +158,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0'
+    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
