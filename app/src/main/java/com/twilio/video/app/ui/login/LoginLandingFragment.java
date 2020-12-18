@@ -27,8 +27,6 @@ import com.twilio.video.app.databinding.LoginLandingFragmentBinding;
 import org.jetbrains.annotations.NotNull;
 
 public class LoginLandingFragment extends Fragment {
-    private LoginLandingFragmentBinding binding;
-
     public interface Listener {
         void onSignInWithGoogle();
 
@@ -51,19 +49,13 @@ public class LoginLandingFragment extends Fragment {
     @Override
     public View onCreateView(
             @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = LoginLandingFragmentBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
+        LoginLandingFragmentBinding binding =
+                LoginLandingFragmentBinding.inflate(inflater, container, false);
         binding.googleSignIn.setSize(SignInButton.SIZE_WIDE);
         binding.googleSignIn.setColorScheme(SignInButton.COLOR_LIGHT);
         binding.googleSignIn.setOnClickListener(v -> onGoogleSignInButton());
         binding.emailSignIn.setOnClickListener(v -> onEmailSignInButton());
-        return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+        return binding.getRoot();
     }
 
     public void onGoogleSignInButton() {
