@@ -59,7 +59,7 @@ class RoomTest : BaseE2ETest() {
 
         onView(allOf(withText(getString(R.string.you)), isDisplayed()))
                 .perform(click())
-        clickView(R.id.local_video_image_button)
+        clickView(R.id.`@+id/local_video`)
         retryEspressoAction {
             onView(allOf(withId(R.id.`@+id/stub`),
                     withContentDescription(getString(R.string.primary_profile_picture))))
@@ -67,7 +67,7 @@ class RoomTest : BaseE2ETest() {
         }
         onView(allOf(withId(R.id.`@+id/stub`),
                 withContentDescription(getString(R.string.profile_picture)))).check(matches(isDisplayed()))
-        clickView(R.id.local_video_image_button)
+        clickView(R.id.`@+id/local_video`)
         retryEspressoAction {
             onView(allOf(withId(R.id.`@+id/stub`),
                     withContentDescription(getString(R.string.primary_profile_picture))))
@@ -81,33 +81,33 @@ class RoomTest : BaseE2ETest() {
 
     @Test
     fun it_should_toggle_the_local_tracks_correctly_in_lobby() {
-        drawableIsDisplayed(R.id.local_video_image_button,
+        drawableIsDisplayed(R.id.`@+id/local_video`,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
-        drawableIsDisplayed(R.id.local_audio_image_button,
+        drawableIsDisplayed(R.id.`@+id/local_audio`,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_mic_white_24px))
 
-        clickView(R.id.local_video_image_button)
+        clickView(R.id.`@+id/local_video`)
 
-        drawableIsDisplayed(R.id.local_video_image_button,
+        drawableIsDisplayed(R.id.`@+id/local_video`,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_off_gray_24px))
         onView(withId(R.id.`@+id/stub`)).check(matches(isDisplayed()))
         onView(withId(R.id.`@+id/video`)).check(HiddenView())
 
-        clickView(R.id.local_video_image_button)
+        clickView(R.id.`@+id/local_video`)
 
-        drawableIsDisplayed(R.id.local_video_image_button,
+        drawableIsDisplayed(R.id.`@+id/local_video`,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
         onView(withId(R.id.`@+id/stub`)).check(HiddenView())
         onView(withId(R.id.`@+id/video`)).check(matches(isDisplayed()))
 
-        clickView(R.id.local_audio_image_button)
+        clickView(R.id.`@+id/local_audio`)
 
-        drawableIsDisplayed(R.id.local_audio_image_button,
+        drawableIsDisplayed(R.id.`@+id/local_audio`,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_mic_off_gray_24px))
 
-        clickView(R.id.local_audio_image_button)
+        clickView(R.id.`@+id/local_audio`)
 
-        drawableIsDisplayed(R.id.local_audio_image_button,
+        drawableIsDisplayed(R.id.`@+id/local_audio`,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_mic_white_24px))
     }
 

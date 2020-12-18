@@ -35,7 +35,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -120,13 +119,13 @@ class RoomActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = RoomActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.joinRoom.roomEditText.doOnTextChanged { text: CharSequence?, _, _, _ ->
+        binding.joinRoom.roomNameInput.doOnTextChanged { text: CharSequence?, _, _, _ ->
             roomNameTextChanged(text)
         }
         binding.joinRoom.connect.setOnClickListener { connectButtonClick() }
         binding.disconnect.setOnClickListener { disconnectButtonClick() }
-        binding.localVideoImageButton.setOnClickListener { toggleLocalVideo() }
-        binding.localAudioImageButton.setOnClickListener { toggleLocalAudio() }
+        binding.localVideo.setOnClickListener { toggleLocalVideo() }
+        binding.localAudio.setOnClickListener { toggleLocalAudio() }
         val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
@@ -180,7 +179,7 @@ class RoomActivity : BaseActivity() {
         val uri = intent.data
         val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
         if (roomName != null) {
-            binding.joinRoom.roomEditText.setText(roomName)
+            binding.joinRoom.roomNameInput.setText(roomName)
             isAppLinkProvided = true
         }
         return isAppLinkProvided
@@ -301,7 +300,7 @@ class RoomActivity : BaseActivity() {
         InputUtils.hideKeyboard(this)
         binding.joinRoom.connect.isEnabled = false
         // obtain room name
-        val text = binding.joinRoom.roomEditText.text
+        val text = binding.joinRoom.roomNameInput.text
         if (text != null) {
             val roomName = text.toString()
             val viewEvent = Connect(displayName ?: "", roomName)
@@ -339,7 +338,7 @@ class RoomActivity : BaseActivity() {
         var joinStatusLayoutState = View.GONE
         var settingsMenuItemState = true
         var screenCaptureMenuItemState = false
-        val roomEditable = binding.joinRoom.roomEditText.text
+        val roomEditable = binding.joinRoom.roomNameInput.text
         val isRoomTextNotEmpty = roomEditable != null && roomEditable.toString().isNotEmpty()
         var connectButtonEnabled = isRoomTextNotEmpty
         var roomName = displayName
@@ -378,12 +377,12 @@ class RoomActivity : BaseActivity() {
         val isMicEnabled = roomViewState.isMicEnabled
         val isCameraEnabled = roomViewState.isCameraEnabled
         val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
-        binding.localAudioImageButton.isEnabled = isLocalMediaEnabled
-        binding.localVideoImageButton.isEnabled = isLocalMediaEnabled
+        binding.localAudio.isEnabled = isLocalMediaEnabled
+        binding.localVideo.isEnabled = isLocalMediaEnabled
         val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
         val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
-        binding.localAudioImageButton.setImageResource(micDrawable)
-        binding.localVideoImageButton.setImageResource(videoDrawable)
+        binding.localAudio.setImageResource(micDrawable)
+        binding.localVideo.setImageResource(videoDrawable)
         statsListAdapter = StatsListAdapter(this)
         binding.statsRecyclerView.adapter = statsListAdapter
         binding.statsRecyclerView.layoutManager = LinearLayoutManager(this)

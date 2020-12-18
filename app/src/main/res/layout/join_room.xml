@@ -26,7 +26,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
 
         <com.twilio.video.app.ui.room.ClearableEditText
-            android:id="@+id/room_edit_text"
+            android:id="@+id/room_name_input"
             style="@style/AppTheme.Lobby.ClearableEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

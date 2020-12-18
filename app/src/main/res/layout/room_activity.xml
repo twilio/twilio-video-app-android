@@ -82,7 +82,7 @@
             android:gravity="end|bottom">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_video_image_button"
+                android:id="@+id/local_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/fab_margin"
@@ -91,7 +91,7 @@
                 app:srcCompat="@drawable/ic_videocam_white_24px" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_audio_image_button"
+                android:id="@+id/local_audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/fab_margin"
