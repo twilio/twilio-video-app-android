@@ -144,10 +144,8 @@ class RoomActivity : BaseActivity() {
         // Cache volume control stream
         savedVolumeControlStream = volumeControlStream
 
-        // setup participant controller
-        val primaryView = binding.room.primaryVideo
-        requireNotNull(primaryView)
-        primaryParticipantController = PrimaryParticipantController(primaryView)
+        // Setup participant controller
+        primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
     }
 
     private fun setupThumbnailRecyclerView() {

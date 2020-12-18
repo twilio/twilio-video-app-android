@@ -1,8 +1,4 @@
 buildscript {
-    ext.versions = [
-            'butterknife' : '10.2.0',
-    ]
-
     ext.keystore = (project.hasProperty('androidKeystore') ?
             project.property('androidKeystore') : '/fake/path/to/keystore')
     ext.keystorePassword = (project.hasProperty('androidKeystorePassword') ?
@@ -76,7 +72,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
-        classpath "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
         classpath "com.google.gms:google-services:4.3.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20"
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
