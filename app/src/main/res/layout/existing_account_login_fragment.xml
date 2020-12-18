@@ -6,7 +6,7 @@
     android:layout_height="match_parent" >
 
     <LinearLayout
-        android:id="@+id/login_linearlayout"
+        android:id="@+id/login_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -14,7 +14,7 @@
         android:layout_alignParentBottom="true" >
 
         <Button
-            android:id="@+id/login_button"
+            android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login"
@@ -34,7 +34,7 @@
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:background="?attr/colorPrimary"
         tools:context=".ui.login.LoginActivity"
-        android:layout_above="@id/login_linearlayout" >
+        android:layout_above="@id/login_layout" >
 
         <LinearLayout
             android:id="@+id/register_layout"
@@ -54,7 +54,7 @@
                 android:src="@drawable/video_logo_splash"/>
 
             <EditText
-                android:id="@+id/email_edittext"
+                android:id="@+id/email"
                 android:layout_marginTop="@dimen/username_margin_top"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -68,7 +68,7 @@
                 android:hint="@string/email"/>
 
             <EditText
-                android:id="@+id/password_edittext"
+                android:id="@+id/password"
                 android:layout_marginTop="@dimen/login_components_margin_top"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"

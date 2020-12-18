@@ -33,7 +33,7 @@ fun loginWithWrongEmailCreds(emailCredentials: EmailCredentials) {
 
 private fun loginWithEmail(email: String, password: String) {
     onView(withId(R.id.email_sign_in_button)).perform(click())
-    onView(withId(R.id.email_edittext)).perform(typeText(email))
-    onView(withId(R.id.password_edittext)).perform(scrollTo(), typeText(password))
-    onView(withId(R.id.login_button)).perform(click())
+    onView(withId(R.id.`@+id/email`)).perform(typeText(email))
+    onView(withId(R.id.`@+id/password`)).perform(scrollTo(), typeText(password))
+    onView(withId(R.id.`@+id/login`)).perform(click())
 }

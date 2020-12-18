@@ -29,12 +29,12 @@ import android.view.ViewGroup;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import com.twilio.video.app.R;
-import com.twilio.video.app.databinding.FragmentExistingAccountLoginBinding;
+import com.twilio.video.app.databinding.ExistingAccountLoginFragmentBinding;
 import org.jetbrains.annotations.NotNull;
 
 public class ExistingAccountLoginFragment extends Fragment {
 
-    private FragmentExistingAccountLoginBinding binding;
+    private ExistingAccountLoginFragmentBinding binding;
 
     private Listener mListener;
 
@@ -53,7 +53,7 @@ public class ExistingAccountLoginFragment extends Fragment {
     @Override
     public View onCreateView(
             @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentExistingAccountLoginBinding.inflate(inflater, container, false);
+        binding = ExistingAccountLoginFragmentBinding.inflate(inflater, container, false);
         TextWatcher textWatcher =
                 new TextWatcher() {
                     @Override
@@ -65,12 +65,12 @@ public class ExistingAccountLoginFragment extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        handleTextChange(s);
+                        credentialsChanged(s);
                     }
                 };
-        binding.emailEdittext.addTextChangedListener(textWatcher);
-        binding.passwordEdittext.addTextChangedListener(textWatcher);
-        binding.loginButton.setOnClickListener(this::onLoginButton);
+        binding.email.addTextChangedListener(textWatcher);
+        binding.password.addTextChangedListener(textWatcher);
+        binding.login.setOnClickListener(this::loginClicked);
         return binding.getRoot();
     }
 
@@ -80,22 +80,22 @@ public class ExistingAccountLoginFragment extends Fragment {
         binding = null;
     }
 
-    public void handleTextChange(Editable editable) {
-        if (binding.passwordEdittext.length() != 0
-                && binding.emailEdittext.length() != 0
-                && Patterns.EMAIL_ADDRESS.matcher(binding.emailEdittext.getText()).matches()) {
-            binding.loginButton.setTextColor(Color.WHITE);
-            binding.loginButton.setEnabled(true);
+    public void credentialsChanged(Editable editable) {
+        if (binding.password.length() != 0
+                && binding.email.length() != 0
+                && Patterns.EMAIL_ADDRESS.matcher(binding.email.getText()).matches()) {
+            binding.login.setTextColor(Color.WHITE);
+            binding.login.setEnabled(true);
         } else {
-            binding.loginButton.setTextColor(
+            binding.login.setTextColor(
                     ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null));
-            binding.loginButton.setEnabled(false);
+            binding.login.setEnabled(false);
         }
     }
 
-    public void onLoginButton(View view) {
-        String email = binding.emailEdittext.getText().toString();
-        String password = binding.passwordEdittext.getText().toString();
+    public void loginClicked(View view) {
+        String email = binding.email.getText().toString();
+        String password = binding.password.getText().toString();
         if (email.length() > 0
                 && password.length() > 0
                 && Patterns.EMAIL_ADDRESS.matcher(email).matches()
