@@ -51,20 +51,6 @@ public class ParticipantThumbView extends ParticipantView {
         init(context);
     }
 
-    @Override
-    public void setState(int state) {
-        super.setState(state);
-
-        binding.participantTrackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
-        binding.participantTrackSwitchOffIcon.setVisibility(isSwitchOffViewVisible(state));
-
-        int resId = R.drawable.participant_background;
-        if (state == State.SELECTED) {
-            resId = R.drawable.participant_selected_background;
-        }
-        selectedLayout.setBackground(ContextCompat.getDrawable(getContext(), resId));
-    }
-
     private void init(Context context) {
         binding = ParticipantViewBinding.inflate(LayoutInflater.from(context), this, true);
         videoLayout = binding.videoLayout;
@@ -80,6 +66,20 @@ public class ParticipantThumbView extends ParticipantView {
         setState(state);
         setMirror(mirror);
         setScaleType(scaleType);
+    }
+
+    @Override
+    public void setState(int state) {
+        super.setState(state);
+
+        binding.participantTrackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
+        binding.participantTrackSwitchOffIcon.setVisibility(isSwitchOffViewVisible(state));
+
+        int resId = R.drawable.participant_background;
+        if (state == State.SELECTED) {
+            resId = R.drawable.participant_selected_background;
+        }
+        selectedLayout.setBackground(ContextCompat.getDrawable(getContext(), resId));
     }
 
     private int isSwitchOffViewVisible(int state) {
