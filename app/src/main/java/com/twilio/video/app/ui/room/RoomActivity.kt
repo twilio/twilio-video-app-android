@@ -50,7 +50,7 @@ import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
-import com.twilio.video.app.databinding.ActivityRoomBinding
+import com.twilio.video.app.databinding.RoomActivityBinding
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Connecting
@@ -87,7 +87,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 class RoomActivity : BaseActivity() {
-    private lateinit var binding: ActivityRoomBinding
+    private lateinit var binding: RoomActivityBinding
     private lateinit var switchCameraMenuItem: MenuItem
     private lateinit var pauseVideoMenuItem: MenuItem
     private lateinit var pauseAudioMenuItem: MenuItem
@@ -118,7 +118,7 @@ class RoomActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRoomBinding.inflate(layoutInflater)
+        binding = RoomActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.joinRoom.roomEditText.doOnTextChanged { text: CharSequence?, _, _, _ ->
             roomNameTextChanged(text)
