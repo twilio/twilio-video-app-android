@@ -31,7 +31,7 @@ import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.databinding.ActivityLoginBinding
+import com.twilio.video.app.databinding.LoginActivityBinding
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.plus
 import io.reactivex.disposables.CompositeDisposable
@@ -43,7 +43,7 @@ internal const val GOOGLE_SIGN_IN = 4615
 
 class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAccountLoginFragment.Listener {
 
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var binding: LoginActivityBinding
 
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
@@ -56,7 +56,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = LoginActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (authenticator.loggedIn()) {
             onSignInSuccess()
