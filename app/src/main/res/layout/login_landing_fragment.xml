@@ -34,7 +34,7 @@
                 android:src="@drawable/video_logo_splash"/>
 
             <com.google.android.gms.common.SignInButton
-                android:id="@+id/google_sign_in_button"
+                android:id="@+id/google_sign_in"
                 android:layout_marginTop="@dimen/username_margin_top"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"/>
 
             <Button
-                android:id="@+id/email_sign_in_button"
+                android:id="@+id/email_sign_in"
                 android:layout_marginTop="@dimen/login_components_margin_top"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"

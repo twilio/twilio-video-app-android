@@ -23,11 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.common.SignInButton;
-import com.twilio.video.app.databinding.FragmentLoginLandingBinding;
+import com.twilio.video.app.databinding.LoginLandingFragmentBinding;
 import org.jetbrains.annotations.NotNull;
 
 public class LoginLandingFragment extends Fragment {
-    private FragmentLoginLandingBinding binding;
+    private LoginLandingFragmentBinding binding;
 
     public interface Listener {
         void onSignInWithGoogle();
@@ -51,12 +51,12 @@ public class LoginLandingFragment extends Fragment {
     @Override
     public View onCreateView(
             @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentLoginLandingBinding.inflate(inflater, container, false);
+        binding = LoginLandingFragmentBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        binding.googleSignInButton.setSize(SignInButton.SIZE_WIDE);
-        binding.googleSignInButton.setColorScheme(SignInButton.COLOR_LIGHT);
-        binding.googleSignInButton.setOnClickListener(v -> onGoogleSignInButton());
-        binding.emailSignInButton.setOnClickListener(v -> onEmailSignInButton());
+        binding.googleSignIn.setSize(SignInButton.SIZE_WIDE);
+        binding.googleSignIn.setColorScheme(SignInButton.COLOR_LIGHT);
+        binding.googleSignIn.setOnClickListener(v -> onGoogleSignInButton());
+        binding.emailSignIn.setOnClickListener(v -> onEmailSignInButton());
         return view;
     }
 
