@@ -67,15 +67,15 @@ public class ParticipantThumbView extends ParticipantView {
 
     private void init(Context context) {
         binding = ParticipantViewBinding.inflate(LayoutInflater.from(context), this, true);
-        videoLayout = binding.participantVideoLayout;
-        videoIdentity = binding.participantVideoIdentity;
-        videoView = binding.participantVideo;
-        selectedLayout = binding.participantSelectedLayout;
-        stubImage = binding.participantStubImage;
-        networkQualityLevelImg = binding.networkQualityLevelImg;
-        selectedIdentity = binding.participantSelectedIdentity;
-        audioToggle = binding.participantNoAudio;
-        pinImage = binding.participantPin;
+        videoLayout = binding.videoLayout;
+        videoIdentity = binding.videoIdentity;
+        videoView = binding.video;
+        selectedLayout = binding.selectedLayout;
+        stubImage = binding.stub;
+        networkQualityLevelImg = binding.networkQuality;
+        selectedIdentity = binding.selectedIdentity;
+        audioToggle = binding.audioToggle;
+        pinImage = binding.pin;
         setIdentity(identity);
         setState(state);
         setMirror(mirror);

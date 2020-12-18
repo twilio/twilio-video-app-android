@@ -21,10 +21,10 @@ import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import com.twilio.video.app.databinding.ParticipantViewPrimaryBinding;
+import com.twilio.video.app.databinding.ParticipantPrimaryViewBinding;
 
 public class ParticipantPrimaryView extends ParticipantView {
-    private ParticipantViewPrimaryBinding binding;
+    private ParticipantPrimaryViewBinding binding;
 
     public ParticipantPrimaryView(Context context) {
         super(context);
@@ -49,20 +49,20 @@ public class ParticipantPrimaryView extends ParticipantView {
     }
 
     public void showIdentityBadge(boolean show) {
-        if (binding.participantVideoIdentity != null) {
-            binding.participantVideoIdentity.setVisibility(show ? VISIBLE : GONE);
+        if (binding.videoIdentity != null) {
+            binding.videoIdentity.setVisibility(show ? VISIBLE : GONE);
         }
     }
 
     private void init(Context context) {
-        binding = ParticipantViewPrimaryBinding.inflate(LayoutInflater.from(context), this, true);
-        videoLayout = binding.participantVideoLayout;
-        videoIdentity = binding.participantVideoIdentity;
-        videoView = binding.participantVideo;
-        selectedLayout = binding.participantSelectedLayout;
-        stubImage = binding.participantStubImage;
+        binding = ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true);
+        videoLayout = binding.videoLayout;
+        videoIdentity = binding.videoIdentity;
+        videoView = binding.video;
+        selectedLayout = binding.selectedLayout;
+        stubImage = binding.stub;
         networkQualityLevelImg = null;
-        selectedIdentity = binding.participantSelectedIdentity;
+        selectedIdentity = binding.selectedIdentity;
         audioToggle = null;
         pinImage = null;
         setIdentity(identity);

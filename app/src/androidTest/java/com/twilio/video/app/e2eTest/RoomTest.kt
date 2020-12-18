@@ -28,7 +28,6 @@ import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
 import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,19 +61,19 @@ class RoomTest : BaseE2ETest() {
                 .perform(click())
         clickView(R.id.local_video_image_button)
         retryEspressoAction {
-            onView(allOf(withId(R.id.participant_stub_image),
+            onView(allOf(withId(R.id.`@+id/stub`),
                     withContentDescription(getString(R.string.primary_profile_picture))))
                         .check(matches(isDisplayed()))
         }
-        onView(allOf(withId(R.id.participant_stub_image),
+        onView(allOf(withId(R.id.`@+id/stub`),
                 withContentDescription(getString(R.string.profile_picture)))).check(matches(isDisplayed()))
         clickView(R.id.local_video_image_button)
         retryEspressoAction {
-            onView(allOf(withId(R.id.participant_stub_image),
+            onView(allOf(withId(R.id.`@+id/stub`),
                     withContentDescription(getString(R.string.primary_profile_picture))))
                         .check(HiddenView())
         }
-        onView(allOf(withId(R.id.participant_stub_image),
+        onView(allOf(withId(R.id.`@+id/stub`),
                 withContentDescription(getString(R.string.profile_picture)))).check(HiddenView())
 
         clickDisconnectButton()
@@ -91,15 +90,15 @@ class RoomTest : BaseE2ETest() {
 
         drawableIsDisplayed(R.id.local_video_image_button,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_off_gray_24px))
-        onView(withId(R.id.participant_stub_image)).check(matches(isDisplayed()))
-        onView(withId(R.id.participant_video)).check(HiddenView())
+        onView(withId(R.id.`@+id/stub`)).check(matches(isDisplayed()))
+        onView(withId(R.id.`@+id/video`)).check(HiddenView())
 
         clickView(R.id.local_video_image_button)
 
         drawableIsDisplayed(R.id.local_video_image_button,
                 DrawableMatcher(getTargetContext(), R.drawable.ic_videocam_white_24px))
-        onView(withId(R.id.participant_stub_image)).check(HiddenView())
-        onView(withId(R.id.participant_video)).check(matches(isDisplayed()))
+        onView(withId(R.id.`@+id/stub`)).check(HiddenView())
+        onView(withId(R.id.`@+id/video`)).check(matches(isDisplayed()))
 
         clickView(R.id.local_audio_image_button)
 

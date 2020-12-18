@@ -56,7 +56,7 @@ fun clickDisconnectButton() {
 }
 
 fun assertParticipantStubIsHidden() {
-    onView(withId(R.id.participant_stub_image))
+    onView(withId(R.id.`@+id/stub`))
         .check(HiddenView())
 }
 
