@@ -15,7 +15,7 @@ import com.twilio.video.app.R
 // TODO Move to common module as part of https://issues.corp.twilio.com/browse/AHOYAPPS-197
 
 fun assertGoogleSignInButtonIsVisible() {
-    onView(withId(R.id.`@+id/google_sign_in`)).check(matches(isDisplayed()))
+    onView(withId(R.id.google_sign_in)).check(matches(isDisplayed()))
 }
 
 fun assertSignInErrorIsVisible() {
@@ -32,8 +32,8 @@ fun loginWithWrongEmailCreds(emailCredentials: EmailCredentials) {
 }
 
 private fun loginWithEmail(email: String, password: String) {
-    onView(withId(R.id.`@+id/email_sign_in`)).perform(click())
-    onView(withId(R.id.`@+id/email`)).perform(typeText(email))
-    onView(withId(R.id.`@+id/password`)).perform(scrollTo(), typeText(password))
-    onView(withId(R.id.`@+id/login`)).perform(click())
+    onView(withId(R.id.email_sign_in)).perform(click())
+    onView(withId(R.id.email)).perform(typeText(email))
+    onView(withId(R.id.password)).perform(scrollTo(), typeText(password))
+    onView(withId(R.id.login)).perform(click())
 }

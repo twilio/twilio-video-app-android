@@ -32,15 +32,15 @@ fun assertRoomNameIsDisplayed(roomName: String) {
 }
 
 fun enterRoomName(roomName: String) {
-    onView(withId(R.id.`@+id/room_name_input`)).perform(typeText(roomName))
+    onView(withId(R.id.room_name_input)).perform(typeText(roomName))
 }
 
 fun clickVideoButton() {
-    onView(withId(R.id.`@+id/local_video`)).perform(click())
+    onView(withId(R.id.local_video)).perform(click())
 }
 
 fun clickMicButton() {
-    onView(withId(R.id.`@+id/local_audio`)).perform(click())
+    onView(withId(R.id.local_audio)).perform(click())
 }
 
 fun clickJoinRoomButton() {
@@ -56,22 +56,22 @@ fun clickDisconnectButton() {
 }
 
 fun assertParticipantStubIsHidden() {
-    onView(withId(R.id.`@+id/stub`))
+    onView(withId(R.id.stub))
         .check(HiddenView())
 }
 
 fun assertVideoButtonIsDisabled() {
-    onView(withId(R.id.`@+id/local_video`)).check(matches(not(isEnabled())))
+    onView(withId(R.id.local_video)).check(matches(not(isEnabled())))
 }
 
 fun assertMicButtonIsDisabled() {
-    onView(withId(R.id.`@+id/local_audio`)).check(matches(not(isEnabled())))
+    onView(withId(R.id.local_audio)).check(matches(not(isEnabled())))
 }
 
 fun assertVideoButtonIsEnabled() {
-    onView(withId(R.id.`@+id/local_video`)).check(matches(isEnabled()))
+    onView(withId(R.id.local_video)).check(matches(isEnabled()))
 }
 
 fun assertMicButtonIsEnabled() {
-    onView(withId(R.id.`@+id/local_audio`)).check(matches(isEnabled()))
+    onView(withId(R.id.local_audio)).check(matches(isEnabled()))
 }
