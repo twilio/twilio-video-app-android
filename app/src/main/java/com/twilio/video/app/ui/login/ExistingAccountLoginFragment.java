@@ -33,7 +33,6 @@ import com.twilio.video.app.databinding.ExistingAccountLoginFragmentBinding;
 import org.jetbrains.annotations.NotNull;
 
 public class ExistingAccountLoginFragment extends Fragment {
-
     private ExistingAccountLoginFragmentBinding binding;
 
     private Listener mListener;
