@@ -43,8 +43,6 @@ internal const val GOOGLE_SIGN_IN = 4615
 
 class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAccountLoginFragment.Listener {
 
-    private lateinit var binding: LoginActivityBinding
-
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
     @Inject
@@ -56,7 +54,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = LoginActivityBinding.inflate(layoutInflater)
+        val binding = LoginActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (authenticator.loggedIn()) {
             onSignInSuccess()
