@@ -27,7 +27,7 @@ import com.twilio.video.RemoteAudioTrack
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.app.R
-import com.twilio.video.app.databinding.StatsLayoutBinding
+import com.twilio.video.app.databinding.StatsViewBinding
 import com.twilio.video.app.model.StatsListItem
 import com.twilio.video.app.sdk.RoomStats
 
@@ -36,44 +36,44 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
     private val statsListItems = ArrayList<StatsListItem>()
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    class ViewHolder(internal val binding: StatsLayoutBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(internal val binding: StatsViewBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = StatsLayoutBinding.inflate(layoutInflater, parent, false)
+        val binding = StatsViewBinding.inflate(layoutInflater, parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = statsListItems[position]
         val binding = holder.binding
-        binding.statsTrackName.text = item.trackName
-        binding.statsTrackSidValue.text = item.trackSid
-        binding.statsCodecValue.text = item.codec
-        binding.statsPacketsValue.text = item.packetsLost.toString()
-        binding.statsBytesValue.text = item.bytes.toString()
+        binding.trackName.text = item.trackName
+        binding.trackSid.text = item.trackSid
+        binding.codec.text = item.codec
+        binding.packetsLost.text = item.packetsLost.toString()
+        binding.bytes.text = item.bytes.toString()
         if (item.isLocalTrack) {
-            binding.statsBytesTitle.text = context.getString(R.string.stats_bytes_sent)
-            binding.statsRttValue.text = item.rtt.toString()
-            binding.statsRttRow.visibility = View.VISIBLE
+            binding.bytesTitle.text = context.getString(R.string.stats_bytes_sent)
+            binding.rtt.text = item.rtt.toString()
+            binding.rttRow.visibility = View.VISIBLE
         } else {
-            binding.statsRttRow.visibility = View.GONE
-            binding.statsBytesTitle.text = context.getString(R.string.stats_bytes_received)
+            binding.rttRow.visibility = View.GONE
+            binding.bytesTitle.text = context.getString(R.string.stats_bytes_received)
         }
         if (item.isAudioTrack) {
-            binding.statsJitterValue.text = item.jitter.toString()
-            binding.statsAudioLevelValue.text = item.audioLevel.toString()
-            binding.statsDimensionsRow.visibility = View.GONE
-            binding.statsFramerateRow.visibility = View.GONE
-            binding.statsJitterRow.visibility = View.VISIBLE
-            binding.statsAudioLevelRow.visibility = View.VISIBLE
+            binding.jitter.text = item.jitter.toString()
+            binding.audioLevel.text = item.audioLevel.toString()
+            binding.dimensionsRow.visibility = View.GONE
+            binding.framerateRow.visibility = View.GONE
+            binding.jitterRow.visibility = View.VISIBLE
+            binding.audioLevelRow.visibility = View.VISIBLE
         } else {
-            binding.statsDimensionsValue.text = item.dimensions
-            binding.statsFramerateValue.text = item.framerate.toString()
-            binding.statsDimensionsRow.visibility = View.VISIBLE
-            binding.statsFramerateRow.visibility = View.VISIBLE
-            binding.statsJitterRow.visibility = View.GONE
-            binding.statsAudioLevelRow.visibility = View.GONE
+            binding.dimensions.text = item.dimensions
+            binding.framerate.text = item.framerate.toString()
+            binding.dimensionsRow.visibility = View.VISIBLE
+            binding.framerateRow.visibility = View.VISIBLE
+            binding.jitterRow.visibility = View.GONE
+            binding.audioLevelRow.visibility = View.GONE
         }
     }
 
