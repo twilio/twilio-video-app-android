@@ -6,5 +6,5 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.twilio.video.app.R
 
 fun clickGoogleSignInButton() {
-    onView(withId(R.id.`@+id/google_sign_in`)).perform(click())
+    onView(withId(R.id.google_sign_in)).perform(click())
 }
