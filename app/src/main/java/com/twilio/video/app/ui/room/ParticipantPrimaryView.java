@@ -61,10 +61,7 @@ public class ParticipantPrimaryView extends ParticipantView {
         videoView = binding.video;
         selectedLayout = binding.selectedLayout;
         stubImage = binding.stub;
-        networkQualityLevelImg = null;
         selectedIdentity = binding.selectedIdentity;
-        audioToggle = null;
-        pinImage = null;
         setIdentity(identity);
         setState(state);
         setMirror(mirror);
