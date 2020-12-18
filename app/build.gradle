@@ -171,6 +171,12 @@ dependencies {
     implementation 'com.twilio:audioswitch:1.1.0'
     implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
+    /*
+     * Include as a compile time only dependency so Android Studio can resolve references
+     * to com.android.ViewBinding.
+     */
+    compileOnly 'com.android.databinding:viewbinding:4.1.1'
+
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
     kapt daggerAndroidProcessor
