@@ -31,7 +31,7 @@
         includedVariants="communityDebug,communityRelease"
         excludedVariants="internalDebug,internalRelease">
         <location
-            file="src/community/res/layout/development_activity_login.xml"
+            file="src/community/res/layout/community_login_activity.xml"
             line="8"
             column="5"/>
     </issue>
