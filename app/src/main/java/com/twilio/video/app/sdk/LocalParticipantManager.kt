@@ -25,6 +25,8 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.get
+import com.twilio.video.ktx.createLocalAudioTrack
+import com.twilio.video.ktx.createLocalVideoTrack
 import timber.log.Timber
 
 class LocalParticipantManager(
@@ -116,8 +118,8 @@ class LocalParticipantManager(
         screenCapturer = ScreenCapturer(context, captureResultCode, captureIntent,
                 screenCapturerListener)
         screenCapturer?.let { screenCapturer ->
-            screenVideoTrack = LocalVideoTrack.create(context, true, screenCapturer,
-                    SCREEN_TRACK_NAME)
+            screenVideoTrack = createLocalVideoTrack(context, true, screenCapturer,
+                    name = SCREEN_TRACK_NAME)
             screenVideoTrack?.let { screenVideoTrack ->
                 localVideoTrackNames[screenVideoTrack.name] =
                         context.getString(R.string.screen_video_track)
@@ -145,7 +147,7 @@ class LocalParticipantManager(
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
-            localAudioTrack = LocalAudioTrack.create(context, true, MICROPHONE_TRACK_NAME)
+            localAudioTrack = createLocalAudioTrack(context, true, MICROPHONE_TRACK_NAME)
             localAudioTrack?.let { publishAudioTrack(it) }
                     ?: Timber.e(RuntimeException(), "Failed to create local audio track")
         }
