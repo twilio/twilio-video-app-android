@@ -583,7 +583,7 @@
         errorLine1="    &lt;ScrollView"
         errorLine2="     ~~~~~~~~~~">
         <location
-            file="src/main/res/layout/fragment_login_landing.xml"
+            file="src/main/res/layout/login_landing_fragment.xml"
             line="8"
             column="6"/>
     </issue>
