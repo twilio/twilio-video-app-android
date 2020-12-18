@@ -55,13 +55,10 @@ abstract class ParticipantView extends FrameLayout implements VideoSink {
     VideoTextureView videoView;
     RelativeLayout selectedLayout;
     ImageView stubImage;
-    @Nullable
-    ImageView networkQualityLevelImg;
+    @Nullable ImageView networkQualityLevelImg;
     TextView selectedIdentity;
-    @Nullable
-    ImageView audioToggle;
-    @Nullable
-    ImageView pinImage;
+    @Nullable ImageView audioToggle;
+    @Nullable ImageView pinImage;
 
     public ParticipantView(@NonNull Context context) {
         super(context);

@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import com.twilio.video.app.databinding.ParticipantViewPrimaryBinding;
 
 public class ParticipantPrimaryView extends ParticipantView {
@@ -27,24 +28,24 @@ public class ParticipantPrimaryView extends ParticipantView {
 
     public ParticipantPrimaryView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public ParticipantPrimaryView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public ParticipantPrimaryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantPrimaryView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context);
     }
 
     public void showIdentityBadge(boolean show) {
@@ -53,8 +54,8 @@ public class ParticipantPrimaryView extends ParticipantView {
         }
     }
 
-    private void init() {
-        binding = ParticipantViewPrimaryBinding.bind(this);
+    private void init(Context context) {
+        binding = ParticipantViewPrimaryBinding.inflate(LayoutInflater.from(context), this, true);
         videoLayout = binding.participantVideoLayout;
         videoIdentity = binding.participantVideoIdentity;
         videoView = binding.participantVideo;

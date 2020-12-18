@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import androidx.core.content.ContextCompat;
 import com.twilio.video.app.R;
@@ -30,24 +31,24 @@ public class ParticipantThumbView extends ParticipantView {
 
     public ParticipantThumbView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public ParticipantThumbView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public ParticipantThumbView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantThumbView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context);
     }
 
     @Override
@@ -64,8 +65,8 @@ public class ParticipantThumbView extends ParticipantView {
         selectedLayout.setBackground(ContextCompat.getDrawable(getContext(), resId));
     }
 
-    private void init() {
-        binding = ParticipantViewBinding.bind(this);
+    private void init(Context context) {
+        binding = ParticipantViewBinding.inflate(LayoutInflater.from(context), this, true);
         videoLayout = binding.participantVideoLayout;
         videoIdentity = binding.participantVideoIdentity;
         videoView = binding.participantVideo;

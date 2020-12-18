@@ -30,7 +30,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import com.twilio.video.app.R;
 import com.twilio.video.app.databinding.FragmentExistingAccountLoginBinding;
-
 import org.jetbrains.annotations.NotNull;
 
 public class ExistingAccountLoginFragment extends Fragment {
@@ -55,18 +54,20 @@ public class ExistingAccountLoginFragment extends Fragment {
     public View onCreateView(
             @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentExistingAccountLoginBinding.inflate(inflater, container, false);
-        TextWatcher textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        TextWatcher textWatcher =
+                new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                handleTextChange(s);
-            }
-        };
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        handleTextChange(s);
+                    }
+                };
         binding.emailEdittext.addTextChangedListener(textWatcher);
         binding.passwordEdittext.addTextChangedListener(textWatcher);
         binding.loginButton.setOnClickListener(this::onLoginButton);

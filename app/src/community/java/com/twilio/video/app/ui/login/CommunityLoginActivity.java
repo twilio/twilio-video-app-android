@@ -51,18 +51,20 @@ public class CommunityLoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DevelopmentActivityLoginBinding.inflate(getLayoutInflater());
-        binding.communityLoginScreenPasscodeEdittext.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        binding.communityLoginScreenPasscodeEdittext.addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                onPasscodeTextChanged(s);
-            }
-        });
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        onPasscodeTextChanged(s);
+                    }
+                });
         binding.communityLoginScreenLoginButton.setOnClickListener(this::onLoginButton);
 
         setContentView(binding.getRoot());

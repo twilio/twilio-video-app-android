@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.common.SignInButton;
 import com.twilio.video.app.databinding.FragmentLoginLandingBinding;
-
 import org.jetbrains.annotations.NotNull;
 
 public class LoginLandingFragment extends Fragment {

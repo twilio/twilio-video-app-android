@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/content_room" />
+        <include android:id="@+id/room" layout="@layout/content_room" />
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/lobby_toolbar"
@@ -29,7 +29,7 @@
                 android:minHeight="?attr/actionBarSize"
                 app:popupTheme="@style/AppTheme.Lobby.PopupMenu" />
 
-            <include layout="@layout/join_room" />
+            <include android:id="@+id/join_room" layout="@layout/join_room" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
