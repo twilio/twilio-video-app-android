@@ -1,8 +1,11 @@
 package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
@@ -59,15 +62,12 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
-import com.twilio.video.app.util.plus
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -76,9 +76,6 @@ class RoomViewModel(
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
-    private val backgroundScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
-    private val rxDisposables: CompositeDisposable = CompositeDisposable(),
-    scheduler: Scheduler = AndroidSchedulers.mainThread(),
     initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
@@ -96,19 +93,13 @@ class RoomViewModel(
             }
         }
 
-        rxDisposables + roomManager.roomEvents
-                .observeOn(scheduler)
-                .subscribe({
-            observeRoomEvents(it)
-        }, {
-            Timber.e(it, "Error in RoomManager RoomEvent stream")
-        })
+        subscribeToRoomChannel()
     }
 
-    override fun onCleared() {
+    @VisibleForTesting(otherwise = PROTECTED)
+    public override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()
-        rxDisposables.clear()
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
@@ -148,6 +139,23 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
             Disconnect -> roomManager.disconnect()
+        }
+    }
+
+    private fun subscribeToRoomChannel() {
+        roomManager.roomReceiveChannel.let { channel ->
+            viewModelScope.launch {
+                while (isActive) {
+                    Timber.d("Listening for RoomEvents")
+                    try {
+                        observeRoomEvents(channel.receive())
+                    } catch (e: CancellationException) {
+                        Timber.e("Cannot receive(), Receiving coroutine has been canceled")
+                    } catch (e: ClosedReceiveChannelException) {
+                        Timber.e("Cannot receive(), Channel has been closed")
+                    }
+                }
+            }
         }
     }
 
@@ -195,10 +203,8 @@ class RoomViewModel(
                 }
             }
             is MaxParticipantFailure -> action {
-                sendEvent {
-                    showLobbyViewState()
-                    ShowMaxParticipantFailureDialog
-                }
+                sendEvent { ShowMaxParticipantFailureDialog }
+                showLobbyViewState()
             }
             is TokenError -> action {
                 sendEvent {
@@ -315,15 +321,16 @@ class RoomViewModel(
     }
 
     private fun connect(identity: String, roomName: String) =
-        backgroundScope.launch {
+        viewModelScope.launch {
             roomManager.connect(
                     identity,
                     roomName)
-        }
+            }
 
     private fun setState(action: (currentState: RoomViewState) -> UIState) =
         actionOn<RoomViewState> { currentState -> setState { action(currentState) } }
 
+    @Suppress("UNCHECKED_CAST")
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
         private val audioDeviceSelector: AudioSwitch,
