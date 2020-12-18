@@ -34,8 +34,20 @@ import org.jetbrains.annotations.NotNull;
 
 public class ExistingAccountLoginFragment extends Fragment {
     private ExistingAccountLoginFragmentBinding binding;
-
     private Listener mListener;
+    private TextWatcher textWatcher =
+            new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    credentialsChanged();
+                }
+            };
 
     public ExistingAccountLoginFragment() {}
 
@@ -53,33 +65,13 @@ public class ExistingAccountLoginFragment extends Fragment {
     public View onCreateView(
             @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = ExistingAccountLoginFragmentBinding.inflate(inflater, container, false);
-        TextWatcher textWatcher =
-                new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(
-                            CharSequence s, int start, int count, int after) {}
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        credentialsChanged(s);
-                    }
-                };
         binding.email.addTextChangedListener(textWatcher);
         binding.password.addTextChangedListener(textWatcher);
         binding.login.setOnClickListener(this::loginClicked);
         return binding.getRoot();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
-    public void credentialsChanged(Editable editable) {
+    public void credentialsChanged() {
         if (binding.password.length() != 0
                 && binding.email.length() != 0
                 && Patterns.EMAIL_ADDRESS.matcher(binding.email.getText()).matches()) {
