@@ -31,7 +31,7 @@ import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.auth.LoginResult;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.api.AuthServiceError;
-import com.twilio.video.app.databinding.DevelopmentActivityLoginBinding;
+import com.twilio.video.app.databinding.CommunityLoginActivityBinding;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.InputUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,7 +41,7 @@ import timber.log.Timber;
 
 // TODO Create view model and fragment for this screen
 public class CommunityLoginActivity extends BaseActivity {
-    private DevelopmentActivityLoginBinding binding;
+    private CommunityLoginActivityBinding binding;
 
     @Inject Authenticator authenticator;
 
@@ -50,8 +50,8 @@ public class CommunityLoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DevelopmentActivityLoginBinding.inflate(getLayoutInflater());
-        binding.communityLoginScreenPasscodeEdittext.addTextChangedListener(
+        binding = CommunityLoginActivityBinding.inflate(getLayoutInflater());
+        binding.passcode.addTextChangedListener(
                 new TextWatcher() {
                     @Override
                     public void beforeTextChanged(
@@ -62,23 +62,21 @@ public class CommunityLoginActivity extends BaseActivity {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        onPasscodeTextChanged(s);
+                        passcodeChanged(s);
                     }
                 });
-        binding.communityLoginScreenLoginButton.setOnClickListener(this::onLoginButton);
-
+        binding.login.setOnClickListener(this::loginClicked);
         setContentView(binding.getRoot());
-
         if (authenticator.loggedIn()) startLobbyActivity();
     }
 
-    public void onPasscodeTextChanged(Editable editable) {
+    private void passcodeChanged(Editable editable) {
         enableLoginButton(isInputValid());
     }
 
-    public void onLoginButton(View view) {
-        String identity = binding.communityLoginScreenNameEdittext.getText().toString();
-        String passcode = binding.communityLoginScreenPasscodeEdittext.getText().toString();
+    private void loginClicked(View view) {
+        String identity = binding.name.getText().toString();
+        String passcode = binding.passcode.getText().toString();
         login(identity, passcode);
     }
 
@@ -112,13 +110,13 @@ public class CommunityLoginActivity extends BaseActivity {
             switch (error) {
                 case INVALID_PASSCODE_ERROR:
                     errorMessage = getString(R.string.login_screen_invalid_passcode_error);
-                    binding.communityLoginScreenPasscode.setError(errorMessage);
-                    binding.communityLoginScreenPasscode.setErrorEnabled(true);
+                    binding.passcodeInput.setError(errorMessage);
+                    binding.passcodeInput.setErrorEnabled(true);
                     return;
                 case EXPIRED_PASSCODE_ERROR:
                     errorMessage = getString(R.string.login_screen_expired_passcode_error);
-                    binding.communityLoginScreenPasscode.setError(errorMessage);
-                    binding.communityLoginScreenPasscode.setErrorEnabled(true);
+                    binding.passcodeInput.setError(errorMessage);
+                    binding.passcodeInput.setErrorEnabled(true);
                     return;
             }
         }
@@ -129,18 +127,18 @@ public class CommunityLoginActivity extends BaseActivity {
     private void preLoginViewState() {
         InputUtils.hideKeyboard(this);
         enableLoginButton(false);
-        binding.communityLoginScreenProgressbar.setVisibility(View.VISIBLE);
-        binding.communityLoginScreenPasscode.setErrorEnabled(false);
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.passcodeInput.setErrorEnabled(false);
     }
 
     private void postLoginViewState() {
-        binding.communityLoginScreenProgressbar.setVisibility(View.GONE);
+        binding.progressBar.setVisibility(View.GONE);
         enableLoginButton(true);
     }
 
     private boolean isInputValid() {
-        Editable nameEditable = binding.communityLoginScreenNameEdittext.getText();
-        Editable passcodeEditable = binding.communityLoginScreenPasscodeEdittext.getText();
+        Editable nameEditable = binding.name.getText();
+        Editable passcodeEditable = binding.passcode.getText();
 
         if (nameEditable != null
                 && passcodeEditable != null
@@ -153,12 +151,12 @@ public class CommunityLoginActivity extends BaseActivity {
 
     private void enableLoginButton(boolean isEnabled) {
         if (isEnabled) {
-            binding.communityLoginScreenLoginButton.setTextColor(Color.WHITE);
-            binding.communityLoginScreenLoginButton.setEnabled(true);
+            binding.login.setTextColor(Color.WHITE);
+            binding.login.setEnabled(true);
         } else {
-            binding.communityLoginScreenLoginButton.setTextColor(
+            binding.login.setTextColor(
                     ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null));
-            binding.communityLoginScreenLoginButton.setEnabled(false);
+            binding.login.setEnabled(false);
         }
     }
 
