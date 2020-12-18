@@ -20,45 +20,50 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import butterknife.ButterKnife;
-import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.ParticipantViewPrimaryBinding;
 
 public class ParticipantPrimaryView extends ParticipantView {
+    private ParticipantViewPrimaryBinding binding;
 
     public ParticipantPrimaryView(Context context) {
         super(context);
-        init(context);
+        init();
     }
 
     public ParticipantPrimaryView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
     public ParticipantPrimaryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantPrimaryView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
+        init();
     }
 
     public void showIdentityBadge(boolean show) {
-        if (videoIdentity != null) {
-            videoIdentity.setVisibility(show ? VISIBLE : GONE);
+        if (binding.participantVideoIdentity != null) {
+            binding.participantVideoIdentity.setVisibility(show ? VISIBLE : GONE);
         }
     }
 
-    private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.participant_view_primary, this);
-        ButterKnife.bind(this, view);
-
+    private void init() {
+        binding = ParticipantViewPrimaryBinding.bind(this);
+        videoLayout = binding.participantVideoLayout;
+        videoIdentity = binding.participantVideoIdentity;
+        videoView = binding.participantVideo;
+        selectedLayout = binding.participantSelectedLayout;
+        stubImage = binding.participantStubImage;
+        networkQualityLevelImg = null;
+        selectedIdentity = binding.participantSelectedIdentity;
+        audioToggle = null;
+        pinImage = null;
         setIdentity(identity);
         setState(state);
         setMirror(mirror);

@@ -20,66 +20,65 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.ParticipantViewBinding;
 
 public class ParticipantThumbView extends ParticipantView {
-
-    @BindView(R.id.participant_track_switch_off_background)
-    View trackSwitchOffBackground;
-
-    @BindView(R.id.participant_track_switch_off_icon)
-    ImageView trackSwitchOffImage;
+    private ParticipantViewBinding binding;
 
     public ParticipantThumbView(Context context) {
         super(context);
-        init(context);
+        init();
     }
 
     public ParticipantThumbView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
     public ParticipantThumbView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantThumbView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
-    }
-
-    private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.participant_view, this);
-        ButterKnife.bind(this, view);
-
-        setIdentity(identity);
-        setState(state);
-        setMirror(mirror);
-        setScaleType(scaleType);
+        init();
     }
 
     @Override
     public void setState(int state) {
         super.setState(state);
 
-        trackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
-        trackSwitchOffImage.setVisibility(isSwitchOffViewVisible(state));
+        binding.participantTrackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
+        binding.participantTrackSwitchOffIcon.setVisibility(isSwitchOffViewVisible(state));
 
         int resId = R.drawable.participant_background;
         if (state == State.SELECTED) {
             resId = R.drawable.participant_selected_background;
         }
         selectedLayout.setBackground(ContextCompat.getDrawable(getContext(), resId));
+    }
+
+    private void init() {
+        binding = ParticipantViewBinding.bind(this);
+        videoLayout = binding.participantVideoLayout;
+        videoIdentity = binding.participantVideoIdentity;
+        videoView = binding.participantVideo;
+        selectedLayout = binding.participantSelectedLayout;
+        stubImage = binding.participantStubImage;
+        networkQualityLevelImg = binding.networkQualityLevelImg;
+        selectedIdentity = binding.participantSelectedIdentity;
+        audioToggle = binding.participantNoAudio;
+        pinImage = binding.participantPin;
+        setIdentity(identity);
+        setState(state);
+        setMirror(mirror);
+        setScaleType(scaleType);
     }
 
     private int isSwitchOffViewVisible(int state) {
