@@ -44,27 +44,27 @@ public class CommunityLoginActivity extends BaseActivity {
     private CommunityLoginActivityBinding binding;
 
     @Inject Authenticator authenticator;
+    TextWatcher textWatcher =
+            new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    passcodeChanged(s);
+                }
+            };
     CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = CommunityLoginActivityBinding.inflate(getLayoutInflater());
-        binding.passcode.addTextChangedListener(
-                new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(
-                            CharSequence s, int start, int count, int after) {}
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        passcodeChanged(s);
-                    }
-                });
+        binding.name.addTextChangedListener(textWatcher);
+        binding.passcode.addTextChangedListener(textWatcher);
         binding.login.setOnClickListener(this::loginClicked);
         setContentView(binding.getRoot());
         if (authenticator.loggedIn()) startLobbyActivity();
