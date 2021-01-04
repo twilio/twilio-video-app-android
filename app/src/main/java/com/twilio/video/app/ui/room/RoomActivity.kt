@@ -120,7 +120,7 @@ class RoomActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = RoomActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.joinRoom.roomNameInput.doOnTextChanged { text: CharSequence?, _, _, _ ->
+        binding.joinRoom.roomName.doOnTextChanged { text: CharSequence?, _, _, _ ->
             roomNameTextChanged(text)
         }
         binding.joinRoom.connect.setOnClickListener { connectButtonClick() }
@@ -180,7 +180,7 @@ class RoomActivity : BaseActivity() {
         val uri = intent.data
         val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
         if (roomName != null) {
-            binding.joinRoom.roomNameInput.setText(roomName)
+            binding.joinRoom.roomName.setText(roomName)
             isAppLinkProvided = true
         }
         return isAppLinkProvided
@@ -301,7 +301,7 @@ class RoomActivity : BaseActivity() {
         InputUtils.hideKeyboard(this)
         binding.joinRoom.connect.isEnabled = false
         // obtain room name
-        val text = binding.joinRoom.roomNameInput.text
+        val text = binding.joinRoom.roomName.text
         if (text != null) {
             val roomName = text.toString()
             val viewEvent = Connect(displayName ?: "", roomName)
@@ -338,7 +338,7 @@ class RoomActivity : BaseActivity() {
         var joinStatusLayoutState = View.GONE
         var settingsMenuItemState = true
         var screenCaptureMenuItemState = false
-        val roomEditable = binding.joinRoom.roomNameInput.text
+        val roomEditable = binding.joinRoom.roomName.text
         val isRoomTextNotEmpty = roomEditable != null && roomEditable.toString().isNotEmpty()
         var connectButtonEnabled = isRoomTextNotEmpty
         var roomName = displayName

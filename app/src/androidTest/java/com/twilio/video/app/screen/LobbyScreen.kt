@@ -32,7 +32,7 @@ fun assertRoomNameIsDisplayed(roomName: String) {
 }
 
 fun enterRoomName(roomName: String) {
-    onView(withId(R.id.room_name_input)).perform(typeText(roomName))
+    onView(withId(R.id.room_name)).perform(typeText(roomName))
 }
 
 fun clickVideoButton() {
