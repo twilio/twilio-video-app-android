@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 def versionCodeProperty = project.property('versionCode') as Integer
@@ -10,6 +9,7 @@ def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
         project.property(includeSdkFromSourceProperty) as Boolean
 
 afterEvaluate {
+    def ndkVersion = 'ndkVersion'
     if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
         android.ndkVersion = "${project.property(ndkVersion)}"
     }
@@ -39,6 +39,10 @@ afterEvaluate {
 android {
     compileSdkVersion 30
     buildToolsVersion '30.0.2'
+
+    buildFeatures {
+        viewBinding true
+    }
 
     lintOptions {
         disable 'GradleDependency'
@@ -135,7 +139,6 @@ android {
 }
 
 dependencies {
-    def butterknifeVersion = '10.2.0'
     def daggerVersion = '2.25.4'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
@@ -155,7 +158,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0'
+    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
@@ -165,7 +168,6 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation "com.jakewharton:butterknife:$butterknifeVersion"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.5.0"
     implementation 'com.google.firebase:firebase-auth:19.4.0'
@@ -184,11 +186,16 @@ dependencies {
     implementation 'com.twilio:audioswitch:1.1.0'
     implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
+    /*
+     * Include as a compile time only dependency so Android Studio can resolve references
+     * to com.android.ViewBinding.
+     */
+    compileOnly 'com.android.databinding:viewbinding:4.1.1'
+
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
-    kapt "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     testImplementation testCore
     testImplementation espresso

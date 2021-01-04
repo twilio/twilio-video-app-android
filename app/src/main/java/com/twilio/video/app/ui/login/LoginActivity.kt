@@ -21,7 +21,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import butterknife.ButterKnife
 import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
@@ -32,6 +31,7 @@ import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
 import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.databinding.LoginActivityBinding
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.plus
 import io.reactivex.disposables.CompositeDisposable
@@ -54,12 +54,11 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_login)
+        val binding = LoginActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         if (authenticator.loggedIn()) {
             onSignInSuccess()
         }
-        ButterKnife.bind(this)
         if (savedInstanceState == null) {
             supportFragmentManager
                     .beginTransaction()
