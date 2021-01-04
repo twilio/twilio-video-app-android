@@ -198,11 +198,7 @@ class RoomActivity : BaseActivity() {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             val recordAudioPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
             val cameraPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED
-            val writeExternalStoragePermissionGranted = grantResults[2] == PackageManager.PERMISSION_GRANTED
-            val permissionsGranted = (recordAudioPermissionGranted &&
-                    cameraPermissionGranted &&
-                    writeExternalStoragePermissionGranted)
-            if (permissionsGranted) {
+            if (recordAudioPermissionGranted && cameraPermissionGranted) {
                 roomViewModel.processInput(OnResume)
             }
         }
