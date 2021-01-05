@@ -20,16 +20,9 @@ import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
 import androidx.core.content.res.ResourcesCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnTextChanged;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
 import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginFailureResult;
@@ -38,6 +31,7 @@ import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.auth.LoginResult;
 import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.api.AuthServiceError;
+import com.twilio.video.app.databinding.CommunityLoginActivityBinding;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.InputUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,50 +41,42 @@ import timber.log.Timber;
 
 // TODO Create view model and fragment for this screen
 public class CommunityLoginActivity extends BaseActivity {
+    private CommunityLoginActivityBinding binding;
 
     @Inject Authenticator authenticator;
+    TextWatcher textWatcher =
+            new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-    @BindView(R.id.community_login_screen_progressbar)
-    ProgressBar progressBar;
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
-    @BindView(R.id.community_login_screen_passcode)
-    TextInputLayout passcodeTextInputLayout;
-
-    @BindView(R.id.community_login_screen_name_edittext)
-    TextInputEditText nameEditText;
-
-    @BindView(R.id.community_login_screen_passcode_edittext)
-    TextInputEditText passcodeEditText;
-
-    @BindView(R.id.community_login_screen_login_button)
-    Button loginButton;
-
+                @Override
+                public void afterTextChanged(Editable s) {
+                    passcodeChanged(s);
+                }
+            };
     CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.development_activity_login);
-
-        ButterKnife.bind(this);
+        binding = CommunityLoginActivityBinding.inflate(getLayoutInflater());
+        binding.name.addTextChangedListener(textWatcher);
+        binding.passcode.addTextChangedListener(textWatcher);
+        binding.login.setOnClickListener(this::loginClicked);
+        setContentView(binding.getRoot());
         if (authenticator.loggedIn()) startLobbyActivity();
     }
 
-    @OnTextChanged(R.id.community_login_screen_name_edittext)
-    public void onNameTextChanged(Editable editable) {
+    private void passcodeChanged(Editable editable) {
         enableLoginButton(isInputValid());
     }
 
-    @OnTextChanged(R.id.community_login_screen_passcode_edittext)
-    public void onPasscodeTextChanged(Editable editable) {
-        enableLoginButton(isInputValid());
-    }
-
-    @OnClick(R.id.community_login_screen_login_button)
-    public void onLoginButton(View view) {
-        String identity = nameEditText.getText().toString();
-        String passcode = passcodeEditText.getText().toString();
+    private void loginClicked(View view) {
+        String identity = binding.name.getText().toString();
+        String passcode = binding.passcode.getText().toString();
         login(identity, passcode);
     }
 
@@ -124,13 +110,13 @@ public class CommunityLoginActivity extends BaseActivity {
             switch (error) {
                 case INVALID_PASSCODE_ERROR:
                     errorMessage = getString(R.string.login_screen_invalid_passcode_error);
-                    passcodeTextInputLayout.setError(errorMessage);
-                    passcodeTextInputLayout.setErrorEnabled(true);
+                    binding.passcodeInput.setError(errorMessage);
+                    binding.passcodeInput.setErrorEnabled(true);
                     return;
                 case EXPIRED_PASSCODE_ERROR:
                     errorMessage = getString(R.string.login_screen_expired_passcode_error);
-                    passcodeTextInputLayout.setError(errorMessage);
-                    passcodeTextInputLayout.setErrorEnabled(true);
+                    binding.passcodeInput.setError(errorMessage);
+                    binding.passcodeInput.setErrorEnabled(true);
                     return;
             }
         }
@@ -141,18 +127,18 @@ public class CommunityLoginActivity extends BaseActivity {
     private void preLoginViewState() {
         InputUtils.hideKeyboard(this);
         enableLoginButton(false);
-        progressBar.setVisibility(View.VISIBLE);
-        passcodeTextInputLayout.setErrorEnabled(false);
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.passcodeInput.setErrorEnabled(false);
     }
 
     private void postLoginViewState() {
-        progressBar.setVisibility(View.GONE);
+        binding.progressBar.setVisibility(View.GONE);
         enableLoginButton(true);
     }
 
     private boolean isInputValid() {
-        Editable nameEditable = nameEditText.getText();
-        Editable passcodeEditable = passcodeEditText.getText();
+        Editable nameEditable = binding.name.getText();
+        Editable passcodeEditable = binding.passcode.getText();
 
         if (nameEditable != null
                 && passcodeEditable != null
@@ -165,12 +151,12 @@ public class CommunityLoginActivity extends BaseActivity {
 
     private void enableLoginButton(boolean isEnabled) {
         if (isEnabled) {
-            loginButton.setTextColor(Color.WHITE);
-            loginButton.setEnabled(true);
+            binding.login.setTextColor(Color.WHITE);
+            binding.login.setEnabled(true);
         } else {
-            loginButton.setTextColor(
+            binding.login.setTextColor(
                     ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null));
-            loginButton.setEnabled(false);
+            binding.login.setEnabled(false);
         }
     }
 

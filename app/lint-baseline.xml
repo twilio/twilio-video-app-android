@@ -2,6 +2,17 @@
 <issues format="5" by="lint 4.0.1" client="gradle" variant="all" version="4.0.1">
 
     <issue
+        id="UselessParent"
+        message="This `ScrollView` layout or its `FrameLayout` parent is possibly useless; transfer the `background` attribute to the other view"
+        errorLine1="    &lt;ScrollView"
+        errorLine2="     ~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/login_landing_fragment.xml"
+            line="8"
+            column="6"/>
+    </issue>
+
+    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;512dp&quot;"
@@ -31,7 +42,7 @@
         includedVariants="communityDebug,communityRelease"
         excludedVariants="internalDebug,internalRelease">
         <location
-            file="src/community/res/layout/development_activity_login.xml"
+            file="src/community/res/layout/community_login_activity.xml"
             line="8"
             column="5"/>
     </issue>
@@ -583,7 +594,7 @@
         errorLine1="    &lt;ScrollView"
         errorLine2="     ~~~~~~~~~~">
         <location
-            file="src/main/res/layout/fragment_login_landing.xml"
+            file="src/main/res/layout/login_landing_fragment.xml"
             line="8"
             column="6"/>
     </issue>
@@ -634,7 +645,7 @@
         errorLine1="                &lt;ImageView"
         errorLine2="                 ~~~~~~~~~">
         <location
-            file="src/main/res/layout-v21/activity_room.xml"
+            file="src/main/res/layout-v21/room_activity.xml"
             line="153"
             column="18"/>
     </issue>

@@ -19,13 +19,13 @@ package com.twilio.video.app.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.twilio.video.app.R
 import com.twilio.video.app.base.BaseActivity
+import com.twilio.video.app.databinding.LoginActivityBinding
 import com.twilio.video.app.ui.room.RoomActivity
 import timber.log.Timber
 
@@ -35,8 +35,9 @@ class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-        findViewById<Button>(R.id.sign_in_button).setOnClickListener {
+        val binding = LoginActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.signInButton.setOnClickListener {
             navigateToFirebaseUIAuth()
         }
     }

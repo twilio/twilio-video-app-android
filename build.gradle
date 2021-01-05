@@ -1,11 +1,4 @@
 buildscript {
-    ext {
-        kotlin_version = '1.4.10'
-    }
-    ext.versions = [
-            'butterknife' : '10.2.0',
-    ]
-
     ext.keystore = (project.hasProperty('androidKeystore') ?
             project.property('androidKeystore') : '/fake/path/to/keystore')
     ext.keystorePassword = (project.hasProperty('androidKeystorePassword') ?
@@ -78,18 +71,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "com.google.gms:google-services:4.3.4"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10"
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21"
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
     }
 }
 
 plugins {
-    id "com.diffplug.gradle.spotless" version "4.0.1"
+    id "com.diffplug.spotless" version "5.8.2"
 }
-apply plugin: "com.diffplug.gradle.spotless"
+apply plugin: "com.diffplug.spotless"
 spotless {
     format 'misc', {
         target '**/*.gradle', '**/*.md', '**/.gitignore'

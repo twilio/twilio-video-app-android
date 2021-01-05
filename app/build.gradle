@@ -1,29 +1,48 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-/*
- * Enable the application to consume the Video Android SDK directly from source
- * instead of from Bintray.
- *
- * The property is not defined by default when consuming the
- * application as a stand-alone project, but is defined by default in the Video Android SDK project.
- * This property enables the Video Android SDK project to build the application as a git subtree
- * with the contents of the source itself as a dependency. This coupling is intentional as it allows
- * SDK developers to iterate on SDK features within the application that is maintained in a separate
- * project.
- */
-def videoAndroidSdkDepProp = "videoAppSdkDependency"
-def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
-        project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:6.0.0")
 def versionCodeProperty = project.property('versionCode') as Integer
+def includeSdkFromSourceProperty = 'includeSdkFromSource'
+def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
+        project.property(includeSdkFromSourceProperty) as Boolean
+
+afterEvaluate {
+    def ndkVersion = 'ndkVersion'
+    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
+        android.ndkVersion = "${project.property(ndkVersion)}"
+    }
+
+    /*
+    * Enable the application to consume the Video Android SDK directly from source
+    * instead of from Bintray.
+    *
+    * The property is not defined by default when consuming the
+    * application as a stand-alone project, but is defined by default in the Video Android SDK project.
+    * This property enables the Video Android SDK project to build the application as a git subtree
+    * with the contents of the source itself as a dependency. This coupling is intentional as it allows
+    * SDK developers to iterate on SDK features within the application that is maintained in a separate
+    * project.
+    */
+    dependencies {
+        if (includeSdkFromSource) {
+            debugImplementation project(':video')
+            debugImplementation project(':video:ktx')
+            releaseImplementation project(':video:ktx')
+        } else {
+            implementation "com.twilio:video-android-ktx:6.1.0"
+        }
+    }
+}
 
 android {
     compileSdkVersion 30
     buildToolsVersion '30.0.2'
+
+    buildFeatures {
+        viewBinding true
+    }
 
     lintOptions {
         disable 'GradleDependency'
@@ -120,10 +139,6 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-    def butterknifeVersion = '10.2.0'
     def daggerVersion = '2.25.4'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
@@ -143,18 +158,15 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0'
-    implementation videoAndroidSdkDep
+    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
-    implementation "androidx.fragment:fragment:$fragmentVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation "com.jakewharton:butterknife:$butterknifeVersion"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.5.0"
     implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
@@ -172,11 +184,16 @@ dependencies {
     implementation 'com.twilio:audioswitch:1.1.0'
     implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
+    /*
+     * Include as a compile time only dependency so Android Studio can resolve references
+     * to com.android.ViewBinding.
+     */
+    compileOnly 'com.android.databinding:viewbinding:4.1.1'
+
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
-    kapt "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     testImplementation testCore
     testImplementation espresso

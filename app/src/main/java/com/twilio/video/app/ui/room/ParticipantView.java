@@ -31,7 +31,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import butterknife.BindView;
 import com.twilio.video.VideoScaleType;
 import com.twilio.video.VideoTextureView;
 import com.twilio.video.VideoTrack;
@@ -51,36 +50,15 @@ abstract class ParticipantView extends FrameLayout implements VideoSink {
     int scaleType = DEFAULT_VIDEO_SCALE_TYPE.ordinal();
 
     VideoTrack videoTrack;
-
-    @BindView(R.id.participant_video_layout)
     ConstraintLayout videoLayout;
-
-    @BindView(R.id.participant_video_identity)
     TextView videoIdentity;
-
-    @BindView(R.id.participant_video)
     VideoTextureView videoView;
-
-    @BindView(R.id.participant_selected_layout)
     RelativeLayout selectedLayout;
-
-    @BindView(R.id.participant_stub_image)
     ImageView stubImage;
-
-    @Nullable
-    @BindView(R.id.network_quality_level_img)
-    ImageView networkQualityLevelImg;
-
-    @BindView(R.id.participant_selected_identity)
+    @Nullable ImageView networkQualityLevelImg;
     TextView selectedIdentity;
-
-    @Nullable
-    @BindView(R.id.participant_no_audio)
-    ImageView audioToggle;
-
-    @Nullable
-    @BindView(R.id.participant_pin)
-    ImageView pinImage;
+    @Nullable ImageView audioToggle;
+    @Nullable ImageView pinImage;
 
     public ParticipantView(@NonNull Context context) {
         super(context);
