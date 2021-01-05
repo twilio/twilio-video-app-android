@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import com.twilio.androidenv.Env
 import com.twilio.video.AudioCodec
 import com.twilio.video.BandwidthProfileMode
-import com.twilio.video.BandwidthProfileOptions
 import com.twilio.video.ConnectOptions
 import com.twilio.video.EncodingParameters
 import com.twilio.video.G722Codec
@@ -18,7 +17,6 @@ import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
 import com.twilio.video.TrackPriority
 import com.twilio.video.TrackSwitchOffMode
-import com.twilio.video.VideoBandwidthProfileOptions
 import com.twilio.video.VideoCodec
 import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
@@ -27,6 +25,8 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.get
+import com.twilio.video.ktx.createBandwidthProfileOptions
+import com.twilio.video.ktx.createConnectOptions
 
 class ConnectOptionsFactory(
     private val context: Context,
@@ -58,27 +58,22 @@ class ConnectOptionsFactory(
                 NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
                 NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
 
-        val videoBandwidthProfileOptionsBuilder = VideoBandwidthProfileOptions.Builder()
-
-        sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
+        val mode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
                 Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT).let {
-            videoBandwidthProfileOptionsBuilder.mode(getBandwidthProfileMode(it))
+            getBandwidthProfileMode(it)
         }
-        sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
-                Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT).let {
-            videoBandwidthProfileOptionsBuilder.maxSubscriptionBitrate(it.toLong())
+        val maxSubscriptionBitrate = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
+                Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT).toLong()
+
+        val maxVideoTracks = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
+                Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT).toLong()
+        val dominantSpeakerPriority = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
+                Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT)?.let {
+            getDominantSpeakerPriority(it)
         }
-        sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
-                Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT).let {
-            videoBandwidthProfileOptionsBuilder.maxTracks(it.toLong())
-        }
-        sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
-                Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT).let {
-            videoBandwidthProfileOptionsBuilder.dominantSpeakerPriority(getDominantSpeakerPriority(it))
-        }
-        sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
+        val trackSwitchOffMode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
                 Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
-            videoBandwidthProfileOptionsBuilder.trackSwitchOffMode(getTrackSwitchOffMode(it))
+            getTrackSwitchOffMode(it)
         }
         val renderDimensions = mutableMapOf<TrackPriority, VideoDimensions>()
         setTrackPriorityRenderDimensions(renderDimensions,
@@ -93,21 +88,18 @@ class ConnectOptionsFactory(
                 TrackPriority.HIGH,
                 Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
                 Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
-        videoBandwidthProfileOptionsBuilder.renderDimensions(renderDimensions)
-        val bandwidthProfileOptions = BandwidthProfileOptions(videoBandwidthProfileOptionsBuilder.build())
+        val bandwidthProfileOptions = createBandwidthProfileOptions {
+            mode(mode)
+            maxSubscriptionBitrate(maxSubscriptionBitrate)
+            maxTracks(maxVideoTracks)
+            dominantSpeakerPriority(dominantSpeakerPriority)
+            trackSwitchOffMode(trackSwitchOffMode)
+            renderDimensions(renderDimensions)
+        }
 
         val isNetworkQualityEnabled = sharedPreferences.get(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT)
-
-        val connectOptionsBuilder = ConnectOptions.Builder(token)
-                .roomName(roomName)
-                .enableInsights(enableInsights)
-                .enableAutomaticSubscription(enableAutomaticTrackSubscription)
-                .enableDominantSpeaker(enableDominantSpeaker)
-                .enableNetworkQuality(isNetworkQualityEnabled)
-                .networkQualityConfiguration(configuration)
-                .bandwidthProfile(bandwidthProfileOptions)
 
         val maxVideoBitrate = sharedPreferences.get(
                 Preferences.MAX_VIDEO_BITRATE,
@@ -116,11 +108,19 @@ class ConnectOptionsFactory(
         val maxAudioBitrate = sharedPreferences.get(
                 Preferences.MAX_AUDIO_BITRATE,
                 Preferences.MAX_AUDIO_BITRATE_DEFAULT)
-        connectOptionsBuilder.encodingParameters(EncodingParameters(maxAudioBitrate, maxVideoBitrate))
-        connectOptionsBuilder.preferVideoCodecs(listOf(preferedVideoCodec))
-        connectOptionsBuilder.preferAudioCodecs(listOf(preferredAudioCodec))
 
-        return connectOptionsBuilder.build()
+        return createConnectOptions(token) {
+            roomName(roomName)
+            enableInsights(enableInsights)
+            enableAutomaticSubscription(enableAutomaticTrackSubscription)
+            enableDominantSpeaker(enableDominantSpeaker)
+            enableNetworkQuality(isNetworkQualityEnabled)
+            networkQualityConfiguration(configuration)
+            bandwidthProfile(bandwidthProfileOptions)
+            encodingParameters(EncodingParameters(maxAudioBitrate, maxVideoBitrate))
+            preferVideoCodecs(listOf(preferedVideoCodec))
+            preferAudioCodecs(listOf(preferredAudioCodec))
+        }
     }
 
     /*

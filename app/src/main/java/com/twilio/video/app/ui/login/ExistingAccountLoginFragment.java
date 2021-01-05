@@ -20,33 +20,34 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnTextChanged;
 import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.ExistingAccountLoginFragmentBinding;
+import org.jetbrains.annotations.NotNull;
 
 public class ExistingAccountLoginFragment extends Fragment {
-
-    @BindView(R.id.email_edittext)
-    EditText emailEditText;
-
-    @BindView(R.id.password_edittext)
-    EditText passwordEditText;
-
-    @BindView(R.id.login_button)
-    Button loginButton;
-
+    private ExistingAccountLoginFragmentBinding binding;
     private Listener mListener;
+    private TextWatcher textWatcher =
+            new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    credentialsChanged();
+                }
+            };
 
     public ExistingAccountLoginFragment() {}
 
@@ -62,30 +63,30 @@ public class ExistingAccountLoginFragment extends Fragment {
 
     @Override
     public View onCreateView(
-            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_existing_account_login, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+            @NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = ExistingAccountLoginFragmentBinding.inflate(inflater, container, false);
+        binding.email.addTextChangedListener(textWatcher);
+        binding.password.addTextChangedListener(textWatcher);
+        binding.login.setOnClickListener(this::loginClicked);
+        return binding.getRoot();
     }
 
-    @OnTextChanged({R.id.email_edittext, R.id.password_edittext})
-    public void onTextChanged(Editable editable) {
-        if (passwordEditText.length() != 0
-                && emailEditText.length() != 0
-                && Patterns.EMAIL_ADDRESS.matcher(emailEditText.getText()).matches()) {
-            loginButton.setTextColor(Color.WHITE);
-            loginButton.setEnabled(true);
+    public void credentialsChanged() {
+        if (binding.password.length() != 0
+                && binding.email.length() != 0
+                && Patterns.EMAIL_ADDRESS.matcher(binding.email.getText()).matches()) {
+            binding.login.setTextColor(Color.WHITE);
+            binding.login.setEnabled(true);
         } else {
-            loginButton.setTextColor(
+            binding.login.setTextColor(
                     ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null));
-            loginButton.setEnabled(false);
+            binding.login.setEnabled(false);
         }
     }
 
-    @OnClick(R.id.login_button)
-    public void onLoginButton(View view) {
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
+    public void loginClicked(View view) {
+        String email = binding.email.getText().toString();
+        String password = binding.password.getText().toString();
         if (email.length() > 0
                 && password.length() > 0
                 && Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -97,7 +98,7 @@ public class ExistingAccountLoginFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         if (context instanceof Listener) {
             mListener = (Listener) context;

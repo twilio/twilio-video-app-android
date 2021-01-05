@@ -1,7 +1,6 @@
 package com.twilio.video.app.e2eTest
 
 import androidx.test.ext.junit.rules.activityScenarioRule
-import androidx.test.rule.GrantPermissionRule
 import com.twilio.video.app.screen.assertMicButtonIsDisabled
 import com.twilio.video.app.screen.assertMicButtonIsEnabled
 import com.twilio.video.app.screen.assertParticipantStubIsHidden
@@ -19,10 +18,6 @@ import org.junit.Test
 
 @E2ETest
 class PermissionTest {
-
-    @get:Rule
-    var permissionRule = GrantPermissionRule.grant(
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()

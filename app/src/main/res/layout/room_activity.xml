@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/content_room" />
+        <include android:id="@+id/room" layout="@layout/content_room" />
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/lobby_toolbar"
@@ -29,7 +29,7 @@
                 android:minHeight="?attr/actionBarSize"
                 app:popupTheme="@style/AppTheme.Lobby.PopupMenu" />
 
-            <include layout="@layout/join_room" />
+            <include android:id="@+id/join_room" layout="@layout/join_room" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -77,11 +77,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginRight="@dimen/fab_margin"
             android:orientation="vertical"
             android:gravity="end|bottom">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_video_image_button"
+                android:id="@+id/local_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/fab_margin"
@@ -90,7 +91,7 @@
                 app:srcCompat="@drawable/ic_videocam_white_24px" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_audio_image_button"
+                android:id="@+id/local_audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/fab_margin"
@@ -119,8 +120,7 @@
         android:layout_gravity="end"
         android:background="?android:attr/windowBackground"
         android:fitsSystemWindows="true"
-        android:fillViewport="true"
-        android:backgroundTint="@color/lobbyStatsDrawerBg">
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -135,6 +135,7 @@
                 style="@style/AppTheme.Lobby.Drawer"
                 android:textSize="20sp"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_gravity="end"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
 
@@ -154,6 +155,7 @@
                     android:id="@+id/stats_disabled_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/stats_disabled"
                     app:srcCompat="@drawable/ic_stats_disabled_image"/>
                 <TextView
                     android:id="@+id/stats_disabled_title"
