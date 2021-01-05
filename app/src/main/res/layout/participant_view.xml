@@ -10,13 +10,13 @@
     <!-- RemoteParticipant layout with video track -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/participant_video_layout"
+        android:id="@+id/video_layout"
         android:background="@color/participantSelectedBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.twilio.video.VideoTextureView
-            android:id="@+id/participant_video"
+            android:id="@+id/video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -43,7 +43,7 @@
             android:visibility="gone"/>
 
         <TextView
-            android:id="@+id/participant_video_identity"
+            android:id="@+id/video_identity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/participantBackground"
@@ -64,13 +64,13 @@
     <!-- RemoteParticipant layout without video track -->
 
     <RelativeLayout
-        android:id="@+id/participant_selected_layout"
+        android:id="@+id/selected_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/participant_selected_background">
 
         <ImageView
-            android:id="@+id/participant_stub_image"
+            android:id="@+id/stub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -78,10 +78,10 @@
             app:srcCompat="@drawable/ic_account_circle_white_24dp" />
 
         <TextView
-            android:id="@+id/participant_selected_identity"
+            android:id="@+id/selected_identity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/participant_stub_image"
+            android:layout_above="@id/stub"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="4dp"
             android:textColor="@android:color/white"
@@ -92,7 +92,7 @@
     <!-- RemoteParticipant audio toggle -->
 
     <ImageView
-        android:id="@+id/participant_no_audio"
+        android:id="@+id/audio_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
@@ -103,7 +103,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ImageView
-        android:id="@+id/participant_pin"
+        android:id="@+id/pin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
@@ -115,7 +115,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ImageView
-        android:id="@+id/network_quality_level_img"
+        android:id="@+id/network_quality"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_margin="6dp"

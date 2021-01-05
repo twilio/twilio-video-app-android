@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import com.twilio.video.app.sdk.RoomManager
-import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.util.plus
 import dagger.android.AndroidInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -41,12 +40,6 @@ class VideoService(
     override fun onCreate() {
         AndroidInjection.inject(this)
         super.onCreate()
-
-        rxDisposables + roomManager.roomEvents.subscribe({
-            observeRoomEvents(it)
-        }, {
-            Timber.e(it, "Error in RoomManager RoomEvent stream")
-        })
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -73,12 +66,5 @@ class VideoService(
                     ONGOING_NOTIFICATION_ID,
                     roomNotification.buildNotification(roomName))
         } }
-    }
-
-    private fun observeRoomEvents(roomEvent: RoomEvent) {
-        when (roomEvent) {
-            is Disconnected -> stopSelf()
-            else -> {}
-        }
     }
 }

@@ -212,7 +212,7 @@ class CommunityLoginActivityTest {
     // TODO Use Espresso for passcode entering as soon as Robolectric bug is fixed https://github.com/robolectric/robolectric/issues/5110
     private fun enterPasscode(passcode: String) {
         scenario.onActivity {
-            val passcodeEditText = it.findViewById<TextInputEditText>(R.id.community_login_screen_passcode_edittext)
+            val passcodeEditText = it.findViewById<TextInputEditText>(R.id.passcode)
             passcodeEditText.setText(passcode)
         }
     }

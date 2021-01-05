@@ -34,20 +34,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
-import butterknife.OnTextChanged
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.twilio.audioswitch.AudioDevice
@@ -61,6 +51,7 @@ import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
+import com.twilio.video.app.databinding.RoomActivityBinding
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Connecting
@@ -97,59 +88,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 class RoomActivity : BaseActivity() {
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-
-    @BindView(R.id.connect)
-    lateinit var connect: Button
-
-    @BindView(R.id.disconnect)
-    lateinit var disconnectButton: ImageButton
-
-    @BindView(R.id.primary_video)
-    lateinit var primaryVideoView: ParticipantPrimaryView
-
-    @BindView(R.id.remote_video_thumbnails)
-    lateinit var thumbnailRecyclerView: RecyclerView
-
-    @BindView(R.id.local_video_image_button)
-    lateinit var localVideoImageButton: ImageButton
-
-    @BindView(R.id.local_audio_image_button)
-    lateinit var localAudioImageButton: ImageButton
-
-    @BindView(R.id.video_container)
-    lateinit var frameLayout: FrameLayout
-
-    @BindView(R.id.join_room_layout)
-    lateinit var joinRoomLayout: LinearLayout
-
-    @BindView(R.id.room_edit_text)
-    lateinit var roomEditText: ClearableEditText
-
-    @BindView(R.id.join_status_layout)
-    lateinit var joinStatusLayout: LinearLayout
-
-    @BindView(R.id.join_status)
-    lateinit var joinStatusTextView: TextView
-
-    @BindView(R.id.join_room_name)
-    lateinit var joinRoomNameTextView: TextView
-
-    @BindView(R.id.recording_notice)
-    lateinit var recordingNoticeTextView: TextView
-
-    @BindView(R.id.stats_recycler_view)
-    lateinit var statsRecyclerView: RecyclerView
-
-    @BindView(R.id.stats_disabled)
-    lateinit var statsDisabledLayout: LinearLayout
-
-    @BindView(R.id.stats_disabled_title)
-    lateinit var statsDisabledTitleTextView: TextView
-
-    @BindView(R.id.stats_disabled_description)
-    lateinit var statsDisabledDescTextView: TextView
+    private lateinit var binding: RoomActivityBinding
     private lateinit var switchCameraMenuItem: MenuItem
     private lateinit var pauseVideoMenuItem: MenuItem
     private lateinit var pauseAudioMenuItem: MenuItem
@@ -180,6 +119,15 @@ class RoomActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = RoomActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.joinRoom.roomName.doOnTextChanged { text: CharSequence?, _, _, _ ->
+            roomNameTextChanged(text)
+        }
+        binding.joinRoom.connect.setOnClickListener { connectButtonClick() }
+        binding.disconnect.setOnClickListener { disconnectButtonClick() }
+        binding.localVideo.setOnClickListener { toggleLocalVideo() }
+        binding.localAudio.setOnClickListener { toggleLocalAudio() }
         val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
@@ -189,28 +137,26 @@ class RoomActivity : BaseActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
 
         // Grab views
-        setContentView(R.layout.activity_room)
-        ButterKnife.bind(this)
         setupThumbnailRecyclerView()
 
         // Setup toolbar
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
 
         // Cache volume control stream
         savedVolumeControlStream = volumeControlStream
 
-        // setup participant controller
-        primaryParticipantController = PrimaryParticipantController(primaryVideoView)
+        // Setup participant controller
+        primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
     }
 
     private fun setupThumbnailRecyclerView() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        thumbnailRecyclerView.layoutManager = layoutManager
+        binding.room.remoteVideoThumbnails.layoutManager = layoutManager
         participantAdapter = ParticipantAdapter()
         participantAdapter
                 .viewHolderEvents
                 .observe(this, { viewEvent: RoomViewEvent -> roomViewModel.processInput(viewEvent) })
-        thumbnailRecyclerView.adapter = participantAdapter
+        binding.room.remoteVideoThumbnails.adapter = participantAdapter
     }
 
     override fun onStart() {
@@ -235,7 +181,7 @@ class RoomActivity : BaseActivity() {
         val uri = intent.data
         val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
         if (roomName != null) {
-            roomEditText.setText(roomName)
+            binding.joinRoom.roomName.setText(roomName)
             isAppLinkProvided = true
         }
         return isAppLinkProvided
@@ -253,11 +199,7 @@ class RoomActivity : BaseActivity() {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             val recordAudioPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
             val cameraPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED
-            val writeExternalStoragePermissionGranted = grantResults[2] == PackageManager.PERMISSION_GRANTED
-            val permissionsGranted = (recordAudioPermissionGranted &&
-                    cameraPermissionGranted &&
-                    writeExternalStoragePermissionGranted)
-            if (permissionsGranted) {
+            if (recordAudioPermissionGranted && cameraPermissionGranted) {
                 roomViewModel.processInput(OnResume)
             }
         }
@@ -331,10 +273,10 @@ class RoomActivity : BaseActivity() {
         if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
             if (resultCode != RESULT_OK) {
                 Snackbar.make(
-                        primaryVideoView,
-                        R.string.screen_capture_permission_not_granted,
-                        BaseTransientBottomBar.LENGTH_LONG)
-                        .show()
+                    binding.room.primaryVideo,
+                    R.string.screen_capture_permission_not_granted,
+                    BaseTransientBottomBar.LENGTH_LONG)
+                    .show()
                 return
             }
             data?.let { data ->
@@ -348,17 +290,15 @@ class RoomActivity : BaseActivity() {
         roomViewModel.processInput(Disconnect)
     }
 
-    @OnTextChanged(value = [R.id.room_edit_text], callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    fun onTextChanged(text: CharSequence?) {
-        connect.isEnabled = !TextUtils.isEmpty(text)
+    private fun roomNameTextChanged(text: CharSequence?) {
+        binding.joinRoom.connect.isEnabled = !TextUtils.isEmpty(text)
     }
 
-    @OnClick(R.id.connect)
-    fun connectButtonClick() {
+    private fun connectButtonClick() {
         InputUtils.hideKeyboard(this)
-        connect.isEnabled = false
+        binding.joinRoom.connect.isEnabled = false
         // obtain room name
-        val text = roomEditText.text
+        val text = binding.joinRoom.roomName.text
         if (text != null) {
             val roomName = text.toString()
             val viewEvent = Connect(displayName ?: "", roomName)
@@ -366,19 +306,16 @@ class RoomActivity : BaseActivity() {
         }
     }
 
-    @OnClick(R.id.disconnect)
-    fun disconnectButtonClick() {
+    private fun disconnectButtonClick() {
         roomViewModel.processInput(Disconnect)
         // TODO Handle screen share
     }
 
-    @OnClick(R.id.local_video_image_button)
-    fun toggleLocalVideo() {
+    private fun toggleLocalVideo() {
         roomViewModel.processInput(ToggleLocalVideo)
     }
 
-    @OnClick(R.id.local_audio_image_button)
-    fun toggleLocalAudio() {
+    private fun toggleLocalAudio() {
         roomViewModel.processInput(ToggleLocalAudio)
     }
 
@@ -386,8 +323,7 @@ class RoomActivity : BaseActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(arrayOf(
                     Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    Manifest.permission.CAMERA
             ),
                     PERMISSIONS_REQUEST_CODE)
         }
@@ -399,8 +335,8 @@ class RoomActivity : BaseActivity() {
         var joinStatusLayoutState = View.GONE
         var settingsMenuItemState = true
         var screenCaptureMenuItemState = false
-        val roomEditable = roomEditText.text
-        val isRoomTextNotEmpty = roomEditable != null && !roomEditable.toString().isEmpty()
+        val roomEditable = binding.joinRoom.roomName.text
+        val isRoomTextNotEmpty = roomEditable != null && roomEditable.toString().isNotEmpty()
         var connectButtonEnabled = isRoomTextNotEmpty
         var roomName = displayName
         var toolbarTitle = displayName
@@ -438,23 +374,23 @@ class RoomActivity : BaseActivity() {
         val isMicEnabled = roomViewState.isMicEnabled
         val isCameraEnabled = roomViewState.isCameraEnabled
         val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
-        localAudioImageButton.isEnabled = isLocalMediaEnabled
-        localVideoImageButton.isEnabled = isLocalMediaEnabled
+        binding.localAudio.isEnabled = isLocalMediaEnabled
+        binding.localVideo.isEnabled = isLocalMediaEnabled
         val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
         val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
-        localAudioImageButton.setImageResource(micDrawable)
-        localVideoImageButton.setImageResource(videoDrawable)
+        binding.localAudio.setImageResource(micDrawable)
+        binding.localVideo.setImageResource(videoDrawable)
         statsListAdapter = StatsListAdapter(this)
-        statsRecyclerView.adapter = statsListAdapter
-        statsRecyclerView.layoutManager = LinearLayoutManager(this)
-        disconnectButton.visibility = disconnectButtonState
-        joinRoomLayout.visibility = joinRoomLayoutState
-        joinStatusLayout.visibility = joinStatusLayoutState
-        connect.isEnabled = connectButtonEnabled
+        binding.statsRecyclerView.adapter = statsListAdapter
+        binding.statsRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.disconnect.visibility = disconnectButtonState
+        binding.joinRoom.joinRoomLayout.visibility = joinRoomLayoutState
+        binding.joinStatusLayout.visibility = joinStatusLayoutState
+        binding.joinRoom.connect.isEnabled = connectButtonEnabled
         setTitle(toolbarTitle)
-        joinStatusTextView.text = joinStatus
-        joinRoomNameTextView.text = roomName
-        recordingNoticeTextView.visibility = recordingWarningVisibility
+        binding.joinStatus.text = joinStatus
+        binding.joinRoomName.text = roomName
+        binding.recordingNotice.visibility = recordingWarningVisibility
         val pauseAudioTitle = getString(if (roomViewState.isAudioEnabled) R.string.pause_audio else R.string.resume_audio)
         val pauseVideoTitle = getString(if (roomViewState.isVideoEnabled) R.string.pause_video else R.string.resume_video)
         pauseAudioMenuItem.title = pauseAudioTitle
@@ -510,32 +446,32 @@ class RoomActivity : BaseActivity() {
             when (roomViewState.configuration) {
                 RoomViewConfiguration.Connected -> {
                     statsListAdapter.updateStatsData(roomViewState.roomStats)
-                    statsRecyclerView.visibility = View.VISIBLE
-                    statsDisabledLayout.visibility = View.GONE
+                    binding.statsRecyclerView.visibility = View.VISIBLE
+                    binding.statsDisabled.visibility = View.GONE
 
                     // disable stats if there is room but no participants (no media)
                     val isStreamingMedia = roomViewState.participantThumbnails?.let { thumbnails ->
                         thumbnails.size > 1
                     } ?: false
                     if (!isStreamingMedia) {
-                        statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-                        statsDisabledDescTextView.text = getString(R.string.stats_description_media_not_shared)
-                        statsRecyclerView.visibility = View.GONE
-                        statsDisabledLayout.visibility = View.VISIBLE
+                        binding.statsDisabledTitle.text = getString(R.string.stats_unavailable)
+                        binding.statsDisabledDescription.text = getString(R.string.stats_description_media_not_shared)
+                        binding.statsRecyclerView.visibility = View.GONE
+                        binding.statsDisabled.visibility = View.VISIBLE
                     }
                 }
                 else -> {
-                    statsDisabledTitleTextView.text = getString(R.string.stats_unavailable)
-                    statsDisabledDescTextView.text = getString(R.string.stats_description_join_room)
-                    statsRecyclerView.visibility = View.GONE
-                    statsDisabledLayout.visibility = View.VISIBLE
+                    binding.statsDisabledTitle.text = getString(R.string.stats_unavailable)
+                    binding.statsDisabledDescription.text = getString(R.string.stats_description_join_room)
+                    binding.statsRecyclerView.visibility = View.GONE
+                    binding.statsDisabled.visibility = View.VISIBLE
                 }
             }
         } else {
-            statsDisabledTitleTextView.text = getString(R.string.stats_gathering_disabled)
-            statsDisabledDescTextView.text = getString(R.string.stats_enable_in_settings)
-            statsRecyclerView.visibility = View.GONE
-            statsDisabledLayout.visibility = View.VISIBLE
+            binding.statsDisabledTitle.text = getString(R.string.stats_gathering_disabled)
+            binding.statsDisabledDescription.text = getString(R.string.stats_enable_in_settings)
+            binding.statsRecyclerView.visibility = View.GONE
+            binding.statsDisabled.visibility = View.VISIBLE
         }
     }
 
@@ -606,7 +542,7 @@ class RoomActivity : BaseActivity() {
                     videoTrack,
                     isMuted,
                     isMirrored)
-            primaryVideoView.showIdentityBadge(!primaryParticipant.isLocalParticipant)
+            binding.room.primaryVideo.showIdentityBadge(!primaryParticipant.isLocalParticipant)
         }
     }
 

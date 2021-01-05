@@ -11,7 +11,6 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.LocalParticipantManager
 import com.twilio.video.app.sdk.RoomManager
-import com.twilio.video.app.sdk.VideoClient
 import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
@@ -20,13 +19,15 @@ import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.util.PermissionUtil
-import io.reactivex.schedulers.TestScheduler
 import io.uniflow.android.test.TestViewObserver
 import io.uniflow.android.test.createTestObserver
 import io.uniflow.test.rule.TestDispatchersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
@@ -37,26 +38,25 @@ import org.junit.Test
 
 private const val PARTICIPANT_SID = "123"
 
+@ExperimentalCoroutinesApi
 class RoomViewModelTest : BaseUnitTest() {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
+    private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
     @get:Rule
-    val coroutineScope = TestDispatchersRule()
+    val coroutineScope = TestDispatchersRule(testDispatcher)
 
     val localParticipantManager = mock<LocalParticipantManager>()
-    private val roomManager = RoomManager(mock(),
-            VideoClient(mock(), mock()), mock()).apply {
+    private val roomManager = RoomManager(mock(), mock(), mock(), testDispatcher).apply {
         localParticipantManager = this@RoomViewModelTest.localParticipantManager
     }
-    private val scheduler = TestScheduler()
     private val participantViewState = ParticipantViewState(PARTICIPANT_SID, "Test Participant")
     private val participantManager = ParticipantManager().apply {
         addParticipant(participantViewState)
     }
-    val permissionUtil = mock<PermissionUtil>()
+    private val permissionUtil = mock<PermissionUtil>()
     private lateinit var testObserver: TestViewObserver
     private lateinit var viewModel: RoomViewModel
     private val localParticipantViewState = ParticipantViewState(isLocalParticipant = true)
@@ -68,17 +68,15 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
-                participantManager,
-                scheduler = scheduler)
+                participantManager)
         testObserver = viewModel.createTestObserver()
     }
 
     @Test
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState`() {
+        connect()
         val expectedVideoTrack = mock<RemoteVideoTrack>()
-
         roomManager.sendRoomEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, false))
-        scheduler.triggerActions()
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
         val expectedParticipantViewState = participantViewState.copy(
@@ -91,10 +89,9 @@ class RoomViewModelTest : BaseUnitTest() {
 
     @Test
     fun `The TrackSwitchOff event should create a new VideoTrackViewState for an existing ParticipantViewState with the switch off set to true`() {
+        connect()
         val expectedVideoTrack = mock<RemoteVideoTrack>()
-
         roomManager.sendRoomEvent(TrackSwitchOff(PARTICIPANT_SID, expectedVideoTrack, true))
-        scheduler.triggerActions()
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack, true)
         val expectedParticipantViewState = participantViewState.copy(
@@ -122,7 +119,6 @@ class RoomViewModelTest : BaseUnitTest() {
                 mock(),
                 permissionUtil,
                 participantManager,
-                scheduler = scheduler,
                 initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
                 .thenReturn(false)
@@ -153,8 +149,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 mock(),
                 permissionUtil,
                 participantManager,
-                scheduler = scheduler,
-                initialViewState = initialRoomViewState.copy(isMicEnabled = true))
+                initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
                 .thenReturn(false)
         val expectedViewState = initialRoomViewState.copy(isMicEnabled = false)
@@ -180,11 +175,12 @@ class RoomViewModelTest : BaseUnitTest() {
 
     @Test
     fun `The ConnectFailure event should send a ShowConnectFailureDialog ViewEffect`() {
+        connect()
         roomManager.sendRoomEvent(ConnectFailure)
-        scheduler.triggerActions()
 
         testObserver.verifySequence(
                 initialRoomViewState,
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 ShowConnectFailureDialog,
                 Disconnected,
                 initialRoomViewState.copy(configuration = Lobby),
@@ -195,16 +191,20 @@ class RoomViewModelTest : BaseUnitTest() {
 
     @Test
     fun `The MaxParticipantFailure event should send a ShowMaxParticipantFailureDialog ViewEffect`() {
+        connect()
         roomManager.sendRoomEvent(MaxParticipantFailure)
-        scheduler.triggerActions()
 
         testObserver.verifySequence(
                 initialRoomViewState,
-                RoomViewEffect.ShowMaxParticipantFailureDialog,
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+                ShowMaxParticipantFailureDialog,
                 Disconnected,
                 initialRoomViewState.copy(configuration = Lobby),
                 initialRoomViewState.copy(configuration = Lobby,
                         primaryParticipant = localParticipantViewState,
                         participantThumbnails = listOf(localParticipantViewState)))
     }
+
+    private fun connect() =
+        viewModel.processInput(Connect("Test", "Test Room"))
 }

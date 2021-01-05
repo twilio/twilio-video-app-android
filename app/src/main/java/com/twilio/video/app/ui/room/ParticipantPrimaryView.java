@@ -21,11 +21,10 @@ import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
-import butterknife.ButterKnife;
-import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.ParticipantPrimaryViewBinding;
 
 public class ParticipantPrimaryView extends ParticipantView {
+    private ParticipantPrimaryViewBinding binding;
 
     public ParticipantPrimaryView(Context context) {
         super(context);
@@ -50,15 +49,19 @@ public class ParticipantPrimaryView extends ParticipantView {
     }
 
     public void showIdentityBadge(boolean show) {
-        if (videoIdentity != null) {
-            videoIdentity.setVisibility(show ? VISIBLE : GONE);
+        if (binding.videoIdentity != null) {
+            binding.videoIdentity.setVisibility(show ? VISIBLE : GONE);
         }
     }
 
     private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.participant_view_primary, this);
-        ButterKnife.bind(this, view);
-
+        binding = ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true);
+        videoLayout = binding.videoLayout;
+        videoIdentity = binding.videoIdentity;
+        videoView = binding.video;
+        selectedLayout = binding.selectedLayout;
+        stubImage = binding.stub;
+        selectedIdentity = binding.selectedIdentity;
         setIdentity(identity);
         setState(state);
         setMirror(mirror);

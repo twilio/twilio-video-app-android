@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/login_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?attr/colorPrimary"
+        android:layout_alignParentBottom="true" >
+
+        <Button
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/login"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/colorButtonText"
+            android:background="?attr/colorPrimaryDark"/>
+
+    </LinearLayout>
 
     <ScrollView
         android:id="@+id/login_scrollview"
@@ -14,7 +33,8 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:background="?attr/colorPrimary"
-        tools:context=".ui.login.LoginActivity">
+        tools:context=".ui.login.LoginActivity"
+        android:layout_above="@id/login_layout" >
 
         <LinearLayout
             android:id="@+id/register_layout"
@@ -33,8 +53,8 @@
                 android:contentDescription="@string/video_logo"
                 android:src="@drawable/video_logo_splash"/>
 
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/google_sign_in_button"
+            <EditText
+                android:id="@+id/email"
                 android:layout_marginTop="@dimen/username_margin_top"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -42,10 +62,13 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:autofillHints="username"
+                android:inputType="textEmailAddress"
+                android:hint="@string/email"/>
 
-            <Button
-                android:id="@+id/email_sign_in_button"
+            <EditText
+                android:id="@+id/password"
                 android:layout_marginTop="@dimen/login_components_margin_top"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -54,11 +77,10 @@
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/white"
-                android:background="?attr/colorPrimaryDark"
-                android:text="@string/sign_in_with_existing_account"/>
+                android:autofillHints="password"
+                android:inputType="textPassword"
+                android:hint="@string/password"/>
         </LinearLayout>
     </ScrollView>
 
-</FrameLayout>
+</RelativeLayout>

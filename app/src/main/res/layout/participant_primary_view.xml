@@ -8,13 +8,13 @@
     <!-- RemoteParticipant layout with video track -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/participant_video_layout"
+        android:id="@+id/video_layout"
         android:background="@color/participantSelectedBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.twilio.video.VideoTextureView
-            android:id="@+id/participant_video"
+            android:id="@+id/video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -23,7 +23,7 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
-            android:id="@+id/participant_video_identity"
+            android:id="@+id/video_identity"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -43,13 +43,13 @@
     <!-- RemoteParticipant layout without video track -->
 
     <RelativeLayout
-        android:id="@+id/participant_selected_layout"
+        android:id="@+id/selected_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/participantSelectedBackground">
 
         <ImageView
-            android:id="@+id/participant_stub_image"
+            android:id="@+id/stub"
             android:layout_width="107dp"
             android:layout_height="107dp"
             android:layout_centerInParent="true"
@@ -57,10 +57,10 @@
             app:srcCompat="@drawable/ic_account_circle_white_48px" />
 
         <TextView
-            android:id="@+id/participant_selected_identity"
+            android:id="@+id/selected_identity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/participant_stub_image"
+            android:layout_above="@id/stub"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="24dp"
             android:textColor="@android:color/white"

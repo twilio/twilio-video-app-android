@@ -25,8 +25,12 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParti
 import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 const val MICROPHONE_TRACK_NAME = "microphone"
@@ -36,40 +40,56 @@ const val SCREEN_TRACK_NAME = "screen"
 class RoomManager(
     private val context: Context,
     private val videoClient: VideoClient,
-    sharedPreferences: SharedPreferences
+    sharedPreferences: SharedPreferences,
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private var statsScheduler: StatsScheduler? = null
     private val roomListener = RoomListener()
-    private val roomEventSubject = PublishSubject.create<RoomEvent>()
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal var roomScope = CoroutineScope(coroutineDispatcher)
+    /*
+     * TODO Use SharedFlow instead once it becomes stable for automatic cancellation
+     */
+    private val roomChannel: Channel<RoomEvent> = Channel(Channel.BUFFERED)
+    val roomReceiveChannel: ReceiveChannel<RoomEvent> = roomChannel
     @VisibleForTesting(otherwise = PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
             LocalParticipantManager(context, this, sharedPreferences)
     var room: Room? = null
-    val roomEvents: Observable<RoomEvent> = roomEventSubject
 
     fun disconnect() {
         room?.disconnect()
     }
 
     suspend fun connect(identity: String, roomName: String) {
-        roomEventSubject.onNext(Connecting)
-        room = try {
-            videoClient.connect(identity, roomName, roomListener)
-        } catch (e: AuthServiceException) {
-            handleTokenException(e, e.error)
-        } catch (e: Exception) {
-            handleTokenException(e)
+        sendToChannel(Connecting)
+        connectToRoom(identity, roomName)
+    }
+
+    private suspend fun connectToRoom(identity: String, roomName: String) {
+        roomScope.launch {
+            room = try {
+                videoClient.connect(identity, roomName, roomListener)
+            } catch (e: AuthServiceException) {
+                handleTokenException(e, e.error)
+            } catch (e: Exception) {
+                handleTokenException(e)
+            }
         }
     }
 
+    private fun sendToChannel(roomEvent: RoomEvent) {
+        roomScope.launch { roomChannel.send(roomEvent) }
+    }
+
     fun sendRoomEvent(roomEvent: RoomEvent) {
-        roomEventSubject.onNext(roomEvent)
+        sendToChannel(roomEvent)
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
         Timber.e(e, "Failed to retrieve token")
-        roomEventSubject.onNext(RoomEvent.TokenError(serviceError = error))
+        sendToChannel(RoomEvent.TokenError(serviceError = error))
         return null
     }
 
@@ -136,7 +156,7 @@ class RoomManager(
 
             stopService(context)
 
-            roomEventSubject.onNext(Disconnected)
+            sendToChannel(Disconnected)
 
             localParticipantManager.localParticipant = null
 
@@ -153,9 +173,9 @@ class RoomManager(
                     twilioException.message)
 
             if (twilioException.code == ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION) {
-                roomEventSubject.onNext(MaxParticipantFailure)
+                sendRoomEvent(MaxParticipantFailure)
             } else {
-                roomEventSubject.onNext(ConnectFailure)
+                sendRoomEvent(ConnectFailure)
             }
         }
 
@@ -178,7 +198,7 @@ class RoomManager(
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
 
-            roomEventSubject.onNext(DominantSpeakerChanged(remoteParticipant?.sid))
+            sendToChannel(DominantSpeakerChanged(remoteParticipant?.sid))
         }
 
         override fun onRecordingStarted(room: Room) {}
@@ -205,7 +225,7 @@ class RoomManager(
                     participants.add(it)
                 }
 
-                roomEventSubject.onNext(Connected(participants, room, room.name))
+                sendToChannel(Connected(participants, room, room.name))
                 localParticipantManager.publishLocalTracks()
             }
         }
