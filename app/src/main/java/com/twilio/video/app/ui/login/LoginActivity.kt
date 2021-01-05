@@ -18,24 +18,36 @@ package com.twilio.video.app.ui.login
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.twilio.video.app.R
 import com.twilio.video.app.base.BaseActivity
+import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.databinding.LoginActivityBinding
 import com.twilio.video.app.ui.room.RoomActivity
+import javax.inject.Inject
 import timber.log.Timber
 
 private const val RC_SIGN_IN = 20
 
 class LoginActivity : BaseActivity() {
 
+    private lateinit var authUI: FirebaseAuth
+
+    @Inject
+    internal lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = LoginActivityBinding.inflate(layoutInflater)
+        authUI = FirebaseAuth.getInstance()
         setContentView(binding.root)
         binding.signInButton.setOnClickListener {
             navigateToFirebaseUIAuth()
@@ -47,7 +59,10 @@ class LoginActivity : BaseActivity() {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == Activity.RESULT_OK) {
-                startLobbyActivity()
+                authUI.currentUser?.let { user ->
+                    saveIdentity(user)
+                    startLobbyActivity()
+                }
             } else {
                 IdpResponse.fromResultIntent(data)?.let {
                     Timber.e(it.error)
@@ -87,5 +102,13 @@ class LoginActivity : BaseActivity() {
     private fun startLobbyActivity() {
         RoomActivity.startActivity(this, intent.data)
         finish()
+    }
+
+    private fun saveIdentity(user: FirebaseUser) {
+        sharedPreferences.edit {
+            val email = user.email
+            putString(Preferences.EMAIL, email)
+            putString(Preferences.DISPLAY_NAME, user.displayName ?: email)
+        }
     }
 }
