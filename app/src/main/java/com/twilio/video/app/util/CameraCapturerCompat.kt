@@ -6,7 +6,6 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.os.Build
-import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.video.Camera2Capturer
 import com.twilio.video.CameraCapturer
 import com.twilio.video.VideoCapturer
@@ -67,16 +66,18 @@ class CameraCapturerCompat(
             } else {
                 Camera1Enumerator().getFrontAndBackCameraIds(context, isCamera2 = false)?.let { cameraIds ->
                     val cameraCapturer = CameraCapturer(context, cameraIds.first ?: cameraIds.second
-                    ?: "", object : CameraCapturer.Listener {
-                        override fun onFirstFrameAvailable() {}
-
-                        override fun onCameraSwitched(newCameraId: String) {}
-
-                        override fun onError(errorCode: Int) {}
-                    })
+                    ?: "", getCameraListener())
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, cameraCapturer = cameraCapturer)
                 }
             }
+        }
+
+        private fun getCameraListener() = object : CameraCapturer.Listener {
+            override fun onFirstFrameAvailable() { }
+
+            override fun onCameraSwitched(newCameraId: String) {}
+
+            override fun onError(errorCode: Int) {}
         }
 
         private fun CameraEnumerator.getFrontAndBackCameraIds(context: Context, isCamera2: Boolean = true): Pair<String?, String?>? {
