@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import com.firebase.ui.auth.AuthUI
@@ -40,16 +41,18 @@ private const val RC_SIGN_IN = 20
 class LoginActivity : BaseActivity() {
 
     private lateinit var authUI: FirebaseAuth
+    private lateinit var binding: LoginActivityBinding
 
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = LoginActivityBinding.inflate(layoutInflater)
+        binding = LoginActivityBinding.inflate(layoutInflater)
         authUI = FirebaseAuth.getInstance()
         setContentView(binding.root)
         binding.signInButton.setOnClickListener {
+            binding.progressBar.visibility = View.VISIBLE
             navigateToFirebaseUIAuth()
         }
     }
@@ -58,6 +61,7 @@ class LoginActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN) {
+            binding.progressBar.visibility = View.GONE
             if (resultCode == Activity.RESULT_OK) {
                 authUI.currentUser?.let { user ->
                     saveIdentity(user)
