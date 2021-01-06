@@ -64,7 +64,7 @@ class CameraCapturerCompat(
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, camera2Capturer = cameraCapturer)
                 }
             } else {
-                Camera1Enumerator().getFrontAndBackCameraIds(context)?.let { cameraIds ->
+                Camera1Enumerator().getFrontAndBackCameraIds(context, isCamera2 = false)?.let { cameraIds ->
                     val cameraCapturer = CameraCapturer(context, cameraIds.first ?: cameraIds.second
                     ?: "")
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, cameraCapturer = cameraCapturer)
@@ -72,15 +72,18 @@ class CameraCapturerCompat(
             }
         }
 
-        private fun CameraEnumerator.getFrontAndBackCameraIds(context: Context): Pair<String?, String?>? {
-            val cameraIds = deviceNames.find { isFrontFacing(it) && isCameraIdSupported(context, it) } to
-                    deviceNames.find { isBackFacing(it) && isCameraIdSupported(context, it) }
+        private fun CameraEnumerator.getFrontAndBackCameraIds(context: Context, isCamera2: Boolean = true): Pair<String?, String?>? {
+            val cameraIds = deviceNames.find { isFrontFacing(it) && isCameraIdSupported(isCamera2, context, it) } to
+                    deviceNames.find { isBackFacing(it) && isCameraIdSupported(isCamera2, context, it) }
             return if (isAtLeastOneCameraAvailable(cameraIds.first, cameraIds.second)) cameraIds
             else {
                 Timber.w("No cameras are available on this device")
                 null
             }
         }
+
+        private fun isCameraIdSupported(isCamera2: Boolean, context: Context, cameraId: String) =
+                if (isCamera2) isCameraIdSupported(context, cameraId) else true
 
         private fun isCameraIdSupported(context: Context, cameraId: String): Boolean {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
