@@ -6,6 +6,8 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.os.Build
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.video.Camera2Capturer
 import com.twilio.video.CameraCapturer
 import com.twilio.video.VideoCapturer
@@ -20,7 +22,8 @@ class CameraCapturerCompat(
     private val frontCameraId: String?,
     private val backCameraId: String?,
     private val cameraCapturer: CameraCapturer? = null,
-    private val camera2Capturer: Camera2Capturer? = null
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal val camera2Capturer: Camera2Capturer? = null
 ) : VideoCapturer {
 
     val cameraId: String

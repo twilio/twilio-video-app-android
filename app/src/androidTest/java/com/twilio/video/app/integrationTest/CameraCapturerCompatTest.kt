@@ -41,7 +41,7 @@ class CameraCapturerCompatTest {
         assertThat(capturerCompat, `is`(not(nullValue())))
 
         capturerCompat?.run {
-            val enumerator = Camera2Enumerator(getTargetContext())
+            val enumerator = if (capturerCompat.camera2Capturer != null) Camera2Enumerator(getTargetContext()) else Camera1Enumerator()
             var isFrontFacing = enumerator.isFrontFacing(cameraId)
             assertThat(isFrontFacing, equalTo(true))
             switchCamera()
