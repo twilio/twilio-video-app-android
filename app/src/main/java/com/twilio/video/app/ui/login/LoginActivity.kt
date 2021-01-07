@@ -91,6 +91,7 @@ class LoginActivity : BaseActivity() {
                         .setAvailableProviders(providers)
                         .setIsSmartLockEnabled(false)
                         .setAlwaysShowSignInMethodScreen(true)
+                        .setTheme(R.style.GreenTheme)
                         .build(),
                 RC_SIGN_IN)
     }

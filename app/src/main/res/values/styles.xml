@@ -85,5 +85,17 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
+    <style name="GreenTheme" parent="FirebaseUI">
+        <!-- Required for sign-in flow styling -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@android:color/white</item>
+
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
+        <item name="colorControlHighlight">@android:color/white</item>
+        <item name="colorError">@android:color/white</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+    </style>
 
 </resources>
