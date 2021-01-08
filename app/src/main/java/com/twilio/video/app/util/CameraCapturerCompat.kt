@@ -102,7 +102,7 @@ class CameraCapturerCompat(
                 cameraCharacteristics = try {
                     cameraManager.getCameraCharacteristics(cameraId)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Timber.e(e)
                     return false
                 }
                 /*
