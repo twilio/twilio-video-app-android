@@ -153,30 +153,6 @@ class RoomActivity : BaseActivity() {
         setupRecordingAnimation()
     }
 
-    private fun setupRecordingAnimation() {
-        val recordingDrawable = ContextCompat.getDrawable(this, R.drawable.ic_recording)
-        ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
-                PropertyValuesHolder.ofInt("alpha", 100, 255)).apply {
-            target = recordingDrawable
-            duration = 750
-            repeatCount = ValueAnimator.INFINITE
-            repeatMode = ValueAnimator.REVERSE
-            start()
-        }
-        binding.recordingIndicator?.setCompoundDrawablesWithIntrinsicBounds(
-                recordingDrawable, null, null, null)
-    }
-
-    private fun setupThumbnailRecyclerView() {
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.room.remoteVideoThumbnails.layoutManager = layoutManager
-        participantAdapter = ParticipantAdapter()
-        participantAdapter
-                .viewHolderEvents
-                .observe(this, { viewEvent: RoomViewEvent -> roomViewModel.processInput(viewEvent) })
-        binding.room.remoteVideoThumbnails.adapter = participantAdapter
-    }
-
     override fun onStart() {
         super.onStart()
         checkIntentURI()
@@ -192,17 +168,6 @@ class RoomActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         roomViewModel.processInput(OnPause)
-    }
-
-    private fun checkIntentURI(): Boolean {
-        var isAppLinkProvided = false
-        val uri = intent.data
-        val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
-        if (roomName != null) {
-            binding.joinRoom.roomName.setText(roomName)
-            isAppLinkProvided = true
-        }
-        return isAppLinkProvided
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
@@ -306,6 +271,41 @@ class RoomActivity : BaseActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         roomViewModel.processInput(Disconnect)
+    }
+
+    private fun setupRecordingAnimation() {
+        val recordingDrawable = ContextCompat.getDrawable(this, R.drawable.ic_recording)
+        ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
+                PropertyValuesHolder.ofInt("alpha", 100, 255)).apply {
+            target = recordingDrawable
+            duration = 750
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+        binding.recordingIndicator?.setCompoundDrawablesWithIntrinsicBounds(
+                recordingDrawable, null, null, null)
+    }
+
+    private fun checkIntentURI(): Boolean {
+        var isAppLinkProvided = false
+        val uri = intent.data
+        val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
+        if (roomName != null) {
+            binding.joinRoom.roomName.setText(roomName)
+            isAppLinkProvided = true
+        }
+        return isAppLinkProvided
+    }
+
+    private fun setupThumbnailRecyclerView() {
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.room.remoteVideoThumbnails.layoutManager = layoutManager
+        participantAdapter = ParticipantAdapter()
+        participantAdapter
+                .viewHolderEvents
+                .observe(this, { viewEvent: RoomViewEvent -> roomViewModel.processInput(viewEvent) })
+        binding.room.remoteVideoThumbnails.adapter = participantAdapter
     }
 
     private fun roomNameTextChanged(text: CharSequence?) {
