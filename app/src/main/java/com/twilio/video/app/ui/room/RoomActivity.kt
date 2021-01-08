@@ -563,9 +563,7 @@ class RoomActivity : BaseActivity() {
                     videoTrack,
                     isMuted,
                     isMirrored)
-            binding.room.primaryVideo.run {
-                showIdentityBadge(!primaryParticipant.isLocalParticipant)
-            }
+            binding.room.primaryVideo.showIdentityBadge(!primaryParticipant.isLocalParticipant)
         }
     }
 
