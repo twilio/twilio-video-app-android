@@ -1,46 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/participant_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <!-- RemoteParticipant layout with video track -->
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/video_layout"
-        android:background="@color/participantSelectedBackground"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.twilio.video.VideoTextureView
-            android:id="@+id/video"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <TextView
-            android:id="@+id/video_identity"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:background="@drawable/badge_background"
-            android:padding="10dp"
-            android:layout_marginTop="100dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <!-- RemoteParticipant layout without video track -->
 
@@ -69,5 +33,64 @@
             android:textSize="24sp"
             android:textStyle="bold" />
     </RelativeLayout>
+
+    <!-- RemoteParticipant layout with video track -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/video_layout"
+        android:background="@color/participantSelectedBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.twilio.video.VideoTextureView
+            android:id="@+id/video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/video_identity"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            tools:text="Some Identity"
+            android:background="@drawable/badge_background"
+            android:padding="10dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/recording_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:text="@string/recording"
+            android:drawableLeft="@drawable/ic_recording"
+            android:drawableStart="@drawable/ic_recording"
+            android:background="@drawable/badge_background"
+            android:padding="10dp"
+            android:drawablePadding="4dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
