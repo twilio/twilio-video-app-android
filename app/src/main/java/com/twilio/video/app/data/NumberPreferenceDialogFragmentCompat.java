@@ -23,6 +23,7 @@ import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
 import com.twilio.video.app.R;
 import java.util.Locale;
+import timber.log.Timber;
 
 /**
  * NumberPreferenceDialogFragmentCompat allows to instantiate custom {@link NumberPreference} dialog
@@ -96,7 +97,7 @@ public class NumberPreferenceDialogFragmentCompat extends PreferenceDialogFragme
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Timber.e(e);
             }
         }
     }
