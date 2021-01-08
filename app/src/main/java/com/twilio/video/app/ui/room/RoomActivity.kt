@@ -118,6 +118,7 @@ class RoomActivity : BaseActivity() {
     private lateinit var primaryParticipantController: PrimaryParticipantController
     private lateinit var participantAdapter: ParticipantAdapter
     private lateinit var roomViewModel: RoomViewModel
+    private lateinit var recordingAnimation: ObjectAnimator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,6 +152,11 @@ class RoomActivity : BaseActivity() {
         primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
 
         setupRecordingAnimation()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        recordingAnimation.cancel()
     }
 
     override fun onStart() {
@@ -275,7 +281,7 @@ class RoomActivity : BaseActivity() {
 
     private fun setupRecordingAnimation() {
         val recordingDrawable = ContextCompat.getDrawable(this, R.drawable.ic_recording)
-        ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
+        recordingAnimation = ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
                 PropertyValuesHolder.ofInt("alpha", 100, 255)).apply {
             target = recordingDrawable
             duration = 750
@@ -283,7 +289,7 @@ class RoomActivity : BaseActivity() {
             repeatMode = ValueAnimator.REVERSE
             start()
         }
-        binding.recordingIndicator?.setCompoundDrawablesWithIntrinsicBounds(
+        binding.recordingIndicator.setCompoundDrawablesWithIntrinsicBounds(
                 recordingDrawable, null, null, null)
     }
 
@@ -383,13 +389,13 @@ class RoomActivity : BaseActivity() {
                 roomName = roomViewState.title
                 toolbarTitle = roomName
                 joinStatus = ""
-                binding.recordingIndicator?.visibility =
+                binding.recordingIndicator.visibility =
                         if (roomViewState.isRecording) View.VISIBLE else View.GONE
             }
             Lobby -> {
                 connectButtonEnabled = isRoomTextNotEmpty
                 screenCaptureMenuItemState = false
-                binding.recordingIndicator?.visibility = View.GONE
+                binding.recordingIndicator.visibility = View.GONE
             }
         }
         val isMicEnabled = roomViewState.isMicEnabled
