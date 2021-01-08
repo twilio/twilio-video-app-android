@@ -15,9 +15,14 @@
  */
 package com.twilio.video.app.ui.room
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.core.content.ContextCompat
+import com.twilio.video.app.R
 import com.twilio.video.app.databinding.ParticipantPrimaryViewBinding
 
 internal class ParticipantPrimaryView @JvmOverloads constructor(
@@ -28,7 +33,6 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
 
     private val binding: ParticipantPrimaryViewBinding =
             ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true)
-
     init {
         videoLayout = binding.videoLayout
         videoIdentity = binding.videoIdentity
@@ -36,6 +40,7 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
         selectedLayout = binding.selectedLayout
         stubImage = binding.stub
         selectedIdentity = binding.selectedIdentity
+        setupRecordingAnimation()
         setIdentity(identity)
         setState(state)
         setMirror(mirror)
@@ -47,6 +52,27 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
     }
 
     fun showRecordingBadge(show: Boolean) {
-        binding.recordingIndicator.visibility = if (show) VISIBLE else GONE
+        binding.recordingIndicator.apply {
+            visibility = if (show) {
+                VISIBLE
+            } else {
+                GONE
+            }
+        }
+    }
+
+    private fun setupRecordingAnimation() {
+        val recordingDrawable = ContextCompat.getDrawable(context, R.drawable.ic_recording)
+        ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
+                PropertyValuesHolder.ofInt("alpha", 100, 255)).apply {
+                    target = recordingDrawable
+                    duration = 750
+                    repeatCount = ValueAnimator.INFINITE
+                    repeatMode = ValueAnimator.REVERSE
+                    start()
+                }
+        binding.recordingIndicator.apply {
+            setCompoundDrawablesWithIntrinsicBounds(recordingDrawable, null, null, null)
+        }
     }
 }
