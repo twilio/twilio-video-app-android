@@ -482,7 +482,7 @@ class RoomActivity : BaseActivity() {
 
     private fun bindRoomViewState(roomViewState: RoomViewState) {
         deviceMenuItem.isVisible = roomViewState.availableAudioDevices?.isNotEmpty() ?: false
-        renderPrimaryView(roomViewState.primaryParticipant)
+        renderPrimaryView(roomViewState.primaryParticipant, roomViewState.isRecording)
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
         updateAudioDeviceIcon(roomViewState.selectedDevice)
@@ -533,7 +533,7 @@ class RoomActivity : BaseActivity() {
         this.deviceMenuItem.setIcon(audioDeviceMenuIcon)
     }
 
-    private fun renderPrimaryView(primaryParticipant: ParticipantViewState) {
+    private fun renderPrimaryView(primaryParticipant: ParticipantViewState, isRecording: Boolean) {
         primaryParticipant.run {
             primaryParticipantController.renderAsPrimary(
                     if (isLocalParticipant) getString(R.string.you) else identity,
@@ -541,7 +541,10 @@ class RoomActivity : BaseActivity() {
                     videoTrack,
                     isMuted,
                     isMirrored)
-            binding.room.primaryVideo.showIdentityBadge(!primaryParticipant.isLocalParticipant)
+            binding.room.primaryVideo.run {
+                showIdentityBadge(!primaryParticipant.isLocalParticipant)
+                showRecordingBadge(isRecording)
+            }
         }
     }
 

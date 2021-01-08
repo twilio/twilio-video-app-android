@@ -54,6 +54,12 @@ public class ParticipantPrimaryView extends ParticipantView {
         }
     }
 
+    public void showRecordingBadge(boolean show) {
+        if (binding.recordingIndicator != null) {
+            binding.recordingIndicator.setVisibility(show ? VISIBLE : GONE);
+        }
+    }
+
     private void init(Context context) {
         binding = ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true);
         videoLayout = binding.videoLayout;
