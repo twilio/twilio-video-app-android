@@ -16,6 +16,9 @@
 package com.twilio.video.app.ui.room
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.AlertDialog
@@ -146,6 +149,22 @@ class RoomActivity : BaseActivity() {
 
         // Setup participant controller
         primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
+
+        setupRecordingAnimation()
+    }
+
+    private fun setupRecordingAnimation() {
+        val recordingDrawable = ContextCompat.getDrawable(this, R.drawable.ic_recording)
+        ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
+                PropertyValuesHolder.ofInt("alpha", 100, 255)).apply {
+            target = recordingDrawable
+            duration = 750
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+        binding.recordingIndicator?.setCompoundDrawablesWithIntrinsicBounds(
+                recordingDrawable, null, null, null)
     }
 
     private fun setupThumbnailRecyclerView() {
@@ -364,10 +383,13 @@ class RoomActivity : BaseActivity() {
                 roomName = roomViewState.title
                 toolbarTitle = roomName
                 joinStatus = ""
+                binding.recordingIndicator?.visibility =
+                        if (roomViewState.isRecording) View.VISIBLE else View.GONE
             }
             Lobby -> {
                 connectButtonEnabled = isRoomTextNotEmpty
                 screenCaptureMenuItemState = false
+                binding.recordingIndicator?.visibility = View.GONE
             }
         }
         val isMicEnabled = roomViewState.isMicEnabled
@@ -482,7 +504,7 @@ class RoomActivity : BaseActivity() {
 
     private fun bindRoomViewState(roomViewState: RoomViewState) {
         deviceMenuItem.isVisible = roomViewState.availableAudioDevices?.isNotEmpty() ?: false
-        renderPrimaryView(roomViewState.primaryParticipant, roomViewState.isRecording)
+        renderPrimaryView(roomViewState.primaryParticipant)
         renderThumbnails(roomViewState)
         updateLayout(roomViewState)
         updateAudioDeviceIcon(roomViewState.selectedDevice)
@@ -533,7 +555,7 @@ class RoomActivity : BaseActivity() {
         this.deviceMenuItem.setIcon(audioDeviceMenuIcon)
     }
 
-    private fun renderPrimaryView(primaryParticipant: ParticipantViewState, isRecording: Boolean) {
+    private fun renderPrimaryView(primaryParticipant: ParticipantViewState) {
         primaryParticipant.run {
             primaryParticipantController.renderAsPrimary(
                     if (isLocalParticipant) getString(R.string.you) else identity,
@@ -543,7 +565,6 @@ class RoomActivity : BaseActivity() {
                     isMirrored)
             binding.room.primaryVideo.run {
                 showIdentityBadge(!primaryParticipant.isLocalParticipant)
-                showRecordingBadge(isRecording)
             }
         }
     }
