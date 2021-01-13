@@ -14,6 +14,8 @@ import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
@@ -203,6 +205,30 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState.copy(configuration = Lobby,
                         primaryParticipant = localParticipantViewState,
                         participantThumbnails = listOf(localParticipantViewState)))
+    }
+
+    @Test
+    fun `The RecordingStarted event should set the isRecording property to true`() {
+        connect()
+        roomManager.sendRoomEvent(RecordingStarted)
+
+        testObserver.verifySequence(
+                initialRoomViewState,
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
+                        isRecording = true))
+    }
+
+    @Test
+    fun `The RecordingStopped event should set the isRecording property to false`() {
+        connect()
+        roomManager.sendRoomEvent(RecordingStopped)
+
+        testObserver.verifySequence(
+                initialRoomViewState,
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
+                        isRecording = false))
     }
 
     private fun connect() =

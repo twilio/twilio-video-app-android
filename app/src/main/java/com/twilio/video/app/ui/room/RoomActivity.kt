@@ -16,6 +16,9 @@
 package com.twilio.video.app.ui.room
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.AlertDialog
@@ -38,7 +41,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
@@ -116,6 +118,7 @@ class RoomActivity : BaseActivity() {
     private lateinit var primaryParticipantController: PrimaryParticipantController
     private lateinit var participantAdapter: ParticipantAdapter
     private lateinit var roomViewModel: RoomViewModel
+    private lateinit var recordingAnimation: ObjectAnimator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,16 +150,13 @@ class RoomActivity : BaseActivity() {
 
         // Setup participant controller
         primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
+
+        setupRecordingAnimation()
     }
 
-    private fun setupThumbnailRecyclerView() {
-        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.room.remoteVideoThumbnails.layoutManager = layoutManager
-        participantAdapter = ParticipantAdapter()
-        participantAdapter
-                .viewHolderEvents
-                .observe(this, { viewEvent: RoomViewEvent -> roomViewModel.processInput(viewEvent) })
-        binding.room.remoteVideoThumbnails.adapter = participantAdapter
+    override fun onDestroy() {
+        super.onDestroy()
+        recordingAnimation.cancel()
     }
 
     override fun onStart() {
@@ -174,17 +174,6 @@ class RoomActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         roomViewModel.processInput(OnPause)
-    }
-
-    private fun checkIntentURI(): Boolean {
-        var isAppLinkProvided = false
-        val uri = intent.data
-        val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
-        if (roomName != null) {
-            binding.joinRoom.roomName.setText(roomName)
-            isAppLinkProvided = true
-        }
-        return isAppLinkProvided
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
@@ -275,7 +264,7 @@ class RoomActivity : BaseActivity() {
                 Snackbar.make(
                     binding.room.primaryVideo,
                     R.string.screen_capture_permission_not_granted,
-                    BaseTransientBottomBar.LENGTH_LONG)
+                    Snackbar.LENGTH_LONG)
                     .show()
                 return
             }
@@ -288,6 +277,41 @@ class RoomActivity : BaseActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         roomViewModel.processInput(Disconnect)
+    }
+
+    private fun setupRecordingAnimation() {
+        val recordingDrawable = ContextCompat.getDrawable(this, R.drawable.ic_recording)
+        recordingAnimation = ObjectAnimator.ofPropertyValuesHolder(recordingDrawable,
+                PropertyValuesHolder.ofInt("alpha", 100, 255)).apply {
+            target = recordingDrawable
+            duration = 750
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+        binding.recordingIndicator.setCompoundDrawablesWithIntrinsicBounds(
+                recordingDrawable, null, null, null)
+    }
+
+    private fun checkIntentURI(): Boolean {
+        var isAppLinkProvided = false
+        val uri = intent.data
+        val roomName = UriRoomParser(UriWrapper(uri)).parseRoom()
+        if (roomName != null) {
+            binding.joinRoom.roomName.setText(roomName)
+            isAppLinkProvided = true
+        }
+        return isAppLinkProvided
+    }
+
+    private fun setupThumbnailRecyclerView() {
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.room.remoteVideoThumbnails.layoutManager = layoutManager
+        participantAdapter = ParticipantAdapter()
+        participantAdapter
+                .viewHolderEvents
+                .observe(this, { viewEvent: RoomViewEvent -> roomViewModel.processInput(viewEvent) })
+        binding.room.remoteVideoThumbnails.adapter = participantAdapter
     }
 
     private fun roomNameTextChanged(text: CharSequence?) {
@@ -365,10 +389,13 @@ class RoomActivity : BaseActivity() {
                 roomName = roomViewState.title
                 toolbarTitle = roomName
                 joinStatus = ""
+                binding.recordingIndicator.visibility =
+                        if (roomViewState.isRecording) View.VISIBLE else View.GONE
             }
             Lobby -> {
                 connectButtonEnabled = isRoomTextNotEmpty
                 screenCaptureMenuItemState = false
+                binding.recordingIndicator.visibility = View.GONE
             }
         }
         val isMicEnabled = roomViewState.isMicEnabled
