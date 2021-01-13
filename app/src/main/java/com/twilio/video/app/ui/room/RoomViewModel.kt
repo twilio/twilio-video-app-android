@@ -27,6 +27,8 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptur
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.NetworkQualityLevelChange
@@ -212,6 +214,8 @@ class RoomViewModel(
                     ShowTokenErrorDialog(roomEvent.serviceError)
                 }
             }
+            RecordingStarted -> setState { it.copy(isRecording = true) }
+            RecordingStopped -> setState { it.copy(isRecording = false) }
             is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
             is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
             is StatsUpdate -> setState { it.copy(roomStats = roomEvent.roomStats) }

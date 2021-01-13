@@ -22,6 +22,7 @@ data class RoomViewState(
     val isVideoEnabled: Boolean = true,
     val isVideoOff: Boolean = false,
     val isScreenCaptureOn: Boolean = false,
+    val isRecording: Boolean = false,
     val roomStats: RoomStats? = null
 ) : UIState()
 
