@@ -20,6 +20,8 @@ import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
 import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
@@ -201,7 +203,9 @@ class RoomManager(
             sendToChannel(DominantSpeakerChanged(remoteParticipant?.sid))
         }
 
-        override fun onRecordingStarted(room: Room) {}
+        override fun onRecordingStarted(room: Room) = sendToChannel(RecordingStarted)
+
+        override fun onRecordingStopped(room: Room) = sendToChannel(RecordingStopped)
 
         override fun onReconnected(room: Room) {
             Timber.i("onReconnected: %s", room.name)
@@ -210,8 +214,6 @@ class RoomManager(
         override fun onReconnecting(room: Room, twilioException: TwilioException) {
             Timber.i("onReconnecting: %s", room.name)
         }
-
-        override fun onRecordingStopped(room: Room) {}
 
         private fun setupParticipants(room: Room) {
             room.localParticipant?.let { localParticipant ->
