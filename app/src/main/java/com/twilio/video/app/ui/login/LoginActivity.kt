@@ -22,7 +22,9 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.twilio.video.app.R
-import com.twilio.video.app.auth.Authenticator
+import com.twilio.video.app.auth.EmailAuthProvider
+import com.twilio.video.app.auth.FirebaseWrapper
+import com.twilio.video.app.auth.GoogleAuthProvider
 import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
 import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
 import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
@@ -46,17 +48,20 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
     @Inject
-    internal lateinit var authenticator: Authenticator
+    internal lateinit var googleAuthProvider: GoogleAuthProvider
+    @Inject
+    internal lateinit var emailAuthProvider: EmailAuthProvider
+    @Inject
+    internal lateinit var firebaseWrapper: FirebaseWrapper
 
     private lateinit var progressDialog: ProgressDialog
     private val disposables = CompositeDisposable()
-    private val loginEventSubject: PublishSubject<LoginEvent> = PublishSubject.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = LoginActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (authenticator.loggedIn()) {
+        if (firebaseWrapper.isLoggedIn) {
             onSignInSuccess()
         }
         if (savedInstanceState == null) {
@@ -70,7 +75,10 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GOOGLE_SIGN_IN) {
             data?.let {
-                loginEventSubject.onNext(GoogleLoginEvent(data))
+                googleAuthProvider.login(it)
+                // TODO run below after login is successful
+//                saveIdentity(it.googleSignInAccount.email!!, it.googleSignInAccount.displayName)
+//                onSignInSuccess()
             } ?: processError()
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -78,25 +86,7 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
 
     // LoginLandingFragment
     override fun onSignInWithGoogle() {
-        disposables + authenticator
-                .login(loginEventSubject.hide())
-                .subscribe(
-                        {
-                            when (it) {
-                                is GoogleLoginIntentResult -> {
-                                    startActivityForResult(it.intent, GOOGLE_SIGN_IN)
-                                }
-                                is GoogleLoginSuccessResult -> {
-                                    saveIdentity(it.googleSignInAccount.email!!, it.googleSignInAccount.displayName)
-                                    onSignInSuccess()
-                                }
-                            }
-                        },
-                        {
-                            Timber.e(it)
-                            processError()
-                        })
-        loginEventSubject.onNext(GoogleLoginIntentRequestEvent)
+        startActivityForResult(googleAuthProvider.signInIntent, GOOGLE_SIGN_IN)
         showAuthenticatingDialog()
     }
 

@@ -6,4 +6,7 @@ class FirebaseWrapper {
 
     val instance: FirebaseAuth
         get() = FirebaseAuth.getInstance()
+
+    val isLoggedIn: Boolean
+        get() = instance.currentUser != null
 }

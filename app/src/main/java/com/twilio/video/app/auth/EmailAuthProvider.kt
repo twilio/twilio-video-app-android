@@ -16,54 +16,22 @@
 
 package com.twilio.video.app.auth
 
-import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
-import com.twilio.video.app.auth.LoginEvent.EmailLoginEvent
-import com.twilio.video.app.util.plus
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.disposables.CompositeDisposable
-import timber.log.Timber
-
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
-class EmailAuthProvider @JvmOverloads constructor(
-    private val firebaseWrapper: FirebaseWrapper,
-    private val disposables: CompositeDisposable = CompositeDisposable()
-) : AuthenticationProvider {
-    override fun logout() {
-        firebaseWrapper.instance.signOut()
-    }
-
-    override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
-        return Observable.create { observable ->
-            disposables + loginEventObservable.subscribe({ loginEvent ->
-                if (loginEvent is EmailLoginEvent) {
-                    loginEvent.run {
-                        if (email.isBlank()) {
-                            onError(observable)
-                        }
-                        if (password.isBlank()) {
-                            onError(observable)
-                        }
-                        firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        observable.onNext(EmailLoginSuccessResult(email))
-                                        observable.onComplete()
-                                        disposables.clear()
-                                    } else {
-                                        onError(observable)
-                                    }
-                                }
+class EmailAuthProvider(private val firebaseWrapper: FirebaseWrapper) {
+    fun login(email: String, password: String) {
+        firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+//                                        observable.onNext(EmailLoginSuccessResult(email))
+//                                        observable.onComplete()
+//                                        disposables.clear()
+                    } else {
+//                                        onError(observable)
                     }
                 }
-            }, {
-                Timber.e(it)
-            })
-        }
     }
 
-    private fun onError(observable: ObservableEmitter<LoginResult>) {
-        observable.onError(AuthenticationException())
-        disposables.clear()
+    fun logout() {
+        firebaseWrapper.instance.signOut()
     }
 }
