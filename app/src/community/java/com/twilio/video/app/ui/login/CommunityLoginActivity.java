@@ -42,6 +42,7 @@ import timber.log.Timber;
 // TODO Create view model and fragment for this screen
 public class CommunityLoginActivity extends BaseActivity {
     private CommunityLoginActivityBinding binding;
+    private int colorButtonText;
 
     @Inject Authenticator authenticator;
     TextWatcher textWatcher =
@@ -65,6 +66,8 @@ public class CommunityLoginActivity extends BaseActivity {
         binding = CommunityLoginActivityBinding.inflate(getLayoutInflater());
         binding.name.addTextChangedListener(textWatcher);
         binding.passcode.addTextChangedListener(textWatcher);
+        colorButtonText = ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null);
+        binding.login.setTextColor(colorButtonText);
         binding.login.setOnClickListener(this::loginClicked);
         setContentView(binding.getRoot());
         if (authenticator.loggedIn()) startLobbyActivity();
@@ -154,8 +157,7 @@ public class CommunityLoginActivity extends BaseActivity {
             binding.login.setTextColor(Color.WHITE);
             binding.login.setEnabled(true);
         } else {
-            binding.login.setTextColor(
-                    ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null));
+            binding.login.setTextColor(colorButtonText);
             binding.login.setEnabled(false);
         }
     }

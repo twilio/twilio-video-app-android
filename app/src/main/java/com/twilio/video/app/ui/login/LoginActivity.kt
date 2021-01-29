@@ -28,7 +28,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.twilio.video.app.R
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.databinding.LoginActivityBinding
 import com.twilio.video.app.ui.room.RoomActivity
 import javax.inject.Inject
 
@@ -42,7 +41,6 @@ class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(LoginActivityBinding.inflate(layoutInflater).root)
         authUI = FirebaseAuth.getInstance()
         navigateToFirebaseUIAuth()
     }
@@ -76,7 +74,8 @@ class LoginActivity : BaseActivity() {
                         .setAvailableProviders(providers)
                         .setIsSmartLockEnabled(false)
                         .setAlwaysShowSignInMethodScreen(true)
-                        .setTheme(R.style.GreenTheme)
+                        .setTheme(R.style.AppTheme_LoginScreen)
+                        .setLogo(R.drawable.video_logo_splash)
                         .build(),
                 RC_SIGN_IN)
     }
