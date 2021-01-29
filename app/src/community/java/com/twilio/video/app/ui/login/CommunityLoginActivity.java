@@ -17,11 +17,11 @@
 package com.twilio.video.app.ui.login;
 
 import android.app.AlertDialog;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import com.twilio.video.app.R;
 import com.twilio.video.app.auth.Authenticator;
@@ -67,10 +67,14 @@ public class CommunityLoginActivity extends BaseActivity {
         binding.name.addTextChangedListener(textWatcher);
         binding.passcode.addTextChangedListener(textWatcher);
         colorButtonText = ResourcesCompat.getColor(getResources(), R.color.colorButtonText, null);
-        binding.login.setTextColor(colorButtonText);
-        binding.login.setOnClickListener(this::loginClicked);
+        setupLoginButton();
         setContentView(binding.getRoot());
         if (authenticator.loggedIn()) startLobbyActivity();
+    }
+
+    private void setupLoginButton() {
+        binding.login.setTextColor(colorButtonText);
+        binding.login.setOnClickListener(this::loginClicked);
     }
 
     private void passcodeChanged(Editable editable) {
@@ -154,7 +158,7 @@ public class CommunityLoginActivity extends BaseActivity {
 
     private void enableLoginButton(boolean isEnabled) {
         if (isEnabled) {
-            binding.login.setTextColor(Color.WHITE);
+            binding.login.setTextColor(ContextCompat.getColor(this, R.color.textColorPrimary));
             binding.login.setEnabled(true);
         } else {
             binding.login.setTextColor(colorButtonText);
