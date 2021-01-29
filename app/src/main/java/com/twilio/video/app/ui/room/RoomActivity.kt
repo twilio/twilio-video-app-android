@@ -41,6 +41,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
@@ -264,7 +265,7 @@ class RoomActivity : BaseActivity() {
                 Snackbar.make(
                     binding.room.primaryVideo,
                     R.string.screen_capture_permission_not_granted,
-                    Snackbar.LENGTH_LONG)
+                    BaseTransientBottomBar.LENGTH_LONG)
                     .show()
                 return
             }
