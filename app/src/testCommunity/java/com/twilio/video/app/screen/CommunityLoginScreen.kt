@@ -3,6 +3,7 @@ package com.twilio.video.app.screen
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -23,7 +24,7 @@ fun enterYourName(name: String) {
 }
 
 fun clickLoginButton() {
-    onView(withId(R.id.login)).perform(click())
+    onView(withId(R.id.login)).perform(scrollTo(), click())
 }
 
 fun assertLoadingIndicatorIsDisplayed() {

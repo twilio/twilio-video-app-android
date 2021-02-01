@@ -5,12 +5,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
 import com.twilio.video.app.R
-import com.twilio.video.app.screen.assertGoogleSignInButtonIsVisible
-import com.twilio.video.app.screen.assertSignInErrorIsVisible
 import com.twilio.video.app.screen.clickSettingsMenuItem
 import com.twilio.video.app.screen.loginWithEmail
-import com.twilio.video.app.screen.loginWithWrongEmailCreds
 import com.twilio.video.app.ui.splash.SplashActivity
+import com.twilio.video.app.util.assertTextIsDisplayed
 import com.twilio.video.app.util.getString
 import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.retryEspressoAction
@@ -38,13 +36,6 @@ class LoginTest {
         retryEspressoAction { clickSettingsMenuItem() }
         scrollAndClickView(getString(R.string.settings_screen_logout), R.id.recycler_view)
 
-        retryEspressoAction { assertGoogleSignInButtonIsVisible() }
-    }
-
-    @Test
-    fun `it_should_not_login_successfully_with_email`() {
-        val emailCredentials = retrieveEmailCredentials()
-        loginWithWrongEmailCreds(emailCredentials)
-        retryEspressoAction { assertSignInErrorIsVisible() }
+        retryEspressoAction { assertTextIsDisplayed(getString(R.string.fui_sign_in_with_email)) }
     }
 }

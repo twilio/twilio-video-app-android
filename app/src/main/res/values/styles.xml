@@ -81,9 +81,4 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Authenticating" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">@color/colorPrimary</item>
-    </style>
-
-
 </resources>
