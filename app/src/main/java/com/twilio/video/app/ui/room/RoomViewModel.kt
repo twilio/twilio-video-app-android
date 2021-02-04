@@ -69,6 +69,7 @@ import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -145,12 +146,12 @@ class RoomViewModel(
     }
 
     private fun subscribeToRoomChannel() {
-        roomManager.roomReceiveChannel.let { channel ->
+        roomManager.roomState.let { stateFlow ->
             viewModelScope.launch {
                 while (isActive) {
                     Timber.d("Listening for RoomEvents")
                     try {
-                        observeRoomEvents(channel.receive())
+                        stateFlow.collect { observeRoomEvents(it) }
                     } catch (e: CancellationException) {
                         Timber.e("Cannot receive(), Receiving coroutine has been canceled")
                     } catch (e: ClosedReceiveChannelException) {
