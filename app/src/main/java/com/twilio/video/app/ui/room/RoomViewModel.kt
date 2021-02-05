@@ -148,16 +148,8 @@ class RoomViewModel(
     private fun subscribeToRoomChannel() {
         roomManager.roomState.let { stateFlow ->
             viewModelScope.launch {
-                while (isActive) {
-                    Timber.d("Listening for RoomEvents")
-                    try {
-                        stateFlow.collect { observeRoomEvents(it) }
-                    } catch (e: CancellationException) {
-                        Timber.e("Cannot receive(), Receiving coroutine has been canceled")
-                    } catch (e: ClosedReceiveChannelException) {
-                        Timber.e("Cannot receive(), Channel has been closed")
-                    }
-                }
+                Timber.d("Listening for RoomEvents")
+                stateFlow.collect { observeRoomEvents(it) }
             }
         }
     }

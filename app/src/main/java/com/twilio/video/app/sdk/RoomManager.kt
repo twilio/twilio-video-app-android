@@ -64,7 +64,7 @@ class RoomManager(
     }
 
     suspend fun connect(identity: String, roomName: String) {
-        sendToStateFlow(Connecting)
+        sendRoomEvent(Connecting)
         connectToRoom(identity, roomName)
     }
 
@@ -80,17 +80,14 @@ class RoomManager(
         }
     }
 
-    private fun sendToStateFlow(roomEvent: RoomEvent) {
-        roomScope.launch { mutableRoomState.value = roomEvent }
-    }
-
     fun sendRoomEvent(roomEvent: RoomEvent) {
-        sendToStateFlow(roomEvent)
+        Timber.d("sendRoomEvent: $roomEvent")
+        roomScope.launch { mutableRoomState.value = roomEvent }
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
         Timber.e(e, "Failed to retrieve token")
-        sendToStateFlow(RoomEvent.TokenError(serviceError = error))
+        sendRoomEvent(RoomEvent.TokenError(serviceError = error))
         return null
     }
 
@@ -127,7 +124,7 @@ class RoomManager(
                     localParticipantManager.localVideoTrackNames,
                     statsReports
             )
-            sendToStateFlow(StatsUpdate(roomStats))
+            sendRoomEvent(StatsUpdate(roomStats))
         }
     }
 
@@ -158,7 +155,7 @@ class RoomManager(
 
             stopService(context)
 
-            sendToStateFlow(Disconnected)
+            sendRoomEvent(Disconnected)
 
             localParticipantManager.localParticipant = null
 
@@ -200,12 +197,12 @@ class RoomManager(
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
 
-            sendToStateFlow(DominantSpeakerChanged(remoteParticipant?.sid))
+            sendRoomEvent(DominantSpeakerChanged(remoteParticipant?.sid))
         }
 
-        override fun onRecordingStarted(room: Room) = sendToStateFlow(RecordingStarted)
+        override fun onRecordingStarted(room: Room) = sendRoomEvent(RecordingStarted)
 
-        override fun onRecordingStopped(room: Room) = sendToStateFlow(RecordingStopped)
+        override fun onRecordingStopped(room: Room) = sendRoomEvent(RecordingStopped)
 
         override fun onReconnected(room: Room) {
             Timber.i("onReconnected: %s", room.name)
@@ -227,7 +224,7 @@ class RoomManager(
                     participants.add(it)
                 }
 
-                sendToStateFlow(Connected(participants, room, room.name))
+                sendRoomEvent(Connected(participants, room, room.name))
                 localParticipantManager.publishLocalTracks()
             }
         }
