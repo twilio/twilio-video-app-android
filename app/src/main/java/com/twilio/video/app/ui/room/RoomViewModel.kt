@@ -67,10 +67,8 @@ import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -83,6 +81,7 @@ class RoomViewModel(
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
     private var permissionCheckRetry = false
+    private var roomManagerJob: Job? = null
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
@@ -103,6 +102,7 @@ class RoomViewModel(
     public override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()
+        roomManagerJob?.cancel()
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
@@ -147,7 +147,7 @@ class RoomViewModel(
 
     private fun subscribeToRoomChannel() {
         roomManager.roomState.let { stateFlow ->
-            viewModelScope.launch {
+            roomManagerJob = viewModelScope.launch {
                 Timber.d("Listening for RoomEvents")
                 stateFlow.collect { observeRoomEvents(it) }
             }

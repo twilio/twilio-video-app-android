@@ -30,9 +30,8 @@ import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -40,7 +39,6 @@ const val MICROPHONE_TRACK_NAME = "microphone"
 const val CAMERA_TRACK_NAME = "camera"
 const val SCREEN_TRACK_NAME = "screen"
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RoomManager(
     private val context: Context,
     private val videoClient: VideoClient,
@@ -52,8 +50,8 @@ class RoomManager(
     private val roomListener = RoomListener()
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
-    private val mutableRoomState: MutableStateFlow<RoomEvent> = MutableStateFlow(Disconnected)
-    val roomState: StateFlow<RoomEvent> = mutableRoomState
+    private val mutableRoomState: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
+    val roomState: SharedFlow<RoomEvent> = mutableRoomState
     @VisibleForTesting(otherwise = PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
             LocalParticipantManager(context, this, sharedPreferences)
@@ -82,7 +80,7 @@ class RoomManager(
 
     fun sendRoomEvent(roomEvent: RoomEvent) {
         Timber.d("sendRoomEvent: $roomEvent")
-        roomScope.launch { mutableRoomState.value = roomEvent }
+        roomScope.launch { mutableRoomState.emit(roomEvent) }
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
