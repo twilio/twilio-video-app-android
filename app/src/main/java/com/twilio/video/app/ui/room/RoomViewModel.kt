@@ -2,6 +2,7 @@ package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
 import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -81,7 +82,8 @@ class RoomViewModel(
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
     private var permissionCheckRetry = false
-    private var roomManagerJob: Job? = null
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal var roomManagerJob: Job? = null
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
@@ -146,7 +148,7 @@ class RoomViewModel(
     }
 
     private fun subscribeToRoomChannel() {
-        roomManager.roomState.let { stateFlow ->
+        roomManager.roomEvents.let { stateFlow ->
             roomManagerJob = viewModelScope.launch {
                 Timber.d("Listening for RoomEvents")
                 stateFlow.collect { observeRoomEvents(it) }

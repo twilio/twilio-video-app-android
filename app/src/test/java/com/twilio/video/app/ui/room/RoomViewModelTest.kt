@@ -50,7 +50,7 @@ class RoomViewModelTest : BaseUnitTest() {
     @get:Rule
     val coroutineScope = TestDispatchersRule(testDispatcher)
 
-    val localParticipantManager = mock<LocalParticipantManager>()
+    private val localParticipantManager = mock<LocalParticipantManager>()
     private val roomManager = RoomManager(mock(), mock(), mock(), testDispatcher).apply {
         localParticipantManager = this@RoomViewModelTest.localParticipantManager
     }
@@ -229,6 +229,17 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
                         isRecording = false))
+    }
+
+    @Test
+    fun `OnCleared should cancel room manager job`() {
+        assertThat(viewModel.roomManagerJob!!.isActive, equalTo(true))
+        assertThat(viewModel.roomManagerJob!!.isCancelled, equalTo(false))
+
+        viewModel.onCleared()
+
+        assertThat(viewModel.roomManagerJob!!.isActive, equalTo(false))
+        assertThat(viewModel.roomManagerJob!!.isCancelled, equalTo(true))
     }
 
     private fun connect() =

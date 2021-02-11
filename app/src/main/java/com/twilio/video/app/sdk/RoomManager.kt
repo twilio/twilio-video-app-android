@@ -50,8 +50,8 @@ class RoomManager(
     private val roomListener = RoomListener()
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
-    private val mutableRoomState: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
-    val roomState: SharedFlow<RoomEvent> = mutableRoomState
+    private val mutableRoomEvents: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
+    val roomEvents: SharedFlow<RoomEvent> = mutableRoomEvents
     @VisibleForTesting(otherwise = PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
             LocalParticipantManager(context, this, sharedPreferences)
@@ -80,7 +80,7 @@ class RoomManager(
 
     fun sendRoomEvent(roomEvent: RoomEvent) {
         Timber.d("sendRoomEvent: $roomEvent")
-        roomScope.launch { mutableRoomState.emit(roomEvent) }
+        roomScope.launch { mutableRoomEvents.emit(roomEvent) }
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
