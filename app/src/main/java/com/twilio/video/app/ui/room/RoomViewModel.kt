@@ -2,6 +2,7 @@ package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
 import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -67,9 +68,8 @@ import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -82,6 +82,8 @@ class RoomViewModel(
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
     private var permissionCheckRetry = false
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal var roomManagerJob: Job? = null
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
@@ -95,13 +97,14 @@ class RoomViewModel(
             }
         }
 
-        subscribeToRoomChannel()
+        subscribeToRoomEvents()
     }
 
     @VisibleForTesting(otherwise = PROTECTED)
     public override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()
+        roomManagerJob?.cancel()
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
@@ -144,19 +147,11 @@ class RoomViewModel(
         }
     }
 
-    private fun subscribeToRoomChannel() {
-        roomManager.roomReceiveChannel.let { channel ->
-            viewModelScope.launch {
-                while (isActive) {
-                    Timber.d("Listening for RoomEvents")
-                    try {
-                        observeRoomEvents(channel.receive())
-                    } catch (e: CancellationException) {
-                        Timber.e("Cannot receive(), Receiving coroutine has been canceled")
-                    } catch (e: ClosedReceiveChannelException) {
-                        Timber.e("Cannot receive(), Channel has been closed")
-                    }
-                }
+    private fun subscribeToRoomEvents() {
+        roomManager.roomEvents.let { sharedFlow ->
+            roomManagerJob = viewModelScope.launch {
+                Timber.d("Listening for RoomEvents")
+                sharedFlow.collect { observeRoomEvents(it) }
             }
         }
     }
