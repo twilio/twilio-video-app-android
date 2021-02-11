@@ -97,7 +97,7 @@ class RoomViewModel(
             }
         }
 
-        subscribeToRoomChannel()
+        subscribeToRoomEvents()
     }
 
     @VisibleForTesting(otherwise = PROTECTED)
@@ -147,11 +147,11 @@ class RoomViewModel(
         }
     }
 
-    private fun subscribeToRoomChannel() {
-        roomManager.roomEvents.let { stateFlow ->
+    private fun subscribeToRoomEvents() {
+        roomManager.roomEvents.let { sharedFlow ->
             roomManagerJob = viewModelScope.launch {
                 Timber.d("Listening for RoomEvents")
-                stateFlow.collect { observeRoomEvents(it) }
+                sharedFlow.collect { observeRoomEvents(it) }
             }
         }
     }
