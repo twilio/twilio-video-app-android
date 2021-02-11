@@ -135,6 +135,8 @@ jobs:
           name: Unit Tests
           command: ./gradlew app:testInternalDebugUnitTest
       - save-cache: *save-cache-gradle
+      - store_test_results:
+          path: "~/app/build/test-results"
 
   community-unit-tests:
     <<: *build-defaults
@@ -149,6 +151,8 @@ jobs:
           name: Community Unit Tests
           command: ./gradlew app:testCommunityDebugUnitTest
       - save-cache: *save-cache-gradle
+      - store_test_results:
+          path: "~/app/build/test-results"
 
   e2e-tests:
     <<: *ui-test-defaults
