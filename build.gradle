@@ -1,4 +1,7 @@
 buildscript {
+    ext {
+        kotlin_version = '1.4.30'
+    }
     ext.keystore = (project.hasProperty('androidKeystore') ?
             project.property('androidKeystore') : '/fake/path/to/keystore')
     ext.keystorePassword = (project.hasProperty('androidKeystorePassword') ?
