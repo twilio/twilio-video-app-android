@@ -1,4 +1,25 @@
 buildscript {
+    ext.versions = [
+        // Android
+        'minSdk': 16,
+        'targetSdk': 30,
+        'buildTools': '30.0.2',
+        'kotlin': '1.4.30',
+
+        // 3rd party
+        'coroutinesAndroidVersion': '1.4.2',
+        'uniflowVersion': '0.11.2',
+        'daggerVersion': '2.25.4',
+        'retrofitVersion': '2.6.4',
+        'lifecycleVersion': '2.2.0',
+        'fragmentVersion': '1.2.5',
+
+        // Test dependencies
+        'junitExtensions': '1.1.1',
+        'jUnit' : '4.13.2',
+        'espresso': '3.3.0',
+        'androidXTest': '1.3.0',
+    ]
     ext.keystore = (project.hasProperty('androidKeystore') ?
             project.property('androidKeystore') : '/fake/path/to/keystore')
     ext.keystorePassword = (project.hasProperty('androidKeystorePassword') ?
@@ -73,7 +94,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
         classpath "com.google.gms:google-services:4.3.5"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
     }
 }
