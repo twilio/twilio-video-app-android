@@ -11,8 +11,9 @@ buildscript {
         'uniflowVersion': '0.11.2',
         'daggerVersion': '2.25.4',
         'retrofitVersion': '2.6.4',
-        'lifecycleVersion': '2.2.0',
+        'lifecycleVersion': '2.3.0',
         'fragmentVersion': '1.2.5',
+        'constraintLayout': '2.0.4',
 
         // Test dependencies
         'junitExtensions': '1.1.1',

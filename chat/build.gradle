@@ -41,6 +41,9 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$versions.daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$versions.daggerVersion"
 
+    implementation "androidx.constraintlayout:constraintlayout:$versions.constraintLayout"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycleVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutinesAndroidVersion"
     implementation "com.google.dagger:dagger-android:$versions.daggerVersion"

@@ -5,4 +5,8 @@
 
     <uses-sdk tools:overrideLibrary="com.twilio.conversations"/>
 
+    <application>
+        <activity android:name=".ChatTestActivity"/>
+    </application>
+
 </manifest>
