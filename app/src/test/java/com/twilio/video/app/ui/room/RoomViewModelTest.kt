@@ -2,15 +2,21 @@ package com.twilio.video.app.ui.room
 
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.RemoteVideoTrack
+import com.twilio.video.Room
 import com.twilio.video.app.BaseUnitTest
+import com.twilio.video.app.chat.ChatManager
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.LocalParticipantManager
 import com.twilio.video.app.sdk.RoomManager
+import com.twilio.video.app.sdk.VideoClient
 import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
@@ -30,6 +36,7 @@ import io.uniflow.android.test.createTestObserver
 import io.uniflow.test.rule.TestDispatchersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
@@ -51,9 +58,11 @@ class RoomViewModelTest : BaseUnitTest() {
     val coroutineScope = TestDispatchersRule(testDispatcher)
 
     private val localParticipantManager = mock<LocalParticipantManager>()
-    private val roomManager = RoomManager(mock(), mock(), mock(), testDispatcher).apply {
+    private val videoClient = mock<VideoClient>()
+    private val roomManager = RoomManager(mock(), videoClient, mock(), testDispatcher).apply {
         localParticipantManager = this@RoomViewModelTest.localParticipantManager
     }
+    private val chatManager = mock<ChatManager>()
     private val participantViewState = ParticipantViewState(PARTICIPANT_SID, "Test Participant")
     private val participantManager = ParticipantManager().apply {
         addParticipant(participantViewState)
@@ -70,6 +79,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
+                chatManager,
                 participantManager)
         testObserver = viewModel.createTestObserver()
     }
@@ -120,6 +130,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
+                chatManager,
                 participantManager,
                 initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
@@ -150,6 +161,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
+                chatManager,
                 participantManager,
                 initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
@@ -240,6 +252,21 @@ class RoomViewModelTest : BaseUnitTest() {
 
         assertThat(viewModel.roomManagerJob!!.isActive, equalTo(false))
         assertThat(viewModel.roomManagerJob!!.isCancelled, equalTo(true))
+    }
+
+    @Test
+    fun `The Connected event should initialize the ChatManager`() {
+        runBlockingTest {
+            whenever(videoClient.connect(eq("Test"), eq("Test Room"), any()))
+                    .thenReturn("Test Token")
+            val room = mock<Room>{ whenever(mock.name).thenReturn("Room Name") }
+
+            connect()
+
+            val roomListener = roomManager.roomListener
+            roomListener.onConnected(room)
+            verify(chatManager.connect("Test Token", "Room Name"))
+        }
     }
 
     private fun connect() =

@@ -47,7 +47,8 @@ class RoomManager(
 ) {
 
     private var statsScheduler: StatsScheduler? = null
-    private val roomListener = RoomListener()
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal val roomListener = RoomListener()
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
     private val mutableRoomEvents: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
