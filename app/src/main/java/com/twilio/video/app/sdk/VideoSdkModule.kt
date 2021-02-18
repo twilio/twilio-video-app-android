@@ -19,17 +19,17 @@ class VideoSdkModule {
     @Provides
     fun providesConnectOptionsFactory(
         application: Application,
-        sharedPreferences: SharedPreferences,
-        tokenService: TokenService
+        sharedPreferences: SharedPreferences
     ): ConnectOptionsFactory =
-            ConnectOptionsFactory(application, sharedPreferences, tokenService)
+            ConnectOptionsFactory(application, sharedPreferences)
 
     @Provides
     fun providesRoomFactory(
         application: Application,
-        connectOptionsFactory: ConnectOptionsFactory
+        connectOptionsFactory: ConnectOptionsFactory,
+        tokenService: TokenService
     ): VideoClient =
-            VideoClient(application, connectOptionsFactory)
+            VideoClient(application, connectOptionsFactory, tokenService)
 
     @Provides
     @ApplicationScope
