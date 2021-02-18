@@ -17,6 +17,7 @@
 package com.twilio.video.app;
 
 import com.twilio.video.app.auth.AuthModule;
+import com.twilio.video.app.chat.ChatModule;
 import com.twilio.video.app.data.DataModule;
 import com.twilio.video.app.data.api.VideoAppServiceModule;
 import com.twilio.video.app.sdk.VideoSdkModule;
@@ -47,7 +48,8 @@ import dagger.android.AndroidInjectionModule;
             SettingsFragmentModule.class,
             VideoServiceModule.class,
             VideoSdkModule.class,
-            AudioSwitchModule.class
+            AudioSwitchModule.class,
+            ChatModule.class
         })
 public interface VideoApplicationComponent {
     void inject(VideoApplication application);

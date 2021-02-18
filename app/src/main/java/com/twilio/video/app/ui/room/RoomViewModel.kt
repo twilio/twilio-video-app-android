@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
+import com.twilio.video.app.chat.ChatManager
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
@@ -77,6 +78,7 @@ class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
+    private val chatManager: ChatManager,
     private val participantManager: ParticipantManager = ParticipantManager(),
     initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
 ) : AndroidDataFlow(defaultState = initialViewState) {
@@ -333,11 +335,12 @@ class RoomViewModel(
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
         private val audioDeviceSelector: AudioSwitch,
-        private val permissionUtil: PermissionUtil
+        private val permissionUtil: PermissionUtil,
+        private val chatManager: ChatManager
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil) as T
+            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil, chatManager) as T
         }
     }
 }
