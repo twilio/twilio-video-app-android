@@ -7,13 +7,13 @@ import com.google.android.material.textfield.TextInputEditText
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.twilio.video.app.ApplicationModule
 import com.twilio.video.app.DaggerCommunityIntegrationTestComponent
 import com.twilio.video.app.R
 import com.twilio.video.app.TestApp
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.auth.CommunityAuthModule
 import com.twilio.video.app.auth.CommunityAuthenticator
+import com.twilio.video.app.core.ApplicationModule
 import com.twilio.video.app.data.AuthServiceModule
 import com.twilio.video.app.data.PASSCODE
 import com.twilio.video.app.data.Preferences.DISPLAY_NAME
