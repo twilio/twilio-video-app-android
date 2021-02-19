@@ -18,6 +18,8 @@ package com.twilio.video.app;
 
 import com.twilio.video.app.auth.AuthModule;
 import com.twilio.video.app.chat.ChatModule;
+import com.twilio.video.app.core.ApplicationModule;
+import com.twilio.video.app.core.ApplicationScope;
 import com.twilio.video.app.data.DataModule;
 import com.twilio.video.app.data.api.VideoAppServiceModule;
 import com.twilio.video.app.sdk.VideoSdkModule;

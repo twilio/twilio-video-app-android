@@ -1,9 +1,11 @@
 package com.twilio.video.app.chat
 
+import android.app.Application
+import com.twilio.video.app.core.ApplicationModule
 import dagger.Module
 import dagger.Provides
 
-@Module
+@Module(includes = [ ApplicationModule::class ])
 class ChatModule {
 
     @Provides

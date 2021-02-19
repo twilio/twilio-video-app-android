@@ -140,6 +140,7 @@ android {
 
 dependencies {
     implementation project(':chat')
+    implementation project(':core')
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutinesAndroidVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutinesAndroidVersion"

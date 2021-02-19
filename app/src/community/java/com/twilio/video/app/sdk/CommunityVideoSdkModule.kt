@@ -2,8 +2,8 @@ package com.twilio.video.app.sdk
 
 import android.app.Application
 import android.content.SharedPreferences
-import com.twilio.video.app.ApplicationModule
-import com.twilio.video.app.ApplicationScope
+import com.twilio.video.app.core.ApplicationModule
+import com.twilio.video.app.core.ApplicationScope
 import com.twilio.video.app.data.AuthServiceModule
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.data.api.TokenService

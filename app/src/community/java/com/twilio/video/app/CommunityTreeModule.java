@@ -18,6 +18,7 @@ package com.twilio.video.app;
 
 import com.twilio.video.LogLevel;
 import com.twilio.video.Video;
+import com.twilio.video.app.core.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
 import timber.log.Timber;
