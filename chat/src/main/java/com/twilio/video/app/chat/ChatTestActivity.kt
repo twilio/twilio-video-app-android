@@ -6,29 +6,34 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
+
+private const val chatToken = ""
+private const val chatName = ""
 
 class ChatTestActivity : AppCompatActivity() {
 
+    private lateinit var chatManager: ChatManager
     private var uiStateJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_test)
+
+        chatManager = ChatManagerImpl(applicationContext)
     }
 
     override fun onStart() {
         super.onStart()
 
-        val chatToken = ""
-        val chatName = ""
-        val chatManager: ChatManager = ChatManagerImpl()
-        val chatFlow = chatManager.connect(chatToken, chatName)
         uiStateJob = lifecycleScope.launch {
-            chatFlow.collect { event: ChatEvent -> handleChatEvent() }
+            chatManager.chatState.collect { state: ChatState -> handleChatState(state) }
         }
+        chatManager.connect(chatToken, chatName)
     }
 
-    private fun handleChatEvent(event: ChatEvent) {
+    private fun handleChatState(state: ChatState) {
+        Timber.d(state.toString())
     }
 
     override fun onStop() {

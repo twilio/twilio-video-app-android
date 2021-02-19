@@ -4,5 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatManager {
 
-    fun connect(token: String, chatName: String): Flow<ChatEvent>
+    val chatState: Flow<ChatState>
+
+    fun connect(token: String, chatName: String)
 }

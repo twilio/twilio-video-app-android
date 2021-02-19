@@ -9,5 +9,5 @@ import dagger.Provides
 class ChatModule {
 
     @Provides
-    fun providesChatManager(): ChatManager = ChatManagerImpl()
+    fun providesChatManager(application: Application): ChatManager = ChatManagerImpl(application)
 }

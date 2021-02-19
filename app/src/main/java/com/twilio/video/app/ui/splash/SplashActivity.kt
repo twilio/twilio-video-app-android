@@ -31,10 +31,11 @@ class SplashActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val newIntent = if (authenticator.loggedIn())
-            Intent(this, RoomActivity::class.java)
-        else
-            Intent(this, screenSelector.loginScreen)
+        val newIntent = Intent(this, ChatTestActivity::class.java)
+//        val newIntent = if (authenticator.loggedIn())
+//            Intent(this, RoomActivity::class.java)
+//        else
+//            Intent(this, screenSelector.loginScreen)
         startActivity(newIntent.apply { data = intent.data })
         finish()
     }

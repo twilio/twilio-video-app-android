@@ -49,6 +49,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutinesAndroidVersion"
     implementation "com.google.dagger:dagger-android:$versions.daggerVersion"
     implementation "com.google.dagger:dagger:$versions.daggerVersion"
+    implementation "com.jakewharton.timber:timber:$versions.timber"
     implementation 'com.twilio:conversations-android:1.2.0'
 
     testImplementation "junit:junit:$versions.jUnit"
