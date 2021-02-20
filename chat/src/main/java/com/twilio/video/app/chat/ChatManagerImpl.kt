@@ -108,6 +108,7 @@ class ChatManagerImpl(
     private fun joinConversation() {
         client?.let { client ->
             chatName?.let { chatName ->
+                Timber.d("Retrieving conversation with unique name: $chatName")
                 client.getConversation(chatName, conversationCallback)
             }
         }

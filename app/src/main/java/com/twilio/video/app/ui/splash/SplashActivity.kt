@@ -20,8 +20,8 @@ import android.content.Intent
 import android.os.Bundle
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.base.BaseActivity
-import com.twilio.video.app.chat.ChatTestActivity
 import com.twilio.video.app.ui.ScreenSelector
+import com.twilio.video.app.ui.room.RoomActivity
 import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
@@ -31,11 +31,10 @@ class SplashActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val newIntent = Intent(this, ChatTestActivity::class.java)
-//        val newIntent = if (authenticator.loggedIn())
-//            Intent(this, RoomActivity::class.java)
-//        else
-//            Intent(this, screenSelector.loginScreen)
+        val newIntent = if (authenticator.loggedIn())
+            Intent(this, RoomActivity::class.java)
+        else
+            Intent(this, screenSelector.loginScreen)
         startActivity(newIntent.apply { data = intent.data })
         finish()
     }

@@ -186,6 +186,7 @@ class RoomViewModel(
                 showConnectingViewState()
             }
             is Connected -> {
+                chatManager.connect(roomEvent.token, roomEvent.room.sid)
                 showConnectedViewState(roomEvent.roomName)
                 checkParticipants(roomEvent.participants)
                 action { sendEvent { RoomViewEffect.Connected(roomEvent.room) } }
