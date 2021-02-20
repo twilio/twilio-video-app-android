@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<manifest xmlns:tools="http://schemas.android.com/tools"
     package="com.twilio.video.app.chat">
 
     <uses-sdk tools:overrideLibrary="com.twilio.conversations"/>
-
-    <application>
-        <activity android:name=".ChatTestActivity"/>
-    </application>
 
 </manifest>
