@@ -11,12 +11,16 @@ import com.twilio.conversations.ConversationsClientListener
 import com.twilio.conversations.ErrorInfo
 import com.twilio.conversations.Message
 import com.twilio.conversations.User
+import com.twilio.video.app.chat.ChatEvent.ClientConnectFailure
+import com.twilio.video.app.chat.ChatEvent.ConversationJoinFailure
+import com.twilio.video.app.chat.ChatEvent.GetMessagesFailure
 import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
 import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -30,11 +34,13 @@ class ChatManagerImpl(
     private val chatScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : ChatManager {
 
-    private val stateFlow = MutableStateFlow(ChatState())
+    private val chatStateFlow = MutableStateFlow(ChatState())
+    private val chatEventFlow = MutableSharedFlow<ChatEvent>()
     private var client: ConversationsClient? = null
     private var conversation: Conversation? = null
     private var chatName: String? = null
-    override val chatState = stateFlow
+    override val chatState = chatStateFlow
+    override val chatEvents = chatEventFlow
 
     override fun connect(token: String, chatName: String) {
         this.chatName = chatName
@@ -57,7 +63,7 @@ class ChatManagerImpl(
 
         override fun onError(errorInfo: ErrorInfo) {
             Timber.e("Error connecting to client: $errorInfo")
-            // TODO unit test
+            sendEvent(ClientConnectFailure)
             updateState { it.copy(connectionState = Disconnected) }
         }
     }
@@ -71,7 +77,7 @@ class ChatManagerImpl(
 
         override fun onError(errorInfo: ErrorInfo) {
             Timber.e("Error joining conversation: $errorInfo")
-            // TODO unit test
+            sendEvent(ConversationJoinFailure)
             updateState { it.copy(connectionState = Disconnected) }
         }
     }
@@ -88,7 +94,7 @@ class ChatManagerImpl(
 
         override fun onError(errorInfo: ErrorInfo) {
             Timber.e("Error retrieving the last $MESSAGE_READ_COUNT messages from the conversation: $errorInfo")
-            // TODO unit test
+            sendEvent(GetMessagesFailure)
             updateState { it.copy(connectionState = Disconnected) }
         }
     }
@@ -110,7 +116,10 @@ class ChatManagerImpl(
             Timber.d("Client synchronization status: $synchronizationStatus")
             when (synchronizationStatus) {
                 SynchronizationStatus.COMPLETED -> joinConversation()
-                SynchronizationStatus.FAILED -> updateState { it.copy(connectionState = Disconnected) } // TODO unit test
+                SynchronizationStatus.FAILED -> {
+                    sendEvent(ChatEvent.ClientSynchronizationFailure)
+                    updateState { it.copy(connectionState = Disconnected) }
+                }
             }
         }
 
@@ -126,8 +135,15 @@ class ChatManagerImpl(
 
     private fun updateState(action: (oldState: ChatState) -> ChatState) {
         chatScope.launch {
-            stateFlow.value = action(stateFlow.value)
-            Timber.d("New ChatManager state: ${stateFlow.value}")
+            chatStateFlow.value = action(chatStateFlow.value)
+            Timber.d("New ChatState: ${chatStateFlow.value}")
+        }
+    }
+
+    private fun sendEvent(chatEvent: ChatEvent) {
+        chatScope.launch {
+            chatEventFlow.emit(chatEvent)
+            Timber.d("New ChatEvent: ${chatStateFlow.value}")
         }
     }
 
