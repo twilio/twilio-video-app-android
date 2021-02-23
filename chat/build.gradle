@@ -53,6 +53,8 @@ dependencies {
     implementation 'com.twilio:conversations-android:1.2.0'
 
     testImplementation "junit:junit:$versions.jUnit"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutinesAndroidVersion"
     kaptTest "com.google.dagger:dagger-android-processor:$versions.daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$versions.daggerVersion"
 

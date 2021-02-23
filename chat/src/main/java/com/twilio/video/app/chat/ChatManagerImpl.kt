@@ -1,6 +1,8 @@
 package com.twilio.video.app.chat
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.conversations.CallbackListener
 import com.twilio.conversations.Conversation
 import com.twilio.conversations.ConversationsClient
@@ -12,26 +14,39 @@ import com.twilio.conversations.User
 import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
-import kotlinx.coroutines.CoroutineDispatcher
+import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-private const val MESSAGE_READ_COUNT = 100
+@VisibleForTesting(otherwise = PRIVATE)
+internal const val MESSAGE_READ_COUNT = 100
 
 class ChatManagerImpl(
     private val context: Context,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val conversationsClientWrapper: ConversationsClientWrapper = ConversationsClientWrapper(),
+    private val chatScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : ChatManager {
 
     private val stateFlow = MutableStateFlow(ChatState())
-    private val chatScope = CoroutineScope(coroutineDispatcher)
     private var client: ConversationsClient? = null
     private var conversation: Conversation? = null
     private var chatName: String? = null
     override val chatState = stateFlow
+
+    override fun connect(token: String, chatName: String) {
+        this.chatName = chatName
+        updateState { it.copy(connectionState = Connecting) }
+        ConversationsClient.setLogLevel(ConversationsClient.LogLevel.VERBOSE)
+        val props = ConversationsClient
+                .Properties
+                .newBuilder()
+                .setCommandTimeout(30000)
+                .createProperties()
+        conversationsClientWrapper.create(context, token, props, conversationsClientCallback)
+    }
 
     private val conversationsClientCallback: CallbackListener<ConversationsClient> = object : CallbackListener<ConversationsClient> {
         override fun onSuccess(conversationsClient: ConversationsClient) {
@@ -51,23 +66,28 @@ class ChatManagerImpl(
         override fun onSuccess(conversation: Conversation) {
             Timber.d("Successfully Joined Conversation")
             this@ChatManagerImpl.conversation = conversation
-            conversation.getLastMessages(MESSAGE_READ_COUNT, object : CallbackListener<List<Message>> {
-                override fun onSuccess(messages: List<Message>) {
-                    Timber.d("Successfully read the last $MESSAGE_READ_COUNT messages:\n$messages")
-                    // TODO unit test
-                    updateState { it.copy(connectionState = Connected) }
-                }
-
-                override fun onError(errorInfo: ErrorInfo) {
-                    Timber.e("Error retrieving the last $MESSAGE_READ_COUNT messages from the conversation: $errorInfo")
-                    // TODO unit test
-                    updateState { it.copy(connectionState = Disconnected) }
-                }
-            })
+            conversation.getLastMessages(MESSAGE_READ_COUNT, getMessagesCallback)
         }
 
         override fun onError(errorInfo: ErrorInfo) {
             Timber.e("Error joining conversation: $errorInfo")
+            // TODO unit test
+            updateState { it.copy(connectionState = Disconnected) }
+        }
+    }
+
+    private val getMessagesCallback = object : CallbackListener<List<Message>> {
+        override fun onSuccess(messages: List<Message>) {
+            Timber.d("Successfully read ${messages.size} messages")
+            updateState {
+                it.copy(connectionState = Connected, messages = messages.map { message ->
+                    ChatMessage(message.sid, message.messageBody)
+                })
+            }
+        }
+
+        override fun onError(errorInfo: ErrorInfo) {
+            Timber.e("Error retrieving the last $MESSAGE_READ_COUNT messages from the conversation: $errorInfo")
             // TODO unit test
             updateState { it.copy(connectionState = Disconnected) }
         }
@@ -102,18 +122,6 @@ class ChatManagerImpl(
         override fun onConnectionStateChange(connectionState: ConversationsClient.ConnectionState) {}
         override fun onTokenExpired() {}
         override fun onTokenAboutToExpire() {}
-    }
-
-    override fun connect(token: String, chatName: String) {
-        this.chatName = chatName
-        updateState { it.copy(connectionState = Connecting) }
-        ConversationsClient.setLogLevel(ConversationsClient.LogLevel.VERBOSE)
-        val props = ConversationsClient
-                .Properties
-                .newBuilder()
-                .setCommandTimeout(30000)
-                .createProperties()
-        ConversationsClient.create(context, token, props, conversationsClientCallback)
     }
 
     private fun updateState(action: (oldState: ChatState) -> ChatState) {

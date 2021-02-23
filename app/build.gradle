@@ -189,7 +189,7 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$versions.junitExtensions"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutinesAndroidVersion"
     testImplementation "junit:junit:$versions.jUnit"
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin"
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
