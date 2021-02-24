@@ -182,7 +182,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.1.0'
+    implementation 'com.twilio:audioswitch:1.1.2'
     implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
     /*
