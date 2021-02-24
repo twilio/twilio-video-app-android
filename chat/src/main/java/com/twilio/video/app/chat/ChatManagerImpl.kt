@@ -117,11 +117,7 @@ class ChatManagerImpl(
         override fun onConversationUpdated(conversation: Conversation, updateReason: Conversation.UpdateReason) {}
         override fun onConversationDeleted(conversation: Conversation) {}
         override fun onConversationSynchronizationChange(conversation: Conversation) {}
-        override fun onError(errorInfo: ErrorInfo) {
-            Timber.e("A client error occurred: $errorInfo")
-            // TODO unit test
-            updateState { it.copy(connectionState = Disconnected) }
-        }
+        override fun onError(errorInfo: ErrorInfo) { Timber.e("A client error occurred: $errorInfo") }
         override fun onUserUpdated(user: User, updateReason: User.UpdateReason) {}
         override fun onUserSubscribed(user: User) {}
         override fun onUserUnsubscribed(user: User) {}
@@ -133,6 +129,7 @@ class ChatManagerImpl(
                     sendEvent(ChatEvent.ClientSynchronizationFailure)
                     updateState { it.copy(connectionState = Disconnected) }
                 }
+                else -> {}
             }
         }
 
