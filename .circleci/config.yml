@@ -163,7 +163,6 @@ jobs:
           command: >
             gcloud firebase test android run --num-flaky-test-attempts=1 --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
             ui-test-args.yaml:e2e-tests
-          no_outout_timeout: 10m
 
   integration-tests:
     <<: *ui-test-defaults
@@ -178,7 +177,6 @@ jobs:
           command: >
             gcloud firebase test android run --use-orchestrator --environment-variables clearPackageData=true --project video-app-79418
             ui-test-args.yaml:integration-tests
-          no_outout_timeout: 10m
 
   build-release-app:
     <<: *build-defaults
