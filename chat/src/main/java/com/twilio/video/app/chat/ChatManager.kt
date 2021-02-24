@@ -8,4 +8,5 @@ interface ChatManager {
     val chatEvents: Flow<ChatEvent>
 
     fun connect(token: String, chatName: String)
+    fun disconnect()
 }

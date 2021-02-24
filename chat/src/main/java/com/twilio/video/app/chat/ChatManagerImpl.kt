@@ -18,6 +18,7 @@ import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
 import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
+import java.lang.IllegalStateException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,7 +37,8 @@ class ChatManagerImpl(
 
     private val chatStateFlow = MutableStateFlow(ChatState())
     private val chatEventFlow = MutableSharedFlow<ChatEvent>()
-    private var client: ConversationsClient? = null
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal var client: ConversationsClient? = null
     private var conversation: Conversation? = null
     private var chatName: String? = null
     override val chatState = chatStateFlow
@@ -52,6 +54,17 @@ class ChatManagerImpl(
                 .setCommandTimeout(30000)
                 .createProperties()
         conversationsClientWrapper.create(context, token, props, conversationsClientCallback)
+    }
+
+    override fun disconnect() {
+        if (chatState.value.connectionState != Disconnected) {
+            client?.shutdown()
+            client = null
+            updateState { it.copy(connectionState = Disconnected, messages = emptyList()) }
+            Timber.d("Shutdown the Twilio Conversations Client")
+        } else {
+            throw IllegalStateException("Cannot disconnect while in the disconnected state")
+        }
     }
 
     private val conversationsClientCallback: CallbackListener<ConversationsClient> = object : CallbackListener<ConversationsClient> {

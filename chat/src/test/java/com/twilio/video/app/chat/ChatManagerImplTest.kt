@@ -4,6 +4,7 @@ import android.content.Context
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.conversations.CallbackListener
 import com.twilio.conversations.Conversation
@@ -23,13 +24,20 @@ import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
 import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
+import java.lang.IllegalStateException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+
+private const val TOKEN = "token"
+private const val CHAT_NAME = "chat"
+private const val TEST_ERROR = "Test Error!"
 
 class ChatManagerImplTest {
 
@@ -39,46 +47,29 @@ class ChatManagerImplTest {
     private val conversation = mock<Conversation>()
     private val client = mock<ConversationsClient>()
     private val chatManager: ChatManager = ChatManagerImpl(context, conversationsClientWrapper, testScope)
+    private val expectedMessages = listOf(ChatMessage("123", "Test Message"))
 
     @Test
     fun `Successfully connecting to the client should update the connection state to connected`() {
-            whenever(conversationsClientWrapper.create(eq(context), eq("token"), isA(), isA()))
-                    .thenAnswer {
-                        (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
-                    }
-            whenever(client.addListener(isA())).thenAnswer {
-                (it.getArgument(0) as ConversationsClientListener).onClientSynchronization(SynchronizationStatus.COMPLETED)
-            }
-            whenever(client.getConversation(eq("chat"), isA())).thenAnswer {
-                (it.getArgument(1) as CallbackListener<Conversation>).onSuccess(conversation)
-            }
-            val messages = listOf<Message>(mock {
-                whenever(mock.messageBody).thenReturn("Test Message")
-                whenever(mock.sid).thenReturn("123")
-            })
-            whenever(conversation.getLastMessages(eq(MESSAGE_READ_COUNT), isA())).thenAnswer {
-                (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(messages)
-            }
-            val expectedMessages = listOf(ChatMessage("123", "Test Message"))
-            val expectedStates = listOf(
-                    ChatState(),
-                    ChatState(Connecting),
-                    ChatState(Connected, expectedMessages)
-            )
-            val testValues = mutableListOf<ChatState>()
-            val testJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(Connecting),
+                ChatState(Connected, expectedMessages)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+        connectClient()
 
-            chatManager.connect("token", "chat")
-            testJob.cancel()
-            assertThat(testValues, equalTo(expectedStates))
+        testJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
     }
 
     @Test
     fun `Failing to connect the client should update the connection state to disconnected and send a ClientConnectFailure event`() {
-        whenever(conversationsClientWrapper.create(eq(context), eq("token"), isA(), isA()))
+        whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
                     (it.getArgument(3) as CallbackListener<ConversationsClient>)
-                            .onError(ErrorInfo(CLIENT_ERROR, "Test error!"))
+                            .onError(ErrorInfo(CLIENT_ERROR, TEST_ERROR))
                 }
         val expectedStates = listOf(
                 ChatState(),
@@ -93,7 +84,7 @@ class ChatManagerImplTest {
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testStates.add(it) } }
         val testChatEventJob = testScope.launch { chatManager.chatEvents.collect { testEvents.add(it) } }
 
-        chatManager.connect("token", "chat")
+        chatManager.connect(TOKEN, CHAT_NAME)
         testChatStateJob.cancel()
         testChatEventJob.cancel()
         assertThat(testStates, equalTo(expectedStates))
@@ -102,7 +93,7 @@ class ChatManagerImplTest {
 
     @Test
     fun `Failing to synchronize the client should update the connection state to disconnected and send a ClientSynchronizationFailure event`() {
-        whenever(conversationsClientWrapper.create(eq(context), eq("token"), isA(), isA()))
+        whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
                     (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
                 }
@@ -122,7 +113,7 @@ class ChatManagerImplTest {
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testStates.add(it) } }
         val testChatEventJob = testScope.launch { chatManager.chatEvents.collect { testEvents.add(it) } }
 
-        chatManager.connect("token", "chat")
+        chatManager.connect(TOKEN, CHAT_NAME)
         testChatStateJob.cancel()
         testChatEventJob.cancel()
         assertThat(testStates, equalTo(expectedStates))
@@ -131,16 +122,16 @@ class ChatManagerImplTest {
 
     @Test
     fun `Failing to join the conversation should update the connection state to disconnected and send a ConversationJoinFailure event`() {
-        whenever(conversationsClientWrapper.create(eq(context), eq("token"), isA(), isA()))
+        whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
                     (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
                 }
         whenever(client.addListener(isA())).thenAnswer {
             (it.getArgument(0) as ConversationsClientListener).onClientSynchronization(SynchronizationStatus.COMPLETED)
         }
-        whenever(client.getConversation(eq("chat"), isA())).thenAnswer {
+        whenever(client.getConversation(eq(CHAT_NAME), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<Conversation>)
-                    .onError(ErrorInfo(CONVERSATION_NOT_FOUND, "Test error!"))
+                    .onError(ErrorInfo(CONVERSATION_NOT_FOUND, TEST_ERROR))
         }
         val expectedStates = listOf(
                 ChatState(),
@@ -155,7 +146,7 @@ class ChatManagerImplTest {
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testStates.add(it) } }
         val testChatEventJob = testScope.launch { chatManager.chatEvents.collect { testEvents.add(it) } }
 
-        chatManager.connect("token", "chat")
+        chatManager.connect(TOKEN, CHAT_NAME)
         testChatStateJob.cancel()
         testChatEventJob.cancel()
         assertThat(testStates, equalTo(expectedStates))
@@ -164,19 +155,19 @@ class ChatManagerImplTest {
 
     @Test
     fun `Failing to get the messages should update the connection state to disconnected and send a GetMessagesFailure event`() {
-        whenever(conversationsClientWrapper.create(eq(context), eq("token"), isA(), isA()))
+        whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
                     (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
                 }
         whenever(client.addListener(isA())).thenAnswer {
             (it.getArgument(0) as ConversationsClientListener).onClientSynchronization(SynchronizationStatus.COMPLETED)
         }
-        whenever(client.getConversation(eq("chat"), isA())).thenAnswer {
+        whenever(client.getConversation(eq(CHAT_NAME), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<Conversation>).onSuccess(conversation)
         }
         whenever(conversation.getLastMessages(eq(MESSAGE_READ_COUNT), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<List<Message>>)
-                    .onError(ErrorInfo(CANNOT_GET_MESSAGE_BY_INDEX, "Test error!"))
+                    .onError(ErrorInfo(CANNOT_GET_MESSAGE_BY_INDEX, TEST_ERROR))
         }
         val expectedStates = listOf(
                 ChatState(),
@@ -191,7 +182,7 @@ class ChatManagerImplTest {
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testStates.add(it) } }
         val testChatEventJob = testScope.launch { chatManager.chatEvents.collect { testEvents.add(it) } }
 
-        chatManager.connect("token", "chat")
+        chatManager.connect(TOKEN, CHAT_NAME)
         testChatStateJob.cancel()
         testChatEventJob.cancel()
         assertThat(testStates, equalTo(expectedStates))
@@ -199,17 +190,84 @@ class ChatManagerImplTest {
     }
 
     @Test
-    fun `Successfully disconnecting the client should update the connection state to disconnected`() {
-        TODO("Not yet implemented")
+    fun `Successfully disconnecting the client should update the connection state to disconnected and clear the messages`() {
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(Connecting),
+                ChatState(Connected, expectedMessages),
+                ChatState(Disconnected)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        connectClient()
+        chatManager.disconnect()
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
     }
 
     @Test
     fun `Successfully disconnecting the client should set the old client reference to null`() {
-        TODO("Not yet implemented")
+        connectClient()
+        chatManager.disconnect()
+
+        assertThat((chatManager as ChatManagerImpl).client, `is`(nullValue()))
+    }
+
+    @Test
+    fun `Successfully disconnecting the client should invoke the client shutdown function`() {
+        connectClient()
+        chatManager.disconnect()
+
+        verify(client).shutdown()
     }
 
     @Test
     fun `Should be able to connect a new client after calling disconnect`() {
-        TODO("Not yet implemented")
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(Connecting),
+                ChatState(Connected, expectedMessages),
+                ChatState(Disconnected),
+                ChatState(Connecting),
+                ChatState(Connected, expectedMessages)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+        connectClient()
+
+        chatManager.disconnect()
+        connectClient()
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Disconnecting before connecting should throw an IllegalStateException`() {
+        chatManager.disconnect()
+    }
+
+    private fun connectClient() {
+        whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
+                .thenAnswer {
+                    (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
+                }
+        whenever(client.addListener(isA())).thenAnswer {
+            (it.getArgument(0) as ConversationsClientListener).onClientSynchronization(SynchronizationStatus.COMPLETED)
+        }
+        whenever(client.getConversation(eq(CHAT_NAME), isA())).thenAnswer {
+            (it.getArgument(1) as CallbackListener<Conversation>).onSuccess(conversation)
+        }
+        val messages = listOf<Message>(mock {
+            whenever(mock.messageBody).thenReturn("Test Message")
+            whenever(mock.sid).thenReturn("123")
+        })
+        whenever(conversation.getLastMessages(eq(MESSAGE_READ_COUNT), isA())).thenAnswer {
+            (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(messages)
+        }
+
+        chatManager.connect(TOKEN, CHAT_NAME)
     }
 }
