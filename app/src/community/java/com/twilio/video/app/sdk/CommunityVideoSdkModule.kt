@@ -2,8 +2,8 @@ package com.twilio.video.app.sdk
 
 import android.app.Application
 import android.content.SharedPreferences
-import com.twilio.video.app.ApplicationModule
-import com.twilio.video.app.ApplicationScope
+import com.twilio.video.app.core.ApplicationModule
+import com.twilio.video.app.core.ApplicationScope
 import com.twilio.video.app.data.AuthServiceModule
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.data.api.TokenService
@@ -19,17 +19,17 @@ class CommunityVideoSdkModule {
     @Provides
     fun providesConnectOptionsFactory(
         application: Application,
-        sharedPreferences: SharedPreferences,
-        tokenService: TokenService
+        sharedPreferences: SharedPreferences
     ): ConnectOptionsFactory =
-            ConnectOptionsFactory(application, sharedPreferences, tokenService)
+            ConnectOptionsFactory(application, sharedPreferences)
 
     @Provides
     fun providesRoomFactory(
         application: Application,
-        connectOptionsFactory: ConnectOptionsFactory
+        connectOptionsFactory: ConnectOptionsFactory,
+        tokenService: TokenService
     ): VideoClient =
-            VideoClient(application, connectOptionsFactory)
+            VideoClient(application, connectOptionsFactory, tokenService)
 
     @Provides
     @ApplicationScope

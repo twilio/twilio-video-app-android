@@ -18,7 +18,7 @@ package com.twilio.video.app.data
 
 import android.app.Application
 import android.content.SharedPreferences
-import com.twilio.video.app.ApplicationScope
+import com.twilio.video.app.core.ApplicationScope
 import com.twilio.video.app.util.getSharedPreferences
 import dagger.Module
 import dagger.Provides

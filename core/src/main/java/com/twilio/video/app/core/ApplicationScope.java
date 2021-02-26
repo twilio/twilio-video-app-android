@@ -1,5 +1,3 @@
-package com.twilio.video.app;
-
 /*
  * Copyright (C) 2019 Twilio, Inc.
  *
@@ -16,21 +14,12 @@ package com.twilio.video.app;
  * limitations under the License.
  */
 
-import android.app.Application;
-import dagger.Module;
-import dagger.Provides;
+package com.twilio.video.app.core;
 
-@Module
-public class ApplicationModule {
-    private final Application app;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import javax.inject.Scope;
 
-    public ApplicationModule(Application app) {
-        this.app = app;
-    }
-
-    @Provides
-    @ApplicationScope
-    Application provideApplication() {
-        return app;
-    }
-}
+@Scope
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ApplicationScope {}

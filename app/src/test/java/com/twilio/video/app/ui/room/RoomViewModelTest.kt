@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.app.BaseUnitTest
+import com.twilio.video.app.chat.ChatManager
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.ParticipantViewState
 import com.twilio.video.app.sdk.LocalParticipantManager
@@ -54,6 +55,7 @@ class RoomViewModelTest : BaseUnitTest() {
     private val roomManager = RoomManager(mock(), mock(), mock(), testDispatcher).apply {
         localParticipantManager = this@RoomViewModelTest.localParticipantManager
     }
+    private val chatManager = mock<ChatManager>()
     private val participantViewState = ParticipantViewState(PARTICIPANT_SID, "Test Participant")
     private val participantManager = ParticipantManager().apply {
         addParticipant(participantViewState)
@@ -70,6 +72,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
+                chatManager,
                 participantManager)
         testObserver = viewModel.createTestObserver()
     }
@@ -120,6 +123,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
+                chatManager,
                 participantManager,
                 initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
@@ -150,6 +154,7 @@ class RoomViewModelTest : BaseUnitTest() {
                 roomManager,
                 mock(),
                 permissionUtil,
+                chatManager,
                 participantManager,
                 initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))

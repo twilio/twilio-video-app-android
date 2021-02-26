@@ -37,8 +37,8 @@ afterEvaluate {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    compileSdkVersion versions.targetSdk
+    buildToolsVersion versions.buildTools
 
     buildFeatures {
         viewBinding true
@@ -58,8 +58,8 @@ android {
     defaultConfig {
         applicationId "com.twilio.video.app"
 
-        minSdkVersion 16
-        targetSdkVersion 30
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
 
         versionName "0.1.0"
         versionCode versionCodeProperty
@@ -139,51 +139,39 @@ android {
 }
 
 dependencies {
-    def daggerVersion = '2.25.4'
-    def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
-    def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
-    def retrofitVersion = '2.6.4'
-    def espressoVersion = '3.3.0'
-    def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
-    def androidXTest = '1.3.0'
-    def testCore = "androidx.test:core:$androidXTest"
-    def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
-    def lifecycleVersion = '2.2.0'
-    def coroutinesAndroidVersion = '1.4.2'
-    def fragmentVersion = '1.2.5'
-    def uniflowVersion = '0.11.2'
-
+    implementation project(':chat')
+    implementation project(':core')
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutinesAndroidVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$versions.coroutinesAndroidVersion"
     implementation 'com.twilio:twilio-android-env:1.0.0@aar'
-    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
+    implementation "androidx.constraintlayout:constraintlayout:$versions.constraintLayout"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
     implementation "androidx.core:core-ktx:1.3.2"
-    implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
-    implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation "androidx.lifecycle:lifecycle-service:$versions.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycleVersion"
+    implementation "androidx.fragment:fragment-ktx:$versions.fragmentVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycleVersion"
+    implementation "com.jakewharton.timber:timber:$versions.timber"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.5.0"
     implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
-    implementation "com.google.dagger:dagger-android:$daggerVersion"
-    implementation "com.google.dagger:dagger:$daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    implementation "com.google.dagger:dagger-android:$versions.daggerVersion"
+    implementation "com.google.dagger:dagger:$versions.daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$versions.daggerVersion"
     implementation "io.reactivex.rxjava2:rxjava:2.2.10"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
-    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
+    implementation "com.squareup.retrofit2:retrofit:$versions.retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$versions.retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-scalars:$versions.retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
     implementation 'com.twilio:audioswitch:1.1.2'
-    implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
+    implementation "io.uniflow:uniflow-androidx:$versions.uniflowVersion"
 
     /*
      * Include as a compile time only dependency so Android Studio can resolve references
@@ -193,30 +181,30 @@ dependencies {
 
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
-    kapt daggerAndroidProcessor
-    kapt daggerCompiler
+    kapt "com.google.dagger:dagger-android-processor:$versions.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$versions.daggerVersion"
 
-    testImplementation testCore
-    testImplementation espresso
-    testImplementation junitExtensions
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
+    testImplementation "androidx.test:core:$versions.androidXTest"
+    testImplementation "androidx.test.espresso:espresso-core:$versions.espresso"
+    testImplementation "androidx.test.ext:junit-ktx:$versions.junitExtensions"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutinesAndroidVersion"
+    testImplementation "junit:junit:$versions.jUnit"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin"
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
-    testImplementation "io.uniflow:uniflow-androidx-test:$uniflowVersion"
-    testImplementation "io.uniflow:uniflow-test:$uniflowVersion"
+    testImplementation "io.uniflow:uniflow-androidx-test:$versions.uniflowVersion"
+    testImplementation "io.uniflow:uniflow-test:$versions.uniflowVersion"
     testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
-    kaptTest daggerAndroidProcessor
-    kaptTest daggerCompiler
+    kaptTest "com.google.dagger:dagger-android-processor:$versions.daggerVersion"
+    kaptTest "com.google.dagger:dagger-compiler:$versions.daggerVersion"
 
-    androidTestImplementation testCore
-    androidTestImplementation espresso
-    androidTestImplementation junitExtensions
-    androidTestImplementation "androidx.test:runner:$androidXTest"
-    androidTestImplementation "androidx.test:rules:$androidXTest"
-    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+    androidTestImplementation "androidx.test:core:$versions.androidXTest"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$versions.espresso"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$versions.junitExtensions"
+    androidTestImplementation "androidx.test:runner:$versions.androidXTest"
+    androidTestImplementation "androidx.test:rules:$versions.androidXTest"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$versions.espresso"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'

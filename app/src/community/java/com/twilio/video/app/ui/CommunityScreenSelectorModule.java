@@ -1,6 +1,6 @@
 package com.twilio.video.app.ui;
 
-import com.twilio.video.app.ApplicationScope;
+import com.twilio.video.app.core.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
 

@@ -19,7 +19,7 @@ package com.twilio.video.app.data.api;
 import static com.twilio.video.app.util.BuildConfigUtilsKt.isReleaseBuildType;
 
 import android.content.SharedPreferences;
-import com.twilio.video.app.ApplicationScope;
+import com.twilio.video.app.core.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
 import java.util.concurrent.TimeUnit;

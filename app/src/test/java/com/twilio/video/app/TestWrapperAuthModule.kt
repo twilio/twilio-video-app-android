@@ -5,6 +5,7 @@ import com.twilio.video.app.auth.GoogleAuthProviderWrapper
 import com.twilio.video.app.auth.GoogleAuthWrapper
 import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
+import com.twilio.video.app.core.ApplicationScope
 import dagger.Module
 import dagger.Provides
 

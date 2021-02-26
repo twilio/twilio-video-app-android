@@ -1,5 +1,7 @@
 package com.twilio.video.app
 
+import com.twilio.video.app.core.ApplicationModule
+import com.twilio.video.app.core.ApplicationScope
 import com.twilio.video.app.data.DataModule
 import com.twilio.video.app.ui.login.LoginActivity
 import com.twilio.video.app.ui.login.LoginActivityModule

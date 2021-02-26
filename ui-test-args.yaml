@@ -1,5 +1,5 @@
 e2e-tests:
-  timeout: 30m
+  timeout: 10m
   type: instrumentation
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
@@ -10,7 +10,7 @@ e2e-tests:
     - "annotation com.twilio.video.app.e2eTest.E2ETest"
 
 integration-tests:
-  timeout: 30m
+  timeout: 10m
   type: instrumentation
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk

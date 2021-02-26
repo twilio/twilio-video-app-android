@@ -22,7 +22,6 @@ import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.createBandwidthProfileOptions
@@ -30,14 +29,11 @@ import com.twilio.video.ktx.createConnectOptions
 
 class ConnectOptionsFactory(
     private val context: Context,
-    private val sharedPreferences: SharedPreferences,
-    private val tokenService: TokenService
+    private val sharedPreferences: SharedPreferences
 ) {
 
-    suspend fun newInstance(identity: String, roomName: String): ConnectOptions {
-
+    fun newInstance(token: String, roomName: String): ConnectOptions {
         setSdkEnvironment(sharedPreferences)
-        val token = tokenService.getToken(identity, roomName)
         val enableInsights = sharedPreferences.getBoolean(
                 Preferences.ENABLE_INSIGHTS,
                 Preferences.ENABLE_INSIGHTS_DEFAULT)

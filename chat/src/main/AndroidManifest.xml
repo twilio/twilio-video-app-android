@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    package="com.twilio.video.app.chat">
+
+    <uses-sdk tools:overrideLibrary="com.twilio.conversations"/>
+
+</manifest>

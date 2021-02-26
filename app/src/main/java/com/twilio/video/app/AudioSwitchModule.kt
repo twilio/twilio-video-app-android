@@ -3,6 +3,7 @@ package com.twilio.video.app
 import android.app.Application
 import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioSwitch
+import com.twilio.video.app.core.ApplicationModule
 import dagger.Module
 import dagger.Provides
 
