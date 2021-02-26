@@ -133,7 +133,7 @@ jobs:
       - run: *get-secrets
       - run:
           name: Unit Tests
-          command: ./gradlew app:testInternalDebugUnitTest
+          command: ./gradlew app:testInternalDebugUnitTest chat:testDebugUnitTest
       - save-cache: *save-cache-gradle
 
   community-unit-tests:

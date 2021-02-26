@@ -13,7 +13,8 @@ sealed class RoomEvent {
     data class Connected(
         val participants: List<Participant>,
         val room: Room,
-        val roomName: String
+        val roomName: String,
+        val token: String
     ) : RoomEvent()
     object Disconnected : RoomEvent()
     object ConnectFailure : RoomEvent()

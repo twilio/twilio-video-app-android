@@ -51,6 +51,9 @@ class RoomManager(
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
     private val mutableRoomEvents: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
+    @Volatile private var token: String? = null
+        @Synchronized get
+        @Synchronized set
     val roomEvents: SharedFlow<RoomEvent> = mutableRoomEvents
     @VisibleForTesting(otherwise = PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
@@ -69,7 +72,7 @@ class RoomManager(
     private suspend fun connectToRoom(identity: String, roomName: String) {
         roomScope.launch {
             try {
-                videoClient.connect(identity, roomName, roomListener)
+                token = videoClient.connect(identity, roomName, roomListener)
             } catch (e: AuthServiceException) {
                 handleTokenException(e, e.error)
             } catch (e: Exception) {
@@ -222,7 +225,8 @@ class RoomManager(
                     participants.add(it)
                 }
 
-                sendRoomEvent(Connected(participants, room, room.name))
+                // TODO Unit test the token passing to the ViewModel layer
+                token?.let { sendRoomEvent(Connected(participants, room, room.name, token = it)) }
                 localParticipantManager.publishLocalTracks()
             }
         }
