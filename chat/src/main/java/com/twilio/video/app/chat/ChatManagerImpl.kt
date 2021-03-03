@@ -18,6 +18,7 @@ import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
 import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
+import com.twilio.video.app.chat.sdk.MessageWrapper
 import java.lang.IllegalStateException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,7 @@ internal const val MESSAGE_READ_COUNT = 100
 class ChatManagerImpl(
     private val context: Context,
     private val conversationsClientWrapper: ConversationsClientWrapper = ConversationsClientWrapper(),
+    private val messageWrapper: MessageWrapper = MessageWrapper(),
     private val chatScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : ChatManager {
 
@@ -56,6 +58,12 @@ class ChatManagerImpl(
         conversationsClientWrapper.create(context, token, props, conversationsClientCallback)
     }
 
+    override fun sendMessage(message: String) {
+        val options = messageWrapper.options()
+                .withBody(message)
+        conversation!!.sendMessage(options, sendMessageCallback)
+    }
+
     override fun disconnect() {
         if (chatState.value.connectionState != Disconnected) {
             client?.shutdown()
@@ -64,6 +72,17 @@ class ChatManagerImpl(
             Timber.d("Shutdown the Twilio Conversations Client")
         } else {
             throw IllegalStateException("Cannot disconnect while in the disconnected state")
+        }
+    }
+
+    private val sendMessageCallback: CallbackListener<Message> = object : CallbackListener<Message> {
+        override fun onSuccess(message: Message) {
+            Timber.d("Success sending message: $message")
+        }
+
+        override fun onError(errorInfo: ErrorInfo) {
+            Timber.e("Error sending message: $errorInfo")
+//            sendEvent(ChatEvent.SendMessageFailure)
         }
     }
 

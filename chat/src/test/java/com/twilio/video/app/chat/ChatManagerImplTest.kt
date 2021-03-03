@@ -24,6 +24,7 @@ import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
 import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
+import com.twilio.video.app.chat.sdk.MessageWrapper
 import java.lang.IllegalStateException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
@@ -43,11 +44,16 @@ class ChatManagerImplTest {
 
     private val testScope: CoroutineScope = CoroutineScope(TestCoroutineDispatcher())
     private val conversationsClientWrapper = mock<ConversationsClientWrapper>()
+    private val messageWrapper = mock<MessageWrapper>()
     private val context = mock<Context>()
     private val conversation = mock<Conversation>()
     private val client = mock<ConversationsClient>()
-    private val chatManager: ChatManager = ChatManagerImpl(context, conversationsClientWrapper, testScope)
+    private val chatManager: ChatManager = ChatManagerImpl(context, conversationsClientWrapper, messageWrapper, testScope)
     private val expectedMessages = listOf(ChatMessage("123", "Test Message"))
+    private val message = mock<Message> {
+        whenever(mock.messageBody).thenReturn(expectedMessages.first().message)
+        whenever(mock.sid).thenReturn(expectedMessages.first().id)
+    }
 
     @Test
     fun `Successfully connecting to the client should update the connection state to connected`() {
@@ -249,6 +255,43 @@ class ChatManagerImplTest {
         chatManager.disconnect()
     }
 
+    @Test
+    fun `Successfully sending a new message should send a success chat event`() {
+        val options = mock<Message.Options> {
+            whenever(mock.withBody(isA())).thenReturn(mock)
+        }
+        whenever(messageWrapper.options()).thenReturn(options)
+        whenever(conversation.sendMessage(eq(options), isA())).thenAnswer {
+            (it.arguments[1] as CallbackListener<Message>).onSuccess(message)
+        }
+        connectClient()
+        val expectedEvents = listOf(
+                ChatEvent.SendMessageSuccess(expectedMessages.first())
+        )
+        val testEvents = mutableListOf<ChatEvent>()
+        val testChatEventJob = testScope.launch { chatManager.chatEvents.collect { testEvents.add(it) } }
+
+        chatManager.sendMessage(expectedMessages.first().message)
+
+        testChatEventJob.cancel()
+        assertThat(testEvents, equalTo(expectedEvents))
+    }
+
+    @Test
+    fun `Failing to send a new message should send a failure chat event`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Sending a new message before connecting should throw an IllegalStateException`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Sending a new message with a null conversation should throw an IllegalStateException`() {
+        TODO("Not yet implemented")
+    }
+
     private fun connectClient() {
         whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
@@ -260,10 +303,7 @@ class ChatManagerImplTest {
         whenever(client.getConversation(eq(CHAT_NAME), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<Conversation>).onSuccess(conversation)
         }
-        val messages = listOf<Message>(mock {
-            whenever(mock.messageBody).thenReturn("Test Message")
-            whenever(mock.sid).thenReturn("123")
-        })
+        val messages = listOf(message)
         whenever(conversation.getLastMessages(eq(MESSAGE_READ_COUNT), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(messages)
         }
