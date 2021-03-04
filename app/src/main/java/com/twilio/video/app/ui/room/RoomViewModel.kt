@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.chat.ChatManager
+import com.twilio.video.app.chat.ConnectionState
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
@@ -100,6 +101,7 @@ class RoomViewModel(
         }
 
         subscribeToRoomEvents()
+        subscribeToChatEvents()
     }
 
     @VisibleForTesting(otherwise = PROTECTED)
@@ -154,6 +156,20 @@ class RoomViewModel(
             roomManagerJob = viewModelScope.launch {
                 Timber.d("Listening for RoomEvents")
                 sharedFlow.collect { observeRoomEvents(it) }
+            }
+        }
+    }
+
+    // Spike code to test send message
+    private fun subscribeToChatEvents() {
+        chatManager.chatState.let { flow ->
+            viewModelScope.launch {
+                Timber.d("Listening for ChatEvents")
+                flow.collect { chatState ->
+                    if (chatState.connectionState == ConnectionState.Connected) {
+                        chatManager.sendMessage("Hello world!")
+                    }
+                }
             }
         }
     }

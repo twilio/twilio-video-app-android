@@ -14,10 +14,13 @@ import com.twilio.conversations.User
 import com.twilio.video.app.chat.ChatEvent.ClientConnectFailure
 import com.twilio.video.app.chat.ChatEvent.ConversationJoinFailure
 import com.twilio.video.app.chat.ChatEvent.GetMessagesFailure
+import com.twilio.video.app.chat.ChatEvent.SendMessageFailure
+import com.twilio.video.app.chat.ChatEvent.SendMessageSuccess
 import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
 import com.twilio.video.app.chat.sdk.ConversationsClientWrapper
+import com.twilio.video.app.chat.sdk.MessageWrapper
 import java.lang.IllegalStateException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +35,7 @@ internal const val MESSAGE_READ_COUNT = 100
 class ChatManagerImpl(
     private val context: Context,
     private val conversationsClientWrapper: ConversationsClientWrapper = ConversationsClientWrapper(),
+    private val messageWrapper: MessageWrapper = MessageWrapper(),
     private val chatScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : ChatManager {
 
@@ -54,6 +58,17 @@ class ChatManagerImpl(
                 .setCommandTimeout(30000)
                 .createProperties()
         conversationsClientWrapper.create(context, token, props, conversationsClientCallback)
+    }
+
+    override fun sendMessage(message: String) {
+        if (chatState.value.connectionState == Connected) {
+            val options = messageWrapper.options()
+                    .withBody(message)
+            conversation?.sendMessage(options, sendMessageCallback)
+        } else {
+            throw IllegalStateException("Cannot send a message while not in the connected state. " +
+                    "Current state is: ${chatState.value.connectionState}")
+        }
     }
 
     override fun disconnect() {
@@ -109,6 +124,18 @@ class ChatManagerImpl(
             Timber.e("Error retrieving the last $MESSAGE_READ_COUNT messages from the conversation: $errorInfo")
             sendEvent(GetMessagesFailure)
             updateState { it.copy(connectionState = Disconnected) }
+        }
+    }
+
+    private val sendMessageCallback: CallbackListener<Message> = object : CallbackListener<Message> {
+        override fun onSuccess(message: Message) {
+            Timber.d("Success sending message: $message")
+            sendEvent(SendMessageSuccess(ChatMessage(message.sid, message.messageBody)))
+        }
+
+        override fun onError(errorInfo: ErrorInfo) {
+            Timber.e("Error sending message: $errorInfo")
+            sendEvent(SendMessageFailure)
         }
     }
 
