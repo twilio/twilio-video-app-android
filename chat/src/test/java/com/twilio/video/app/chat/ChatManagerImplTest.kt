@@ -279,17 +279,29 @@ class ChatManagerImplTest {
 
     @Test
     fun `Failing to send a new message should send a failure chat event`() {
-        TODO("Not yet implemented")
+        val options = mock<Message.Options> {
+            whenever(mock.withBody(isA())).thenReturn(mock)
+        }
+        whenever(messageWrapper.options()).thenReturn(options)
+        whenever(conversation.sendMessage(eq(options), isA())).thenAnswer {
+            (it.arguments[1] as CallbackListener<Message>).onError(ErrorInfo(CONVERSATION_NOT_FOUND, TEST_ERROR))
+        }
+        connectClient()
+        val expectedEvents = listOf(
+                ChatEvent.SendMessageFailure
+        )
+        val testEvents = mutableListOf<ChatEvent>()
+        val testChatEventJob = testScope.launch { chatManager.chatEvents.collect { testEvents.add(it) } }
+
+        chatManager.sendMessage(expectedMessages.first().message)
+
+        testChatEventJob.cancel()
+        assertThat(testEvents, equalTo(expectedEvents))
     }
 
     @Test(expected = IllegalStateException::class)
     fun `Sending a new message before connecting should throw an IllegalStateException`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun `Sending a new message with a null conversation should throw an IllegalStateException`() {
-        TODO("Not yet implemented")
+        chatManager.sendMessage(expectedMessages.first().message)
     }
 
     private fun connectClient() {

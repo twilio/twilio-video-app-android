@@ -14,6 +14,8 @@ import com.twilio.conversations.User
 import com.twilio.video.app.chat.ChatEvent.ClientConnectFailure
 import com.twilio.video.app.chat.ChatEvent.ConversationJoinFailure
 import com.twilio.video.app.chat.ChatEvent.GetMessagesFailure
+import com.twilio.video.app.chat.ChatEvent.SendMessageFailure
+import com.twilio.video.app.chat.ChatEvent.SendMessageSuccess
 import com.twilio.video.app.chat.ConnectionState.Connected
 import com.twilio.video.app.chat.ConnectionState.Connecting
 import com.twilio.video.app.chat.ConnectionState.Disconnected
@@ -59,9 +61,13 @@ class ChatManagerImpl(
     }
 
     override fun sendMessage(message: String) {
-        val options = messageWrapper.options()
-                .withBody(message)
-        conversation!!.sendMessage(options, sendMessageCallback)
+        if (chatState.value.connectionState == Connected) {
+            val options = messageWrapper.options()
+                    .withBody(message)
+            conversation?.sendMessage(options, sendMessageCallback)
+        } else {
+            throw IllegalStateException("Cannot send a message while not in the connected state")
+        }
     }
 
     override fun disconnect() {
@@ -72,17 +78,6 @@ class ChatManagerImpl(
             Timber.d("Shutdown the Twilio Conversations Client")
         } else {
             throw IllegalStateException("Cannot disconnect while in the disconnected state")
-        }
-    }
-
-    private val sendMessageCallback: CallbackListener<Message> = object : CallbackListener<Message> {
-        override fun onSuccess(message: Message) {
-            Timber.d("Success sending message: $message")
-        }
-
-        override fun onError(errorInfo: ErrorInfo) {
-            Timber.e("Error sending message: $errorInfo")
-//            sendEvent(ChatEvent.SendMessageFailure)
         }
     }
 
@@ -128,6 +123,18 @@ class ChatManagerImpl(
             Timber.e("Error retrieving the last $MESSAGE_READ_COUNT messages from the conversation: $errorInfo")
             sendEvent(GetMessagesFailure)
             updateState { it.copy(connectionState = Disconnected) }
+        }
+    }
+
+    private val sendMessageCallback: CallbackListener<Message> = object : CallbackListener<Message> {
+        override fun onSuccess(message: Message) {
+            Timber.d("Success sending message: $message")
+            sendEvent(SendMessageSuccess(ChatMessage(message.sid, message.messageBody)))
+        }
+
+        override fun onError(errorInfo: ErrorInfo) {
+            Timber.e("Error sending message: $errorInfo")
+            sendEvent(SendMessageFailure)
         }
     }
 
