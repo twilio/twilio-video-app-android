@@ -66,7 +66,8 @@ class ChatManagerImpl(
                     .withBody(message)
             conversation?.sendMessage(options, sendMessageCallback)
         } else {
-            throw IllegalStateException("Cannot send a message while not in the connected state")
+            throw IllegalStateException("Cannot send a message while not in the connected state. " +
+                    "Current state is: ${chatState.value.connectionState}")
         }
     }
 
