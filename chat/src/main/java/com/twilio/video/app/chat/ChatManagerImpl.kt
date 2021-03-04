@@ -5,11 +5,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.conversations.CallbackListener
 import com.twilio.conversations.Conversation
+import com.twilio.conversations.ConversationListener
 import com.twilio.conversations.ConversationsClient
 import com.twilio.conversations.ConversationsClient.SynchronizationStatus
 import com.twilio.conversations.ConversationsClientListener
 import com.twilio.conversations.ErrorInfo
 import com.twilio.conversations.Message
+import com.twilio.conversations.Participant
 import com.twilio.conversations.User
 import com.twilio.video.app.chat.ChatEvent.ClientConnectFailure
 import com.twilio.video.app.chat.ChatEvent.ConversationJoinFailure
@@ -100,6 +102,7 @@ class ChatManagerImpl(
         override fun onSuccess(conversation: Conversation) {
             Timber.d("Successfully Joined Conversation")
             this@ChatManagerImpl.conversation = conversation
+            conversation.addListener(conversationListener)
             conversation.getLastMessages(MESSAGE_READ_COUNT, getMessagesCallback)
         }
 
@@ -140,14 +143,6 @@ class ChatManagerImpl(
     }
 
     private val conversationsClientListener: ConversationsClientListener = object : ConversationsClientListener {
-        override fun onConversationAdded(conversation: Conversation) {}
-        override fun onConversationUpdated(conversation: Conversation, updateReason: Conversation.UpdateReason) {}
-        override fun onConversationDeleted(conversation: Conversation) {}
-        override fun onConversationSynchronizationChange(conversation: Conversation) {}
-        override fun onError(errorInfo: ErrorInfo) { Timber.e("A client error occurred: $errorInfo") }
-        override fun onUserUpdated(user: User, updateReason: User.UpdateReason) {}
-        override fun onUserSubscribed(user: User) {}
-        override fun onUserUnsubscribed(user: User) {}
         override fun onClientSynchronization(synchronizationStatus: SynchronizationStatus) {
             Timber.d("Client synchronization status: $synchronizationStatus")
             when (synchronizationStatus) {
@@ -159,7 +154,14 @@ class ChatManagerImpl(
                 else -> {}
             }
         }
-
+        override fun onError(errorInfo: ErrorInfo) { Timber.e("A client error occurred: $errorInfo") }
+        override fun onConversationAdded(conversation: Conversation) {}
+        override fun onConversationUpdated(conversation: Conversation, updateReason: Conversation.UpdateReason) {}
+        override fun onConversationDeleted(conversation: Conversation) {}
+        override fun onConversationSynchronizationChange(conversation: Conversation) {}
+        override fun onUserUpdated(user: User, updateReason: User.UpdateReason) {}
+        override fun onUserSubscribed(user: User) {}
+        override fun onUserUnsubscribed(user: User) {}
         override fun onNewMessageNotification(s: String, s1: String, l: Long) {}
         override fun onAddedToConversationNotification(s: String) {}
         override fun onRemovedFromConversationNotification(s: String) {}
@@ -168,6 +170,20 @@ class ChatManagerImpl(
         override fun onConnectionStateChange(connectionState: ConversationsClient.ConnectionState) {}
         override fun onTokenExpired() {}
         override fun onTokenAboutToExpire() {}
+    }
+
+    private val conversationListener = object : ConversationListener {
+        override fun onMessageAdded(message: Message) {
+            Timber.d("New message added: ${ChatMessage(message.sid, message.messageBody)}")
+        }
+        override fun onMessageUpdated(message: Message?, reason: Message.UpdateReason?) {}
+        override fun onMessageDeleted(message: Message?) {}
+        override fun onParticipantAdded(participant: Participant?) {}
+        override fun onParticipantUpdated(participant: Participant?, reason: Participant.UpdateReason?) {}
+        override fun onParticipantDeleted(participant: Participant?) {}
+        override fun onTypingStarted(conversation: Conversation?, participant: Participant?) {}
+        override fun onTypingEnded(conversation: Conversation?, participant: Participant?) {}
+        override fun onSynchronizationChanged(conversation: Conversation?) {}
     }
 
     private fun updateState(action: (oldState: ChatState) -> ChatState) {

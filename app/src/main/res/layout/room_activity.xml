@@ -126,6 +126,15 @@
                 app:backgroundTint="@android:color/holo_red_dark"
                 app:srcCompat="@drawable/ic_call_end_white_24px" />
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/fab_margin"
+                android:background="@drawable/roundbutton"
+                app:backgroundTint="@android:color/holo_red_dark"
+                app:srcCompat="@drawable/ic_chat" />
+
         </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

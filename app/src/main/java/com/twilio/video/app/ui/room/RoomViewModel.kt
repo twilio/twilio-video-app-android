@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.chat.ChatManager
-import com.twilio.video.app.chat.ConnectionState
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
@@ -48,6 +47,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.ClickChat
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
@@ -70,6 +70,7 @@ import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.androidx.flow.AndroidDataFlow
 import io.uniflow.core.flow.actionOn
 import io.uniflow.core.flow.data.UIState
+import java.util.Date
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -101,7 +102,6 @@ class RoomViewModel(
         }
 
         subscribeToRoomEvents()
-        subscribeToChatEvents()
     }
 
     @VisibleForTesting(otherwise = PROTECTED)
@@ -148,6 +148,10 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
             Disconnect -> roomManager.disconnect()
+            ClickChat -> {
+                // Spike code to test sending a message
+                chatManager.sendMessage("Hello world! - ${Date(System.currentTimeMillis())}")
+            }
         }
     }
 
@@ -156,20 +160,6 @@ class RoomViewModel(
             roomManagerJob = viewModelScope.launch {
                 Timber.d("Listening for RoomEvents")
                 sharedFlow.collect { observeRoomEvents(it) }
-            }
-        }
-    }
-
-    // Spike code to test send message
-    private fun subscribeToChatEvents() {
-        chatManager.chatState.let { flow ->
-            viewModelScope.launch {
-                Timber.d("Listening for ChatEvents")
-                flow.collect { chatState ->
-                    if (chatState.connectionState == ConnectionState.Connected) {
-                        chatManager.sendMessage("Hello world!")
-                    }
-                }
             }
         }
     }

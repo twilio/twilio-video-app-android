@@ -67,6 +67,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.ClickChat
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
@@ -136,6 +137,10 @@ class RoomActivity : BaseActivity() {
         binding.disconnect.setOnClickListener { disconnectButtonClick() }
         binding.localVideo.setOnClickListener { toggleLocalVideo() }
         binding.localAudio.setOnClickListener { toggleLocalAudio() }
+        binding.chat.setOnClickListener {
+            // Spike code to test sending a message
+            roomViewModel.processInput(ClickChat)
+        }
         val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this), chatManager)
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
