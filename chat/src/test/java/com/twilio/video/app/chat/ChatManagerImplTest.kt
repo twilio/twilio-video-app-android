@@ -1,6 +1,7 @@
 package com.twilio.video.app.chat
 
 import android.content.Context
+import com.appmattus.kotlinfixture.kotlinFixture
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
@@ -49,7 +50,8 @@ class ChatManagerImplTest {
     private val conversation = mock<Conversation>()
     private val client = mock<ConversationsClient>()
     private val chatManager: ChatManager = ChatManagerImpl(context, conversationsClientWrapper, messageWrapper, testScope)
-    private val expectedMessages = listOf(ChatMessage("123", "Test Message"))
+    private val messageFixture = kotlinFixture()
+    private val expectedMessages = listOf(messageFixture<ChatMessage>())
     private val message = mock<Message> {
         whenever(mock.messageBody).thenReturn(expectedMessages.first().message)
         whenever(mock.sid).thenReturn(expectedMessages.first().id)
