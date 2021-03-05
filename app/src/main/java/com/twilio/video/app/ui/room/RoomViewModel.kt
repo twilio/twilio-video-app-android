@@ -147,7 +147,10 @@ class RoomViewModel(
                 participantManager.updateParticipantScreenTrack(viewEvent.sid, null)
                 updateParticipantViewState()
             }
-            Disconnect -> roomManager.disconnect()
+            Disconnect -> {
+                roomManager.disconnect()
+                chatManager.disconnect()
+            }
             ClickChat -> {
                 // Spike code to test sending a message
                 chatManager.sendMessage("Hello world! - ${Date(System.currentTimeMillis())}")
