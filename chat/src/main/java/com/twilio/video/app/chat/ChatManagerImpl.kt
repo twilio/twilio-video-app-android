@@ -49,6 +49,9 @@ class ChatManagerImpl(
     private var chatName: String? = null
     override val chatState = chatStateFlow
     override val chatEvents = chatEventFlow
+    override var isUserReadingMessages: Boolean
+        get() = TODO("Not yet implemented")
+        set(value) {}
 
     override fun connect(token: String, chatName: String) {
         this.chatName = chatName
@@ -175,6 +178,12 @@ class ChatManagerImpl(
     private val conversationListener = object : ConversationListener {
         override fun onMessageAdded(message: Message) {
             Timber.d("New message added: ${ChatMessage(message.sid, message.messageBody)}")
+            updateState {
+                val newMessages = it.messages.toMutableList().apply {
+                    add(ChatMessage(message.sid, message.messageBody))
+                }
+                it.copy(messages = newMessages, hasUnreadMessages = true)
+            }
         }
         override fun onMessageUpdated(message: Message?, reason: Message.UpdateReason?) {}
         override fun onMessageDeleted(message: Message?) {}

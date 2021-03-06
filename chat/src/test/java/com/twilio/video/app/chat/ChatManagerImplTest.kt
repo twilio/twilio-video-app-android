@@ -2,6 +2,7 @@ package com.twilio.video.app.chat
 
 import android.content.Context
 import com.appmattus.kotlinfixture.kotlinFixture
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
@@ -9,6 +10,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.conversations.CallbackListener
 import com.twilio.conversations.Conversation
+import com.twilio.conversations.ConversationListener
 import com.twilio.conversations.ConversationsClient
 import com.twilio.conversations.ConversationsClient.SynchronizationStatus
 import com.twilio.conversations.ConversationsClientListener
@@ -304,6 +306,74 @@ class ChatManagerImplTest {
     @Test(expected = IllegalStateException::class)
     fun `Sending a new message before connecting should throw an IllegalStateException`() {
         chatManager.sendMessage(expectedMessages.first().message)
+    }
+
+    @Test
+    fun `Receiving a new message should add a new message to the state and with the user not reading the messages should set the has unread messages state to true`() {
+        connectClient()
+        val newMessage = messageFixture<ChatMessage>()
+        val conversationListenerCaptor = argumentCaptor<ConversationListener>()
+        val expectedMessages = listOf(this.expectedMessages.first(), newMessage)
+        val expectedStates = listOf(
+                ChatState(Connected, this.expectedMessages),
+                ChatState(Connected, expectedMessages, true)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        verify(conversation).addListener(conversationListenerCaptor.capture())
+        // Using argument captor to trigger onMessageAdded after the get message callback is invoked
+        conversationListenerCaptor.lastValue.onMessageAdded(mock {
+            whenever(mock.messageBody).thenReturn(newMessage.message)
+            whenever(mock.sid).thenReturn(newMessage.id)
+        })
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    @Test
+    fun `Receiving a new message should add a new message to the state and with the user reading the messages should set the has unread messages state to false`() {
+        connectClient()
+        val newMessage = messageFixture<ChatMessage>()
+        val conversationListenerCaptor = argumentCaptor<ConversationListener>()
+        val expectedMessages = listOf(this.expectedMessages.first(), newMessage)
+        val expectedStates = listOf(
+                ChatState(Connected, this.expectedMessages),
+                ChatState(Connected, expectedMessages, true)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        verify(conversation).addListener(conversationListenerCaptor.capture())
+        // Using argument captor to trigger onMessageAdded after the get message callback is invoked
+        conversationListenerCaptor.lastValue.onMessageAdded(mock {
+            whenever(mock.messageBody).thenReturn(newMessage.message)
+            whenever(mock.sid).thenReturn(newMessage.id)
+        })
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    @Test
+    fun `Receiving a new message with the user reading the messages should set the has unread messages state to false`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `Successfully connecting to the client with existing messages with the user not reading the messages should set the has unread messages state to true`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `Successfully connecting to the client with existing messages with the user reading the messages should set the has unread messages state to false`() {
+        TODO("Not yet implemented")
+    }
+
+    @Test
+    fun `Successfully connecting to the client without existing messages should set the has unread messages state to false`() {
+        TODO("Not yet implemented")
     }
 
     private fun connectClient() {
