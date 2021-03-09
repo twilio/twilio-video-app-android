@@ -64,7 +64,7 @@ class ChatManagerImplTest {
         val expectedStates = listOf(
                 ChatState(),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages)
+                ChatState(Connected)
         )
         val testValues = mutableListOf<ChatState>()
         val testJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
@@ -204,7 +204,7 @@ class ChatManagerImplTest {
         val expectedStates = listOf(
                 ChatState(),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages),
+                ChatState(Connected),
                 ChatState(Disconnected)
         )
         val testValues = mutableListOf<ChatState>()
@@ -238,10 +238,10 @@ class ChatManagerImplTest {
         val expectedStates = listOf(
                 ChatState(),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages),
+                ChatState(Connected),
                 ChatState(Disconnected),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages)
+                ChatState(Connected)
         )
         val testValues = mutableListOf<ChatState>()
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
@@ -313,10 +313,9 @@ class ChatManagerImplTest {
         connectClient()
         val newMessage = messageFixture<ChatMessage>()
         val conversationListenerCaptor = argumentCaptor<ConversationListener>()
-        val expectedMessages = listOf(this.expectedMessages.first(), newMessage)
         val expectedStates = listOf(
-                ChatState(Connected, this.expectedMessages),
-                ChatState(Connected, expectedMessages, true)
+                ChatState(Connected),
+                ChatState(Connected, listOf(newMessage), true)
         )
         val testValues = mutableListOf<ChatState>()
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
@@ -337,14 +336,15 @@ class ChatManagerImplTest {
         connectClient()
         val newMessage = messageFixture<ChatMessage>()
         val conversationListenerCaptor = argumentCaptor<ConversationListener>()
-        val expectedMessages = listOf(this.expectedMessages.first(), newMessage)
         val expectedStates = listOf(
-                ChatState(Connected, this.expectedMessages),
-                ChatState(Connected, expectedMessages, true)
+                ChatState(Connected),
+                ChatState(Connected, isUserReadingMessages = true),
+                ChatState(Connected, listOf(newMessage), isUserReadingMessages = true, hasUnreadMessages = false)
         )
         val testValues = mutableListOf<ChatState>()
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
 
+        chatManager.isUserReadingMessages = true
         verify(conversation).addListener(conversationListenerCaptor.capture())
         // Using argument captor to trigger onMessageAdded after the get message callback is invoked
         conversationListenerCaptor.lastValue.onMessageAdded(mock {
@@ -357,26 +357,40 @@ class ChatManagerImplTest {
     }
 
     @Test
-    fun `Receiving a new message with the user reading the messages should set the has unread messages state to false`() {
-        TODO("Not yet implemented")
-    }
-
-    @Test
     fun `Successfully connecting to the client with existing messages with the user not reading the messages should set the has unread messages state to true`() {
-        TODO("Not yet implemented")
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(Connecting),
+                ChatState(Connected, expectedMessages, hasUnreadMessages = true)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        connectClient(listOf(message))
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
     }
 
     @Test
     fun `Successfully connecting to the client with existing messages with the user reading the messages should set the has unread messages state to false`() {
-        TODO("Not yet implemented")
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(isUserReadingMessages = true),
+                ChatState(Connecting, isUserReadingMessages = true),
+                ChatState(Connected, expectedMessages, isUserReadingMessages = true, hasUnreadMessages = false)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        chatManager.isUserReadingMessages = true
+        connectClient(listOf(message))
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
     }
 
-    @Test
-    fun `Successfully connecting to the client without existing messages should set the has unread messages state to false`() {
-        TODO("Not yet implemented")
-    }
-
-    private fun connectClient() {
+    private fun connectClient(existingMessages: List<Message> = emptyList()) {
         whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
                     (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
@@ -387,9 +401,8 @@ class ChatManagerImplTest {
         whenever(client.getConversation(eq(CHAT_NAME), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<Conversation>).onSuccess(conversation)
         }
-        val messages = listOf(message)
         whenever(conversation.getLastMessages(eq(MESSAGE_READ_COUNT), isA())).thenAnswer {
-            (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(messages)
+            (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(existingMessages)
         }
 
         chatManager.connect(TOKEN, CHAT_NAME)

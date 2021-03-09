@@ -50,8 +50,8 @@ class ChatManagerImpl(
     override val chatState = chatStateFlow
     override val chatEvents = chatEventFlow
     override var isUserReadingMessages: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
+        get() = chatStateFlow.value.isUserReadingMessages
+        set(value) = updateState { it.copy(isUserReadingMessages = value) }
 
     override fun connect(token: String, chatName: String) {
         this.chatName = chatName
@@ -122,7 +122,7 @@ class ChatManagerImpl(
             updateState {
                 it.copy(connectionState = Connected, messages = messages.map { message ->
                     ChatMessage(message.sid, message.messageBody)
-                })
+                }, hasUnreadMessages = messages.isNotEmpty() && !isUserReadingMessages)
             }
         }
 
@@ -182,7 +182,7 @@ class ChatManagerImpl(
                 val newMessages = it.messages.toMutableList().apply {
                     add(ChatMessage(message.sid, message.messageBody))
                 }
-                it.copy(messages = newMessages, hasUnreadMessages = true)
+                it.copy(messages = newMessages, hasUnreadMessages = !isUserReadingMessages)
             }
         }
         override fun onMessageUpdated(message: Message?, reason: Message.UpdateReason?) {}
