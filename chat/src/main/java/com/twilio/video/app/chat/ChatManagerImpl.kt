@@ -177,10 +177,11 @@ class ChatManagerImpl(
 
     private val conversationListener = object : ConversationListener {
         override fun onMessageAdded(message: Message) {
-            Timber.d("New message added: ${ChatMessage(message.sid, message.messageBody)}")
+            val chatMessage = ChatMessage(message.sid, message.messageBody)
+            Timber.d("New message added: $chatMessage")
             updateState {
                 val newMessages = it.messages.toMutableList().apply {
-                    add(ChatMessage(message.sid, message.messageBody))
+                    add(chatMessage)
                 }
                 it.copy(messages = newMessages, hasUnreadMessages = !isUserReadingMessages)
             }
