@@ -23,4 +23,5 @@ sealed class RoomViewEvent {
     data class VideoTrackRemoved(val sid: String) : RoomViewEvent()
     data class ScreenTrackRemoved(val sid: String) : RoomViewEvent()
     object Disconnect : RoomViewEvent()
+    object ClickChat : RoomViewEvent()
 }

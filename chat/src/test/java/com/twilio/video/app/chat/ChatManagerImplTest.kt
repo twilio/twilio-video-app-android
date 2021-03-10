@@ -1,6 +1,8 @@
 package com.twilio.video.app.chat
 
 import android.content.Context
+import com.appmattus.kotlinfixture.kotlinFixture
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
@@ -8,6 +10,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.conversations.CallbackListener
 import com.twilio.conversations.Conversation
+import com.twilio.conversations.ConversationListener
 import com.twilio.conversations.ConversationsClient
 import com.twilio.conversations.ConversationsClient.SynchronizationStatus
 import com.twilio.conversations.ConversationsClientListener
@@ -49,7 +52,8 @@ class ChatManagerImplTest {
     private val conversation = mock<Conversation>()
     private val client = mock<ConversationsClient>()
     private val chatManager: ChatManager = ChatManagerImpl(context, conversationsClientWrapper, messageWrapper, testScope)
-    private val expectedMessages = listOf(ChatMessage("123", "Test Message"))
+    private val messageFixture = kotlinFixture()
+    private val expectedMessages = listOf(messageFixture<ChatMessage>())
     private val message = mock<Message> {
         whenever(mock.messageBody).thenReturn(expectedMessages.first().message)
         whenever(mock.sid).thenReturn(expectedMessages.first().id)
@@ -60,7 +64,7 @@ class ChatManagerImplTest {
         val expectedStates = listOf(
                 ChatState(),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages)
+                ChatState(Connected)
         )
         val testValues = mutableListOf<ChatState>()
         val testJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
@@ -200,7 +204,7 @@ class ChatManagerImplTest {
         val expectedStates = listOf(
                 ChatState(),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages),
+                ChatState(Connected),
                 ChatState(Disconnected)
         )
         val testValues = mutableListOf<ChatState>()
@@ -234,10 +238,10 @@ class ChatManagerImplTest {
         val expectedStates = listOf(
                 ChatState(),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages),
+                ChatState(Connected),
                 ChatState(Disconnected),
                 ChatState(Connecting),
-                ChatState(Connected, expectedMessages)
+                ChatState(Connected)
         )
         val testValues = mutableListOf<ChatState>()
         val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
@@ -304,7 +308,89 @@ class ChatManagerImplTest {
         chatManager.sendMessage(expectedMessages.first().message)
     }
 
-    private fun connectClient() {
+    @Test
+    fun `Receiving a new message should add a new message to the state and with the user not reading the messages should set the has unread messages state to true`() {
+        connectClient()
+        val newMessage = messageFixture<ChatMessage>()
+        val conversationListenerCaptor = argumentCaptor<ConversationListener>()
+        val expectedStates = listOf(
+                ChatState(Connected),
+                ChatState(Connected, listOf(newMessage), true)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        verify(conversation).addListener(conversationListenerCaptor.capture())
+        // Using argument captor to trigger onMessageAdded after the get message callback is invoked
+        conversationListenerCaptor.lastValue.onMessageAdded(mock {
+            whenever(mock.messageBody).thenReturn(newMessage.message)
+            whenever(mock.sid).thenReturn(newMessage.id)
+        })
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    @Test
+    fun `Receiving a new message should add a new message to the state and with the user reading the messages should set the has unread messages state to false`() {
+        connectClient()
+        val newMessage = messageFixture<ChatMessage>()
+        val conversationListenerCaptor = argumentCaptor<ConversationListener>()
+        val expectedStates = listOf(
+                ChatState(Connected),
+                ChatState(Connected, isUserReadingMessages = true),
+                ChatState(Connected, listOf(newMessage), isUserReadingMessages = true, hasUnreadMessages = false)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        chatManager.isUserReadingMessages = true
+        verify(conversation).addListener(conversationListenerCaptor.capture())
+        // Using argument captor to trigger onMessageAdded after the get message callback is invoked
+        conversationListenerCaptor.lastValue.onMessageAdded(mock {
+            whenever(mock.messageBody).thenReturn(newMessage.message)
+            whenever(mock.sid).thenReturn(newMessage.id)
+        })
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    @Test
+    fun `Successfully connecting to the client with existing messages with the user not reading the messages should set the has unread messages state to true`() {
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(Connecting),
+                ChatState(Connected, expectedMessages, hasUnreadMessages = true)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        connectClient(listOf(message))
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    @Test
+    fun `Successfully connecting to the client with existing messages with the user reading the messages should set the has unread messages state to false`() {
+        val expectedStates = listOf(
+                ChatState(),
+                ChatState(isUserReadingMessages = true),
+                ChatState(Connecting, isUserReadingMessages = true),
+                ChatState(Connected, expectedMessages, isUserReadingMessages = true, hasUnreadMessages = false)
+        )
+        val testValues = mutableListOf<ChatState>()
+        val testChatStateJob = testScope.launch { chatManager.chatState.collect { testValues.add(it) } }
+
+        chatManager.isUserReadingMessages = true
+        connectClient(listOf(message))
+
+        testChatStateJob.cancel()
+        assertThat(testValues, equalTo(expectedStates))
+    }
+
+    private fun connectClient(existingMessages: List<Message> = emptyList()) {
         whenever(conversationsClientWrapper.create(eq(context), eq(TOKEN), isA(), isA()))
                 .thenAnswer {
                     (it.getArgument(3) as CallbackListener<ConversationsClient>).onSuccess(client)
@@ -315,9 +401,8 @@ class ChatManagerImplTest {
         whenever(client.getConversation(eq(CHAT_NAME), isA())).thenAnswer {
             (it.getArgument(1) as CallbackListener<Conversation>).onSuccess(conversation)
         }
-        val messages = listOf(message)
         whenever(conversation.getLastMessages(eq(MESSAGE_READ_COUNT), isA())).thenAnswer {
-            (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(messages)
+            (it.getArgument(1) as CallbackListener<List<Message>>).onSuccess(existingMessages)
         }
 
         chatManager.connect(TOKEN, CHAT_NAME)

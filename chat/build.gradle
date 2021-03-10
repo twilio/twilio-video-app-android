@@ -55,6 +55,7 @@ dependencies {
     testImplementation "junit:junit:$versions.jUnit"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutinesAndroidVersion"
+    testImplementation "com.appmattus.fixture:fixture:1.1.0"
     kaptTest "com.google.dagger:dagger-android-processor:$versions.daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$versions.daggerVersion"
 
