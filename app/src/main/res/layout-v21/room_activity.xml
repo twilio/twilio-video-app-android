@@ -89,42 +89,48 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/floating_action_buttons"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/fab_margin"
-            android:orientation="vertical"
-            android:gravity="end|bottom">
+            android:gravity="end|bottom"/>
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_video"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/fab_margin"
-                android:background="@drawable/roundbutton"
-                app:backgroundTint="@color/lobbyMediaControls"
-                app:srcCompat="@drawable/ic_videocam_white_24px" />
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_marginEnd="@dimen/fab_margin"-->
+<!--            android:orientation="vertical"-->
+<!--            android:gravity="end|bottom">-->
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_audio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/fab_margin"
-                android:background="@drawable/roundbutton"
-                app:backgroundTint="@color/lobbyMediaControls"
-                app:srcCompat="@drawable/ic_mic_white_24px" />
+<!--            <androidx.appcompat.widget.AppCompatImageButton-->
+<!--                android:id="@+id/local_video"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="@dimen/fab_margin"-->
+<!--                android:background="@drawable/roundbutton"-->
+<!--                app:backgroundTint="@color/lobbyMediaControls"-->
+<!--                app:srcCompat="@drawable/ic_videocam_white_24px" />-->
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/disconnect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/fab_margin"
-                android:background="@drawable/roundbutton"
-                android:visibility="gone"
-                app:backgroundTint="@android:color/holo_red_dark"
-                app:srcCompat="@drawable/ic_call_end_white_24px" />
+<!--            <androidx.appcompat.widget.AppCompatImageButton-->
+<!--                android:id="@+id/local_audio"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="@dimen/fab_margin"-->
+<!--                android:background="@drawable/roundbutton"-->
+<!--                app:backgroundTint="@color/lobbyMediaControls"-->
+<!--                app:srcCompat="@drawable/ic_mic_white_24px" />-->
 
-        </LinearLayout>
+<!--            <androidx.appcompat.widget.AppCompatImageButton-->
+<!--                android:id="@+id/disconnect"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="@dimen/fab_margin"-->
+<!--                android:background="@drawable/roundbutton"-->
+<!--                android:visibility="gone"-->
+<!--                app:backgroundTint="@android:color/holo_red_dark"-->
+<!--                app:srcCompat="@drawable/ic_call_end_white_24px" />-->
+
+<!--        </LinearLayout>-->
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

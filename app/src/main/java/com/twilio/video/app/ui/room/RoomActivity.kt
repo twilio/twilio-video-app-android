@@ -37,6 +37,18 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -123,17 +135,17 @@ class RoomActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
+        roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
         binding = RoomActivityBinding.inflate(layoutInflater)
+        binding.floatingActionButtons?.setContent {
+            RoomScreen(roomViewModel)
+        }
         setContentView(binding.root)
         binding.joinRoom.roomName.doOnTextChanged { text: CharSequence?, _, _, _ ->
             roomNameTextChanged(text)
         }
         binding.joinRoom.connect.setOnClickListener { connectButtonClick() }
-        binding.disconnect.setOnClickListener { disconnectButtonClick() }
-        binding.localVideo.setOnClickListener { toggleLocalVideo() }
-        binding.localAudio.setOnClickListener { toggleLocalAudio() }
-        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
-        roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
         // So calls can be answered when screen is locked
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
@@ -153,6 +165,44 @@ class RoomActivity : BaseActivity() {
         primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
 
         setupRecordingAnimation()
+    }
+
+    @Composable
+    fun RoomScreen(roomViewModel: RoomViewModel) {
+
+        onStates(roomViewModel) {
+            // TODO wire button state
+//            val isMicEnabled = roomViewState.isMicEnabled
+//            val isCameraEnabled = roomViewState.isCameraEnabled
+//            val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
+//            binding.localAudio.isEnabled = isLocalMediaEnabled
+//            binding.localVideo.isEnabled = isLocalMediaEnabled
+//            val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
+//            val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
+//            binding.localAudio.setImageResource(micDrawable)
+//            binding.localVideo.setImageResource(videoDrawable)
+//            binding.disconnect.visibility = disconnectButtonState
+        }
+        MaterialTheme {
+            Column(
+                modifier = Modifier
+                    .padding(end = 16.dp)) {
+                VideoActionButton(painterResource(R.drawable.ic_videocam_white_24px))
+            }
+        }
+    }
+
+    // TODO Add content descriptions
+    @Composable
+    fun VideoActionButton(icon: Painter) {
+        // TODO
+//        binding.disconnect.setOnClickListener { disconnectButtonClick() }
+//        binding.localVideo.setOnClickListener { toggleLocalVideo() }
+//        binding.localAudio.setOnClickListener { toggleLocalAudio() }
+        val color = colorResource(R.color.lobbyMediaControls)
+        FloatingActionButton(onClick = { /*TODO*/ }) {
+            Icon(icon, "")
+        }
     }
 
     override fun onDestroy() {
@@ -186,6 +236,7 @@ class RoomActivity : BaseActivity() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             val recordAudioPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
             val cameraPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED
@@ -399,19 +450,10 @@ class RoomActivity : BaseActivity() {
                 binding.recordingIndicator.visibility = View.GONE
             }
         }
-        val isMicEnabled = roomViewState.isMicEnabled
-        val isCameraEnabled = roomViewState.isCameraEnabled
-        val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
-        binding.localAudio.isEnabled = isLocalMediaEnabled
-        binding.localVideo.isEnabled = isLocalMediaEnabled
-        val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
-        val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
-        binding.localAudio.setImageResource(micDrawable)
-        binding.localVideo.setImageResource(videoDrawable)
+
         statsListAdapter = StatsListAdapter(this)
         binding.statsRecyclerView.adapter = statsListAdapter
         binding.statsRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.disconnect.visibility = disconnectButtonState
         binding.joinRoom.joinRoomLayout.visibility = joinRoomLayoutState
         binding.joinStatusLayout.visibility = joinStatusLayoutState
         binding.joinRoom.connect.isEnabled = connectButtonEnabled
@@ -426,17 +468,15 @@ class RoomActivity : BaseActivity() {
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         settingsMenuItem.isVisible = settingsMenuItemState
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
-            val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
-                R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
-            } else {
-                R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
-            }
-            screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
-                    screenCaptureResources.first)
-            screenCaptureMenuItem.title = screenCaptureResources.second
+        screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
+        val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
+            R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
+        } else {
+            R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
         }
+        screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
+                screenCaptureResources.first)
+        screenCaptureMenuItem.title = screenCaptureResources.second
     }
 
     private fun setTitle(toolbarTitle: String?) {
