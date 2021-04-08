@@ -30,8 +30,8 @@ import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -50,11 +50,8 @@ class RoomManager(
     private val roomListener = RoomListener()
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
-    /*
-     * TODO Use SharedFlow instead once it becomes stable for automatic cancellation
-     */
-    private val roomChannel: Channel<RoomEvent> = Channel(Channel.BUFFERED)
-    val roomReceiveChannel: ReceiveChannel<RoomEvent> = roomChannel
+    private val mutableRoomEvents: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
+    val roomEvents: SharedFlow<RoomEvent> = mutableRoomEvents
     @VisibleForTesting(otherwise = PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
             LocalParticipantManager(context, this, sharedPreferences)
@@ -65,13 +62,13 @@ class RoomManager(
     }
 
     suspend fun connect(identity: String, roomName: String) {
-        sendToChannel(Connecting)
+        sendRoomEvent(Connecting)
         connectToRoom(identity, roomName)
     }
 
     private suspend fun connectToRoom(identity: String, roomName: String) {
         roomScope.launch {
-            room = try {
+            try {
                 videoClient.connect(identity, roomName, roomListener)
             } catch (e: AuthServiceException) {
                 handleTokenException(e, e.error)
@@ -81,17 +78,14 @@ class RoomManager(
         }
     }
 
-    private fun sendToChannel(roomEvent: RoomEvent) {
-        roomScope.launch { roomChannel.send(roomEvent) }
-    }
-
     fun sendRoomEvent(roomEvent: RoomEvent) {
-        sendToChannel(roomEvent)
+        Timber.d("sendRoomEvent: $roomEvent")
+        roomScope.launch { mutableRoomEvents.emit(roomEvent) }
     }
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
         Timber.e(e, "Failed to retrieve token")
-        sendToChannel(RoomEvent.TokenError(serviceError = error))
+        sendRoomEvent(RoomEvent.TokenError(serviceError = error))
         return null
     }
 
@@ -150,6 +144,7 @@ class RoomManager(
             setupParticipants(room)
 
             statsScheduler = StatsScheduler(this@RoomManager, room).apply { start() }
+            this@RoomManager.room = room
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
@@ -158,7 +153,7 @@ class RoomManager(
 
             stopService(context)
 
-            sendToChannel(Disconnected)
+            sendRoomEvent(Disconnected)
 
             localParticipantManager.localParticipant = null
 
@@ -200,12 +195,12 @@ class RoomManager(
             Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
                     room.sid, remoteParticipant?.sid)
 
-            sendToChannel(DominantSpeakerChanged(remoteParticipant?.sid))
+            sendRoomEvent(DominantSpeakerChanged(remoteParticipant?.sid))
         }
 
-        override fun onRecordingStarted(room: Room) = sendToChannel(RecordingStarted)
+        override fun onRecordingStarted(room: Room) = sendRoomEvent(RecordingStarted)
 
-        override fun onRecordingStopped(room: Room) = sendToChannel(RecordingStopped)
+        override fun onRecordingStopped(room: Room) = sendRoomEvent(RecordingStopped)
 
         override fun onReconnected(room: Room) {
             Timber.i("onReconnected: %s", room.name)
@@ -227,7 +222,7 @@ class RoomManager(
                     participants.add(it)
                 }
 
-                sendToChannel(Connected(participants, room, room.name))
+                sendRoomEvent(Connected(participants, room, room.name))
                 localParticipantManager.publishLocalTracks()
             }
         }

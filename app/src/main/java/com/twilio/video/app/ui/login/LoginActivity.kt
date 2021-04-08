@@ -16,115 +16,68 @@
 
 package com.twilio.video.app.ui.login
 
-import android.app.ProgressDialog
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
+import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.twilio.video.app.R
-import com.twilio.video.app.auth.Authenticator
-import com.twilio.video.app.auth.InternalLoginResult.EmailLoginSuccessResult
-import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginIntentResult
-import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
-import com.twilio.video.app.auth.LoginEvent
-import com.twilio.video.app.auth.LoginEvent.GoogleLoginEvent
-import com.twilio.video.app.auth.LoginEvent.GoogleLoginIntentRequestEvent
 import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.databinding.LoginActivityBinding
 import com.twilio.video.app.ui.room.RoomActivity
-import com.twilio.video.app.util.plus
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
-import timber.log.Timber
 
-internal const val GOOGLE_SIGN_IN = 4615
+private const val RC_SIGN_IN = 20
 
-class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAccountLoginFragment.Listener {
+class LoginActivity : BaseActivity() {
 
+    private lateinit var authUI: FirebaseAuth
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
-    @Inject
-    internal lateinit var authenticator: Authenticator
-
-    private lateinit var progressDialog: ProgressDialog
-    private val disposables = CompositeDisposable()
-    private val loginEventSubject: PublishSubject<LoginEvent> = PublishSubject.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = LoginActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        if (authenticator.loggedIn()) {
-            onSignInSuccess()
-        }
-        if (savedInstanceState == null) {
-            supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.login_fragment_container, LoginLandingFragment.newInstance())
-                    .commit()
-        }
+        authUI = FirebaseAuth.getInstance()
+        navigateToFirebaseUIAuth()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == GOOGLE_SIGN_IN) {
-            data?.let {
-                loginEventSubject.onNext(GoogleLoginEvent(data))
-            } ?: processError()
-            super.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == Activity.RESULT_OK) {
+                authUI.currentUser?.let { user ->
+                    saveIdentity(user)
+                    startLobbyActivity()
+                }
+            }
+            finish()
         }
     }
 
-    // LoginLandingFragment
-    override fun onSignInWithGoogle() {
-        disposables + authenticator
-                .login(loginEventSubject.hide())
-                .subscribe(
-                        {
-                            when (it) {
-                                is GoogleLoginIntentResult -> {
-                                    startActivityForResult(it.intent, GOOGLE_SIGN_IN)
-                                }
-                                is GoogleLoginSuccessResult -> {
-                                    saveIdentity(it.googleSignInAccount.email!!, it.googleSignInAccount.displayName)
-                                    onSignInSuccess()
-                                }
-                            }
-                        },
-                        {
-                            Timber.e(it)
-                            processError()
-                        })
-        loginEventSubject.onNext(GoogleLoginIntentRequestEvent)
-        showAuthenticatingDialog()
-    }
-
-    // LoginLandingFragment
-    override fun onSignInWithEmail() {
-        supportFragmentManager
-                .beginTransaction()
-                .add(R.id.login_fragment_container, ExistingAccountLoginFragment.newInstance())
-                .addToBackStack(null)
-                .commit()
-    }
-
-    // ExistingAccountLoginFragment
-    override fun onExistingAccountCredentials(email: String, password: String) {
-        disposables + authenticator
-                .login(loginEventSubject.hide())
-                .subscribe({
-                    if (it is EmailLoginSuccessResult) {
-                        saveIdentity(email)
-                        onSignInSuccess()
-                    }
-                },
-                {
-                    Timber.e(it)
-                    processError()
-                })
-        loginEventSubject.onNext(LoginEvent.EmailLoginEvent(email, password))
-        showAuthenticatingDialog()
+    private fun navigateToFirebaseUIAuth() {
+        val acceptedDomain = "twilio.com"
+        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .setHostedDomain(acceptedDomain)
+                .build()
+        val providers = arrayListOf(
+                AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(false).build(),
+                AuthUI.IdpConfig.GoogleBuilder().setSignInOptions(signInOptions).build())
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .setIsSmartLockEnabled(false)
+                        .setAlwaysShowSignInMethodScreen(true)
+                        .setTheme(R.style.AppTheme_LoginScreen)
+                        .setLogo(R.drawable.video_logo_splash)
+                        .build(),
+                RC_SIGN_IN)
     }
 
     private fun startLobbyActivity() {
@@ -132,40 +85,11 @@ class LoginActivity : BaseActivity(), LoginLandingFragment.Listener, ExistingAcc
         finish()
     }
 
-    // TODO Provide more detailed error handling as part of https://issues.corp.twilio.com/browse/AHOYAPPS-153
-    private fun processError() {
-        progressDialog.dismiss()
-        showUnauthorizedEmailDialog()
-    }
-
-    private fun showUnauthorizedEmailDialog() {
-        AlertDialog.Builder(this, R.style.AppTheme_Dialog)
-                .setTitle(getString(R.string.login_screen_auth_error_title))
-                .setMessage(getString(R.string.login_screen_auth_error_desc))
-                .setPositiveButton("OK", null)
-                .show()
-    }
-
-    internal fun showAuthenticatingDialog() {
-        progressDialog = ProgressDialog(this, R.style.Authenticating)
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        progressDialog.setMessage("Authenticating")
-        progressDialog.setCancelable(true)
-        progressDialog.isIndeterminate = true
-        progressDialog.show()
-    }
-
-    private fun onSignInSuccess() {
-        disposables.clear()
-        progressDialog.dismiss()
-        startLobbyActivity()
-    }
-
-    private fun saveIdentity(email: String, displayName: String? = null) {
-        sharedPreferences
-                .edit()
-                .putString(Preferences.EMAIL, email)
-                .putString(Preferences.DISPLAY_NAME, displayName ?: email)
-                .apply()
+    private fun saveIdentity(user: FirebaseUser) {
+        sharedPreferences.edit {
+            val email = user.email
+            putString(Preferences.EMAIL, email)
+            putString(Preferences.DISPLAY_NAME, user.displayName ?: email)
+        }
     }
 }
