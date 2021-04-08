@@ -10,11 +10,15 @@
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
-    <style name="AppTheme.LoginScreen" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.LoginScreen" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorAccent">@android:color/white</item>
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColorHint">@color/login_hint</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorError">@android:color/white</item>
     </style>
 
     <style name="AppTheme.Lobby" parent="AppTheme.NoActionBar">
@@ -28,5 +32,19 @@
 
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">@color/lobbyToolbar</item>
+    </style>
+
+    <!--  Firebase UI theme overriding  -->
+
+    <style name="FirebaseUI.Button.AccountChooser.EmailButton">
+        <item name="drawableStartCompat">@drawable/fui_ic_mail_white_24dp</item>
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="FirebaseUI.Text.Link">
+        <item name="android:minHeight">@dimen/fui_min_height_target</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

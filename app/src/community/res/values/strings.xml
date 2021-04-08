@@ -8,4 +8,7 @@
     <string name="login_screen_error_title">Log In Error</string>
     <string name="login_screen_invalid_passcode_error">Passcode incorrect.</string>
     <string name="login_screen_expired_passcode_error">Passcode expired.</string>
+    <string name="login_screen_auth_error_desc">There was an issue logging in.</string>
+    <string name="login">LOG IN</string>
+    <string name="video_logo">Video Logo</string>
 </resources>
