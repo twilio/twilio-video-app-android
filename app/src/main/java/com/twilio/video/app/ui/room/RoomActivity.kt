@@ -44,6 +44,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -187,20 +188,29 @@ class RoomActivity : BaseActivity() {
 //            binding.disconnect.visibility = disconnectButtonState
         }
         MaterialTheme {
-                ConstraintLayout {
-                    val buttonColumn = createRef()
-                    Column(
-                        modifier = Modifier.constrainAs(buttonColumn) {
-                            end.linkTo(parent.end)
-                            bottom.linkTo(parent.bottom)
-                        }
-                            .padding(
-                                end = 16.dp,
-                                bottom = 16.dp)) {
-                        VideoActionButton(painterResource(R.drawable.ic_videocam_white_24px))
-                    }
-                }
+            VideoActionButtonLayout()
         }
+    }
+
+    @Preview
+    @Composable
+    fun VideoActionButtonLayout() {
+        ConstraintLayout {
+            val buttonColumn = createRef()
+            Column(
+                modifier = Modifier
+                    .constrainAs(buttonColumn) {
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                    }) {
+                VideoActionButton(painterResource(R.drawable.ic_videocam_white_24px))
+                VideoActionButton(painterResource(R.drawable.ic_mic_white_24px))
+                VideoActionButton(
+                    painterResource(R.drawable.ic_call_end_white_24px),
+                    colorResource(R.color.lobbyHangup))
+            }
+        }
+
     }
 
     // TODO Add content descriptions
@@ -208,13 +218,16 @@ class RoomActivity : BaseActivity() {
     @Composable
     fun VideoActionButton(
         icon: Painter = painterResource(R.drawable.ic_videocam_white_24px),
+        backgroundColor: Color = colorResource(R.color.lobbyMediaControls)
     ) {
         // TODO
 //        binding.disconnect.setOnClickListener { disconnectButtonClick() }
 //        binding.localVideo.setOnClickListener { toggleLocalVideo() }
 //        binding.localAudio.setOnClickListener { toggleLocalAudio() }
-        val color = colorResource(R.color.lobbyMediaControls)
-        FloatingActionButton(onClick = { /*TODO*/ }, backgroundColor = color) {
+        FloatingActionButton(
+            modifier = Modifier.padding(bottom = 16.dp),
+            onClick = { /*TODO*/ },
+            backgroundColor = backgroundColor) {
             Icon(icon, "", tint = colorResource(android.R.color.white))
         }
     }
