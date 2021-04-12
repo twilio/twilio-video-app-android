@@ -32,9 +32,6 @@ object Preferences {
     const val ENVIRONMENT_DEFAULT = BuildConfig.ENVIRONMENT_DEFAULT
     const val TOPOLOGY = "pref_topology"
     val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
-    const val MIN_FPS = "pref_min_fps"
-    const val MAX_FPS = "pref_max_fps"
-    const val VIDEO_DIMENSIONS_RANGE_BAR = "pref_video_dim_range_bar"
     val VIDEO_DIMENSIONS = arrayOf(
             VideoDimensions.CIF_VIDEO_DIMENSIONS,
             VideoDimensions.VGA_VIDEO_DIMENSIONS,
@@ -45,11 +42,8 @@ object Preferences {
             VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
             VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
     )
-    const val MIN_VIDEO_DIMENSIONS = "pref_min_video_dim"
-    const val MAX_VIDEO_DIMENSIONS = "pref_max_video_dim"
-    const val MIN_VIDEO_DIMENSIONS_DEFAULT = 0
-    val MAX_VIDEO_DIMENSIONS_DEFAULT = VIDEO_DIMENSIONS.lastIndex
-    const val ASPECT_RATIO = "pref_aspect_ratio"
+    const val VIDEO_CAPTURE_RESOLUTION = "pref_video_capture_resolution"
+    const val VIDEO_CAPTURE_RESOLUTION_DEFAULT = "1"
     const val VERSION_NAME = "pref_version_name"
     const val VIDEO_LIBRARY_VERSION = "pref_video_library_version"
     const val LOGOUT = "pref_logout"

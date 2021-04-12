@@ -22,19 +22,12 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.twilio.video.app.R;
+import com.twilio.video.app.databinding.ParticipantViewBinding;
 
 public class ParticipantThumbView extends ParticipantView {
-
-    @BindView(R.id.participant_track_switch_off_background)
-    View trackSwitchOffBackground;
-
-    @BindView(R.id.participant_track_switch_off_icon)
-    ImageView trackSwitchOffImage;
+    private ParticipantViewBinding binding;
 
     public ParticipantThumbView(Context context) {
         super(context);
@@ -59,9 +52,16 @@ public class ParticipantThumbView extends ParticipantView {
     }
 
     private void init(Context context) {
-        View view = LayoutInflater.from(context).inflate(R.layout.participant_view, this);
-        ButterKnife.bind(this, view);
-
+        binding = ParticipantViewBinding.inflate(LayoutInflater.from(context), this, true);
+        videoLayout = binding.videoLayout;
+        videoIdentity = binding.videoIdentity;
+        videoView = binding.video;
+        selectedLayout = binding.selectedLayout;
+        stubImage = binding.stub;
+        networkQualityLevelImg = binding.networkQuality;
+        selectedIdentity = binding.selectedIdentity;
+        audioToggle = binding.audioToggle;
+        pinImage = binding.pin;
         setIdentity(identity);
         setState(state);
         setMirror(mirror);
@@ -72,8 +72,8 @@ public class ParticipantThumbView extends ParticipantView {
     public void setState(int state) {
         super.setState(state);
 
-        trackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
-        trackSwitchOffImage.setVisibility(isSwitchOffViewVisible(state));
+        binding.participantTrackSwitchOffBackground.setVisibility(isSwitchOffViewVisible(state));
+        binding.participantTrackSwitchOffIcon.setVisibility(isSwitchOffViewVisible(state));
 
         int resId = R.drawable.participant_background;
         if (state == State.SELECTED) {

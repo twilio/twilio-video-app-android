@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/content_room" />
+        <include android:id="@+id/room" layout="@layout/content_room" />
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/lobby_toolbar"
@@ -29,9 +29,26 @@
                 android:minHeight="?attr/actionBarSize"
                 app:popupTheme="@style/AppTheme.Lobby.PopupMenu" />
 
-            <include layout="@layout/join_room" />
+            <include android:id="@+id/join_room" layout="@layout/join_room" />
 
         </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/recording_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:text="@string/recording"
+            android:padding="10dp"
+            android:background="@drawable/badge_background"
+            android:drawablePadding="4dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_gravity="end" />
 
         <LinearLayout
             android:id="@+id/join_status_layout"
@@ -82,7 +99,7 @@
             android:gravity="end|bottom">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_video_image_button"
+                android:id="@+id/local_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/fab_margin"
@@ -91,7 +108,7 @@
                 app:srcCompat="@drawable/ic_videocam_white_24px" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/local_audio_image_button"
+                android:id="@+id/local_audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/fab_margin"

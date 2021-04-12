@@ -18,8 +18,8 @@ package com.twilio.video.app.data
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import com.twilio.video.app.ApplicationScope
+import com.twilio.video.app.util.getSharedPreferences
 import dagger.Module
 import dagger.Provides
 
@@ -28,6 +28,6 @@ class DataModule {
     @Provides
     @ApplicationScope
     internal fun provideSharedPreferences(app: Application): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(app)
+        return getSharedPreferences(app)
     }
 }

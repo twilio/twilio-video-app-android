@@ -3,6 +3,7 @@ package com.twilio.video.app.screen
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -19,27 +20,27 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.robolectric.shadows.ShadowDialog.getLatestDialog
 
 fun enterYourName(name: String) {
-    onView(withId(R.id.community_login_screen_name_edittext)).perform(clearText(), typeText(name))
+    onView(withId(R.id.name)).perform(clearText(), typeText(name))
 }
 
 fun clickLoginButton() {
-    onView(withId(R.id.community_login_screen_login_button)).perform(click())
+    onView(withId(R.id.login)).perform(scrollTo(), click())
 }
 
 fun assertLoadingIndicatorIsDisplayed() {
-    onView(withId(R.id.community_login_screen_progressbar)).check(matches(isDisplayed()))
+    onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
 }
 
 fun assertLoadingIndicatorIsNotDisplayed() {
-    onView(withId(R.id.community_login_screen_progressbar)).check(matches(not(isDisplayed())))
+    onView(withId(R.id.progress_bar)).check(matches(not(isDisplayed())))
 }
 
 fun assertLoginButtonIsEnabled() {
-    onView(withId(R.id.community_login_screen_login_button)).check(matches(isEnabled()))
+    onView(withId(R.id.login)).check(matches(isEnabled()))
 }
 
 fun assertLoginButtonIsDisabled() {
-    onView(withId(R.id.community_login_screen_login_button)).check(matches(not(isEnabled())))
+    onView(withId(R.id.login)).check(matches(not(isEnabled())))
 }
 
 fun assertInvalidPasscodeErrorIsDisplayed() {
@@ -51,7 +52,7 @@ fun assertExpiredPasscodeErrorIsDisplayed() {
 }
 
 fun assertThatPasscodeErrorIsDisabled() {
-    onView(withId(R.id.community_login_screen_passcode)).check(matches(not(isTextInputLayoutError())))
+    onView(withId(R.id.passcode_input)).check(matches(not(isTextInputLayoutError())))
 }
 
 fun assertErrorDialogIsDisplayed() {

@@ -1,29 +1,48 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-/*
- * Enable the application to consume the Video Android SDK directly from source
- * instead of from Bintray.
- *
- * The property is not defined by default when consuming the
- * application as a stand-alone project, but is defined by default in the Video Android SDK project.
- * This property enables the Video Android SDK project to build the application as a git subtree
- * with the contents of the source itself as a dependency. This coupling is intentional as it allows
- * SDK developers to iterate on SDK features within the application that is maintained in a separate
- * project.
- */
-def videoAndroidSdkDepProp = "videoAppSdkDependency"
-def videoAndroidSdkDep = (project.hasProperty(videoAndroidSdkDepProp) ?
-        project("${project.property(videoAndroidSdkDepProp)}") :
-        "com.twilio:video-android:5.11.1")
 def versionCodeProperty = project.property('versionCode') as Integer
+def includeSdkFromSourceProperty = 'includeSdkFromSource'
+def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
+        project.property(includeSdkFromSourceProperty) as Boolean
+
+afterEvaluate {
+    def ndkVersion = 'ndkVersion'
+    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
+        android.ndkVersion = "${project.property(ndkVersion)}"
+    }
+
+    /*
+    * Enable the application to consume the Video Android SDK directly from source
+    * instead of from Bintray.
+    *
+    * The property is not defined by default when consuming the
+    * application as a stand-alone project, but is defined by default in the Video Android SDK project.
+    * This property enables the Video Android SDK project to build the application as a git subtree
+    * with the contents of the source itself as a dependency. This coupling is intentional as it allows
+    * SDK developers to iterate on SDK features within the application that is maintained in a separate
+    * project.
+    */
+    dependencies {
+        if (includeSdkFromSource) {
+            debugImplementation project(':video')
+            debugImplementation project(':video:ktx')
+            releaseImplementation project(':video:ktx')
+        } else {
+            implementation "com.twilio:video-android-ktx:6.3.0"
+        }
+    }
+}
 
 android {
     compileSdkVersion 30
     buildToolsVersion '30.0.2'
+
+    buildFeatures {
+        viewBinding true
+    }
 
     lintOptions {
         disable 'GradleDependency'
@@ -120,7 +139,6 @@ android {
 }
 
 dependencies {
-    def butterknifeVersion = '10.2.0'
     def daggerVersion = '2.25.4'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
@@ -131,7 +149,7 @@ dependencies {
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.2.0'
-    def coroutinesAndroidVersion = '1.3.9'
+    def coroutinesAndroidVersion = '1.4.2'
     def fragmentVersion = '1.2.5'
     def uniflowVersion = '0.11.2'
 
@@ -140,25 +158,21 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0'
-    implementation videoAndroidSdkDep
+    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
     implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.preference:preference-ktx:1.1.1"
+    implementation "androidx.core:core-ktx:1.3.2"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
-    implementation "androidx.fragment:fragment:$fragmentVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation "com.appyvet:materialrangebar:1.3"
-    implementation "com.jakewharton:butterknife:$butterknifeVersion"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.5.0"
-    implementation 'com.google.firebase:firebase-auth:19.4.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
+    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation "com.google.dagger:dagger-android:$daggerVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
@@ -171,11 +185,16 @@ dependencies {
     implementation project(':audioswitch')
     implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
 
-    internalImplementation "com.microsoft.appcenter:appcenter-distribute:2.5.1"
+    /*
+     * Include as a compile time only dependency so Android Studio can resolve references
+     * to com.android.ViewBinding.
+     */
+    compileOnly 'com.android.databinding:viewbinding:4.1.1'
+
+    internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
-    kapt "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     testImplementation testCore
     testImplementation espresso
@@ -188,6 +207,7 @@ dependencies {
     testImplementation 'android.arch.core:core-testing:1.1.1'
     testImplementation "io.uniflow:uniflow-androidx-test:$uniflowVersion"
     testImplementation "io.uniflow:uniflow-test:$uniflowVersion"
+    testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
 
