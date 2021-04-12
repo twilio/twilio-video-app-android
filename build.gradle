@@ -50,8 +50,8 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
+        jcenter()
         maven {
             url  "https://twilio.bintray.com/releases"
         }
@@ -176,8 +176,8 @@ task incrementVersionCode {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
+        jcenter()
         maven {
             url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
         }
