@@ -1,8 +1,6 @@
 package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
-import android.telephony.PhoneStateListener
-import android.telephony.TelephonyManager
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.annotation.VisibleForTesting.PROTECTED
@@ -11,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
-import com.twilio.video.app.TwilioPhoneStateListener
 import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
@@ -80,7 +77,6 @@ class RoomViewModel(
     private val roomManager: RoomManager,
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
-    private val telephonyManager: TelephonyManager,
     private val participantManager: ParticipantManager = ParticipantManager(),
     initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
 ) : AndroidDataFlow(defaultState = initialViewState) {
@@ -88,11 +84,18 @@ class RoomViewModel(
     private var permissionCheckRetry = false
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomManagerJob: Job? = null
-    private val twilioPhoneStateListener = TwilioPhoneStateListener({ audioSwitch.stop() }, { startAudioSwitch() })
 
     init {
-        telephonyManager.listen(twilioPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
-        startAudioSwitch()
+        audioSwitch.start { audioDevices, selectedDevice ->
+            actionOn<RoomViewState> { currentState ->
+                setState {
+                    currentState.copy(
+                        selectedDevice = selectedDevice,
+                        availableAudioDevices = audioDevices
+                    )
+                }
+            }
+        }
 
         subscribeToRoomEvents()
     }
@@ -102,7 +105,6 @@ class RoomViewModel(
         super.onCleared()
         audioSwitch.stop()
         roomManagerJob?.cancel()
-        telephonyManager.listen(twilioPhoneStateListener, PhoneStateListener.LISTEN_NONE)
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
@@ -142,22 +144,6 @@ class RoomViewModel(
                 updateParticipantViewState()
             }
             Disconnect -> roomManager.disconnect()
-        }
-    }
-
-    private fun startAudioSwitch() {
-        audioSwitch.start { audioDevices, selectedDevice ->
-            actionOn<RoomViewState> { currentState ->
-                setState {
-                    currentState.copy(
-                            selectedDevice = selectedDevice,
-                            availableAudioDevices = audioDevices
-                    )
-                }
-            }
-        }
-        if ((getCurrentState() as RoomViewState).configuration == RoomViewConfiguration.Connected) {
-            audioSwitch.activate()
         }
     }
 
@@ -347,12 +333,11 @@ class RoomViewModel(
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
         private val audioDeviceSelector: AudioSwitch,
-        private val permissionUtil: PermissionUtil,
-        private val telephonyManager: TelephonyManager
+        private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil, telephonyManager) as T
+            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil) as T
         }
     }
 }

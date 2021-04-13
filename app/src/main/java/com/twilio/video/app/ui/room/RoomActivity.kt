@@ -32,7 +32,6 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
@@ -133,8 +132,7 @@ class RoomActivity : BaseActivity() {
         binding.disconnect.setOnClickListener { disconnectButtonClick() }
         binding.localVideo.setOnClickListener { toggleLocalVideo() }
         binding.localAudio.setOnClickListener { toggleLocalAudio() }
-        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this), telephonyManager)
+        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
         // So calls can be answered when screen is locked
@@ -172,12 +170,6 @@ class RoomActivity : BaseActivity() {
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
         setTitle(displayName)
         roomViewModel.processInput(OnResume)
-
-        // Test Speakerphone
-        val isSpeakerphoneOn = (getSystemService(Context.AUDIO_SERVICE) as AudioManager?)?.let {
-            it.isSpeakerphoneOn
-        } ?: false
-        Timber.d("isSpeakerphoneOn: $isSpeakerphoneOn")
     }
 
     override fun onPause() {
