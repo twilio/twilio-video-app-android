@@ -41,10 +41,6 @@ class VideoApplication : Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
 
-        if (!deviceIsBlacklistedForOpenSLESUsage()) {
-            setBlacklistDeviceForOpenSLESUsage(true)
-        }
-
         DaggerVideoApplicationComponent
                 .builder()
                 .applicationModule(ApplicationModule(this))
