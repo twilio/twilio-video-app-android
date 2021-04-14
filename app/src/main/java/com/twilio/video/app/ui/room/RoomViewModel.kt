@@ -13,72 +13,29 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoTrackViewState
-import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
+import com.twilio.video.app.ui.room.RoomEvent.*
 import com.twilio.video.app.ui.room.RoomEvent.Connected
-import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
-import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioDisabled
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioEnabled
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
-import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
-import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
-import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.NetworkQualityLevelChange
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrackUpdated
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
-import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
-import com.twilio.video.app.ui.room.RoomEvent.TokenError
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.*
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.*
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
-import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
-import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
-import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
-import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
-import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.Connect
-import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
-import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalVideo
-import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
-import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
-import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
-import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
-import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
-import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
-import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
-import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
-import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
-import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
-import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
-import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
-import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
-import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
+import com.twilio.video.app.ui.room.RoomViewEffect.*
+import com.twilio.video.app.ui.room.RoomViewEvent.*
 import com.twilio.video.app.util.PermissionUtil
-import io.uniflow.androidx.flow.AndroidDataFlow
-import io.uniflow.core.flow.actionOn
+import io.uniflow.android.AndroidDataFlow
 import io.uniflow.core.flow.data.UIState
+import io.uniflow.core.flow.onState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class RoomViewModel(
-    private val roomManager: RoomManager,
-    private val audioSwitch: AudioSwitch,
-    private val permissionUtil: PermissionUtil,
-    private val participantManager: ParticipantManager = ParticipantManager(),
-    initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
+        private val roomManager: RoomManager,
+        private val audioSwitch: AudioSwitch,
+        private val permissionUtil: PermissionUtil,
+        private val participantManager: ParticipantManager = ParticipantManager(),
+        initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
     private var permissionCheckRetry = false
@@ -87,16 +44,13 @@ class RoomViewModel(
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
-            actionOn<RoomViewState> { currentState ->
-                setState {
-                    currentState.copy(
+            updateState { currentState ->
+                currentState.copy(
                         selectedDevice = selectedDevice,
                         availableAudioDevices = audioDevices
-                    )
-                }
+                )
             }
         }
-
         subscribeToRoomEvents()
     }
 
@@ -160,8 +114,8 @@ class RoomViewModel(
         val isCameraEnabled = permissionUtil.isPermissionGranted(permission.CAMERA)
         val isMicEnabled = permissionUtil.isPermissionGranted(permission.RECORD_AUDIO)
 
-        setState {
-            it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
+        updateState { currentState ->
+            currentState.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
         }
         if (isCameraEnabled && isMicEnabled) {
             roomManager.onResume()
@@ -209,18 +163,18 @@ class RoomViewModel(
                     ShowTokenErrorDialog(roomEvent.serviceError)
                 }
             }
-            RecordingStarted -> setState { it.copy(isRecording = true) }
-            RecordingStopped -> setState { it.copy(isRecording = false) }
+            RecordingStarted -> updateState { currentState -> currentState.copy(isRecording = true) }
+            RecordingStopped -> updateState { currentState -> currentState.copy(isRecording = false) }
             is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
             is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
-            is StatsUpdate -> setState { it.copy(roomStats = roomEvent.roomStats) }
+            is StatsUpdate -> updateState { currentState -> currentState.copy(roomStats = roomEvent.roomStats) }
         }
     }
 
     private fun handleRemoteParticipantEvent(remoteParticipantEvent: RemoteParticipantEvent) {
         when (remoteParticipantEvent) {
             is RemoteParticipantConnected -> addParticipant(remoteParticipantEvent.participant)
-            is VideoTrackUpdated -> {
+            is RemoteParticipantEvent.VideoTrackUpdated -> {
                 participantManager.updateParticipantVideoTrack(remoteParticipantEvent.sid,
                         remoteParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
@@ -259,16 +213,16 @@ class RoomViewModel(
                 participantManager.updateLocalParticipantVideoTrack(
                         localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
-                setState { it.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
+                updateState { currentState -> currentState.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
             }
-            AudioOn -> setState { it.copy(isAudioMuted = false) }
-            AudioOff -> setState { it.copy(isAudioMuted = true) }
-            AudioEnabled -> setState { it.copy(isAudioEnabled = true) }
-            AudioDisabled -> setState { it.copy(isAudioEnabled = false) }
-            ScreenCaptureOn -> setState { it.copy(isScreenCaptureOn = true) }
-            ScreenCaptureOff -> setState { it.copy(isScreenCaptureOn = false) }
-            VideoEnabled -> setState { it.copy(isVideoEnabled = true) }
-            VideoDisabled -> setState { it.copy(isVideoEnabled = false) }
+            AudioOn -> updateState { currentState -> currentState.copy(isAudioMuted = false) }
+            AudioOff -> updateState { currentState -> currentState.copy(isAudioMuted = true) }
+            AudioEnabled -> updateState { currentState -> currentState.copy(isAudioEnabled = true) }
+            AudioDisabled -> updateState { currentState -> currentState.copy(isAudioEnabled = false) }
+            ScreenCaptureOn -> updateState { currentState -> currentState.copy(isScreenCaptureOn = true) }
+            ScreenCaptureOff -> updateState { currentState -> currentState.copy(isScreenCaptureOn = false) }
+            VideoEnabled -> updateState { currentState -> currentState.copy(isVideoEnabled = true) }
+            VideoDisabled -> updateState { currentState -> currentState.copy(isVideoEnabled = false) }
         }
     }
 
@@ -280,22 +234,22 @@ class RoomViewModel(
 
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
-        setState {
-            it.copy(configuration = Lobby)
+        updateState { currentState ->
+            currentState.copy(configuration = Lobby)
         }
         participantManager.clearRemoteParticipants()
         updateParticipantViewState()
     }
 
     private fun showConnectingViewState() {
-        setState {
-            it.copy(configuration = RoomViewConfiguration.Connecting)
+        updateState { currentState ->
+            currentState.copy(configuration = RoomViewConfiguration.Connecting)
         }
     }
 
     private fun showConnectedViewState(roomName: String) {
-        setState {
-            it.copy(configuration = RoomViewConfiguration.Connected, title = roomName)
+        updateState { currentState ->
+            currentState.copy(configuration = RoomViewConfiguration.Connected, title = roomName)
         }
     }
 
@@ -311,8 +265,8 @@ class RoomViewModel(
     }
 
     private fun updateParticipantViewState() {
-        setState {
-            it.copy(
+        updateState { currentState ->
+            currentState.copy(
                     participantThumbnails = participantManager.participantThumbnails,
                     primaryParticipant = participantManager.primaryParticipant
             )
@@ -320,20 +274,20 @@ class RoomViewModel(
     }
 
     private fun connect(identity: String, roomName: String) =
-        viewModelScope.launch {
-            roomManager.connect(
-                    identity,
-                    roomName)
+            viewModelScope.launch {
+                roomManager.connect(
+                        identity,
+                        roomName)
             }
 
-    private fun setState(action: (currentState: RoomViewState) -> UIState) =
-        actionOn<RoomViewState> { currentState -> setState { action(currentState) } }
+    private fun updateState(action: (currentState: RoomViewState) -> UIState) =
+            action { onState<RoomViewState> { currentState -> setState { action(currentState) } } }
 
     @Suppress("UNCHECKED_CAST")
     class RoomViewModelFactory(
-        private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioSwitch,
-        private val permissionUtil: PermissionUtil
+            private val roomManager: RoomManager,
+            private val audioDeviceSelector: AudioSwitch,
+            private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
