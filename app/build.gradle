@@ -45,6 +45,7 @@ android {
     }
 
     lintOptions {
+        disable 'GradleDependency'
         warningsAsErrors true
         // TODO: Fix all baseline app warnings and errors GSDK-1984
         baseline file("lint-baseline.xml")
