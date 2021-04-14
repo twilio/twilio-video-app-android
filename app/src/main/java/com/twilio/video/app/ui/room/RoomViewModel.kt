@@ -1,12 +1,15 @@
 package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
+import android.content.Context
+import android.media.AudioManager
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.Participant
 import com.twilio.video.app.participant.ParticipantManager
@@ -75,7 +78,7 @@ import timber.log.Timber
 
 class RoomViewModel(
     private val roomManager: RoomManager,
-    private val audioSwitch: AudioSwitch,
+    applicationContext: Context,
     private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
     initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
@@ -84,6 +87,25 @@ class RoomViewModel(
     private var permissionCheckRetry = false
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomManagerJob: Job? = null
+    private val audioFocusChangeListener: AudioManager.OnAudioFocusChangeListener =
+            AudioManager.OnAudioFocusChangeListener { focusChange ->
+                Timber.d("AS/AudioFocusChanged! code = $focusChange")
+                (getCurrentState() as RoomViewState).let { currentViewState ->
+                    if (focusChange == AUDIOFOCUS_GAIN &&
+                            currentViewState.configuration is RoomViewConfiguration.Connected &&
+                            audioSwitch.selectedAudioDevice !is AudioDevice.BluetoothHeadset) {
+                        Timber.d("AS/Re activate non bluetooth audio device")
+                        audioSwitch.activate()
+                    }
+        }
+    }
+    private val audioSwitch = AudioSwitch(applicationContext,
+            loggingEnabled = true,
+            preferredDeviceList = listOf(AudioDevice.BluetoothHeadset::class.java,
+                    AudioDevice.WiredHeadset::class.java,
+                    AudioDevice.Speakerphone::class.java,
+                    AudioDevice.Earpiece::class.java),
+            audioFocusChangeListener = audioFocusChangeListener)
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
@@ -332,12 +354,12 @@ class RoomViewModel(
     @Suppress("UNCHECKED_CAST")
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
-        private val audioDeviceSelector: AudioSwitch,
+        private val applicationContext: Context,
         private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RoomViewModel(roomManager, audioDeviceSelector, permissionUtil) as T
+            return RoomViewModel(roomManager, applicationContext, permissionUtil) as T
         }
     }
 }

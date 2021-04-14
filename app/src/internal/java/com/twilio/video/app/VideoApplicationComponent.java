@@ -46,8 +46,7 @@ import dagger.android.AndroidInjectionModule;
             SettingsActivityModule.class,
             SettingsFragmentModule.class,
             VideoServiceModule.class,
-            VideoSdkModule.class,
-            AudioSwitchModule.class
+            VideoSdkModule.class
         })
 public interface VideoApplicationComponent {
     void inject(VideoApplication application);

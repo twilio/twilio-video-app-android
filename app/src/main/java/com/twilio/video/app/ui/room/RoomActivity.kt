@@ -47,7 +47,6 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
-import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.base.BaseActivity
@@ -112,9 +111,6 @@ class RoomActivity : BaseActivity() {
     @Inject
     lateinit var roomManager: RoomManager
 
-    @Inject
-    lateinit var audioSwitch: AudioSwitch
-
     /** Coordinates participant thumbs and primary participant rendering.  */
     private lateinit var primaryParticipantController: PrimaryParticipantController
     private lateinit var participantAdapter: ParticipantAdapter
@@ -132,7 +128,7 @@ class RoomActivity : BaseActivity() {
         binding.disconnect.setOnClickListener { disconnectButtonClick() }
         binding.localVideo.setOnClickListener { toggleLocalVideo() }
         binding.localAudio.setOnClickListener { toggleLocalAudio() }
-        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
+        val factory = RoomViewModelFactory(roomManager, application, PermissionUtil(this))
         roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
         // So calls can be answered when screen is locked
@@ -170,6 +166,12 @@ class RoomActivity : BaseActivity() {
         displayName = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
         setTitle(displayName)
         roomViewModel.processInput(OnResume)
+
+        // Test Speakerphone
+        val isSpeakerphoneOn = (getSystemService(Context.AUDIO_SERVICE) as AudioManager?)?.let {
+            it.isSpeakerphoneOn
+        } ?: false
+        Timber.d("isSpeakerphoneOn: $isSpeakerphoneOn")
     }
 
     override fun onPause() {
