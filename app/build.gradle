@@ -205,8 +205,8 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
-    testImplementation "io.uniflow:uniflow-androidx-test:$uniflowVersion"
-    testImplementation "io.uniflow:uniflow-test:$uniflowVersion"
+    testImplementation "org.uniflow-kt:uniflow-android-test:$uniflowVersion"
+    testImplementation "org.uniflow-kt:uniflow-test:$uniflowVersion"
     testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler

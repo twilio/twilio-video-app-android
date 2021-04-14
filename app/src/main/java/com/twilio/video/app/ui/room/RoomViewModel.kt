@@ -13,14 +13,56 @@ import com.twilio.video.app.participant.ParticipantManager
 import com.twilio.video.app.participant.buildParticipantViewState
 import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.sdk.VideoTrackViewState
-import com.twilio.video.app.ui.room.RoomEvent.*
+import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
 import com.twilio.video.app.ui.room.RoomEvent.Connected
+import com.twilio.video.app.ui.room.RoomEvent.Connecting
 import com.twilio.video.app.ui.room.RoomEvent.Disconnected
-import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.*
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.*
+import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioDisabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioEnabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.AudioOn
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOff
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
+import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
+import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.MuteRemoteParticipant
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.NetworkQualityLevelChange
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
+import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
+import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
-import com.twilio.video.app.ui.room.RoomViewEffect.*
-import com.twilio.video.app.ui.room.RoomViewEvent.*
+import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
+import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.Connect
+import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.DisableLocalVideo
+import com.twilio.video.app.ui.room.RoomViewEvent.Disconnect
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
+import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
+import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
+import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
+import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
+import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
+import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
+import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
+import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
+import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.android.AndroidDataFlow
 import io.uniflow.core.flow.data.UIState
@@ -31,11 +73,11 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class RoomViewModel(
-        private val roomManager: RoomManager,
-        private val audioSwitch: AudioSwitch,
-        private val permissionUtil: PermissionUtil,
-        private val participantManager: ParticipantManager = ParticipantManager(),
-        initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
+    private val roomManager: RoomManager,
+    private val audioSwitch: AudioSwitch,
+    private val permissionUtil: PermissionUtil,
+    private val participantManager: ParticipantManager = ParticipantManager(),
+    initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
     private var permissionCheckRetry = false
@@ -285,9 +327,9 @@ class RoomViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class RoomViewModelFactory(
-            private val roomManager: RoomManager,
-            private val audioDeviceSelector: AudioSwitch,
-            private val permissionUtil: PermissionUtil
+        private val roomManager: RoomManager,
+        private val audioDeviceSelector: AudioSwitch,
+        private val permissionUtil: PermissionUtil
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
