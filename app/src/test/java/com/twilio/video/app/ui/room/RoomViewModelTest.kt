@@ -27,7 +27,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
 import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.android.test.TestViewObserver
 import io.uniflow.android.test.createTestObserver
-import io.uniflow.test.rule.TestDispatchersRule
+import io.uniflow.test.rule.UniflowTestDispatchersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.hamcrest.CoreMatchers.`is`
@@ -48,7 +48,7 @@ class RoomViewModelTest : BaseUnitTest() {
 
     private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
     @get:Rule
-    val coroutineScope = TestDispatchersRule(testDispatcher)
+    val coroutineScope = UniflowTestDispatchersRule(testDispatcher)
 
     private val localParticipantManager = mock<LocalParticipantManager>()
     private val roomManager = RoomManager(mock(), mock(), mock(), testDispatcher).apply {
@@ -83,7 +83,7 @@ class RoomViewModelTest : BaseUnitTest() {
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
         val expectedParticipantViewState = participantViewState.copy(
                 videoTrack = expectedTrackViewState)
-        val updatedParticipant = (viewModel.getCurrentState() as RoomViewState).participantThumbnails?.find {
+        val updatedParticipant = (viewModel.getState() as RoomViewState).participantThumbnails?.find {
             it.sid == PARTICIPANT_SID
         }
         assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
@@ -98,7 +98,7 @@ class RoomViewModelTest : BaseUnitTest() {
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack, true)
         val expectedParticipantViewState = participantViewState.copy(
                 videoTrack = expectedTrackViewState)
-        val updatedParticipant = (viewModel.getCurrentState() as RoomViewState).participantThumbnails?.find {
+        val updatedParticipant = (viewModel.getState() as RoomViewState).participantThumbnails?.find {
             it.sid == PARTICIPANT_SID
         }
         assertThat(updatedParticipant, equalTo(expectedParticipantViewState))
@@ -111,7 +111,7 @@ class RoomViewModelTest : BaseUnitTest() {
         val expectedViewState = initialRoomViewState.copy(isCameraEnabled = true)
         viewModel.processInput(OnResume)
 
-        testObserver.verifySequence(initialRoomViewState, expectedViewState, PermissionsDenied)
+        testObserver.verifySequence(expectedViewState, PermissionsDenied)
     }
 
     @Test
@@ -141,7 +141,7 @@ class RoomViewModelTest : BaseUnitTest() {
 
         viewModel.processInput(OnResume)
 
-        testObserver.verifySequence(initialRoomViewState, expectedViewState, PermissionsDenied)
+        testObserver.verifySequence(expectedViewState, PermissionsDenied)
     }
 
     @Test
@@ -181,7 +181,6 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(ConnectFailure)
 
         testObserver.verifySequence(
-                initialRoomViewState,
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 ShowConnectFailureDialog,
                 Disconnected,
@@ -197,7 +196,6 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(MaxParticipantFailure)
 
         testObserver.verifySequence(
-                initialRoomViewState,
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 ShowMaxParticipantFailureDialog,
                 Disconnected,
@@ -213,7 +211,6 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(RecordingStarted)
 
         testObserver.verifySequence(
-                initialRoomViewState,
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
                         isRecording = true))
@@ -225,7 +222,6 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(RecordingStopped)
 
         testObserver.verifySequence(
-                initialRoomViewState,
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
                         isRecording = false))
