@@ -34,6 +34,7 @@ object Preferences {
     val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     val VIDEO_DIMENSIONS = arrayOf(
             VideoDimensions(176, 144),
+            VideoDimensions.CIF_VIDEO_DIMENSIONS,
             VideoDimensions.VGA_VIDEO_DIMENSIONS,
             VideoDimensions.WVGA_VIDEO_DIMENSIONS,
             VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
