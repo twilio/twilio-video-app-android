@@ -85,4 +85,12 @@ object Preferences {
     const val BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = SERVER_DEFAULT
     const val BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS = "pref_bandwidth_profile_high_track_priority_dimensions"
     const val BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT = SERVER_DEFAULT
+    const val AUDIO_ACOUSTIC_ECHO_CANCELER = "pref_audio_acoustic_echo_canceler"
+    const val AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT = true
+    const val AUDIO_ACOUSTIC_NOISE_SUPRESSOR = "pref_noise_supressor"
+    const val AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT = true
+    const val AUDIO_AUTOMATIC_GAIN_CONTROL = "pref_audio_automatic_gain_control"
+    const val AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT = true
+    const val AUDIO_OPEN_SLES_USAGE = "pref_audio_open_sles_usage"
+    const val AUDIO_OPEN_SLES_USAGE_DEFAULT = false
 }
