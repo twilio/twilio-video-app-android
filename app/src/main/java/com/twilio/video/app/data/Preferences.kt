@@ -33,7 +33,7 @@ object Preferences {
     const val TOPOLOGY = "pref_topology"
     val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     val VIDEO_DIMENSIONS = arrayOf(
-            VideoDimensions.CIF_VIDEO_DIMENSIONS,
+            VideoDimensions(176, 144),
             VideoDimensions.VGA_VIDEO_DIMENSIONS,
             VideoDimensions.WVGA_VIDEO_DIMENSIONS,
             VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
