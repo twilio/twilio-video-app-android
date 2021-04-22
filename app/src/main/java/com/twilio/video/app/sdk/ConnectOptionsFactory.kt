@@ -112,10 +112,10 @@ class ConnectOptionsFactory(
         val openSLESUsage = sharedPreferences.getBoolean(
                 Preferences.AUDIO_OPEN_SLES_USAGE,
                 Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT)
-        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(acousticEchoCanceler)
-        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(noiseSuppressor)
-        WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(automaticGainControl)
-        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(openSLESUsage)
+        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
+        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(!noiseSuppressor)
+        WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(!automaticGainControl)
+        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(!openSLESUsage)
 
         val isNetworkQualityEnabled = sharedPreferences.get(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,

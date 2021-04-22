@@ -173,8 +173,8 @@
     <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
     <string name="settings_screen_bandwidth_profile_standard_track_priority">Standard Track Priority</string>
     <string name="settings_screen_bandwidth_profile_high_track_priority">High Track Priority</string>
-    <string name="settings_screen_audio_acoustic_echo_canceler">Enable Acoustic Echo Canceler</string>
-    <string name="settings_screen_audio_noise_supressor">Enable Noise Supressor</string>
-    <string name="settings_screen_audio_automatic_gain_control">Enable Automatic Gain Control</string>
+    <string name="settings_screen_audio_acoustic_echo_canceler">Enable Hardware Acoustic Echo Canceler</string>
+    <string name="settings_screen_audio_noise_supressor">Enable Hardware Noise Supressor</string>
+    <string name="settings_screen_audio_automatic_gain_control">Enable Hardware Automatic Gain Control</string>
     <string name="settings_screen_audio_open_sles_usage">Enable Open SLES Usage</string>
 </resources>
