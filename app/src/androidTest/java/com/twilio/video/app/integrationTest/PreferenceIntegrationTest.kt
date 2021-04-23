@@ -58,6 +58,37 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
+    fun it_should_assert_correct_default_audio_preferences() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+
+        assertTextIsDisplayedRetry(getString(R.string.settings_title_advanced))
+
+        scrollAndClickView(getString(R.string.settings_title_audio), R.id.recycler_view)
+
+        assertTextIsDisplayedRetry(getString(R.string.settings_title_audio))
+
+        // Use inverse of default as second param to ensure default works from preference screen
+        val sharedPreferences = getSharedPreferences(getTargetContext())
+        val acousticEchoCanceler = sharedPreferences.getBoolean(
+                Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
+                !Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT)
+        val noiseSuppressor = sharedPreferences.getBoolean(
+                Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
+                !Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT)
+        val automaticGainControl = sharedPreferences.getBoolean(
+                Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
+                !Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT)
+        val openSLESUsage = sharedPreferences.getBoolean(
+                Preferences.AUDIO_OPEN_SLES_USAGE,
+                !Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT)
+
+        assertThat(acousticEchoCanceler, equalTo(Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT))
+        assertThat(noiseSuppressor, equalTo(Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT))
+        assertThat(automaticGainControl, equalTo(Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT))
+        assertThat(openSLESUsage, equalTo(Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT))
+    }
+
+    @Test
     fun it_should_select_the_correct_topology() {
         scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
 
