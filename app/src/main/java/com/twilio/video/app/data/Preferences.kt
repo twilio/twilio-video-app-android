@@ -31,9 +31,11 @@ object Preferences {
     const val ENVIRONMENT = "pref_environment"
     const val ENVIRONMENT_DEFAULT = BuildConfig.ENVIRONMENT_DEFAULT
     const val TOPOLOGY = "pref_topology"
+    const val QCIF_VIDEO_WIDTH = 176
+    const val QCIF_VIDEO_HEIGHT = 144
     val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     val VIDEO_DIMENSIONS = arrayOf(
-            VideoDimensions(176, 144),
+            VideoDimensions(QCIF_VIDEO_WIDTH, QCIF_VIDEO_HEIGHT),
             VideoDimensions.CIF_VIDEO_DIMENSIONS,
             VideoDimensions.VGA_VIDEO_DIMENSIONS,
             VideoDimensions.WVGA_VIDEO_DIMENSIONS,
