@@ -180,7 +180,7 @@ class AuthServiceRepositoryTest {
             val repository = setupRepository()
             val actualToken = repository.getToken(userIdentity, roomName, passcode)
 
-            verify(authService).getToken(expectedURL, expectedRequestDTO)
+            verify(authService).getToken(expectedURL, expectedRequestDTO.copy(create_room = true))
             assertThat(actualToken, equalTo(token))
         }
     }

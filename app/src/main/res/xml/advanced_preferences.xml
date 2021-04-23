@@ -83,6 +83,11 @@
             app:fragment="com.twilio.video.app.ui.settings.BandwidthProfileSettingsFragment"
             app:iconSpaceReserved="false">
         </Preference>
+`       <Preference
+            android:title="@string/settings_title_audio"
+            app:fragment="com.twilio.video.app.ui.settings.AudioSettingsFragment"
+            app:iconSpaceReserved="false">
+        </Preference>
     </PreferenceCategory>
     <PreferenceCategory>
         <Preference

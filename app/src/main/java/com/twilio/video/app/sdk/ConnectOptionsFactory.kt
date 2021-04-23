@@ -27,6 +27,8 @@ import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.createBandwidthProfileOptions
 import com.twilio.video.ktx.createConnectOptions
+import tvi.webrtc.voiceengine.WebRtcAudioManager
+import tvi.webrtc.voiceengine.WebRtcAudioUtils
 
 class ConnectOptionsFactory(
     private val context: Context,
@@ -96,6 +98,23 @@ class ConnectOptionsFactory(
             trackSwitchOffMode(trackSwitchOffMode)
             renderDimensions(renderDimensions)
         }
+
+        val acousticEchoCanceler = sharedPreferences.getBoolean(
+                Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
+                Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT)
+        val noiseSuppressor = sharedPreferences.getBoolean(
+                Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
+                Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT)
+        val automaticGainControl = sharedPreferences.getBoolean(
+                Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
+                Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT)
+        val openSLESUsage = sharedPreferences.getBoolean(
+                Preferences.AUDIO_OPEN_SLES_USAGE,
+                Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT)
+        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
+        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(!noiseSuppressor)
+        WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(!automaticGainControl)
+        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(!openSLESUsage)
 
         val isNetworkQualityEnabled = sharedPreferences.get(
                 Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
