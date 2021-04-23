@@ -101,8 +101,8 @@ import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
-import io.uniflow.androidx.flow.onEvents
-import io.uniflow.androidx.flow.onStates
+import io.uniflow.android.livedata.onEvents
+import io.uniflow.android.livedata.onStates
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -287,10 +287,8 @@ class RoomActivity : BaseActivity() {
         onStates(roomViewModel) { state ->
             if (state is RoomViewState) bindRoomViewState(state)
         }
-        onEvents(roomViewModel) { eventWrapper ->
-            eventWrapper.take()?.let { event ->
-                if (event is RoomViewEffect) bindRoomViewEffects(event)
-            }
+        onEvents(roomViewModel) { event ->
+            if (event is RoomViewEffect) bindRoomViewEffects(event)
         }
         return true
     }
@@ -648,7 +646,7 @@ class RoomActivity : BaseActivity() {
     }
 
     private fun displayAudioDeviceList() {
-        (roomViewModel.getCurrentState() as RoomViewState).let { viewState ->
+        (roomViewModel.getState() as RoomViewState).let { viewState ->
             val selectedDevice = viewState.selectedDevice
             val audioDevices = viewState.availableAudioDevices
             if (selectedDevice != null && audioDevices != null) {
