@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_title_audio"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        android:key="pref_audio_acoustic_echo_canceler"
+        android:title="@string/settings_screen_audio_acoustic_echo_canceler"
+        android:defaultValue="true"
+        app:iconSpaceReserved="false"/>
+
+    <CheckBoxPreference
+        android:key="pref_noise_supressor"
+        android:title="@string/settings_screen_audio_noise_supressor"
+        android:defaultValue="true"
+        app:iconSpaceReserved="false"/>
+
+    <CheckBoxPreference
+        android:key="pref_audio_automatic_gain_control"
+        android:title="@string/settings_screen_audio_automatic_gain_control"
+        android:defaultValue="true"
+        app:iconSpaceReserved="false"/>
+
+    <CheckBoxPreference
+        android:key="pref_audio_open_sles_usage"
+        android:title="@string/settings_screen_audio_open_sles_usage"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"/>
+</PreferenceScreen>

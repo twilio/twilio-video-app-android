@@ -69,10 +69,9 @@ class AuthServiceRepository(
         identity: String?,
         roomName: String?
     ): Pair<AuthServiceRequestDTO, String> {
-        val requestBody = AuthServiceRequestDTO(
-                passcode,
-                identity,
-                roomName)
+        val requestBody = roomName?.let { roomName ->
+            AuthServiceRequestDTO(passcode, identity, roomName, true)
+        } ?: AuthServiceRequestDTO(passcode, identity)
         val appId = passcode.substring(6, 10)
         val serverlessId = passcode.substring(10)
         val url = if (passcode.length == PASSCODE_SIZE) {

@@ -104,6 +104,7 @@
     <string name="settings_title_advanced">Advanced</string>
     <string name="settings_title_internal">Internal</string>
     <string name="settings_title_bandwidth_profile">Bandwidth Profile</string>
+    <string name="settings_title_audio">Audio</string>
     <string name="username">Username</string>
     <string name="join_room">Join Room</string>
     <string name="registering">Registering</string>
@@ -172,4 +173,8 @@
     <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
     <string name="settings_screen_bandwidth_profile_standard_track_priority">Standard Track Priority</string>
     <string name="settings_screen_bandwidth_profile_high_track_priority">High Track Priority</string>
+    <string name="settings_screen_audio_acoustic_echo_canceler">Hardware Acoustic Echo Canceler</string>
+    <string name="settings_screen_audio_noise_supressor">Hardware Noise Supressor</string>
+    <string name="settings_screen_audio_automatic_gain_control">Hardware Automatic Gain Control</string>
+    <string name="settings_screen_audio_open_sles_usage">Open SLES Usage</string>
 </resources>
