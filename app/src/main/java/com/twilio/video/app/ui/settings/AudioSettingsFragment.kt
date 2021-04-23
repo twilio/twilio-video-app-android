@@ -7,5 +7,7 @@ class AudioSettingsFragment : BaseSettingsFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.audio_preferences)
+
+        setHasOptionsMenu(true)
     }
 }
