@@ -37,7 +37,6 @@ import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParti
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.ScreenTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
-import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.RoomEvent.TokenError
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
@@ -65,9 +64,9 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
-import io.uniflow.androidx.flow.AndroidDataFlow
-import io.uniflow.core.flow.actionOn
+import io.uniflow.android.AndroidDataFlow
 import io.uniflow.core.flow.data.UIState
+import io.uniflow.core.flow.onState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -87,16 +86,13 @@ class RoomViewModel(
 
     init {
         audioSwitch.start { audioDevices, selectedDevice ->
-            actionOn<RoomViewState> { currentState ->
-                setState {
-                    currentState.copy(
+            updateState { currentState ->
+                currentState.copy(
                         selectedDevice = selectedDevice,
                         availableAudioDevices = audioDevices
-                    )
-                }
+                )
             }
         }
-
         subscribeToRoomEvents()
     }
 
@@ -160,8 +156,8 @@ class RoomViewModel(
         val isCameraEnabled = permissionUtil.isPermissionGranted(permission.CAMERA)
         val isMicEnabled = permissionUtil.isPermissionGranted(permission.RECORD_AUDIO)
 
-        setState {
-            it.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
+        updateState { currentState ->
+            currentState.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
         }
         if (isCameraEnabled && isMicEnabled) {
             roomManager.onResume()
@@ -209,18 +205,18 @@ class RoomViewModel(
                     ShowTokenErrorDialog(roomEvent.serviceError)
                 }
             }
-            RecordingStarted -> setState { it.copy(isRecording = true) }
-            RecordingStopped -> setState { it.copy(isRecording = false) }
+            RecordingStarted -> updateState { currentState -> currentState.copy(isRecording = true) }
+            RecordingStopped -> updateState { currentState -> currentState.copy(isRecording = false) }
             is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
             is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
-            is StatsUpdate -> setState { it.copy(roomStats = roomEvent.roomStats) }
+            is StatsUpdate -> updateState { currentState -> currentState.copy(roomStats = roomEvent.roomStats) }
         }
     }
 
     private fun handleRemoteParticipantEvent(remoteParticipantEvent: RemoteParticipantEvent) {
         when (remoteParticipantEvent) {
             is RemoteParticipantConnected -> addParticipant(remoteParticipantEvent.participant)
-            is VideoTrackUpdated -> {
+            is RemoteParticipantEvent.VideoTrackUpdated -> {
                 participantManager.updateParticipantVideoTrack(remoteParticipantEvent.sid,
                         remoteParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
@@ -259,16 +255,16 @@ class RoomViewModel(
                 participantManager.updateLocalParticipantVideoTrack(
                         localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
                 updateParticipantViewState()
-                setState { it.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
+                updateState { currentState -> currentState.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
             }
-            AudioOn -> setState { it.copy(isAudioMuted = false) }
-            AudioOff -> setState { it.copy(isAudioMuted = true) }
-            AudioEnabled -> setState { it.copy(isAudioEnabled = true) }
-            AudioDisabled -> setState { it.copy(isAudioEnabled = false) }
-            ScreenCaptureOn -> setState { it.copy(isScreenCaptureOn = true) }
-            ScreenCaptureOff -> setState { it.copy(isScreenCaptureOn = false) }
-            VideoEnabled -> setState { it.copy(isVideoEnabled = true) }
-            VideoDisabled -> setState { it.copy(isVideoEnabled = false) }
+            AudioOn -> updateState { currentState -> currentState.copy(isAudioMuted = false) }
+            AudioOff -> updateState { currentState -> currentState.copy(isAudioMuted = true) }
+            AudioEnabled -> updateState { currentState -> currentState.copy(isAudioEnabled = true) }
+            AudioDisabled -> updateState { currentState -> currentState.copy(isAudioEnabled = false) }
+            ScreenCaptureOn -> updateState { currentState -> currentState.copy(isScreenCaptureOn = true) }
+            ScreenCaptureOff -> updateState { currentState -> currentState.copy(isScreenCaptureOn = false) }
+            VideoEnabled -> updateState { currentState -> currentState.copy(isVideoEnabled = true) }
+            VideoDisabled -> updateState { currentState -> currentState.copy(isVideoEnabled = false) }
         }
     }
 
@@ -280,22 +276,22 @@ class RoomViewModel(
 
     private fun showLobbyViewState() {
         action { sendEvent { RoomViewEffect.Disconnected } }
-        setState {
-            it.copy(configuration = Lobby)
+        updateState { currentState ->
+            currentState.copy(configuration = Lobby)
         }
         participantManager.clearRemoteParticipants()
         updateParticipantViewState()
     }
 
     private fun showConnectingViewState() {
-        setState {
-            it.copy(configuration = RoomViewConfiguration.Connecting)
+        updateState { currentState ->
+            currentState.copy(configuration = RoomViewConfiguration.Connecting)
         }
     }
 
     private fun showConnectedViewState(roomName: String) {
-        setState {
-            it.copy(configuration = RoomViewConfiguration.Connected, title = roomName)
+        updateState { currentState ->
+            currentState.copy(configuration = RoomViewConfiguration.Connected, title = roomName)
         }
     }
 
@@ -311,8 +307,8 @@ class RoomViewModel(
     }
 
     private fun updateParticipantViewState() {
-        setState {
-            it.copy(
+        updateState { currentState ->
+            currentState.copy(
                     participantThumbnails = participantManager.participantThumbnails,
                     primaryParticipant = participantManager.primaryParticipant
             )
@@ -320,14 +316,14 @@ class RoomViewModel(
     }
 
     private fun connect(identity: String, roomName: String) =
-        viewModelScope.launch {
-            roomManager.connect(
-                    identity,
-                    roomName)
+            viewModelScope.launch {
+                roomManager.connect(
+                        identity,
+                        roomName)
             }
 
-    private fun setState(action: (currentState: RoomViewState) -> UIState) =
-        actionOn<RoomViewState> { currentState -> setState { action(currentState) } }
+    private fun updateState(action: (currentState: RoomViewState) -> UIState) =
+            action { onState<RoomViewState> { currentState -> setState { action(currentState) } } }
 
     @Suppress("UNCHECKED_CAST")
     class RoomViewModelFactory(

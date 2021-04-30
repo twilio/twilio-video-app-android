@@ -139,28 +139,28 @@ android {
 }
 
 dependencies {
-    def daggerVersion = '2.25.4'
+    def daggerVersion = '2.28.3'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
-    def retrofitVersion = '2.6.4'
+    def retrofitVersion = '2.9.0'
     def espressoVersion = '3.3.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     def androidXTest = '1.3.0'
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
-    def lifecycleVersion = '2.2.0'
-    def coroutinesAndroidVersion = '1.4.2'
-    def fragmentVersion = '1.2.5'
-    def uniflowVersion = '0.11.2'
+    def lifecycleVersion = '2.3.1'
+    def coroutinesAndroidVersion = '1.4.3'
+    def fragmentVersion = '1.3.2'
+    def uniflowVersion = '1.0.5'
 
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.0.0@aar'
-    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.twilio:twilio-android-env:1.1.0@aar'
+    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+    implementation 'com.google.android.material:material:1.3.0'
     implementation "androidx.preference:preference-ktx:1.1.1"
     implementation "androidx.core:core-ktx:1.3.2"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
@@ -170,7 +170,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.firebase:firebase-core:17.5.0"
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
+    implementation 'com.google.firebase:firebase-crashlytics:17.4.1'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation "com.google.dagger:dagger-android:$daggerVersion"
@@ -183,13 +183,13 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
     implementation 'com.twilio:audioswitch:1.1.2'
-    implementation "io.uniflow:uniflow-androidx:$uniflowVersion"
+    implementation "org.uniflow-kt:uniflow-android:$uniflowVersion"
 
     /*
      * Include as a compile time only dependency so Android Studio can resolve references
      * to com.android.ViewBinding.
      */
-    compileOnly 'com.android.databinding:viewbinding:4.1.1'
+    compileOnly 'com.android.databinding:viewbinding:4.1.3'
 
     internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
 
@@ -200,13 +200,13 @@ dependencies {
     testImplementation espresso
     testImplementation junitExtensions
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.robolectric:robolectric:4.3.1'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
-    testImplementation "io.uniflow:uniflow-androidx-test:$uniflowVersion"
-    testImplementation "io.uniflow:uniflow-test:$uniflowVersion"
+    testImplementation "org.uniflow-kt:uniflow-android-test:$uniflowVersion"
+    testImplementation "org.uniflow-kt:uniflow-test:$uniflowVersion"
     testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
