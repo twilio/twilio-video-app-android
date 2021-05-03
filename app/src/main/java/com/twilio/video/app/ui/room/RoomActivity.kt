@@ -43,15 +43,14 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -103,6 +102,7 @@ import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
 import io.uniflow.android.livedata.onEvents
 import io.uniflow.android.livedata.onStates
+import io.uniflow.android.livedata.states
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -173,44 +173,44 @@ class RoomActivity : BaseActivity() {
 
     @Composable
     fun RoomScreen(roomViewModel: RoomViewModel) {
-
-        onStates(roomViewModel) {
-            // TODO wire button state
-//            val isMicEnabled = roomViewState.isMicEnabled
-//            val isCameraEnabled = roomViewState.isCameraEnabled
-//            val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
-//            binding.localAudio.isEnabled = isLocalMediaEnabled
-//            binding.localVideo.isEnabled = isLocalMediaEnabled
-//            val micDrawable = if (roomViewState.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
-//            val videoDrawable = if (roomViewState.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
-//            binding.localAudio.setImageResource(micDrawable)
-//            binding.localVideo.setImageResource(videoDrawable)
-//            binding.disconnect.visibility = disconnectButtonState
-        }
-        MaterialTheme {
-            VideoActionButtonLayout()
+        roomViewModel.states.observeAsState().let { it.value as RoomViewState }.let { state ->
+            MaterialTheme {
+                VideoActionButtonLayout(state)
+            }
         }
     }
 
     @Preview
     @Composable
-    fun VideoActionButtonLayout() {
+    fun VideoActionButtonLayout(state: RoomViewState) {
         ConstraintLayout {
             val buttonColumn = createRef()
+            val isMicEnabled = state.isMicEnabled
+            val isCameraEnabled = state.isCameraEnabled
+            val isLocalMediaEnabled = isMicEnabled && isCameraEnabled
+            val videoDrawable = if (state.isVideoOff || !isLocalMediaEnabled) R.drawable.ic_videocam_off_gray_24px else R.drawable.ic_videocam_white_24px
+            val micDrawable = if (state.isAudioMuted || !isLocalMediaEnabled) R.drawable.ic_mic_off_gray_24px else R.drawable.ic_mic_white_24px
             Column(
                 modifier = Modifier
                     .constrainAs(buttonColumn) {
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
                     }) {
-                VideoActionButton(painterResource(R.drawable.ic_videocam_white_24px))
-                VideoActionButton(painterResource(R.drawable.ic_mic_white_24px))
+                VideoActionButton(
+                    painterResource(videoDrawable),
+                    isEnabled = state.isVideoEnabled
+                )
+                VideoActionButton(
+                    painterResource(micDrawable),
+                    isEnabled = state.isMicEnabled
+                )
                 VideoActionButton(
                     painterResource(R.drawable.ic_call_end_white_24px),
-                    colorResource(R.color.lobbyHangup))
+                    colorResource(R.color.lobbyHangup),
+                    isVisible = state.configuration == RoomViewConfiguration.Connected
+                )
             }
         }
-
     }
 
     // TODO Add content descriptions
@@ -218,7 +218,9 @@ class RoomActivity : BaseActivity() {
     @Composable
     fun VideoActionButton(
         icon: Painter = painterResource(R.drawable.ic_videocam_white_24px),
-        backgroundColor: Color = colorResource(R.color.lobbyMediaControls)
+        backgroundColor: Color = colorResource(R.color.lobbyMediaControls),
+        isEnabled: Boolean = true,
+        isVisible: Boolean = true
     ) {
         // TODO
 //        binding.disconnect.setOnClickListener { disconnectButtonClick() }
