@@ -186,6 +186,7 @@ class RoomActivity : BaseActivity() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             val recordAudioPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
             val cameraPermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED

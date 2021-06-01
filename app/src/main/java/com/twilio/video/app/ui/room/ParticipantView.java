@@ -37,10 +37,8 @@ import com.twilio.video.VideoTrack;
 import com.twilio.video.app.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import tvi.webrtc.VideoFrame;
-import tvi.webrtc.VideoSink;
 
-abstract class ParticipantView extends FrameLayout implements VideoSink {
+abstract class ParticipantView extends FrameLayout {
 
     private static final VideoScaleType DEFAULT_VIDEO_SCALE_TYPE = VideoScaleType.ASPECT_FIT;
 
@@ -142,9 +140,8 @@ abstract class ParticipantView extends FrameLayout implements VideoSink {
         if (pinImage != null) pinImage.setVisibility(pinned ? VISIBLE : GONE);
     }
 
-    @Override
-    public void onFrame(VideoFrame videoFrame) {
-        videoView.onFrame(videoFrame);
+    public VideoTextureView getVideoTextureView() {
+        return videoView;
     }
 
     void initParams(Context context, AttributeSet attrs) {
