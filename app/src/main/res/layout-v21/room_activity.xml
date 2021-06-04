@@ -8,17 +8,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.room.RoomActivity" >
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include android:id="@+id/room" layout="@layout/content_room" />
+        <include android:id="@+id/room" layout="@layout/content_room"/>
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/lobby_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/lobbyToolbar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:elevation="0dp">
 
             <androidx.appcompat.widget.Toolbar
@@ -45,8 +48,10 @@
             android:drawablePadding="4dp"
             android:layout_marginTop="100dp"
             android:layout_marginEnd="16dp"
-            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             tools:visibility="visible"
+            android:visibility="gone"
             android:layout_gravity="end" />
 
         <LinearLayout
@@ -56,6 +61,7 @@
             android:layout_marginTop="16dp"
             android:orientation="vertical"
             android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
@@ -90,11 +96,12 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/fab_margin"
             android:orientation="vertical"
-            android:gravity="end|bottom">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/floating_action_buttons"
@@ -103,7 +110,7 @@
 
         </LinearLayout>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:layout_width="match_parent"
