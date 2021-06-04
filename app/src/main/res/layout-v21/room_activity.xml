@@ -95,20 +95,12 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/floating_action_buttons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/fab_margin"
-            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/floating_action_buttons"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

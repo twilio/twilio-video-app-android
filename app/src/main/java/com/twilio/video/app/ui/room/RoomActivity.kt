@@ -195,7 +195,8 @@ class RoomActivity : BaseActivity() {
                     .constrainAs(buttonColumn) {
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
-                    }) {
+                    }
+                    .padding(16.dp)) {
                 VideoActionButton(
                     painterResource(videoDrawable),
                     isEnabled = state.isVideoEnabled
