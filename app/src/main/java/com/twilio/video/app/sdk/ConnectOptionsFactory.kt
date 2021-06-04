@@ -67,8 +67,6 @@ class ConnectOptionsFactory(
         val maxSubscriptionBitrate = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
                 Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT).toLong()
 
-        val maxVideoTracks = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS,
-                Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT).toLong()
         val dominantSpeakerPriority = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
                 Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT)?.let {
             getDominantSpeakerPriority(it)
@@ -93,7 +91,6 @@ class ConnectOptionsFactory(
         val bandwidthProfileOptions = createBandwidthProfileOptions {
             mode(mode)
             maxSubscriptionBitrate(maxSubscriptionBitrate)
-            maxTracks(maxVideoTracks)
             dominantSpeakerPriority(dominantSpeakerPriority)
             trackSwitchOffMode(trackSwitchOffMode)
             renderDimensions(renderDimensions)

@@ -30,28 +30,33 @@ internal class PrimaryParticipantController(
         muted: Boolean,
         mirror: Boolean
     ) {
-
         val old = primaryItem
-        val selectedTrack = screenTrack?.videoTrack ?: videoTrack?.videoTrack
-        val newItem = Item(identity, selectedTrack, muted, mirror)
-
-        // clean old primary video renderings
-        old?.let { removeRender(it.videoTrack, primaryView) }
-
+        val newItem = Item(
+                identity,
+                screenTrack?.videoTrack ?: videoTrack?.videoTrack,
+                muted,
+                mirror)
         primaryItem = newItem
         primaryView.setIdentity(newItem.identity)
         primaryView.showIdentityBadge(true)
         primaryView.setMuted(newItem.muted)
         primaryView.setMirror(newItem.mirror)
-        newItem.videoTrack?.let { newVideoTrack ->
-            if (newVideoTrack.isEnabled) newVideoTrack.addSink(primaryView)
+        val newVideoTrack = newItem.videoTrack
+
+        // Only update sink for a new video track
+        if (newVideoTrack != old?.videoTrack) {
+            old?.let { removeSink(it.videoTrack, primaryView) }
+            newVideoTrack?.let { if (it.isEnabled) it.addSink(primaryView.videoTextureView) }
+        }
+
+        newVideoTrack?.let {
             primaryView.setState(ParticipantView.State.VIDEO)
         } ?: primaryView.setState(ParticipantView.State.NO_VIDEO)
     }
 
-    private fun removeRender(videoTrack: VideoTrack?, view: ParticipantView) {
-        if (videoTrack == null || !videoTrack.sinks.contains(view)) return
-        videoTrack.removeSink(view)
+    private fun removeSink(videoTrack: VideoTrack?, view: ParticipantView) {
+        if (videoTrack == null || !videoTrack.sinks.contains(view.videoTextureView)) return
+        videoTrack.removeSink(view.videoTextureView)
     }
 
     internal class Item(
