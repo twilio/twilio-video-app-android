@@ -19,12 +19,6 @@
             android:defaultValue="true"
             app:iconSpaceReserved="false"/>
         <CheckBoxPreference
-            android:key="pref_record_participants_on_connect"
-            android:title="@string/settings_screen_record_participants_on_connect"
-            android:defaultValue="false"
-            app:iconSpaceReserved="false"
-            />
-        <CheckBoxPreference
             android:key="pref_enable_automatic_subscription"
             android:title="@string/settings_screen_enable_automatic_track_subscription"
             android:defaultValue="true"
