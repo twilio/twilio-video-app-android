@@ -139,7 +139,7 @@ android {
 }
 
 dependencies {
-    def daggerVersion = '2.25.4'
+    def daggerVersion = '2.35.1'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
     def retrofitVersion = '2.6.4'
