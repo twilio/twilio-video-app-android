@@ -18,7 +18,6 @@ import com.twilio.video.PcmuCodec
 import com.twilio.video.TrackPriority
 import com.twilio.video.TrackSwitchOffMode
 import com.twilio.video.VideoCodec
-import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
@@ -75,25 +74,11 @@ class ConnectOptionsFactory(
                 Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
             getTrackSwitchOffMode(it)
         }
-        val renderDimensions = mutableMapOf<TrackPriority, VideoDimensions>()
-        setTrackPriorityRenderDimensions(renderDimensions,
-                TrackPriority.LOW,
-                Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS,
-                Preferences.BANDWIDTH_PROFILE_LOW_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
-        setTrackPriorityRenderDimensions(renderDimensions,
-                TrackPriority.STANDARD,
-                Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS,
-                Preferences.BANDWIDTH_PROFILE_STANDARD_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
-        setTrackPriorityRenderDimensions(renderDimensions,
-                TrackPriority.HIGH,
-                Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS,
-                Preferences.BANDWIDTH_PROFILE_HIGH_TRACK_PRIORITY_RENDER_DIMENSIONS_DEFAULT)
         val bandwidthProfileOptions = createBandwidthProfileOptions {
             mode(mode)
             maxSubscriptionBitrate(maxSubscriptionBitrate)
             dominantSpeakerPriority(dominantSpeakerPriority)
             trackSwitchOffMode(trackSwitchOffMode)
-            renderDimensions(renderDimensions)
         }
 
         val acousticEchoCanceler = sharedPreferences.getBoolean(
@@ -136,26 +121,6 @@ class ConnectOptionsFactory(
             encodingParameters(EncodingParameters(maxAudioBitrate, maxVideoBitrate))
             preferVideoCodecs(listOf(preferedVideoCodec))
             preferAudioCodecs(listOf(preferredAudioCodec))
-        }
-    }
-
-    /*
-     * Utility method that extracts the VideoDimensions from a preference string in the format
-     * NxN. The resolution will be extracted and set to the render dimensions of the specified
-     * track priority. If the preference value does match the NxN format, then no render
-     * dimenions will be set for the track priority.
-     */
-    private fun setTrackPriorityRenderDimensions(
-        renderDimensions: MutableMap<TrackPriority, VideoDimensions>,
-        trackPriority: TrackPriority,
-        preferenceKey: String,
-        preferenceDefaultValue: String
-    ) {
-        sharedPreferences.get(preferenceKey, preferenceDefaultValue).let {
-            Regex("(\\d+)x(\\d+)").find(it)?.let { match ->
-                val (width, height) = match.destructured
-                renderDimensions[trackPriority] = VideoDimensions(width.toInt(), height.toInt())
-            }
         }
     }
 

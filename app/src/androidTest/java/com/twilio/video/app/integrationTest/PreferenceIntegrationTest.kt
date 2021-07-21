@@ -116,22 +116,10 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         assertDefaultValue(getString(R.string.settings_screen_max_subscription_bitrate),
                 Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT.toString())
 
-        assertDefaultValue(getString(R.string.settings_screen_max_video_tracks),
-                Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT.toString())
-
         assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_dominant_speaker_priority),
                 getStringArray(R.array.settings_screen_bandwidth_profile_dominant_speaker_priorities)[2])
 
         assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_track_switch_mode),
-                Preferences.SERVER_DEFAULT)
-
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_low_track_priority),
-                Preferences.SERVER_DEFAULT)
-
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_standard_track_priority),
-                Preferences.SERVER_DEFAULT)
-
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_high_track_priority),
                 Preferences.SERVER_DEFAULT)
     }
 
