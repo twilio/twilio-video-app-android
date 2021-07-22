@@ -80,6 +80,8 @@ object Preferences {
     val BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT = TrackPriority.STANDARD.name
     const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE = "pref_bandwidth_profile_track_switch_off_mode"
     const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT = SERVER_DEFAULT
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL = "pref_bandwidth_profile_track_switch_off_control"
+    const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL_DEFAULT = SERVER_DEFAULT
     const val AUDIO_ACOUSTIC_ECHO_CANCELER = "pref_audio_acoustic_echo_canceler"
     const val AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT = true
     const val AUDIO_ACOUSTIC_NOISE_SUPRESSOR = "pref_noise_supressor"

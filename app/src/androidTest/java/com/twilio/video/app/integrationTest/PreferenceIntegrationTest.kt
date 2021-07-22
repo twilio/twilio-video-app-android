@@ -109,6 +109,34 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         }
     }
 
+    @Test
+    fun assertDefaultClientTrackSwitchOffSettings() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+
+        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_switch_off_control),
+                getStringArray(R.array.settings_screen_bandwidth_profile_switch_off_controls)[0])
+    }
+
+    @Test
+    fun it_should_select_the_correct_ClientTrackSwitchOffControls() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+
+        val sharedPreferences = getSharedPreferences(getTargetContext())
+        var preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL, null)
+        val switchOffControls = getStringArray(R.array.settings_screen_bandwidth_profile_switch_off_controls)
+        assertThat(preference, equalTo(switchOffControls[0]))
+
+        switchOffControls.forEach { control ->
+            scrollAndClickView(getString(R.string.settings_screen_bandwidth_profile_switch_off_control), R.id.recycler_view)
+            clickView(control)
+
+            preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL, null)
+            assertThat(preference, equalTo(control))
+        }
+    }
+
     private fun assertDefaultBandwidthProfileSettings() {
         assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_mode),
                 getStringArray(R.array.settings_screen_bandwidth_profile_modes)[1])
