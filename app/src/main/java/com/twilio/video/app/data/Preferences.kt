@@ -82,6 +82,8 @@ object Preferences {
     const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT = SERVER_DEFAULT
     const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL = "pref_bandwidth_profile_track_switch_off_control"
     const val BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL_DEFAULT = SERVER_DEFAULT
+    const val BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE = "pref_bandwidth_profile_video_content_preferences_mode"
+    const val BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE_DEFAULT = SERVER_DEFAULT
     const val AUDIO_ACOUSTIC_ECHO_CANCELER = "pref_audio_acoustic_echo_canceler"
     const val AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT = true
     const val AUDIO_ACOUSTIC_NOISE_SUPRESSOR = "pref_noise_supressor"
