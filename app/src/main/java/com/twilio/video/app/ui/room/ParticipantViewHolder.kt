@@ -17,7 +17,7 @@ import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import timber.log.Timber
 
-internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
+internal class ParticipantViewHolder(internal val thumb: ParticipantThumbView) :
         RecyclerView.ViewHolder(thumb) {
 
     private val localParticipantIdentity = thumb.context.getString(R.string.you)

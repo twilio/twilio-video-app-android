@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.twilio.androidenv.Env
 import com.twilio.video.AudioCodec
 import com.twilio.video.BandwidthProfileMode
+import com.twilio.video.ClientTrackSwitchOffControl
 import com.twilio.video.ConnectOptions
 import com.twilio.video.EncodingParameters
 import com.twilio.video.G722Codec
@@ -18,6 +19,7 @@ import com.twilio.video.PcmuCodec
 import com.twilio.video.TrackPriority
 import com.twilio.video.TrackSwitchOffMode
 import com.twilio.video.VideoCodec
+import com.twilio.video.VideoContentPreferencesMode
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
@@ -67,18 +69,28 @@ class ConnectOptionsFactory(
                 Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT).toLong()
 
         val dominantSpeakerPriority = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
-                Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT)?.let {
+                Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT).let {
             getDominantSpeakerPriority(it)
         }
         val trackSwitchOffMode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
                 Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
             getTrackSwitchOffMode(it)
         }
+        val clientTrackSwitchOffControl = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL,
+            Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
+                getClientTrackSwitchOffControl(it)
+        }
+        val videoContentPreferencesMode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE,
+                Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE_DEFAULT).let {
+            getVideoContentPreferencesMode(it)
+        }
         val bandwidthProfileOptions = createBandwidthProfileOptions {
             mode(mode)
             maxSubscriptionBitrate(maxSubscriptionBitrate)
             dominantSpeakerPriority(dominantSpeakerPriority)
             trackSwitchOffMode(trackSwitchOffMode)
+            clientTrackSwitchOffControl?.let { clientTrackSwitchOffControl(it) }
+            videoContentPreferencesMode?.let { videoContentPreferencesMode(it) }
         }
 
         val acousticEchoCanceler = sharedPreferences.getBoolean(
@@ -124,23 +136,35 @@ class ConnectOptionsFactory(
         }
     }
 
-    private fun getTrackSwitchOffMode(trackSwitchOffModeString: String): TrackSwitchOffMode? {
-        return when (trackSwitchOffModeString) {
-            TrackSwitchOffMode.PREDICTED.name -> TrackSwitchOffMode.PREDICTED
-            TrackSwitchOffMode.DETECTED.name -> TrackSwitchOffMode.DETECTED
-            TrackSwitchOffMode.DISABLED.name -> TrackSwitchOffMode.DISABLED
-            else -> null
-        }
-    }
+    private fun getTrackSwitchOffMode(trackSwitchOffModeString: String) =
+            when (trackSwitchOffModeString) {
+                TrackSwitchOffMode.PREDICTED.name -> TrackSwitchOffMode.PREDICTED
+                TrackSwitchOffMode.DETECTED.name -> TrackSwitchOffMode.DETECTED
+                TrackSwitchOffMode.DISABLED.name -> TrackSwitchOffMode.DISABLED
+                else -> null
+            }
 
-    private fun getDominantSpeakerPriority(dominantSpeakerPriorityString: String): TrackPriority? {
-        return when (dominantSpeakerPriorityString) {
-            TrackPriority.LOW.name -> TrackPriority.LOW
-            TrackPriority.STANDARD.name -> TrackPriority.STANDARD
-            TrackPriority.HIGH.name -> TrackPriority.HIGH
-            else -> null
-        }
-    }
+    private fun getClientTrackSwitchOffControl(controlString: String) =
+            when (controlString.uppercase()) {
+                ClientTrackSwitchOffControl.MANUAL.name -> ClientTrackSwitchOffControl.MANUAL
+                ClientTrackSwitchOffControl.AUTO.name -> ClientTrackSwitchOffControl.AUTO
+                else -> null
+            }
+
+    private fun getVideoContentPreferencesMode(modeString: String) =
+            when (modeString.uppercase()) {
+                VideoContentPreferencesMode.MANUAL.name -> VideoContentPreferencesMode.MANUAL
+                VideoContentPreferencesMode.AUTO.name -> VideoContentPreferencesMode.AUTO
+                else -> null
+            }
+
+    private fun getDominantSpeakerPriority(dominantSpeakerPriorityString: String) =
+            when (dominantSpeakerPriorityString) {
+                TrackPriority.LOW.name -> TrackPriority.LOW
+                TrackPriority.STANDARD.name -> TrackPriority.STANDARD
+                TrackPriority.HIGH.name -> TrackPriority.HIGH
+                else -> null
+            }
 
     private fun getBandwidthProfileMode(modeString: String): BandwidthProfileMode? {
         return when (modeString) {
