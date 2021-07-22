@@ -31,7 +31,7 @@ afterEvaluate {
             debugImplementation project(':video:ktx')
             releaseImplementation project(':video:ktx')
         } else {
-            implementation "com.twilio:video-android-ktx:6.4.0-rc1"
+            implementation "com.twilio:video-android-ktx:6.4.0-rc3"
         }
     }
 }
