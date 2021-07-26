@@ -45,7 +45,7 @@
         android:entries="@array/settings_screen_bandwidth_media_optimizations_controls"
         android:entryValues="@array/settings_screen_bandwidth_media_optimizations_controls"
         android:summary="%s"
-        android:title="@string/settings_screen_bandwidth_profile_video_content_preferences_mode"
+        android:title="@string/settings_title_video_content_preferences_mode"
         android:negativeButtonText="@null"
         app:iconSpaceReserved="false"/>
 </PreferenceScreen>

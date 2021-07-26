@@ -167,7 +167,6 @@
     <string name="settings_screen_bandwidth_profile_dominant_speaker_priority">Dominant Speaker Priority</string>
     <string name="settings_screen_bandwidth_profile_track_switch_mode">Track Switch Off Mode</string>
     <string name="settings_screen_bandwidth_profile_switch_off_control">Client Track Switch Off Control</string>
-    <string name="settings_screen_bandwidth_profile_video_content_preferences_mode">Video Content Preferences Mode</string>
     <string name="settings_screen_audio_acoustic_echo_canceler">Hardware Acoustic Echo Canceler</string>
     <string name="settings_screen_audio_noise_supressor">Hardware Noise Supressor</string>
     <string name="settings_screen_audio_automatic_gain_control">Hardware Automatic Gain Control</string>

@@ -142,7 +142,7 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
         scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
 
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_video_content_preferences_mode),
+        assertDefaultValue(getString(R.string.settings_title_video_content_preferences_mode),
                 getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0])
     }
 
@@ -157,7 +157,7 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         assertThat(preference, equalTo(switchOffControls[0]))
 
         switchOffControls.forEach { control ->
-            scrollAndClickView(getString(R.string.settings_screen_bandwidth_profile_video_content_preferences_mode), R.id.recycler_view)
+            scrollAndClickView(getString(R.string.settings_title_video_content_preferences_mode), R.id.recycler_view)
             clickView(control)
 
             preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE, null)
