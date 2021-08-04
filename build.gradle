@@ -8,44 +8,21 @@ buildscript {
     ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
             project.property('androidReleaseKeyPassword') : 'fakepassword')
 
-    ext.getBintrayUsername = {
-        def bintrayUsername  = System.getenv("BINTRAY_USERNAME")
-
-        if (bintrayUsername == null) {
-            logger.log(LogLevel.INFO, "Could not locate BINTRAY_USERNAME environment variable. " +
+    ext.getPropertyValue =  { propertyKey ->
+        def property  = System.getenv(propertyKey)
+        if (property == null) {
+            logger.log(LogLevel.INFO, "Could not locate $propertyKey as environment variable. " +
                     "Trying local.properties")
             Properties properties = new Properties()
             if (project.rootProject.file('local.properties').exists()) {
                 properties.load(project.rootProject.file('local.properties').newDataInputStream())
-                bintrayUsername = properties.getProperty('BINTRAY_USERNAME')
+                property = properties.getProperty(propertyKey)
             }
         }
-
-        if (bintrayUsername == null) {
-            logger.log(LogLevel.WARN, "Bintray username unavailable.")
+        if (property == null) {
+            logger.log(LogLevel.WARN, "$propertyKey unavailable.")
         }
-
-        return bintrayUsername
-    }
-
-    ext.getBintrayPassword = {
-        def bintrayPassword  = System.getenv("BINTRAY_PASSWORD")
-
-        if (bintrayPassword == null) {
-            logger.log(LogLevel.INFO, "Could not locate BINTRAY_PASSWORD environment variable. " +
-                    "Trying local.properties")
-            Properties properties = new Properties()
-            if (project.rootProject.file('local.properties').exists()) {
-                properties.load(project.rootProject.file('local.properties').newDataInputStream())
-                bintrayPassword = properties.getProperty('BINTRAY_PASSWORD')
-            }
-        }
-
-        if (bintrayPassword == null) {
-            logger.log(LogLevel.WARN, "Bintray password unavailable.")
-        }
-
-        return bintrayPassword
+        return property
     }
 
     repositories {
@@ -53,28 +30,22 @@ buildscript {
         mavenCentral()
         jcenter()
         maven {
-            url  "https://twilio.bintray.com/releases"
-        }
-        maven {
-            url  "https://twilio.bintray.com/internal-releases"
+            url  "https://twilio.jfrog.io/artifactory/internal-releases"
             credentials {
-                username "${getBintrayUsername()}"
-                password "${getBintrayPassword()}"
+                username "${getPropertyValue('ARTIFACTORY_USERNAME')}"
+                password "${getPropertyValue('ARTIFACTORY_PASSWORD')}"
             }
-        }
-        maven {
-            url  "https://twilio.bintray.com/snapshots"
-            credentials {
-                username "${getBintrayUsername()}"
-                password "${getBintrayPassword()}"
+            metadataSources {
+                mavenPom()
+                artifact()
             }
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.3'
-        classpath "com.google.gms:google-services:4.3.5"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
+        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath "com.google.gms:google-services:4.3.8"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0"
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.6.1'
     }
 }
 
@@ -182,20 +153,14 @@ allprojects {
             url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
         }
         maven {
-            url  "https://twilio.bintray.com/releases"
-        }
-        maven {
-            url  "https://twilio.bintray.com/internal-releases"
+            url  "https://twilio.jfrog.io/artifactory/internal-releases"
             credentials {
-                username "${getBintrayUsername()}"
-                password "${getBintrayPassword()}"
+                username "${getPropertyValue('ARTIFACTORY_USERNAME')}"
+                password "${getPropertyValue('ARTIFACTORY_PASSWORD')}"
             }
-        }
-        maven {
-            url  "https://twilio.bintray.com/snapshots"
-            credentials {
-                username "${getBintrayUsername()}"
-                password "${getBintrayPassword()}"
+            metadataSources {
+                mavenPom()
+                artifact()
             }
         }
         maven {

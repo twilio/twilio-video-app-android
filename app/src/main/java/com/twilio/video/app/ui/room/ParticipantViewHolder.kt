@@ -17,7 +17,7 @@ import com.twilio.video.app.sdk.VideoTrackViewState
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import timber.log.Timber
 
-internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
+internal class ParticipantViewHolder(internal val thumb: ParticipantThumbView) :
         RecyclerView.ViewHolder(thumb) {
 
     private val localParticipantIdentity = thumb.context.getString(R.string.you)
@@ -51,11 +51,11 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
             val videoTrackViewState = participantViewState.videoTrack
             val newVideoTrack = videoTrackViewState?.let { it.videoTrack }
             if (videoTrack !== newVideoTrack) {
-                removeRender(videoTrack, this)
+                removeSink(videoTrack, this)
                 videoTrack = newVideoTrack
                 videoTrack?.let { videoTrack ->
                     setVideoState(videoTrackViewState)
-                    if (videoTrack.isEnabled) videoTrack.addSink(this)
+                    if (videoTrack.isEnabled) videoTrack.addSink(this.videoTextureView)
                 } ?: setState(ParticipantView.State.NO_VIDEO)
             } else {
                 setVideoState(videoTrackViewState)
@@ -72,9 +72,9 @@ internal class ParticipantViewHolder(private val thumb: ParticipantThumbView) :
         }
     }
 
-    private fun removeRender(videoTrack: VideoTrack?, view: ParticipantView) {
-        if (videoTrack == null || !videoTrack.sinks.contains(view)) return
-        videoTrack.removeSink(view)
+    private fun removeSink(videoTrack: VideoTrack?, view: ParticipantView) {
+        if (videoTrack == null || !videoTrack.sinks.contains(view.videoTextureView)) return
+        videoTrack.removeSink(view.videoTextureView)
     }
 
     private fun setNetworkQualityLevelImage(

@@ -109,6 +109,62 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         }
     }
 
+    @Test
+    fun assertDefaultClientTrackSwitchOffSettings() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+
+        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_switch_off_control),
+                getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0])
+    }
+
+    @Test
+    fun it_should_select_the_correct_ClientTrackSwitchOffControls() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+
+        val sharedPreferences = getSharedPreferences(getTargetContext())
+        var preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL, null)
+        val switchOffControls = getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)
+        assertThat(preference, equalTo(switchOffControls[0]))
+
+        switchOffControls.forEach { control ->
+            scrollAndClickView(getString(R.string.settings_screen_bandwidth_profile_switch_off_control), R.id.recycler_view)
+            clickView(control)
+
+            preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL, null)
+            assertThat(preference, equalTo(control))
+        }
+    }
+
+    @Test
+    fun assertDefaultVideoContentPreferencesSettings() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+
+        assertDefaultValue(getString(R.string.settings_title_video_content_preferences_mode),
+                getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0])
+    }
+
+    @Test
+    fun it_should_select_the_correct_VideoContentPreferencesMode() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+        scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
+
+        val sharedPreferences = getSharedPreferences(getTargetContext())
+        var preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE, null)
+        val switchOffControls = getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)
+        assertThat(preference, equalTo(switchOffControls[0]))
+
+        switchOffControls.forEach { control ->
+            scrollAndClickView(getString(R.string.settings_title_video_content_preferences_mode), R.id.recycler_view)
+            clickView(control)
+
+            preference = sharedPreferences.getString(Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE, null)
+            assertThat(preference, equalTo(control))
+        }
+    }
+
     private fun assertDefaultBandwidthProfileSettings() {
         assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_mode),
                 getStringArray(R.array.settings_screen_bandwidth_profile_modes)[1])
@@ -116,22 +172,10 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         assertDefaultValue(getString(R.string.settings_screen_max_subscription_bitrate),
                 Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT.toString())
 
-        assertDefaultValue(getString(R.string.settings_screen_max_video_tracks),
-                Preferences.BANDWIDTH_PROFILE_MAX_VIDEO_TRACKS_DEFAULT.toString())
-
         assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_dominant_speaker_priority),
                 getStringArray(R.array.settings_screen_bandwidth_profile_dominant_speaker_priorities)[2])
 
         assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_track_switch_mode),
-                Preferences.SERVER_DEFAULT)
-
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_low_track_priority),
-                Preferences.SERVER_DEFAULT)
-
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_standard_track_priority),
-                Preferences.SERVER_DEFAULT)
-
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_high_track_priority),
                 Preferences.SERVER_DEFAULT)
     }
 
