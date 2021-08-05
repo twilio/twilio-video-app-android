@@ -200,25 +200,6 @@ jobs:
             - app/build
       - save-cache: *save-cache-gradle
 
-  test-job:
-    <<: *build-defaults
-    resource_class: large
-    steps:
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore-cache: *restore-cache-gradle
-      - run: *get-secrets
-      - run: *configure-git-user
-      - run:
-          name: Increment Version Code
-          command: ./gradlew incrementVersionCode
-      - persist_to_workspace:
-          root: .
-          paths:
-            - app/build
-      - save-cache: *save-cache-gradle
-
   publish-to-appcenter:
     <<: *build-defaults
     resource_class: medium+
@@ -240,38 +221,36 @@ workflows:
 
   build-test:
     jobs:
-      - test-job:
+      - lint:
           <<: *build-test-filter
-#      - lint:
-#          <<: *build-test-filter
-#      - check-format:
-#          <<: *build-test-filter
-#      - build-app:
-#          <<: *build-test-filter
-#      - unit-tests:
-#          <<: *build-test-filter
-#          requires:
-#            - build-app
-#            - lint
-#            - check-format
-#      - community-unit-tests:
-#          <<: *build-test-filter
-#          requires:
-#            - build-app
-#            - lint
-#            - check-format
-#      - e2e-tests:
-#          <<: *build-test-filter
-#          requires:
-#            - build-app
-#            - lint
-#            - check-format
-#      - integration-tests:
-#          <<: *build-test-filter
-#          requires:
-#            - build-app
-#            - lint
-#            - check-format
+      - check-format:
+          <<: *build-test-filter
+      - build-app:
+          <<: *build-test-filter
+      - unit-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - community-unit-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - e2e-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
+      - integration-tests:
+          <<: *build-test-filter
+          requires:
+            - build-app
+            - lint
+            - check-format
 
   publish-to-appcenter:
     jobs:
