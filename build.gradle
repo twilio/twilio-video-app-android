@@ -84,6 +84,10 @@ task incrementVersionCode {
         def versionCode = project.property("versionCode")
         def versionCodeTag = "v0.$versionCode"
         def newVersionCode = (versionCode as Integer) + 1
+        // Create build directory if not created
+        if (!buildDir.exists()) {
+            buildDir.mkdir()
+        }
 
         exec {
             workingDir "${rootDir}"
@@ -109,7 +113,12 @@ task incrementVersionCode {
             commandLine "sed",
                     "s@versionCode=.*@versionCode=${newVersionCode}@",
                     "gradle.properties"
-            standardOutput propertiesFile
+            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
+        }
+
+        exec {
+            workingDir "${rootDir}"
+            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
         }
 
         exec {
