@@ -106,7 +106,9 @@ task incrementVersionCode {
 
         exec {
             workingDir "${rootDir}"
-            commandLine "echo", "versionCode=${newVersionCode}"
+            commandLine "sed",
+                    "s@versionCode=.*@versionCode=${newVersionCode}@",
+                    "gradle.properties"
             standardOutput propertiesFile
         }
 
