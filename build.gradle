@@ -101,6 +101,8 @@ task incrementVersionCode {
             commandLine "git", "fetch", "${remote}"
         }
 
+        def propertiesFile = new FileOutputStream("${rootDir}/gradle.properties")
+
         exec {
             workingDir "${rootDir}"
             commandLine "git", "tag", "-a", "$versionCodeTag", "-m", "$versionCodeTag"
@@ -111,12 +113,7 @@ task incrementVersionCode {
             commandLine "sed",
                     "s@versionCode=.*@versionCode=${newVersionCode}@",
                     "gradle.properties"
-            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
+            standardOutput propertiesFile
         }
 
         exec {
