@@ -86,13 +86,10 @@
         <item>PREDICTED</item>
         <item>DETECTED</item>
     </string-array>
-    <string-array name="settings_screen_bandwidth_profile_render_dimensions">
+    <string-array name="settings_screen_bandwidth_media_optimizations_controls">
         <item>Server Default</item>
-        <item>176x144</item>
-        <item>640x480</item>
-        <item>960x540</item>
-        <item>1280x720</item>
-        <item>1920x1080</item>
+        <item>Auto</item>
+        <item>Manual</item>
     </string-array>
 
     <string name="stats_enable_in_settings">Enable in Settings</string>
@@ -104,6 +101,7 @@
     <string name="settings_title_advanced">Advanced</string>
     <string name="settings_title_internal">Internal</string>
     <string name="settings_title_bandwidth_profile">Bandwidth Profile</string>
+    <string name="settings_title_video_content_preferences_mode">Video Content Preferences Mode</string>
     <string name="settings_title_audio">Audio</string>
     <string name="username">Username</string>
     <string name="join_room">Join Room</string>
@@ -166,13 +164,9 @@
     <string name="number">Number</string>
     <string name="settings_screen_bandwidth_profile_mode">Mode</string>
     <string name="settings_screen_max_subscription_bitrate">Max Subscription Bitrate (Kbps)</string>
-    <string name="settings_screen_max_video_tracks">Max Video Tracks</string>
     <string name="settings_screen_bandwidth_profile_dominant_speaker_priority">Dominant Speaker Priority</string>
     <string name="settings_screen_bandwidth_profile_track_switch_mode">Track Switch Off Mode</string>
-    <string name="settings_screen_render_dimensions">Render Dimensions</string>
-    <string name="settings_screen_bandwidth_profile_low_track_priority">Low Track Priority</string>
-    <string name="settings_screen_bandwidth_profile_standard_track_priority">Standard Track Priority</string>
-    <string name="settings_screen_bandwidth_profile_high_track_priority">High Track Priority</string>
+    <string name="settings_screen_bandwidth_profile_switch_off_control">Client Track Switch Off Control</string>
     <string name="settings_screen_audio_acoustic_echo_canceler">Hardware Acoustic Echo Canceler</string>
     <string name="settings_screen_audio_noise_supressor">Hardware Noise Supressor</string>
     <string name="settings_screen_audio_automatic_gain_control">Hardware Automatic Gain Control</string>
