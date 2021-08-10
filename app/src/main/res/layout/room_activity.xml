@@ -45,7 +45,6 @@
             android:drawablePadding="4dp"
             android:layout_marginTop="100dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
             android:visibility="gone"
             tools:visibility="visible"
             android:layout_gravity="end" />
@@ -94,7 +93,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="@dimen/fab_margin"
-            android:layout_marginRight="@dimen/fab_margin"
             android:orientation="vertical"
             android:gravity="end|bottom">
 
@@ -137,7 +135,8 @@
         android:layout_gravity="end"
         android:background="?android:attr/windowBackground"
         android:fitsSystemWindows="true"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:backgroundTint="@color/lobbyStatsDrawerBg">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -152,7 +151,6 @@
                 style="@style/AppTheme.Lobby.Drawer"
                 android:textSize="20sp"
                 android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_gravity="end"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
 
@@ -172,7 +170,7 @@
                     android:id="@+id/stats_disabled_image"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/stats_disabled"
+                    android:contentDescription="@string/stats_gathering_disabled"
                     app:srcCompat="@drawable/ic_stats_disabled_image"/>
                 <TextView
                     android:id="@+id/stats_disabled_title"
