@@ -62,7 +62,6 @@
             android:background="@drawable/badge_background"
             android:padding="10dp"
             android:layout_marginTop="100dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:maxLines="1"
             android:ellipsize="end"
