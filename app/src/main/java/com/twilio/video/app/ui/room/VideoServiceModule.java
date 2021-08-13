@@ -16,18 +16,14 @@
 
 package com.twilio.video.app.ui.room;
 
-import dagger.Binds;
-import dagger.Module;
 import dagger.android.AndroidInjector;
-import dagger.multibindings.ClassKey;
-import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = VideoServiceSubcomponent.class)
+// @Module(subcomponents = VideoServiceSubcomponent.class)
 public abstract class VideoServiceModule {
 
-    @Binds
-    @IntoMap
-    @ClassKey(VideoService.class)
+    //    @Binds
+    //    @IntoMap
+    //    @ClassKey(VideoService.class)
     abstract AndroidInjector.Factory<?> bindYourServiceInjectorFactory(
             VideoServiceSubcomponent.Factory factory);
 }

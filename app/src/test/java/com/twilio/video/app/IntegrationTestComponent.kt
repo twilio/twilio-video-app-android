@@ -9,7 +9,6 @@ import dagger.android.AndroidInjectionModule
 @ApplicationScope
 @Component(modules = [
     AndroidInjectionModule::class,
-    ApplicationModule::class,
     DataModule::class,
     TestWrapperAuthModule::class,
     TestAuthModule::class,

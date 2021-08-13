@@ -16,17 +16,13 @@
 
 package com.twilio.video.app.ui.settings;
 
-import dagger.Binds;
-import dagger.Module;
 import dagger.android.AndroidInjector;
-import dagger.multibindings.ClassKey;
-import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = SettingsActivitySubcomponent.class)
+// @Module(subcomponents = SettingsActivitySubcomponent.class)
 public abstract class SettingsActivityModule {
-    @Binds
-    @IntoMap
-    @ClassKey(SettingsActivity.class)
+    //    @Binds
+    //    @IntoMap
+    //    @ClassKey(SettingsActivity.class)
     abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
             SettingsActivitySubcomponent.Factory factory);
 }

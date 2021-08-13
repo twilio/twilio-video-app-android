@@ -16,17 +16,13 @@
 
 package com.twilio.video.app.ui.room;
 
-import dagger.Binds;
-import dagger.Module;
 import dagger.android.AndroidInjector;
-import dagger.multibindings.ClassKey;
-import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = RoomActivitySubcomponent.class)
+// @Module(subcomponents = RoomActivitySubcomponent.class)
 public abstract class RoomActivityModule {
-    @Binds
-    @IntoMap
-    @ClassKey(RoomActivity.class)
+    //    @Binds
+    //    @IntoMap
+    //    @ClassKey(RoomActivity.class)
     abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
             RoomActivitySubcomponent.Factory builder);
 }

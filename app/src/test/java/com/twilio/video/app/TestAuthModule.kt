@@ -15,7 +15,6 @@ import dagger.Module
 import dagger.Provides
 
 @Module(includes = [
-    ApplicationModule::class,
     TestWrapperAuthModule::class
 ])
 class TestAuthModule {

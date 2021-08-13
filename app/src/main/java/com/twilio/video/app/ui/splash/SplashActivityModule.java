@@ -16,17 +16,13 @@
 
 package com.twilio.video.app.ui.splash;
 
-import dagger.Binds;
-import dagger.Module;
 import dagger.android.AndroidInjector;
-import dagger.multibindings.ClassKey;
-import dagger.multibindings.IntoMap;
 
-@Module(subcomponents = SplashActivitySubcomponent.class)
+// @Module(subcomponents = SplashActivitySubcomponent.class)
 public abstract class SplashActivityModule {
-    @Binds
-    @IntoMap
-    @ClassKey(SplashActivity.class)
+    //    @Binds
+    //    @IntoMap
+    //    @ClassKey(SplashActivity.class)
     abstract AndroidInjector.Factory<?> bindYourActivityInjectorFactory(
             SplashActivitySubcomponent.Factory factory);
 }

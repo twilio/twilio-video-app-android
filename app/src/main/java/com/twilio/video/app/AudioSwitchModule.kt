@@ -5,8 +5,11 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioSwitch
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-@Module(includes = [ ApplicationModule::class ])
+@Module
+@InstallIn(SingletonComponent::class)
 class AudioSwitchModule {
 
     @Provides

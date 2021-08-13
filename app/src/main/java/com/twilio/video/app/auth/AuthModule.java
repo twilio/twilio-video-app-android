@@ -19,19 +19,19 @@ package com.twilio.video.app.auth;
 import android.app.Application;
 import android.content.Context;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.twilio.video.app.ApplicationModule;
-import com.twilio.video.app.ApplicationScope;
 import com.twilio.video.app.R;
 import dagger.Module;
 import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-@Module(includes = {ApplicationModule.class})
+@Module
+@InstallIn(SingletonComponent.class)
 public class AuthModule {
 
     @Provides
-    @ApplicationScope
     Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper, Application application) {
         Context context = application.getApplicationContext();
         List<AuthenticationProvider> authProviders = new ArrayList<>();
@@ -51,7 +51,6 @@ public class AuthModule {
     }
 
     @Provides
-    @ApplicationScope
     FirebaseWrapper providesFirebaseWrapper() {
         return new FirebaseWrapper();
     }
