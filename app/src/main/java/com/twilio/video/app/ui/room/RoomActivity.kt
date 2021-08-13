@@ -37,6 +37,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
@@ -50,7 +51,6 @@ import com.twilio.audioswitch.AudioDevice.WiredHeadset
 import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.TokenService
@@ -85,12 +85,14 @@ import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.InputUtils
 import com.twilio.video.app.util.PermissionUtil
+import dagger.hilt.android.AndroidEntryPoint
 import io.uniflow.android.livedata.onEvents
 import io.uniflow.android.livedata.onStates
 import javax.inject.Inject
 import timber.log.Timber
 
-class RoomActivity : BaseActivity() {
+@AndroidEntryPoint
+class RoomActivity : AppCompatActivity() {
     private lateinit var binding: RoomActivityBinding
     private lateinit var switchCameraMenuItem: MenuItem
     private lateinit var pauseVideoMenuItem: MenuItem

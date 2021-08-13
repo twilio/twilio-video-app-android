@@ -2,7 +2,6 @@ package com.twilio.video.app.sdk
 
 import android.app.Application
 import android.content.SharedPreferences
-import com.twilio.video.app.ApplicationScope
 import com.twilio.video.app.data.api.TokenService
 import dagger.Module
 import dagger.Provides
@@ -29,7 +28,6 @@ class VideoSdkModule {
             VideoClient(application, connectOptionsFactory)
 
     @Provides
-    @ApplicationScope
     fun providesRoomManager(
         application: Application,
         videoClient: VideoClient,

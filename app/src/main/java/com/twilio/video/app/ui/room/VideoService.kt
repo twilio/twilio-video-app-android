@@ -6,14 +6,14 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import com.twilio.video.app.sdk.RoomManager
-import com.twilio.video.app.util.plus
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 import timber.log.Timber
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
+@AndroidEntryPoint
 class VideoService(
     private val rxDisposables: CompositeDisposable = CompositeDisposable()
 ) : Service() {
@@ -36,11 +36,6 @@ class VideoService(
     }
 
     @Inject lateinit var roomManager: RoomManager
-
-    override fun onCreate() {
-        AndroidInjection.inject(this)
-        super.onCreate()
-    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
