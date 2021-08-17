@@ -64,15 +64,18 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.VideoTrackRemoved
 import com.twilio.video.app.util.PermissionUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.uniflow.android.AndroidDataFlow
 import io.uniflow.core.flow.data.UIState
 import io.uniflow.core.flow.onState
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class RoomViewModel(
+@HiltViewModel
+class RoomViewModel @Inject constructor(
     private val roomManager: RoomManager,
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,

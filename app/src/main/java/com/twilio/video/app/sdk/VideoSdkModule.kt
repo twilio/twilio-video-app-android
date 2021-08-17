@@ -13,25 +13,13 @@ import dagger.hilt.components.SingletonComponent
 class VideoSdkModule {
 
     @Provides
-    fun providesConnectOptionsFactory(
+    fun providesRoomManager(
         application: Application,
         sharedPreferences: SharedPreferences,
         tokenService: TokenService
-    ): ConnectOptionsFactory =
-            ConnectOptionsFactory(application, sharedPreferences, tokenService)
-
-    @Provides
-    fun providesRoomFactory(
-        application: Application,
-        connectOptionsFactory: ConnectOptionsFactory
-    ): VideoClient =
-            VideoClient(application, connectOptionsFactory)
-
-    @Provides
-    fun providesRoomManager(
-        application: Application,
-        videoClient: VideoClient,
-        sharedPreferences: SharedPreferences
-    ): RoomManager =
-            RoomManager(application, videoClient, sharedPreferences)
+    ): RoomManager {
+        val connectOptionsFactory = ConnectOptionsFactory(application, sharedPreferences, tokenService)
+        val videoClient = VideoClient(application, connectOptionsFactory)
+        return RoomManager(application, videoClient, sharedPreferences)
+    }
 }
