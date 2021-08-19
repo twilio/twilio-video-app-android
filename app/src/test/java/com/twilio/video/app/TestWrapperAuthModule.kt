@@ -7,8 +7,11 @@ import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 @Module
+@InstallIn(SingletonComponent::class)
 class TestWrapperAuthModule(
     private val firebaseWrapper: FirebaseWrapper,
     private val googleAuthWrapper: GoogleAuthWrapper,
@@ -18,31 +21,26 @@ class TestWrapperAuthModule(
 ) {
 
     @Provides
-    @ApplicationScope
     fun providesFirebaseWrapper(): FirebaseWrapper {
         return firebaseWrapper
     }
 
     @Provides
-    @ApplicationScope
     fun providesGoogleAuthWrapper(): GoogleAuthWrapper {
         return googleAuthWrapper
     }
 
     @Provides
-    @ApplicationScope
     fun providesGoogleSignInWrapper(): GoogleSignInWrapper {
         return googleSignInWrapper
     }
 
     @Provides
-    @ApplicationScope
     fun providesGoogleSignInOptionsWrapper(): GoogleSignInOptionsWrapper {
         return googleSignInOptionsWrapper
     }
 
     @Provides
-    @ApplicationScope
     fun providesGoogleAuthProviderWrapper(): GoogleAuthProviderWrapper {
         return googleAuthProviderWrapper
     }

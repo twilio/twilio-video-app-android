@@ -33,7 +33,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Module
 @InstallIn(SingletonComponent.class)
-public class VideoAppServiceModule {
+public class AuthServiceModule {
     private static final String VIDEO_APP_SERVICE_DEV_URL = "https://app.dev.video.bytwilio.com";
     private static final String VIDEO_APP_SERVICE_STAGE_URL =
             "https://app.stage.video.bytwilio.com";

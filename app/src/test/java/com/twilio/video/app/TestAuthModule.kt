@@ -13,14 +13,14 @@ import com.twilio.video.app.auth.GoogleSignInOptionsWrapper
 import com.twilio.video.app.auth.GoogleSignInWrapper
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-@Module(includes = [
-    TestWrapperAuthModule::class
-])
+@Module
+@InstallIn(SingletonComponent::class)
 class TestAuthModule {
 
     @Provides
-    @ApplicationScope
     internal fun providesAuthenticator(
         firebaseWrapper: FirebaseWrapper,
         googleAuthWrapper: GoogleAuthWrapper,
