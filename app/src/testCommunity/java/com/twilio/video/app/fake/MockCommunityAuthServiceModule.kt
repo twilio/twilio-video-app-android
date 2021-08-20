@@ -1,7 +1,6 @@
 package com.twilio.video.app.fake
 
 import android.content.SharedPreferences
-import com.nhaarman.mockitokotlin2.mock
 import com.twilio.video.app.android.SharedPreferencesWrapper
 import com.twilio.video.app.data.CommunityAuthServiceModule
 import com.twilio.video.app.data.api.AuthService
@@ -12,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import org.mockito.kotlin.mock
 
 @Module
 @TestInstallIn(

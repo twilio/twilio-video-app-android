@@ -208,7 +208,7 @@ dependencies {
     testImplementation junitExtensions
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:3.2.0'
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
     testImplementation 'org.robolectric:robolectric:4.4'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'

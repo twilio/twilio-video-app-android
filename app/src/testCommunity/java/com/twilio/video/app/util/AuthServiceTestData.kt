@@ -1,9 +1,9 @@
 package com.twilio.video.app.util
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.app.data.api.AuthServiceResponseDTO
 import okhttp3.ResponseBody
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import retrofit2.HttpException
 import retrofit2.Response
 
