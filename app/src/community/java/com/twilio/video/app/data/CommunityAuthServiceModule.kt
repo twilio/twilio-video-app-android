@@ -27,6 +27,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -36,6 +37,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 @InstallIn(SingletonComponent::class)
 class CommunityAuthServiceModule {
     @Provides
+    @Singleton
     fun providesOkHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
         if (!isReleaseBuildType) {
@@ -50,6 +52,7 @@ class CommunityAuthServiceModule {
     }
 
     @Provides
+    @Singleton
     fun providesAuthService(okHttpClient: OkHttpClient): AuthService {
         return Retrofit.Builder()
                 .client(okHttpClient)

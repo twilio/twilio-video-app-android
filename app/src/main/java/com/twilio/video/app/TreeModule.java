@@ -26,12 +26,14 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
+import javax.inject.Singleton;
 import timber.log.Timber;
 
 @Module
 @InstallIn(SingletonComponent.class)
 public class TreeModule {
     @Provides
+    @Singleton
     Timber.Tree providesTree(CrashlyticsTreeRanger treeRanger) {
         if (BuildConfig.DEBUG || BuildConfigUtilsKt.isInternalFlavor()) {
             Video.setLogLevel(LogLevel.DEBUG);

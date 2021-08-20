@@ -9,21 +9,26 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
 @InstallIn(ViewModelComponent::class)
 class RoomViewModelModule {
 
     @Provides
+    @ViewModelScoped
     fun providesPermissionUtil(application: Application) = PermissionUtil(application)
 
     @Provides
+    @ViewModelScoped
     fun providesParticipantManager() = ParticipantManager()
 
     @Provides
+    @ViewModelScoped
     fun providesInitialViewState(participantManager: ParticipantManager) = RoomViewState(participantManager.primaryParticipant)
 
     @Provides
+    @ViewModelScoped
     fun providesAudioSwitch(application: Application): AudioSwitch =
         AudioSwitch(application,
             loggingEnabled = true,

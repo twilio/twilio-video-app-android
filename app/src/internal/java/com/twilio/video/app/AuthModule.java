@@ -26,12 +26,14 @@ import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Singleton;
 
 @Module
 @InstallIn(SingletonComponent.class)
 public class AuthModule {
 
     @Provides
+    @Singleton
     Authenticator providesAuthenticator(FirebaseWrapper firebaseWrapper, Application application) {
         Context context = application.getApplicationContext();
         List<AuthenticationProvider> authProviders = new ArrayList<>();

@@ -25,6 +25,7 @@ import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -40,6 +41,7 @@ public class AuthServiceModule {
     private static final String VIDEO_APP_SERVICE_PROD_URL = "https://app.video.bytwilio.com";
 
     @Provides
+    @Singleton
     @Named("VideoAppService")
     OkHttpClient providesOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -55,6 +57,7 @@ public class AuthServiceModule {
     }
 
     @Provides
+    @Singleton
     @Named("VideoAppServiceDev")
     VideoAppService providesVideoAppServiceDev(
             @Named("VideoAppService") OkHttpClient okHttpClient) {
@@ -68,6 +71,7 @@ public class AuthServiceModule {
     }
 
     @Provides
+    @Singleton
     @Named("VideoAppServiceStage")
     VideoAppService providesVideoAppServiceStage(
             @Named("VideoAppService") OkHttpClient okHttpClient) {
@@ -81,6 +85,7 @@ public class AuthServiceModule {
     }
 
     @Provides
+    @Singleton
     @Named("VideoAppServiceProd")
     VideoAppService providesVideoAppServiceProd(
             @Named("VideoAppService") OkHttpClient okHttpClient) {

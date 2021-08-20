@@ -3,10 +3,10 @@ package com.twilio.video.app.ui;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
-import dagger.hilt.components.SingletonComponent;
+import dagger.hilt.android.components.ActivityComponent;
 
 @Module
-@InstallIn(SingletonComponent.class)
+@InstallIn(ActivityComponent.class)
 public class ScreenSelectorModule {
 
     @Provides
