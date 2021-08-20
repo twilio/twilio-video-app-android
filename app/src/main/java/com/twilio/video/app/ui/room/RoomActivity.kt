@@ -37,9 +37,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -47,16 +48,12 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
-import com.twilio.audioswitch.AudioSwitch
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.AuthServiceError
-import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.databinding.RoomActivityBinding
 import com.twilio.video.app.participant.ParticipantViewState
-import com.twilio.video.app.sdk.RoomManager
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Connecting
 import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Connected
@@ -81,16 +78,16 @@ import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.SwitchCamera
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
-import com.twilio.video.app.ui.room.RoomViewModel.RoomViewModelFactory
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.InputUtils
-import com.twilio.video.app.util.PermissionUtil
+import dagger.hilt.android.AndroidEntryPoint
 import io.uniflow.android.livedata.onEvents
 import io.uniflow.android.livedata.onStates
 import javax.inject.Inject
 import timber.log.Timber
 
-class RoomActivity : BaseActivity() {
+@AndroidEntryPoint
+class RoomActivity : AppCompatActivity() {
     private lateinit var binding: RoomActivityBinding
     private lateinit var switchCameraMenuItem: MenuItem
     private lateinit var pauseVideoMenuItem: MenuItem
@@ -104,22 +101,13 @@ class RoomActivity : BaseActivity() {
     private lateinit var statsListAdapter: StatsListAdapter
 
     @Inject
-    lateinit var tokenService: TokenService
-
-    @Inject
     lateinit var sharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var roomManager: RoomManager
-
-    @Inject
-    lateinit var audioSwitch: AudioSwitch
 
     /** Coordinates participant thumbs and primary participant rendering.  */
     private lateinit var primaryParticipantController: PrimaryParticipantController
     private lateinit var participantAdapter: ParticipantAdapter
-    private lateinit var roomViewModel: RoomViewModel
     private lateinit var recordingAnimation: ObjectAnimator
+    private val roomViewModel: RoomViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,8 +120,6 @@ class RoomActivity : BaseActivity() {
         binding.disconnect.setOnClickListener { disconnectButtonClick() }
         binding.localVideo.setOnClickListener { toggleLocalVideo() }
         binding.localAudio.setOnClickListener { toggleLocalAudio() }
-        val factory = RoomViewModelFactory(roomManager, audioSwitch, PermissionUtil(this))
-        roomViewModel = ViewModelProvider(this, factory).get(RoomViewModel::class.java)
 
         // So calls can be answered when screen is locked
         window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)

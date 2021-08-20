@@ -1,6 +1,5 @@
 package com.twilio.video.app.ui.settings
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.Preference
@@ -11,20 +10,16 @@ import com.twilio.video.app.R
 import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.ScreenSelector
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsFragment : BaseSettingsFragment() {
 
     @Inject
     internal lateinit var screenSelector: ScreenSelector
     @Inject
     internal lateinit var authenticator: Authenticator
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         // Add our preference from resources

@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import com.twilio.video.app.R;
@@ -29,18 +30,19 @@ import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginFailureResul
 import com.twilio.video.app.auth.CommunityLoginResult.CommunityLoginSuccessResult;
 import com.twilio.video.app.auth.LoginEvent.CommunityLoginEvent;
 import com.twilio.video.app.auth.LoginResult;
-import com.twilio.video.app.base.BaseActivity;
 import com.twilio.video.app.data.api.AuthServiceError;
 import com.twilio.video.app.databinding.CommunityLoginActivityBinding;
 import com.twilio.video.app.ui.room.RoomActivity;
 import com.twilio.video.app.util.InputUtils;
+import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import javax.inject.Inject;
 import timber.log.Timber;
 
 // TODO Create view model and fragment for this screen
-public class CommunityLoginActivity extends BaseActivity {
+@AndroidEntryPoint
+public class CommunityLoginActivity extends AppCompatActivity {
     private CommunityLoginActivityBinding binding;
     private int colorButtonText;
 

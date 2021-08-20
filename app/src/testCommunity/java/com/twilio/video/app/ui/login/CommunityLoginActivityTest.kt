@@ -1,24 +1,15 @@
 package com.twilio.video.app.ui.login
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.textfield.TextInputEditText
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import com.twilio.video.app.ApplicationModule
-import com.twilio.video.app.DaggerCommunityIntegrationTestComponent
 import com.twilio.video.app.R
-import com.twilio.video.app.TestApp
-import com.twilio.video.app.android.SharedPreferencesWrapper
-import com.twilio.video.app.auth.CommunityAuthModule
-import com.twilio.video.app.auth.CommunityAuthenticator
-import com.twilio.video.app.data.AuthServiceModule
+import com.twilio.video.app.auth.Authenticator
 import com.twilio.video.app.data.PASSCODE
 import com.twilio.video.app.data.Preferences.DISPLAY_NAME
 import com.twilio.video.app.data.api.AuthService
-import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.AuthServiceRequestDTO
 import com.twilio.video.app.data.api.AuthServiceResponseDTO
 import com.twilio.video.app.data.api.URL_PREFIX
@@ -33,14 +24,16 @@ import com.twilio.video.app.screen.assertLoginButtonIsEnabled
 import com.twilio.video.app.screen.assertThatPasscodeErrorIsDisabled
 import com.twilio.video.app.screen.clickLoginButton
 import com.twilio.video.app.screen.enterYourName
-import com.twilio.video.app.security.SecurePreferencesFake
-import com.twilio.video.app.security.SecurityModule
+import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.ui.room.RoomActivity
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import com.twilio.video.app.util.getMockHttpException
-import com.twilio.video.app.util.getSharedPreferences
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -49,6 +42,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
@@ -56,51 +50,38 @@ import org.robolectric.annotation.Config
 private const val IDENTITY = "Identity"
 private const val VALID_PASSCODE = "0123456789"
 
+@HiltAndroidTest
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApp::class)
+@Config(application = HiltTestApplication::class)
 class CommunityLoginActivityTest {
 
     @get:Rule
     val coroutineScope = MainCoroutineScopeRule()
 
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var authService: AuthService
+
+    @Inject
+    lateinit var securePreferences: SecurePreferences
+
+    @Inject
+    lateinit var authenticator: Authenticator
+
+    @Inject
+    lateinit var preferences: SharedPreferences
+
     private val url = URL_PREFIX + VALID_PASSCODE.substring(6) + URL_SUFFIX
     private val requestBody = AuthServiceRequestDTO(VALID_PASSCODE, IDENTITY)
     private lateinit var scenario: ActivityScenario<CommunityLoginActivity>
-    private val testApp = ApplicationProvider.getApplicationContext<TestApp>()
-    private val authService: AuthService = mock()
-    private val preferences = getSharedPreferences(testApp)
-    private val securePreferences = SecurePreferencesFake()
-    private val authServiceRepository = AuthServiceRepository(authService,
-            securePreferences, SharedPreferencesWrapper(preferences))
-    private val securityModule: SecurityModule = mock {
-        whenever(mock.providesSecurePreferences(any(), any())).thenReturn(securePreferences)
-    }
-    private val authServiceModule: AuthServiceModule = mock {
-        whenever(mock.providesOkHttpClient()).thenReturn(mock())
-        whenever(mock.providesAuthService(any())).thenReturn(authService)
-        whenever(mock.providesTokenService(any(), any(), any())).thenReturn(authServiceRepository)
-    }
-    private val authenticator = CommunityAuthenticator(
-            preferences,
-            securePreferences,
-            authServiceRepository,
-            coroutineScope.coroutineContext)
-    private val communityAuthModule: CommunityAuthModule = mock {
-        whenever(mock.providesCommunityAuthenticator(any(), any(), any())).thenReturn(authenticator)
-    }
+    private val testApp = ApplicationProvider.getApplicationContext<HiltTestApplication>()
 
     @Before
     fun setUp() {
-        val component = DaggerCommunityIntegrationTestComponent
-                .builder()
-                .applicationModule(ApplicationModule(testApp))
-                .authServiceModule(authServiceModule)
-                .communityAuthModule(communityAuthModule)
-                .securityModule(securityModule)
-                .build()
-        component.inject(testApp)
-
+        hiltRule.inject()
         scenario = ActivityScenario.launch(CommunityLoginActivity::class.java)
     }
 

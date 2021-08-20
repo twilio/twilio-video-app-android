@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'dagger.hilt.android.plugin'
 
 def versionCodeProperty = project.property('versionCode') as Integer
 def includeSdkFromSourceProperty = 'includeSdkFromSource'
@@ -142,6 +143,7 @@ dependencies {
     def daggerVersion = '2.35.1'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
+    def hiltVersion = '2.38.1'
     def retrofitVersion = '2.9.0'
     def espressoVersion = '3.3.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
@@ -176,6 +178,7 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$daggerVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation "io.reactivex.rxjava2:rxjava:2.2.10"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
@@ -195,19 +198,22 @@ dependencies {
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
+    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
 
     testImplementation testCore
     testImplementation espresso
     testImplementation junitExtensions
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:3.2.0'
+    testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    testImplementation 'org.robolectric:robolectric:4.4'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
     testImplementation "org.uniflow-kt:uniflow-android-test:$uniflowVersion"
     testImplementation "org.uniflow-kt:uniflow-test:$uniflowVersion"
     testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
+    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
 
@@ -233,6 +239,10 @@ def getLocalProperty(key) {
                 project.rootProject.toString() + ". Community variant cannot connect to room" +
                 " without credentials")
     }
+}
+
+kapt {
+    correctErrorTypes true
 }
 
 apply plugin: 'com.google.gms.google-services'
