@@ -81,6 +81,7 @@ class CommunityLoginActivityTest {
 
     @Before
     fun setUp() {
+        hiltRule.inject()
         scenario = ActivityScenario.launch(CommunityLoginActivity::class.java)
     }
 
