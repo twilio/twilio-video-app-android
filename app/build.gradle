@@ -209,12 +209,14 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    testImplementation 'org.robolectric:robolectric:4.4'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
     testImplementation "org.uniflow-kt:uniflow-android-test:$uniflowVersion"
     testImplementation "org.uniflow-kt:uniflow-test:$uniflowVersion"
     testImplementation 'net.lachlanmckee:timber-junit-rule:1.0.1'
+    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kaptTest daggerAndroidProcessor
     kaptTest daggerCompiler
 
