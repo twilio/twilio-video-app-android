@@ -1,10 +1,5 @@
 package com.twilio.video.app.participant
 
-import com.nhaarman.mockitokotlin2.inOrder
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.twilio.video.LocalVideoTrack
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.TrackPriority.HIGH
@@ -19,6 +14,11 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyZeroInteractions
 
 @RunWith(JUnitParamsRunner::class)
 class ParticipantManagerTest : BaseUnitTest() {

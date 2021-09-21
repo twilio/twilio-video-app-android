@@ -2,9 +2,6 @@ package com.twilio.video.app.ui.room
 
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.RemoteVideoTrack
 import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.participant.ParticipantManager
@@ -37,6 +34,9 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 private const val PARTICIPANT_SID = "123"
 
