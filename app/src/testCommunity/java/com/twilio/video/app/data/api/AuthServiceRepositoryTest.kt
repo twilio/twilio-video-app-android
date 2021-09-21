@@ -1,11 +1,6 @@
 package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
-import com.nhaarman.mockitokotlin2.isA
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.VideoDimensions.HD_720P_VIDEO_DIMENSIONS
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.android.SharedPreferencesWrapper
@@ -40,6 +35,11 @@ import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.isA
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.whenever
 
 private const val passcode = "12345678901234"
 private const val token = "token"

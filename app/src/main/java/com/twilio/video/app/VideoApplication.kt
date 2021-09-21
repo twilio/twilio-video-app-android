@@ -19,15 +19,12 @@ package com.twilio.video.app
 import android.app.Application
 import android.content.Context
 import androidx.multidex.MultiDex
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import timber.log.Timber
 
-class VideoApplication : Application(), HasAndroidInjector {
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
+@HiltAndroidApp
+class VideoApplication : Application() {
     @Inject
     lateinit var tree: Timber.Tree
 
@@ -39,18 +36,8 @@ class VideoApplication : Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
 
-        DaggerVideoApplicationComponent
-                .builder()
-                .applicationModule(ApplicationModule(this))
-                .build()
-                .inject(this)
-
         Timber.plant(tree)
 
         startAppcenter(this)
-    }
-
-    override fun androidInjector(): AndroidInjector<Any> {
-        return dispatchingAndroidInjector
     }
 }

@@ -9,10 +9,6 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.auth.InternalLoginResult.GoogleLoginSuccessResult
 import io.reactivex.Observable
@@ -20,6 +16,10 @@ import io.reactivex.disposables.CompositeDisposable
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class GoogleAuthProviderTest : BaseUnitTest() {
     private val context: Context = mock {

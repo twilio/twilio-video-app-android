@@ -2,10 +2,10 @@ package com.twilio.video.app.ui.settings
 
 import android.content.SharedPreferences
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.NumberPreference
 import com.twilio.video.app.data.NumberPreferenceDialogFragmentCompat
 import com.twilio.video.app.util.get
@@ -17,7 +17,7 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
 
-        (requireActivity() as BaseActivity).supportActionBar?.title = preferenceScreen.title
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = preferenceScreen.title
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {

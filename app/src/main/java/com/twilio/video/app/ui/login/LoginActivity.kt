@@ -20,20 +20,22 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.twilio.video.app.R
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.ui.room.RoomActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 private const val RC_SIGN_IN = 20
 
-class LoginActivity : BaseActivity() {
+@AndroidEntryPoint
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var authUI: FirebaseAuth
     @Inject

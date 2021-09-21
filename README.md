@@ -21,7 +21,7 @@ This application demonstrates multi-party voice and video built with [Twilio’s
 
 Android Studio Version | Android API Version Min
 ------------ | -------------
-3.5+ | 16
+3.5+ | 21
 
 ## Getting Started
 
@@ -67,10 +67,10 @@ If the max number of participants is exceeded, then the video app will present a
 
 ### Build
 
-Currently there are three product flavors for the application.
+There are different product flavors for the application:
 
 1. Internal - The application intended for internal testing and QA at Twilio. _This variant can only be built by Twilions._
-3. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
+1. Community - The application intended for developers interested in using Programmable Video. _This variant can be built by all developers._
    1. debug and release build types are supported.
 
 #### Building the Community Flavor

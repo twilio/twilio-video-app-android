@@ -16,21 +16,19 @@
 package com.twilio.video.app.auth
 
 import android.content.SharedPreferences
-import com.twilio.video.app.ApplicationScope
-import com.twilio.video.app.data.AuthServiceModule
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.security.SecurePreferences
-import com.twilio.video.app.security.SecurityModule
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
-@Module(includes = [
-    AuthServiceModule::class,
-    SecurityModule::class
-])
+@Module
+@InstallIn(SingletonComponent::class)
 class CommunityAuthModule {
     @Provides
-    @ApplicationScope
+    @Singleton
     fun providesCommunityAuthenticator(
         preferences: SharedPreferences,
         securePreferences: SecurePreferences,

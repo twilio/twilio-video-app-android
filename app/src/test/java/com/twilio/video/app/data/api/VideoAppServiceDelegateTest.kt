@@ -1,8 +1,6 @@
 package com.twilio.video.app.data.api
 
 import android.content.SharedPreferences
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT
@@ -15,6 +13,8 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 private const val identity = "John"
 private const val roomName = "room"

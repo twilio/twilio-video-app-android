@@ -1,8 +1,8 @@
 package com.twilio.video.app.ui
 
-import com.twilio.video.app.base.BaseActivity
+import androidx.appcompat.app.AppCompatActivity
 
 interface ScreenSelector {
 
-    val loginScreen: Class<out BaseActivity>
+    val loginScreen: Class<out AppCompatActivity>
 }

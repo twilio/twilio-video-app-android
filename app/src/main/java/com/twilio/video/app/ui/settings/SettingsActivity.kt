@@ -18,13 +18,15 @@ package com.twilio.video.app.ui.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.util.replaceFragment
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-class SettingsActivity : BaseActivity(),
+@AndroidEntryPoint
+class SettingsActivity : AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject

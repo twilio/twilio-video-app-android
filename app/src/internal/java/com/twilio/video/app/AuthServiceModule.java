@@ -19,11 +19,13 @@ package com.twilio.video.app.data.api;
 import static com.twilio.video.app.util.BuildConfigUtilsKt.isReleaseBuildType;
 
 import android.content.SharedPreferences;
-import com.twilio.video.app.ApplicationScope;
 import dagger.Module;
 import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -31,14 +33,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Module
-public class VideoAppServiceModule {
+@InstallIn(SingletonComponent.class)
+public class AuthServiceModule {
     private static final String VIDEO_APP_SERVICE_DEV_URL = "https://app.dev.video.bytwilio.com";
     private static final String VIDEO_APP_SERVICE_STAGE_URL =
             "https://app.stage.video.bytwilio.com";
     private static final String VIDEO_APP_SERVICE_PROD_URL = "https://app.video.bytwilio.com";
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @Named("VideoAppService")
     OkHttpClient providesOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -54,7 +57,7 @@ public class VideoAppServiceModule {
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @Named("VideoAppServiceDev")
     VideoAppService providesVideoAppServiceDev(
             @Named("VideoAppService") OkHttpClient okHttpClient) {
@@ -68,7 +71,7 @@ public class VideoAppServiceModule {
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @Named("VideoAppServiceStage")
     VideoAppService providesVideoAppServiceStage(
             @Named("VideoAppService") OkHttpClient okHttpClient) {
@@ -82,7 +85,7 @@ public class VideoAppServiceModule {
     }
 
     @Provides
-    @ApplicationScope
+    @Singleton
     @Named("VideoAppServiceProd")
     VideoAppService providesVideoAppServiceProd(
             @Named("VideoAppService") OkHttpClient okHttpClient) {
@@ -96,7 +99,6 @@ public class VideoAppServiceModule {
     }
 
     @Provides
-    @ApplicationScope
     VideoAppServiceDelegate providesVideoAppServiceDelegate(
             SharedPreferences sharedPreferences,
             @Named("VideoAppServiceDev") VideoAppService videoAppServiceDev,
@@ -108,7 +110,6 @@ public class VideoAppServiceModule {
     }
 
     @Provides
-    @ApplicationScope
     TokenService providesTokenService(final VideoAppServiceDelegate videoAppServiceDelegate) {
         return videoAppServiceDelegate;
     }

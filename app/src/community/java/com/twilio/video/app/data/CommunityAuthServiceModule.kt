@@ -21,19 +21,23 @@ import com.twilio.video.app.data.api.AuthService
 import com.twilio.video.app.data.api.AuthServiceRepository
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.security.SecurePreferences
-import com.twilio.video.app.security.SecurityModule
 import com.twilio.video.app.util.isReleaseBuildType
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-@Module(includes = [SecurityModule::class])
-class AuthServiceModule {
+@Module
+@InstallIn(SingletonComponent::class)
+class CommunityAuthServiceModule {
     @Provides
+    @Singleton
     fun providesOkHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
         if (!isReleaseBuildType) {
@@ -48,6 +52,7 @@ class AuthServiceModule {
     }
 
     @Provides
+    @Singleton
     fun providesAuthService(okHttpClient: OkHttpClient): AuthService {
         return Retrofit.Builder()
                 .client(okHttpClient)

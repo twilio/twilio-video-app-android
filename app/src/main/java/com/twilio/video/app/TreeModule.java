@@ -24,12 +24,16 @@ import com.twilio.video.app.util.DebugTree;
 import com.twilio.video.app.util.ReleaseTree;
 import dagger.Module;
 import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
+import javax.inject.Singleton;
 import timber.log.Timber;
 
 @Module
+@InstallIn(SingletonComponent.class)
 public class TreeModule {
     @Provides
-    @ApplicationScope
+    @Singleton
     Timber.Tree providesTree(CrashlyticsTreeRanger treeRanger) {
         if (BuildConfig.DEBUG || BuildConfigUtilsKt.isInternalFlavor()) {
             Video.setLogLevel(LogLevel.DEBUG);

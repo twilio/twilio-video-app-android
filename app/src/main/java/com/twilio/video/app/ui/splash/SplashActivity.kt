@@ -18,13 +18,15 @@ package com.twilio.video.app.ui.splash
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.twilio.video.app.auth.Authenticator
-import com.twilio.video.app.base.BaseActivity
 import com.twilio.video.app.ui.ScreenSelector
 import com.twilio.video.app.ui.room.RoomActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-class SplashActivity : BaseActivity() {
+@AndroidEntryPoint
+class SplashActivity : AppCompatActivity() {
 
     @Inject lateinit var authenticator: Authenticator
     @Inject lateinit var screenSelector: ScreenSelector

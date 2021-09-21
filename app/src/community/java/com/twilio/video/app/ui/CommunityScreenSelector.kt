@@ -1,10 +1,10 @@
 package com.twilio.video.app.ui
 
-import com.twilio.video.app.base.BaseActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.twilio.video.app.ui.login.CommunityLoginActivity
 
 class CommunityScreenSelector : ScreenSelector {
 
-    override val loginScreen: Class<out BaseActivity>
+    override val loginScreen: Class<out AppCompatActivity>
         get() = CommunityLoginActivity::class.java
 }
