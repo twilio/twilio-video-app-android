@@ -1,13 +1,19 @@
 # Change Log
 
-## 0.108
+## 0.109 (October 15, 2021)
+
+### Dependency Upgrades
+
+* This release uses Video Android SDK 7.0.1.
+
+## 0.108 (September 17, 2021)
 
 ### Dependency Upgrades
 
 * This release uses Video Android SDK 7.0.0.
 * The minimum supported Android API level has been raised to 21.
 
-### 0.107
+### 0.107 (September 13, 2021)
 
 ### New Feature
 
@@ -24,7 +30,7 @@
 **Note:** See git history for other changes since version 0.1.0.
 
 
-## 0.1.0
+## 0.1.0 (November 8, 2019)
 
 This release marks the first iteration of the Twilio Video Collaboration App: a canonical multi-party collaboration video application built with Programmable Video. This application is intended to demonstrate the capabilities of Programmable Video and serve as a reference to developers building video apps.
 
