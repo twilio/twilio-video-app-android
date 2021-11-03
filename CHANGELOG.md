@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.110 (November 2, 2021)
+
+* Updated to properly support Android 12
+* Delayed starting of AudioSwitch till after user has granted necessary permissions
+* Updated to use AudioSwitch 1.1.4
+
 ## 0.109 (October 15, 2021)
 
 ### Dependency Upgrades
