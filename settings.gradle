@@ -1,7 +1,2 @@
 include ':app'
 
-includeBuild("/Users/afalls/code/audioswitch") {
-    dependencySubstitution {
-        substitute(module("com.twilio:audioswitch")).with(project(":audioswitch"))
-    }
-}
