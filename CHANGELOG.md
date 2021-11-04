@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.110 (November 3, 2021)
+
+### Dependency Upgrades
+
+* This release uses Video Android SDK 7.0.2.
+
 ## 0.109 (October 15, 2021)
 
 ### Dependency Upgrades
