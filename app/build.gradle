@@ -38,7 +38,7 @@ afterEvaluate {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion '30.0.2'
 
     buildFeatures {
@@ -60,7 +60,7 @@ android {
         applicationId "com.twilio.video.app"
 
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
 
         versionName "0.1.0"
         versionCode versionCodeProperty
@@ -147,7 +147,7 @@ dependencies {
     def retrofitVersion = '2.9.0'
     def espressoVersion = '3.3.0'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
-    def androidXTest = '1.3.0'
+    def androidXTest = '1.4.1-alpha03'
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
     def lifecycleVersion = '2.3.1'
@@ -185,7 +185,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.1.2'
+    implementation 'com.twilio:audioswitch:1.1.3'
     implementation "org.uniflow-kt:uniflow-android:$uniflowVersion"
 
     /*
@@ -194,7 +194,7 @@ dependencies {
      */
     compileOnly 'com.android.databinding:viewbinding:4.1.3'
 
-    internalImplementation "com.microsoft.appcenter:appcenter-distribute:3.3.1"
+    internalImplementation "com.microsoft.appcenter:appcenter-distribute:4.3.1"
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler
@@ -223,7 +223,7 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$androidXTest"
     androidTestImplementation "androidx.test:rules:$androidXTest"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 }
