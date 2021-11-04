@@ -330,24 +330,19 @@ class RoomActivity : AppCompatActivity() {
         roomViewModel.processInput(ToggleLocalAudio)
     }
 
-    // requestPermissions(..) requires API M, but compiler isn't smart enough to determine that
-    // it can't get to block
-    @SuppressLint("NewApi")
     private fun requestPermissions() {
-        when (Build.VERSION.SDK_INT) {
-            in 0..Build.VERSION_CODES.LOLLIPOP_MR1 -> {
-                return
-            }
-            in Build.VERSION_CODES.M..Build.VERSION_CODES.R -> {
-                requestPermissions(
-                    arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA),
-                    PERMISSIONS_REQUEST_CODE)
-            }
-            else -> {
+        // nested if statements used to keep lint happy and avoid needing a @SuppressLint decoration
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(
                     arrayOf(Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.CAMERA,
                         Manifest.permission.BLUETOOTH_CONNECT),
+                    PERMISSIONS_REQUEST_CODE)
+            } else {
+                requestPermissions(
+                    arrayOf(Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.CAMERA),
                     PERMISSIONS_REQUEST_CODE)
             }
         }

@@ -21,19 +21,8 @@ class RoomNotification(private val context: Context) {
                     notificationIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                     // Android 12/S requires a flag to be set and FLAG_IMMUTBALE isn't available
                     // before Android M (23)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        PendingIntent.getActivity(
-                            context,
-                            0,
-                            notificationIntent,
-                            PendingIntent.FLAG_IMMUTABLE)
-                    } else {
-                        PendingIntent.getActivity(
-                            context,
-                            0,
-                            notificationIntent,
-                            0)
-                    }
+                    var flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+                    PendingIntent.getActivity(context, 0, notificationIntent, flags)
                 }
 
     init {
