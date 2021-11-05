@@ -6,6 +6,12 @@
 
 * This release uses Video Android SDK 7.0.2.
 
+## 0.110 (November 2, 2021)
+
+* Updated to properly support Android 12
+* Delayed starting of AudioSwitch till after user has granted necessary permissions
+* Updated to use AudioSwitch 1.1.3
+
 ## 0.109 (October 15, 2021)
 
 ### Dependency Upgrades
