@@ -4,8 +4,8 @@ e2e-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: lucye, version: 24}
-    - {model: flame, version: 29}
+    - {model: hammerhead, version: 23}
+    - {model: redfin, version: 30}
   test-targets:
     - "annotation com.twilio.video.app.e2eTest.E2ETest"
 
@@ -15,10 +15,10 @@ integration-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: athene, version: 23}
-    - {model: lucye, version: 24}
-    - {model: sawfish, version: 26}
-    - {model: albus, version: 26}
-    - {model: flame, version: 29}
+    - {model: hammerhead, version: 23}
+    - {model: griffin, version: 24}
+    - {model: HWCOR, version: 27}
+    - {model: pettyl, version: 27}
+    - {model: redfin, version: 30}
   test-targets:
     - "annotation com.twilio.video.app.integrationTest.IntegrationTest"
