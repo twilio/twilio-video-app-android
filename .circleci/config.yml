@@ -38,21 +38,17 @@ executors:
         type: string
     working_directory: *workspace
     docker:
-      - image: circleci/android:api-28-node
+      - image: cimg/android:2021.10.2-node
     environment:
       _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
     resource_class: << parameters.resource-class >>
 
-  test:
+  ftl-test:
     parameters:
-      resource-class:
-        description: "Test executor resource class"
-        default: "medium+"
-        type: string
     working_directory: *workspace
     docker:
       - image: google/cloud-sdk:latest
-    resource_class: << parameters.resource-class >>
+    resource_class: small
 
 commands:
   configure_git_user:
@@ -250,7 +246,7 @@ jobs:
       - save_cache: *save-cache-gradle
 
   e2e-tests:
-    executor: test
+    executor: ftl-test
     steps:
       # Setup
       - checkout
@@ -273,7 +269,7 @@ jobs:
           destination: test-results
 
   integration-tests:
-    executor: test
+    executor: ftl-test
     steps:
       # Setup
       - checkout
