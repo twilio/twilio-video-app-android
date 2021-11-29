@@ -94,42 +94,39 @@ class CameraCapturerCompat(
                 if (isCamera2) isCameraIdSupported(context, cameraId) else true
 
         private fun isCameraIdSupported(context: Context, cameraId: String): Boolean {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-                var isMonoChromeSupported = false
-                var isPrivateImageFormatSupported = false
-                val cameraCharacteristics: CameraCharacteristics
-                cameraCharacteristics = try {
-                    cameraManager.getCameraCharacteristics(cameraId)
-                } catch (e: Exception) {
-                    Timber.e(e)
-                    return false
-                }
-                /*
-                 * This is a temporary work around for a RuntimeException that occurs on devices which contain cameras
-                 * that do not support ImageFormat.PRIVATE output formats. A long term fix is currently in development.
-                 * https://github.com/twilio/video-quickstart-android/issues/431
-                 */
-                val streamMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                if (streamMap != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    isPrivateImageFormatSupported = streamMap.isOutputSupportedFor(ImageFormat.PRIVATE)
-                }
+            val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            var isMonoChromeSupported = false
+            var isPrivateImageFormatSupported = false
+            val cameraCharacteristics: CameraCharacteristics = try {
+                cameraManager.getCameraCharacteristics(cameraId)
+            } catch (e: Exception) {
+                Timber.e(e)
+                return false
+            }
+            /*
+             * This is a temporary work around for a RuntimeException that occurs on devices which contain cameras
+             * that do not support ImageFormat.PRIVATE output formats. A long term fix is currently in development.
+             * https://github.com/twilio/video-quickstart-android/issues/431
+             */
+            val streamMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+            if (streamMap != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                isPrivateImageFormatSupported = streamMap.isOutputSupportedFor(ImageFormat.PRIVATE)
+            }
 
-                /*
-                 * Read the color filter arrangements of the camera to filter out the ones that support
-                 * SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO or SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR.
-                 * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
-                 */
-                val colorFilterArrangement = cameraCharacteristics.get(
-                        CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && colorFilterArrangement != null) {
-                    isMonoChromeSupported = (colorFilterArrangement
-                            == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO ||
-                            colorFilterArrangement
-                            == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR)
-                }
-                isPrivateImageFormatSupported && !isMonoChromeSupported
-            } else true
+            /*
+             * Read the color filter arrangements of the camera to filter out the ones that support
+             * SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO or SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR.
+             * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
+             */
+            val colorFilterArrangement = cameraCharacteristics.get(
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && colorFilterArrangement != null) {
+                isMonoChromeSupported = (colorFilterArrangement
+                        == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO ||
+                        colorFilterArrangement
+                        == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR)
+            }
+            return isPrivateImageFormatSupported && !isMonoChromeSupported
         }
 
         private fun isAtLeastOneCameraAvailable(frontCameraId: String?, backCameraId: String?) =

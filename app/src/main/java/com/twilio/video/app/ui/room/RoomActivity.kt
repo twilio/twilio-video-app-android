@@ -419,17 +419,15 @@ class RoomActivity : AppCompatActivity() {
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         settingsMenuItem.isVisible = settingsMenuItemState
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
-            val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
-                R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
-            } else {
-                R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
-            }
-            screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
-                    screenCaptureResources.first)
-            screenCaptureMenuItem.title = screenCaptureResources.second
+        screenCaptureMenuItem.isVisible = screenCaptureMenuItemState
+        val screenCaptureResources = if (roomViewState.isScreenCaptureOn) {
+            R.drawable.ic_stop_screen_share_white_24dp to getString(R.string.stop_screen_share)
+        } else {
+            R.drawable.ic_screen_share_white_24dp to getString(R.string.share_screen)
         }
+        screenCaptureMenuItem.icon = ContextCompat.getDrawable(this,
+                screenCaptureResources.first)
+        screenCaptureMenuItem.title = screenCaptureResources.second
     }
 
     private fun setTitle(toolbarTitle: String?) {
