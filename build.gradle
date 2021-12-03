@@ -28,7 +28,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven {
             url  "https://twilio.jfrog.io/artifactory/internal-releases"
             credentials {
@@ -158,7 +157,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven {
             url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
         }
