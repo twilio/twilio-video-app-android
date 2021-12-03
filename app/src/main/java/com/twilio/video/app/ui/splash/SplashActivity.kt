@@ -16,6 +16,7 @@
 
 package com.twilio.video.app.ui.splash
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,7 @@ import com.twilio.video.app.ui.room.RoomActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
