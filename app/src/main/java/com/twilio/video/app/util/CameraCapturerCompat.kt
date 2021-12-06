@@ -97,8 +97,7 @@ class CameraCapturerCompat(
             val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
             var isMonoChromeSupported = false
             var isPrivateImageFormatSupported = false
-            val cameraCharacteristics: CameraCharacteristics
-            cameraCharacteristics = try {
+            val cameraCharacteristics: CameraCharacteristics = try {
                 cameraManager.getCameraCharacteristics(cameraId)
             } catch (e: Exception) {
                 Timber.e(e)
@@ -109,8 +108,7 @@ class CameraCapturerCompat(
              * that do not support ImageFormat.PRIVATE output formats. A long term fix is currently in development.
              * https://github.com/twilio/video-quickstart-android/issues/431
              */
-            val streamMap =
-                cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+            val streamMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             if (streamMap != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 isPrivateImageFormatSupported = streamMap.isOutputSupportedFor(ImageFormat.PRIVATE)
             }
@@ -121,8 +119,7 @@ class CameraCapturerCompat(
              * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
              */
             val colorFilterArrangement = cameraCharacteristics.get(
-                CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
-            )
+                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && colorFilterArrangement != null) {
                 isMonoChromeSupported = (colorFilterArrangement
                         == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO ||

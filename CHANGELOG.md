@@ -1,10 +1,22 @@
 # Change Log
 
-## 0.110 (November 3, 2021)
+## 0.114 (December 6, 2021)
+
+### Dependency Upgrades
+
+* This release uses Video Android SDK 7.0.3.
+
+## 0.113 (November 3, 2021)
 
 ### Dependency Upgrades
 
 * This release uses Video Android SDK 7.0.2.
+
+## 0.111 (November 2, 2021)
+
+* Updated to properly support Android 12
+* Delayed starting of AudioSwitch till after user has granted necessary permissions
+* Updated to use AudioSwitch 1.1.3
 
 ## 0.109 (October 15, 2021)
 

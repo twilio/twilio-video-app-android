@@ -23,10 +23,10 @@
         <activity
             android:name=".ui.splash.SplashActivity"
             android:theme="@style/AppTheme.SplashScreen"
-            android:configChanges="orientation|screenSize">
+            android:configChanges="orientation|screenSize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter android:autoVerify="true"

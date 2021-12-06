@@ -88,14 +88,6 @@ class RoomViewModel @Inject constructor(
     internal var roomManagerJob: Job? = null
 
     init {
-        audioSwitch.start { audioDevices, selectedDevice ->
-            updateState { currentState ->
-                currentState.copy(
-                        selectedDevice = selectedDevice,
-                        availableAudioDevices = audioDevices
-                )
-            }
-        }
         subscribeToRoomEvents()
     }
 
@@ -163,6 +155,16 @@ class RoomViewModel @Inject constructor(
             currentState.copy(isCameraEnabled = isCameraEnabled, isMicEnabled = isMicEnabled)
         }
         if (isCameraEnabled && isMicEnabled) {
+            // start audio switch, it will silently error if it has already been started
+            audioSwitch.start { audioDevices, selectedDevice ->
+                updateState { currentState ->
+                    currentState.copy(
+                        selectedDevice = selectedDevice,
+                        availableAudioDevices = audioDevices
+                    )
+                }
+            }
+            // resume everything else
             roomManager.onResume()
         } else {
             if (!permissionCheckRetry) {
