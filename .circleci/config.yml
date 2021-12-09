@@ -17,12 +17,6 @@ aliases:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
 
-  - &build-test-filter
-    filters:
-      branches:
-        ignore:
-          - master
-
   - &publish-to-appcenter-filter
     filters:
       branches:
@@ -331,32 +325,25 @@ jobs:
 workflows:
   build-test:
     jobs:
-      - lint:
-          <<: *build-test-filter
-      - check-format:
-          <<: *build-test-filter
-      - build-app:
-          <<: *build-test-filter
+      - lint
+      - check-format
+      - build-app
       - unit-tests:
-          <<: *build-test-filter
           requires:
             - build-app
             - lint
             - check-format
       - community-unit-tests:
-          <<: *build-test-filter
           requires:
             - build-app
             - lint
             - check-format
       - e2e-tests:
-          <<: *build-test-filter
           requires:
             - build-app
             - lint
             - check-format
       - integration-tests:
-          <<: *build-test-filter
           requires:
             - build-app
             - lint

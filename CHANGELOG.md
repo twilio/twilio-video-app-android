@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.115 (December 6, 2021)
+
+### Dependency Upgrades
+
+* Modified circle-ci to always run e2e test cases
+* Upgraded firebase-ui-auth to 7.2.0
+* Upgraded  android gradle tools to 7.0.3
+* Upgraded google-services 4.3.10
+* Upgraded kotlin-gradle-plugin to 1.6.0
+* Upgrade firebase-crashlytics-graddle to 2.8.1
+* Upgraded Gradle to 7.0.2
+
+### Bug Fixes
+
+* Updated build to also include test runner framework application
+
 ## 0.114 (December 6, 2021)
 
 ### Dependency Upgrades
