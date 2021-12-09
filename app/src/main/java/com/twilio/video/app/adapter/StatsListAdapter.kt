@@ -16,6 +16,7 @@
 
 package com.twilio.video.app.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -81,6 +82,8 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
         return statsListItems.size
     }
 
+    /* because every stats notification resets the data set, suppress lint warning */
+    @SuppressLint("NotifyDataSetChanged")
     fun updateStatsData(roomStats: RoomStats?) {
         /*
          * Generate new items on a separate list to ensure statsListItems changes are only
