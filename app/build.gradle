@@ -11,7 +11,7 @@ def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
         project.property(includeSdkFromSourceProperty) as Boolean
 
 afterEvaluate {
-//    def ndkVersion = 'ndkVersion'
+    def ndkVersion = 'ndkVersion'
 //    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
 //        android.ndkVersion = "${project.property(ndkVersion)}"
 //    }
@@ -188,7 +188,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.1.3'
+    implementation 'com.twilio:audioswitch:1.1.4'
     implementation "org.uniflow-kt:uniflow-android:$uniflowVersion"
 
     /*
