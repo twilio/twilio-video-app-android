@@ -1,4 +1,8 @@
 # Change Log
+## 0.116 (December 6, 2021)
+
+### Dependency Upgrades
+* Updated Audioswitch to 1.1.4
 
 ## 0.115 (December 6, 2021)
 
