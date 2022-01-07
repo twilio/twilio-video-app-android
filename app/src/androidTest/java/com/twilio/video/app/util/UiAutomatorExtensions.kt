@@ -9,11 +9,11 @@ import java.util.concurrent.TimeoutException
 fun uiDevice(): UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
 fun UiDevice.allowAllPermissions() {
-    clickThroughDialogs("Allow|ALLOW")
+    clickThroughDialogs("Allow|ALLOW|While using the app")
 }
 
 fun UiDevice.denyAllPermissions() {
-    clickThroughDialogs("Deny|DENY")
+    clickThroughDialogs("Deny|DENY|Don\\p{Punct}t allow")
 }
 
 private fun UiDevice.clickThroughDialogs(text: String) {
