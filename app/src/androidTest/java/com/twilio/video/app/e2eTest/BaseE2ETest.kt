@@ -1,7 +1,7 @@
 package com.twilio.video.app.e2eTest
 
-import android.util.Log
 import android.app.Activity
+import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage.RESUMED
@@ -31,7 +31,7 @@ open class BaseE2ETest {
     }
 
     open fun getActivityInstance(): Activity? {
-        var currentActivity : Activity ?= null
+        var currentActivity: Activity ? = null
         getInstrumentation().runOnMainSync {
             val resumedActivities: Collection<*> =
                 ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(RESUMED)
@@ -42,11 +42,11 @@ open class BaseE2ETest {
         return currentActivity
     }
 
-    inline fun <reified T : Activity> isVisible() : Boolean {
+    inline fun <reified T : Activity> isVisible(): Boolean {
         return T::class.java.name == getActivityInstance()!!::class.java.name
     }
 
-    inline fun <reified T : Activity> waitUntilActivityVisible(timeout : Long) {
+    inline fun <reified T : Activity> waitUntilActivityVisible(timeout: Long) {
         val startTime = System.currentTimeMillis()
         while (!isVisible<T>()) {
             Thread.sleep(100)

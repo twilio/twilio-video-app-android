@@ -16,19 +16,19 @@ import org.hamcrest.Matchers
 
 // TODO Move to common module as part of https://issues.corp.twilio.com/browse/AHOYAPPS-197
 
-class DisableAutofillAction: ViewAction {
+class DisableAutofillAction : ViewAction {
     override fun getConstraints(): Matcher<View>? {
         return Matchers.any(View::class.java)
     }
 
     override fun getDescription(): String {
-        return "Marking view not important for autofill";
+        return "Marking view not important for autofill"
     }
 
     override fun perform(uiController: UiController?, view: View?) {
         // Required to disable autofill suggestions during tests on API 26+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            view?.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO;
+            view?.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
         }
     }
 }

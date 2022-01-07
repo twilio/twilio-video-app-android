@@ -2,12 +2,12 @@ package com.twilio.video.app.espresso
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.drawable.Drawable
-import android.view.View
-import android.widget.ImageView
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.view.View
+import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.view.menu.ActionMenuItemView
 import org.hamcrest.Description
@@ -50,7 +50,7 @@ class DrawableMatcher(
             Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
         return bitmap
     }
