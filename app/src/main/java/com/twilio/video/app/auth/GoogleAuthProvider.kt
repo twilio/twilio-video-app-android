@@ -65,6 +65,8 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
                             }
                         }
                     }
+                    else -> { Timber.e("Should never reach here")}
+
                 }
             },
                     {

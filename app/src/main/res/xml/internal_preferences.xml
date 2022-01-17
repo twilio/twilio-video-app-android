@@ -15,11 +15,13 @@
         android:summary="%s"
         android:title="@string/settings_screen_topology"
         android:negativeButtonText="@null"
-        app:iconSpaceReserved="false"/>
+        app:iconSpaceReserved="false"
+        android:enabled="false" />
     <CheckBoxPreference
         android:key="pref_record_participants_on_connect"
         android:title="@string/settings_screen_record_participants_on_connect"
         android:defaultValue="false"
         app:iconSpaceReserved="false"
+        android:enabled="false"
         />
 </PreferenceScreen>
