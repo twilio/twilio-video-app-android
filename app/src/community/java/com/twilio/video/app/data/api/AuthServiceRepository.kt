@@ -48,8 +48,8 @@ class AuthServiceRepository(
     }
 
     override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
-        getPasscode(passcode)?.let { _ ->
-            val (requestBody, url) = buildRequest(passcode!!, identity, roomName)
+        getPasscode(passcode)?.let { password ->
+            val (requestBody, url) = buildRequest(password, identity, roomName)
 
             try {
                 authService.getToken(url, requestBody).let { response ->
