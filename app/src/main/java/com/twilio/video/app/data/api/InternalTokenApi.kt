@@ -20,5 +20,5 @@ import retrofit2.http.POST
 
 interface InternalTokenApi {
     @POST("/token")
-    suspend fun getToken(@Body request: AuthServiceRequestDTO) : AuthServiceResponseDTO
+    suspend fun getToken(@Body request: AuthServiceRequestDTO): AuthServiceResponseDTO
 }

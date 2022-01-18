@@ -6,7 +6,6 @@ import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.dto.Topology
 
-
 class InternalSettingsFragment : BaseSettingsFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

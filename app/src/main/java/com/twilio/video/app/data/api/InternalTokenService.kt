@@ -26,7 +26,6 @@ import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.ENVIRONMENT
 import com.twilio.video.app.data.Preferences.ENVIRONMENT_DEFAULT
 import com.twilio.video.app.data.api.dto.Topology
-
 import retrofit2.HttpException
 import timber.log.Timber
 
