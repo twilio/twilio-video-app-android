@@ -36,11 +36,11 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 @InstallIn(SingletonComponent.class)
 public class AuthServiceModule {
     private static final String VIDEO_APP_SERVICE_DEV_URL =
-            "https://dev.twilio-video-react.appspot.com/";
+            "https://dev-dot-twilio-video-react.appspot.com/";
     private static final String VIDEO_APP_SERVICE_STAGE_URL =
             "https://stage-dot-twilio-video-react.appspot.com/";
     private static final String VIDEO_APP_SERVICE_PROD_URL =
-            "https://dev-dot-twilio-video-react.appspot.com";
+            "https://twilio-video-react.appspot.com/";
 
     @Provides
     @Singleton
