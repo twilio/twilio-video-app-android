@@ -14,7 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.clickView
