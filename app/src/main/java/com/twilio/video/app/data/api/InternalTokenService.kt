@@ -68,7 +68,7 @@ class InternalTokenService(
                 response)
             response.topology?.let { serverTopology ->
                 val isTopologyChange =
-                    sharedPreferences.getString(Preferences.TOPOLOGY, null) != serverTopology.value
+                    sharedPreferences.getString(Preferences.TOPOLOGY, Preferences.TOPOLOGY_DEFAULT) != serverTopology.value
                 if (isTopologyChange) {
                     val (enableSimulcast, videoDimensionsIndex) = when (serverTopology) {
                         Topology.GROUP, Topology.GROUP_SMALL -> true to Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
