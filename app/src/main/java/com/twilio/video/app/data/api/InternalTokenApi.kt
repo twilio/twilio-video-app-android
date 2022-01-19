@@ -15,16 +15,10 @@
  */
 package com.twilio.video.app.data.api
 
-import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Body
+import retrofit2.http.POST
 
-interface VideoAppService {
-    @GET("api/v1/token")
-    suspend fun getToken(
-        @Query("identity") identity: String?,
-        @Query("roomName") roomName: String?,
-        @Query("appEnvironment") appEnvironment: String?,
-        @Query("topology") topology: String?,
-        @Query("recordParticipantsOnConnect") recordParticipantsOnConnect: Boolean
-    ): String
+interface InternalTokenApi {
+    @POST("/token")
+    suspend fun getToken(@Body request: AuthServiceRequestDTO): AuthServiceResponseDTO
 }

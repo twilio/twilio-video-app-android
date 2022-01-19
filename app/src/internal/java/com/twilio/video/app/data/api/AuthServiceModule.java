@@ -35,14 +35,15 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 @Module
 @InstallIn(SingletonComponent.class)
 public class AuthServiceModule {
-    private static final String VIDEO_APP_SERVICE_DEV_URL = "https://app.dev.video.bytwilio.com";
+    private static final String VIDEO_APP_SERVICE_DEV_URL =
+            "https://dev-dot-twilio-video-react.appspot.com/";
     private static final String VIDEO_APP_SERVICE_STAGE_URL =
-            "https://app.stage.video.bytwilio.com";
-    private static final String VIDEO_APP_SERVICE_PROD_URL = "https://app.video.bytwilio.com";
+            "https://stage-dot-twilio-video-react.appspot.com/";
+    private static final String VIDEO_APP_SERVICE_PROD_URL =
+            "https://twilio-video-react.appspot.com/";
 
     @Provides
     @Singleton
-    @Named("VideoAppService")
     OkHttpClient providesOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         if (!isReleaseBuildType()) {
@@ -58,59 +59,55 @@ public class AuthServiceModule {
 
     @Provides
     @Singleton
-    @Named("VideoAppServiceDev")
-    VideoAppService providesVideoAppServiceDev(
-            @Named("VideoAppService") OkHttpClient okHttpClient) {
+    @Named("InternalTokenApiDev")
+    InternalTokenApi providesVideoAppServiceDev(OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(VIDEO_APP_SERVICE_DEV_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(VideoAppService.class);
+                .create(InternalTokenApi.class);
     }
 
     @Provides
     @Singleton
-    @Named("VideoAppServiceStage")
-    VideoAppService providesVideoAppServiceStage(
-            @Named("VideoAppService") OkHttpClient okHttpClient) {
+    @Named("InternalTokenApiStage")
+    InternalTokenApi providesVideoAppServiceStage(OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(VIDEO_APP_SERVICE_STAGE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(VideoAppService.class);
+                .create(InternalTokenApi.class);
     }
 
     @Provides
     @Singleton
-    @Named("VideoAppServiceProd")
-    VideoAppService providesVideoAppServiceProd(
-            @Named("VideoAppService") OkHttpClient okHttpClient) {
+    @Named("InternalTokenApiProd")
+    InternalTokenApi providesVideoAppServiceProd(OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
                 .baseUrl(VIDEO_APP_SERVICE_PROD_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
-                .create(VideoAppService.class);
+                .create(InternalTokenApi.class);
     }
 
     @Provides
-    VideoAppServiceDelegate providesVideoAppServiceDelegate(
+    InternalTokenService providesInternalTokenService(
             SharedPreferences sharedPreferences,
-            @Named("VideoAppServiceDev") VideoAppService videoAppServiceDev,
-            @Named("VideoAppServiceStage") VideoAppService videoAppServiceStage,
-            @Named("VideoAppServiceProd") VideoAppService videoAppServiceProd) {
+            @Named("InternalTokenApiDev") InternalTokenApi dev,
+            @Named("InternalTokenApiStage") InternalTokenApi stage,
+            @Named("InternalTokenApiProd") InternalTokenApi prod) {
 
-        return new VideoAppServiceDelegate(
-                sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd);
+        return new InternalTokenService(sharedPreferences, dev, stage, prod);
     }
 
     @Provides
-    TokenService providesTokenService(final VideoAppServiceDelegate videoAppServiceDelegate) {
-        return videoAppServiceDelegate;
+    TokenService providesTokenService(final InternalTokenService internalTokenService) {
+        return internalTokenService;
     }
 }
