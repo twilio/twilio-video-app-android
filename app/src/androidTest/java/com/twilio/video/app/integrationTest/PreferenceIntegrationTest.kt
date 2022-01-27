@@ -14,7 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.clickView
@@ -24,6 +24,7 @@ import com.twilio.video.app.util.getStringArray
 import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.scrollAndClickView
 import org.hamcrest.CoreMatchers.equalTo
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,6 +89,7 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         assertThat(openSLESUsage, equalTo(Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT))
     }
 
+    @Ignore("Topology is no longer selectable from applicaiton due to auth changes")
     @Test
     fun it_should_select_the_correct_topology() {
         scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)

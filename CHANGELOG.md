@@ -1,5 +1,23 @@
 # Change Log
 
+## 0.118 (January 18, 2022)
+
+### Bug Fixes
+
+* Modified 'internal' auth process to reflect internal changes to Twilio's auth service.
+
+
+## 0.117 (January 6, 2022)
+
+### Bug Fixes
+
+* Updated e2e test cases such that successful execution is possible
+
+### Dependency Upgrades
+
+* Updated Espresso to 3.5.0-alpha03
+* Updated junit/junit-ktx to 1.1.4-alpha03
+
 ## 0.116 (January 4, 2022)
 
 ### Dependency Upgrades

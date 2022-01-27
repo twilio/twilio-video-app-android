@@ -11,11 +11,7 @@ import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
-import com.twilio.video.app.data.api.model.Topology
-import com.twilio.video.app.data.api.model.Topology.GO
-import com.twilio.video.app.data.api.model.Topology.GROUP
-import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
-import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
+import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.security.SecurePreferences
 import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
@@ -187,11 +183,23 @@ class AuthServiceRepositoryTest {
 
     fun videoCodecParams() =
             arrayOf(
-                    arrayOf(GROUP, GROUP_SMALL, true, VIDEO_CAPTURE_RESOLUTION_DEFAULT),
-                    arrayOf(PEER_TO_PEER, GROUP, true, VIDEO_CAPTURE_RESOLUTION_DEFAULT),
-                    arrayOf(GROUP_SMALL, PEER_TO_PEER, false,
+                    arrayOf(Topology.GROUP,
+                        Topology.GROUP_SMALL,
+                        true,
+                        VIDEO_CAPTURE_RESOLUTION_DEFAULT),
+                    arrayOf(
+                        Topology.PEER_TO_PEER,
+                        Topology.GROUP,
+                        true,
+                        VIDEO_CAPTURE_RESOLUTION_DEFAULT),
+                    arrayOf(
+                        Topology.GROUP_SMALL,
+                        Topology.PEER_TO_PEER, false,
                             VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()),
-                    arrayOf(GROUP, GO, false, VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString())
+                    arrayOf(Topology.GROUP,
+                        Topology.GO,
+                        false,
+                        VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString())
     )
 
     @Parameters(method = "videoCodecParams")
@@ -217,7 +225,7 @@ class AuthServiceRepositoryTest {
     @Test
     fun `it should not update the video codec, room type, and video dimensions if the room type has not changed`() {
         runBlockingTest {
-            val (editor, repository) = setupServerRoomTypeMock(GROUP, GROUP)
+            val (editor, repository) = setupServerRoomTypeMock(Topology.GROUP, Topology.GROUP)
 
             repository.getToken(passcode = "12345678901234")
 
@@ -228,11 +236,11 @@ class AuthServiceRepositoryTest {
     @Test
     fun `it should update the video codec and the room type if using a legacy passcode`() {
         runBlockingTest {
-            val (editor, repository) = setupServerRoomTypeMock(GROUP_SMALL, GROUP)
+            val (editor, repository) = setupServerRoomTypeMock(Topology.GROUP_SMALL, Topology.GROUP)
 
             repository.getToken(passcode = "1234567890")
 
-            verify(editor).putString(TOPOLOGY, GROUP.value)
+            verify(editor).putString(TOPOLOGY, Topology.GROUP.value)
             verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
             verify(editor).putBoolean(VP8_SIMULCAST, true)
         }

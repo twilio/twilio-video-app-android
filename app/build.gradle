@@ -85,6 +85,7 @@ android {
 
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
         unitTests {
             includeAndroidResources = true
         }
@@ -146,11 +147,12 @@ dependencies {
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
     def hiltVersion = '2.38.1'
     def retrofitVersion = '2.9.0'
-    def espressoVersion = '3.3.0'
+    def espressoVersion = '3.5.0-alpha03'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     def androidXTest = '1.4.1-alpha03'
+    def andoridXJunit = '1.1.4-alpha03'
     def testCore = "androidx.test:core:$androidXTest"
-    def junitExtensions = 'androidx.test.ext:junit-ktx:1.1.1'
+    def junitExtensions = "androidx.test.ext:junit-ktx:$andoridXJunit"
     def lifecycleVersion = '2.3.1'
     def coroutinesAndroidVersion = '1.4.3'
     def fragmentVersion = '1.3.2'
@@ -226,7 +228,7 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$androidXTest"
     androidTestImplementation "androidx.test:rules:$androidXTest"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation "androidx.test.ext:junit:$andoridXJunit"
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.9.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     androidTestUtil "androidx.test:orchestrator:$androidXTest"

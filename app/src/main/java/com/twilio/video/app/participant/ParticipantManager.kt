@@ -91,7 +91,7 @@ class ParticipantManager {
 
     fun changeDominantSpeaker(newDominantSpeakerSid: String?) {
         Timber.d("new dominant speaker with sid: %s", newDominantSpeakerSid)
-        newDominantSpeakerSid?.let { sid ->
+        newDominantSpeakerSid?.let { _ ->
             clearDominantSpeaker()
 
             getParticipant(newDominantSpeakerSid)?.copy(

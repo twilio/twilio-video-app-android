@@ -27,16 +27,16 @@ import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
-import com.twilio.video.app.data.api.model.Topology.GO
-import com.twilio.video.app.data.api.model.Topology.GROUP
-import com.twilio.video.app.data.api.model.Topology.GROUP_SMALL
-import com.twilio.video.app.data.api.model.Topology.PEER_TO_PEER
+import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.security.SecurePreferences
 import retrofit2.HttpException
 import timber.log.Timber
 
 private const val LEGACY_PASSCODE_SIZE = 10
 private const val PASSCODE_SIZE = 14
+
+const val URL_PREFIX = "https://video-app-"
+const val URL_SUFFIX = "-dev.twil.io/token"
 
 class AuthServiceRepository(
     private val authService: AuthService,
@@ -48,8 +48,8 @@ class AuthServiceRepository(
     }
 
     override suspend fun getToken(identity: String?, roomName: String?, passcode: String?): String {
-        getPasscode(passcode)?.let { passcode ->
-            val (requestBody, url) = buildRequest(passcode, identity, roomName)
+        getPasscode(passcode)?.let { password ->
+            val (requestBody, url) = buildRequest(password, identity, roomName)
 
             try {
                 authService.getToken(url, requestBody).let { response ->
@@ -92,8 +92,8 @@ class AuthServiceRepository(
                 if (isTopologyChange) {
                     sharedPreferences.edit { putString(TOPOLOGY, serverTopology.value) }
                     val (enableSimulcast, videoDimensionsIndex) = when (serverTopology) {
-                        GROUP, GROUP_SMALL -> true to VIDEO_CAPTURE_RESOLUTION_DEFAULT
-                        PEER_TO_PEER, GO -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()
+                        Topology.GROUP, Topology.GROUP_SMALL -> true to VIDEO_CAPTURE_RESOLUTION_DEFAULT
+                        Topology.PEER_TO_PEER, Topology.GO -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()
                     }
                     Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
                             serverTopology, enableSimulcast)
