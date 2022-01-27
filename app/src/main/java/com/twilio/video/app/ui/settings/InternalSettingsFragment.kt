@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.preference.ListPreference
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
-import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.data.api.dto.Topology
 
 class InternalSettingsFragment : BaseSettingsFragment() {
 

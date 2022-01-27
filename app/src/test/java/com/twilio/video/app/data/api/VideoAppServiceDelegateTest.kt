@@ -7,6 +7,7 @@ import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT
 import com.twilio.video.app.data.Preferences.RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT
 import com.twilio.video.app.data.Preferences.TOPOLOGY
 import com.twilio.video.app.data.Preferences.TOPOLOGY_DEFAULT
+import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -32,15 +33,15 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
         whenever(mock.getBoolean(RECORD_PARTICIPANTS_ON_CONNECT, Preferences
             .RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)).thenReturn(RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)
     }
-    private val videoAppServiceDev: VideoAppService = mock()
-    private val videoAppServiceStage: VideoAppService = mock()
-    private val videoAppServiceProd: VideoAppService = mock()
+    private val videoAppServiceDev: InternalTokenApi = mock()
+    private val videoAppServiceStage: InternalTokenApi = mock()
+    private val videoAppServiceProd: InternalTokenApi = mock()
 
     @Test
     fun `getToken should retrieve production environment token successfully`() {
         coroutineScope.runBlockingTest {
             mockService(videoAppServiceProd, prodTestToken)
-            val videoAppServiceDelegate = VideoAppServiceDelegate(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
+            val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
             whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
                     .thenReturn("production")
 
@@ -54,7 +55,7 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
     fun `getToken should retrieve stage environment token successfully`() {
         coroutineScope.runBlockingTest {
             mockService(videoAppServiceStage, stageTestToken)
-            val videoAppServiceDelegate = VideoAppServiceDelegate(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
+            val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
             whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
                     .thenReturn(TWILIO_API_STAGE_ENV)
 
@@ -68,7 +69,7 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
     fun `getToken should retrieve dev environment token successfully`() {
         coroutineScope.runBlockingTest {
             mockService(videoAppServiceDev, devTestToken)
-            val videoAppServiceDelegate = VideoAppServiceDelegate(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
+            val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
             whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
                     .thenReturn(TWILIO_API_DEV_ENV)
 
@@ -78,14 +79,10 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
         }
     }
 
-    private suspend fun mockService(mock: VideoAppService, token: String) {
-        whenever(mock.getToken(
-                identity,
-                roomName,
-                "production",
-                TOPOLOGY_DEFAULT,
-                RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT
+    private suspend fun mockService(mock: InternalTokenApi, token: String) {
+        whenever(
+            mock.getToken(AuthServiceRequestDTO(null, identity, roomName, true)
         )
-        ).thenReturn(token)
+        ).thenReturn(AuthServiceResponseDTO(token, Topology.GROUP))
     }
 }

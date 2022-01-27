@@ -21,7 +21,7 @@ import com.twilio.video.TrackPriority
 import com.twilio.video.VideoDimensions
 import com.twilio.video.Vp8Codec
 import com.twilio.video.app.BuildConfig
-import com.twilio.video.app.data.api.model.Topology
+import com.twilio.video.app.data.api.dto.Topology
 
 object Preferences {
     const val INTERNAL = "pref_internal"
