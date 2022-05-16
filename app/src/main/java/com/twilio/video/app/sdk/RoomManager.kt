@@ -5,26 +5,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
-import com.twilio.video.Participant
-import com.twilio.video.RemoteParticipant
-import com.twilio.video.Room
-import com.twilio.video.StatsReport
-import com.twilio.video.TwilioException
+import com.twilio.video.*
 import com.twilio.video.TwilioException.ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.ui.room.RoomEvent
-import com.twilio.video.app.ui.room.RoomEvent.ConnectFailure
-import com.twilio.video.app.ui.room.RoomEvent.Connected
-import com.twilio.video.app.ui.room.RoomEvent.Connecting
-import com.twilio.video.app.ui.room.RoomEvent.Disconnected
-import com.twilio.video.app.ui.room.RoomEvent.DominantSpeakerChanged
-import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
-import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
-import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
+import com.twilio.video.app.ui.room.RoomEvent.*
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
-import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import kotlinx.coroutines.CoroutineDispatcher
@@ -59,6 +47,8 @@ class RoomManager(
 
     fun disconnect() {
         room?.disconnect()
+        localParticipantManager.removeAudioTrack()
+        localParticipantManager.removeCameraTrack()
     }
 
     suspend fun connect(identity: String, roomName: String) {

@@ -3,20 +3,52 @@ package com.twilio.video.app.ui.room
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import com.twilio.video.app.sdk.RoomManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.CompositeDisposable
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
 @AndroidEntryPoint
-class VideoService(
-    private val rxDisposables: CompositeDisposable = CompositeDisposable()
-) : Service() {
+class VideoService : Service() {
+
+    private val binder: IBinder = LocalBinder()
+
+    @Inject
+    lateinit var roomManager: RoomManager
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        setupForegroundService(intent)
+        Timber.d("VideoService created")
+        return START_NOT_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("VideoService destroyed")
+        stopForeground(true)
+    }
+
+    override fun onBind(intent: Intent?): IBinder {
+        return binder
+    }
+
+    private fun setupForegroundService(intent: Intent?) {
+        intent?.let {
+            it.getStringExtra(ROOM_NAME_EXTRA)?.let { roomName ->
+                val roomNotification = RoomNotification(this@VideoService)
+                startForeground(
+                    ONGOING_NOTIFICATION_ID,
+                    roomNotification.buildNotification(roomName)
+                )
+            }
+        }
+    }
 
     companion object {
         fun startService(context: Context, roomName: String) {
@@ -35,31 +67,8 @@ class VideoService(
         }
     }
 
-    @Inject lateinit var roomManager: RoomManager
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        setupForegroundService(intent)
-        Timber.d("VideoService created")
-        return START_NOT_STICKY
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("VideoService destroyed")
-        rxDisposables.clear()
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
-    private fun setupForegroundService(intent: Intent?) {
-        intent?.let { it.getStringExtra(ROOM_NAME_EXTRA)?.let { roomName ->
-            val roomNotification = RoomNotification(this@VideoService)
-            startForeground(
-                    ONGOING_NOTIFICATION_ID,
-                    roomNotification.buildNotification(roomName))
-        } }
+    inner class LocalBinder : Binder() {
+        val service: VideoService
+            get() = this@VideoService
     }
 }
