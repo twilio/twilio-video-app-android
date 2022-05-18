@@ -196,7 +196,7 @@ class LocalParticipantManager(
         }
     }
 
-    fun removeCameraTrack() {
+    private fun removeCameraTrack() {
         cameraVideoTrack?.let { cameraVideoTrack ->
             unpublishTrack(cameraVideoTrack)
             localVideoTrackNames.remove(cameraVideoTrack.name)
@@ -205,7 +205,7 @@ class LocalParticipantManager(
         }
     }
 
-    fun removeAudioTrack() {
+    private fun removeAudioTrack() {
         localAudioTrack?.let { localAudioTrack ->
             unpublishTrack(localAudioTrack)
             localAudioTrack.release()

@@ -3,7 +3,6 @@ package com.twilio.video.app.ui.room
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import com.twilio.video.app.sdk.RoomManager
@@ -15,8 +14,6 @@ private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
 @AndroidEntryPoint
 class VideoService : Service() {
-
-    private val binder: IBinder = LocalBinder()
 
     @Inject
     lateinit var roomManager: RoomManager
@@ -34,8 +31,8 @@ class VideoService : Service() {
         stopForeground(true)
     }
 
-    override fun onBind(intent: Intent?): IBinder {
-        return binder
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 
     private fun setupForegroundService(intent: Intent?) {
@@ -65,10 +62,5 @@ class VideoService : Service() {
         fun stopService(context: Context) {
             Intent(context, VideoService::class.java).let { context.stopService(it) }
         }
-    }
-
-    inner class LocalBinder : Binder() {
-        val service: VideoService
-            get() = this@VideoService
     }
 }
