@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-* Disconnect the room when the app is closed or killed.
+* When app is closed or killed, disconnection from room now happens properly.
 
 ## 0.120 (May 11, 2022)
 
