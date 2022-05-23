@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.121 (May 17, 2022)
+
+### Bug Fixes
+
+* When app is closed or killed, disconnection from room now happens properly.
+
 ## 0.120 (May 11, 2022)
 
 ### Dependency Upgrades

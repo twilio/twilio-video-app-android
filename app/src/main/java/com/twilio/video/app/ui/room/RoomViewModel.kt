@@ -96,6 +96,7 @@ class RoomViewModel @Inject constructor(
         super.onCleared()
         audioSwitch.stop()
         roomManagerJob?.cancel()
+        processInput(Disconnect)
     }
 
     fun processInput(viewEvent: RoomViewEvent) {
