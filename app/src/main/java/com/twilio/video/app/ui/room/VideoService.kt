@@ -8,8 +8,8 @@ import android.os.IBinder
 import androidx.annotation.RestrictTo
 import com.twilio.video.app.sdk.RoomManager
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 

@@ -68,11 +68,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.uniflow.android.AndroidDataFlow
 import io.uniflow.core.flow.data.UIState
 import io.uniflow.core.flow.onState
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class RoomViewModel @Inject constructor(
