@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import androidx.annotation.RestrictTo
 import com.twilio.video.app.sdk.RoomManager
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -22,6 +23,7 @@ class VideoService : Service() {
         super.onStartCommand(intent, flags, startId)
         setupForegroundService(intent)
         Timber.d("VideoService created")
+        isServiceStarted = true
         return START_NOT_STICKY
     }
 
@@ -29,6 +31,7 @@ class VideoService : Service() {
         super.onDestroy()
         Timber.d("VideoService destroyed")
         stopForeground(true)
+        isServiceStarted = false
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -48,6 +51,9 @@ class VideoService : Service() {
     }
 
     companion object {
+        @RestrictTo(RestrictTo.Scope.TESTS)
+        internal var isServiceStarted: Boolean = false
+
         fun startService(context: Context, roomName: String) {
             Intent(context, VideoService::class.java).let { intent ->
                 intent.putExtra(ROOM_NAME_EXTRA, roomName)

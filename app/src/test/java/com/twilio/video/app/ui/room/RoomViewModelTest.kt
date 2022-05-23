@@ -14,7 +14,6 @@ import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
 import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.TrackSwitchOff
-import com.twilio.video.app.ui.room.RoomViewConfiguration.Lobby
 import com.twilio.video.app.ui.room.RoomViewEffect.Disconnected
 import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
@@ -184,8 +183,8 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 ShowConnectFailureDialog,
                 Disconnected,
-                initialRoomViewState.copy(configuration = Lobby),
-                initialRoomViewState.copy(configuration = Lobby,
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby,
                 primaryParticipant = localParticipantViewState,
                 participantThumbnails = listOf(localParticipantViewState)))
     }
@@ -199,8 +198,8 @@ class RoomViewModelTest : BaseUnitTest() {
                 initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
                 ShowMaxParticipantFailureDialog,
                 Disconnected,
-                initialRoomViewState.copy(configuration = Lobby),
-                initialRoomViewState.copy(configuration = Lobby,
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
+                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby,
                         primaryParticipant = localParticipantViewState,
                         participantThumbnails = listOf(localParticipantViewState)))
     }
@@ -236,6 +235,23 @@ class RoomViewModelTest : BaseUnitTest() {
 
         assertThat(viewModel.roomManagerJob!!.isActive, equalTo(false))
         assertThat(viewModel.roomManagerJob!!.isCancelled, equalTo(true))
+    }
+
+    @Test
+    fun `OnCleared should disconnect room`() {
+        connect()
+
+        testObserver.verifySequence(
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connected)
+        )
+
+        viewModel.onCleared()
+
+        testObserver.verifySequence(
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby)
+        )
     }
 
     private fun connect() =

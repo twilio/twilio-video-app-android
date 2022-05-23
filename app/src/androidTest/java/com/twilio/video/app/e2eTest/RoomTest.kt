@@ -1,6 +1,7 @@
 package com.twilio.video.app.e2eTest
 
 import androidx.annotation.IdRes
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -20,6 +21,7 @@ import com.twilio.video.app.screen.clickJoinRoomButton
 import com.twilio.video.app.screen.clickMicButton
 import com.twilio.video.app.screen.clickVideoButton
 import com.twilio.video.app.screen.enterRoomName
+import com.twilio.video.app.ui.room.VideoService
 import com.twilio.video.app.ui.splash.SplashActivity
 import com.twilio.video.app.util.assertTextIsDisplayedRetry
 import com.twilio.video.app.util.clickView
@@ -28,6 +30,7 @@ import com.twilio.video.app.util.getTargetContext
 import com.twilio.video.app.util.randomUUID
 import com.twilio.video.app.util.retryEspressoAction
 import org.hamcrest.CoreMatchers.allOf
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -146,6 +149,18 @@ class RoomTest : BaseE2ETest() {
         drawableIsDisplayed(R.id.device_menu_item, speakerphoneDrawableMatcher)
 
         clickDisconnectButton()
+    }
+
+    @Test
+    fun it_should_kill_the_background_service_when_app_is_closed() {
+        enterRoomName(randomUUID())
+        clickJoinRoomButton()
+        retryEspressoAction { assertRoomIsConnected() }
+        retryEspressoAction { Assert.assertTrue(VideoService.isServiceStarted) }
+
+        Espresso.pressBackUnconditionally()
+
+        retryEspressoAction { Assert.assertFalse(VideoService.isServiceStarted) }
     }
 
     private fun drawableIsDisplayed(@IdRes id: Int, earpieceDrawableMatcher: DrawableMatcher) {
