@@ -12,9 +12,9 @@ def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
 
 afterEvaluate {
     def ndkVersion = 'ndkVersion'
-//    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
-//        android.ndkVersion = "${project.property(ndkVersion)}"
-//    }
+    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
+        android.ndkVersion = "${project.property(ndkVersion)}"
+    }
 
     /*
     * Enable the application to consume the Video Android SDK directly from source
@@ -33,7 +33,7 @@ afterEvaluate {
             debugImplementation project(':video:ktx')
             releaseImplementation project(':video:ktx')
         } else {
-            implementation "com.twilio:video-android-ktx:7.0.3"
+            implementation "com.twilio:video-android-ktx:7.4.0"
         }
     }
 }
@@ -190,7 +190,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.1.4'
+    implementation 'com.twilio:audioswitch:1.1.5'
     implementation "org.uniflow-kt:uniflow-android:$uniflowVersion"
 
     /*

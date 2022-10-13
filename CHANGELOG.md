@@ -1,11 +1,52 @@
 # Change Log
 
+## 0.126 (Oct 10, 2022)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.4.0
+
+## 0.125 (Aug 24, 2022)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.3.0
+
+## 0.123 (July 6, 2022)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.1.2
+
+## 0.122 (June 17, 2022)
+
+### Dependency Upgrades
+
+* Updated AudioSwitch version to 1.1.5
+
+## 0.121 (May 17, 2022)
+
+### Bug Fixes
+
+* When app is closed or killed, disconnection from room now happens properly.
+
+## 0.120 (May 11, 2022)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.1.1
+
+## 0.119 (March 16, 2022)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.1.0
+
 ## 0.118 (January 18, 2022)
 
 ### Bug Fixes
 
 * Modified 'internal' auth process to reflect internal changes to Twilio's auth service.
-
 
 ## 0.117 (January 6, 2022)
 

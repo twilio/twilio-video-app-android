@@ -50,6 +50,11 @@
             android:key="pref_max_audio_bitrate"
             android:title="@string/settings_screen_max_audio_bitrate"
             app:iconSpaceReserved="false"/>
+        <CheckBoxPreference
+            android:key="pref_video_encoding_mode"
+            android:title="Video Encoding Mode Auto"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false"/>
         <ListPreference
             android:key="pref_video_codecs"
             android:negativeButtonText="@null"

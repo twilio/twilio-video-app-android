@@ -89,6 +89,20 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         assertThat(openSLESUsage, equalTo(Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT))
     }
 
+    @Test
+    fun it_should_assert_correct_default_video_encoding_mode() {
+        scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
+
+        assertTextIsDisplayedRetry(getString(R.string.settings_title_advanced))
+
+        // Use inverse of default as second param to ensure default works from preference screen
+        val sharedPreferences = getSharedPreferences(getTargetContext())
+        val videoEncodingMode = sharedPreferences.getBoolean(
+                Preferences.VIDEO_ENCODING_MODE,
+                !Preferences.VIDEO_ENCODING_MODE_DEFAULT)
+        assertThat(videoEncodingMode, equalTo(Preferences.VIDEO_ENCODING_MODE_DEFAULT))
+    }
+
     @Ignore("Topology is no longer selectable from applicaiton due to auth changes")
     @Test
     fun it_should_select_the_correct_topology() {
