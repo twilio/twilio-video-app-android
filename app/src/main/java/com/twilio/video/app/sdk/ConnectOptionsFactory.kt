@@ -3,25 +3,7 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.SharedPreferences
 import com.twilio.androidenv.Env
-import com.twilio.video.AudioCodec
-import com.twilio.video.BandwidthProfileMode
-import com.twilio.video.ClientTrackSwitchOffControl
-import com.twilio.video.ConnectOptions
-import com.twilio.video.EncodingParameters
-import com.twilio.video.G722Codec
-import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
-import com.twilio.video.NetworkQualityConfiguration
-import com.twilio.video.NetworkQualityVerbosity
-import com.twilio.video.OpusCodec
-import com.twilio.video.PcmaCodec
-import com.twilio.video.PcmuCodec
-import com.twilio.video.TrackPriority
-import com.twilio.video.TrackSwitchOffMode
-import com.twilio.video.VideoCodec
-import com.twilio.video.VideoContentPreferencesMode
-import com.twilio.video.Vp8Codec
-import com.twilio.video.Vp9Codec
+import com.twilio.video.*
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
@@ -122,6 +104,26 @@ class ConnectOptionsFactory(
                 Preferences.MAX_AUDIO_BITRATE,
                 Preferences.MAX_AUDIO_BITRATE_DEFAULT)
 
+        val videoEncodingMode = sharedPreferences.get(Preferences.VIDEO_ENCODING_MODE,
+                Preferences.VIDEO_ENCODING_MODE_DEFAULT).let {
+            getVideoEncodingMode(it)
+        }
+
+        if (videoEncodingMode == VideoEncodingMode.AUTO) {
+            return createConnectOptions(token) {
+                roomName(roomName)
+                enableInsights(enableInsights)
+                enableAutomaticSubscription(enableAutomaticTrackSubscription)
+                enableDominantSpeaker(enableDominantSpeaker)
+                enableNetworkQuality(isNetworkQualityEnabled)
+                networkQualityConfiguration(configuration)
+                bandwidthProfile(bandwidthProfileOptions)
+                encodingParameters(EncodingParameters(maxAudioBitrate, 0))
+                preferAudioCodecs(listOf(preferredAudioCodec))
+                videoEncodingMode(videoEncodingMode)
+            }
+        }
+
         return createConnectOptions(token) {
             roomName(roomName)
             enableInsights(enableInsights)
@@ -202,6 +204,13 @@ class ConnectOptionsFactory(
                 else -> OpusCodec()
             }
         } ?: OpusCodec()
+    }
+
+    private fun getVideoEncodingMode(modeBoolean: Boolean): VideoEncodingMode? {
+        return when (modeBoolean) {
+            true -> VideoEncodingMode.AUTO
+            else -> null
+        }
     }
 
     private fun setSdkEnvironment(sharedPreferences: SharedPreferences) {

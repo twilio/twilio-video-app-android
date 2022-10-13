@@ -1,6 +1,7 @@
 package com.twilio.video.app.ui.settings
 
 import android.os.Bundle
+import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -16,8 +17,13 @@ import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.MAX_VIDEO_BITRATE
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
+import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
+import com.twilio.video.app.data.Preferences.VIDEO_ENCODING_MODE
+import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
+import com.twilio.video.app.util.get
 import com.twilio.video.app.util.isInternalFlavor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
@@ -26,9 +32,31 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
     private val videoCodecNames = arrayOf(Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME)
     private val audioCodecNames = arrayOf(IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME)
 
+    override fun onStart() {
+        super.onStart()
+        val onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference: Preference, newValue: Any ->
+            enableOrDisableVideoPreferences(newValue as Boolean)
+            true
+        }
+        val checkBoxPreference: CheckBoxPreference? = findPreference(VIDEO_ENCODING_MODE)
+        checkBoxPreference?.isChecked?.let { enableOrDisableVideoPreferences(it) }
+        checkBoxPreference?.onPreferenceChangeListener = onPreferenceChangeListener
+    }
+
+    private fun enableOrDisableVideoPreferences(videoEncodingMode: Boolean) {
+        if (videoEncodingMode) {
+            findPreference<Preference>(MAX_VIDEO_BITRATE)?.isEnabled = false
+            findPreference<Preference>(VIDEO_CODEC)?.isEnabled = false
+            findPreference<Preference>(VP8_SIMULCAST)?.isEnabled = false
+        } else {
+            findPreference<Preference>(MAX_VIDEO_BITRATE)?.isEnabled = true
+            findPreference<Preference>(VIDEO_CODEC)?.isEnabled = true
+            findPreference<Preference>(VP8_SIMULCAST)?.isEnabled = true
+        }
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.advanced_preferences)
-
         findPreference<Preference>(Preferences.INTERNAL)?.isVisible = isInternalFlavor
 
         setHasOptionsMenu(true)
@@ -44,7 +72,6 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
                 }
             }
         }
-
         setupCodecListPreference(
                 VideoCodec::class.java,
                 Preferences.VIDEO_CODEC,
