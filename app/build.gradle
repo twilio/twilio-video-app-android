@@ -12,9 +12,9 @@ def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
 
 afterEvaluate {
     def ndkVersion = 'ndkVersion'
-    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
-        android.ndkVersion = "${project.property(ndkVersion)}"
-    }
+//    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
+//        android.ndkVersion = "${project.property(ndkVersion)}"
+//    }
 
     /*
     * Enable the application to consume the Video Android SDK directly from source
