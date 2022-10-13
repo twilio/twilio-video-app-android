@@ -20,6 +20,7 @@ import com.twilio.video.TrackPriority
 import com.twilio.video.TrackSwitchOffMode
 import com.twilio.video.VideoCodec
 import com.twilio.video.VideoContentPreferencesMode
+import com.twilio.video.VideoEncodingMode
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
@@ -122,6 +123,26 @@ class ConnectOptionsFactory(
                 Preferences.MAX_AUDIO_BITRATE,
                 Preferences.MAX_AUDIO_BITRATE_DEFAULT)
 
+        val videoEncodingMode = sharedPreferences.get(Preferences.VIDEO_ENCODING_MODE,
+                Preferences.VIDEO_ENCODING_MODE_DEFAULT).let {
+            getVideoEncodingMode(it)
+        }
+
+        if (videoEncodingMode == VideoEncodingMode.AUTO) {
+            return createConnectOptions(token) {
+                roomName(roomName)
+                enableInsights(enableInsights)
+                enableAutomaticSubscription(enableAutomaticTrackSubscription)
+                enableDominantSpeaker(enableDominantSpeaker)
+                enableNetworkQuality(isNetworkQualityEnabled)
+                networkQualityConfiguration(configuration)
+                bandwidthProfile(bandwidthProfileOptions)
+                encodingParameters(EncodingParameters(maxAudioBitrate, 0))
+                preferAudioCodecs(listOf(preferredAudioCodec))
+                videoEncodingMode(videoEncodingMode)
+            }
+        }
+
         return createConnectOptions(token) {
             roomName(roomName)
             enableInsights(enableInsights)
@@ -202,6 +223,13 @@ class ConnectOptionsFactory(
                 else -> OpusCodec()
             }
         } ?: OpusCodec()
+    }
+
+    private fun getVideoEncodingMode(modeBoolean: Boolean): VideoEncodingMode? {
+        return when (modeBoolean) {
+            true -> VideoEncodingMode.AUTO
+            else -> null
+        }
     }
 
     private fun setSdkEnvironment(sharedPreferences: SharedPreferences) {
