@@ -52,7 +52,7 @@ commands:
           name: Configure git user
           command: |
             git config --global user.email "twilio-sdk-build@twilio.com"
-            git config --global user.name "twilio-sdk-build"jobs:
+            git config --global user.name "twilio-sdk-build"
 
   gcloud_auth:
     description: "Authenticate gcloud client"
