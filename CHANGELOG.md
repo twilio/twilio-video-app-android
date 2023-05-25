@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.127 (May 25, 2023)
+
+### Dependency Upgrades
+
+* Updated AudioSwitch version to 1.1.8
+
+
 ## 0.126 (Oct 10, 2022)
 
 ### Dependency Upgrades
