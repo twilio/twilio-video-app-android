@@ -39,29 +39,25 @@ afterEvaluate {
 }
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion '30.0.2'
+    compileSdkVersion 34
+    namespace 'com.twilio.video.app'
+    testNamespace 'com.twilio.video.app.e2eTest'
 
     buildFeatures {
         viewBinding true
     }
-
-    lintOptions {
-        disable 'GradleDependency'
-        warningsAsErrors true
-        // TODO: Fix all baseline app warnings and errors GSDK-1984
-        baseline file("lint-baseline.xml")
-    }
-
     packagingOptions {
-        exclude 'META-INF/LICENSE'
+        resources {
+            excludes += ['META-INF/LICENSE']
+        }
     }
+
 
     defaultConfig {
         applicationId "com.twilio.video.app"
 
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 34
 
         versionName "0.1.0"
         versionCode versionCodeProperty
@@ -75,12 +71,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_11
     }
 
     testOptions {
@@ -138,6 +134,12 @@ android {
                     "TWILIO_ACCESS_TOKEN",
                     "\"${getLocalProperty("TWILIO_ACCESS_TOKEN")}\"")
         }
+    }
+
+    lint {
+        baseline file('lint-baseline.xml')
+        disable 'GradleDependency'
+        warningsAsErrors true
     }
 }
 
