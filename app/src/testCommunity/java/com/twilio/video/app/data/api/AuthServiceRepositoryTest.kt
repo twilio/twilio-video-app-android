@@ -34,7 +34,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 private const val passcode = "12345678901234"
@@ -237,7 +237,7 @@ class AuthServiceRepositoryTest {
 
             repository.getToken(passcode = "12345678901234")
 
-            verifyZeroInteractions(editor)
+            verifyNoInteractions(editor)
         }
     }
 
