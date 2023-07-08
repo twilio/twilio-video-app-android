@@ -1,37 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.0.1" client="gradle" variant="all" version="4.0.1">
+<issues format="6" by="lint 8.0.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.0.2)" variant="all" version="8.0.2">
 
     <issue
-        id="UnusedResources"
-        message="The resource `R.style.FirebaseUI_Button_AccountChooser_EmailButton` appears to be unused"
-        errorLine1="    &lt;style name=&quot;FirebaseUI.Button.AccountChooser.EmailButton&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="ObsoleteLintCustomCheck"
+        message="Library lint checks out of date;&#xA;these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`dagger.lint.DaggerIssueRegistry`)&#xA;which was compiled against an older version of lint&#xA;than this one. This is usually fine, but not in this&#xA;case; some basic verification shows that the lint&#xA;check jar references (for example) the following API&#xA;which is no longer valid in this version of lint:&#xA;org.jetbrains.uast.kotlin.KotlinUClass: org.jetbrains.kotlin.psi.KtClassOrObject getKtClass()&#xA;(Referenced from dagger/lint/DaggerKotlinIssueDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`JvmStaticProvidesInObjectDetector`,`FieldSiteTargetOnQualifierAnnotation`,`ModuleCompanionObjects`,`ModuleCompanionObjectsNotInModuleParent`&#xA;&#xA;Recompile the checks against the latest version, or if&#xA;this is a check bundled with a third-party library, see&#xA;if there is a more recent version available.&#xA;&#xA;Version of Lint API this lint check is using is 8.&#xA;The Lint API version currently running is 14 (8.0+).">
         <location
-            file="src/main/res/values-v21/styles.xml"
-            line="39"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.style.FirebaseUI_Text_Link` appears to be unused"
-        errorLine1="    &lt;style name=&quot;FirebaseUI.Text.Link&quot;>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-v21/styles.xml"
-            line="45"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UselessParent"
-        message="This `ScrollView` layout or its `FrameLayout` parent is possibly useless; transfer the `background` attribute to the other view"
-        errorLine1="    &lt;ScrollView"
-        errorLine2="     ~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/login_landing_fragment.xml"
-            line="8"
-            column="6"/>
+            file="$GRADLE_USER_HOME/caches/transforms-3/286d99bfe5155205450c10c6340eba3e/transformed/jetified-dagger-lint-aar-2.38.1/jars/lint.jar"/>
     </issue>
 
     <issue
@@ -57,26 +31,13 @@
     </issue>
 
     <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorPrimary` with a theme that also paints a background (inferred theme is `@style/AppTheme_LoginScreen`)"
-        errorLine1="    android:background=&quot;?attr/colorPrimary&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        includedVariants="communityDebug,communityRelease"
-        excludedVariants="internalDebug,internalRelease">
-        <location
-            file="src/community/res/layout/community_login_activity.xml"
-            line="8"
-            column="5"/>
-    </issue>
-
-    <issue
         id="UnusedResources"
         message="The resource `R.color.lobbyStatusBar` appears to be unused"
         errorLine1="    &lt;color name=&quot;lobbyStatusBar&quot;>#e0e0e0&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="16"
+            line="17"
             column="12"/>
     </issue>
 
@@ -87,7 +48,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="17"
+            line="18"
             column="12"/>
     </issue>
 
@@ -98,7 +59,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="21"
+            line="22"
             column="12"/>
     </issue>
 
@@ -166,30 +127,6 @@
             file="src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
             line="2"
             column="1"/>
-        <location
-            file="src/main/res/mipmap-hdpi/ic_launcher_round.png"/>
-        <location
-            file="src/main/res/mipmap-mdpi/ic_launcher_round.png"/>
-        <location
-            file="src/main/res/mipmap-xhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/main/res/mipmap-xxhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/community/res/mipmap-anydpi-v26/ic_launcher_round.xml"
-            line="2"
-            column="1"/>
-        <location
-            file="src/community/res/mipmap-hdpi/ic_launcher_round.png"/>
-        <location
-            file="src/community/res/mipmap-mdpi/ic_launcher_round.png"/>
-        <location
-            file="src/community/res/mipmap-xhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/community/res/mipmap-xxhdpi/ic_launcher_round.png"/>
-        <location
-            file="src/community/res/mipmap-xxxhdpi/ic_launcher_round.png"/>
     </issue>
 
     <issue
@@ -342,7 +279,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="126"
+            line="96"
             column="13"/>
     </issue>
 
@@ -353,7 +290,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="127"
+            line="97"
             column="13"/>
     </issue>
 
@@ -364,7 +301,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="129"
+            line="99"
             column="13"/>
     </issue>
 
@@ -375,7 +312,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="135"
+            line="106"
             column="13"/>
     </issue>
 
@@ -386,7 +323,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="136"
+            line="107"
             column="13"/>
     </issue>
 
@@ -397,7 +334,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="137"
+            line="108"
             column="13"/>
     </issue>
 
@@ -408,7 +345,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="138"
+            line="109"
             column="13"/>
     </issue>
 
@@ -419,7 +356,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="139"
+            line="110"
             column="13"/>
     </issue>
 
@@ -430,7 +367,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="140"
+            line="111"
             column="13"/>
     </issue>
 
@@ -441,7 +378,7 @@
         errorLine2="            ~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="142"
+            line="113"
             column="13"/>
     </issue>
 
@@ -452,7 +389,7 @@
         errorLine2="            ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="143"
+            line="114"
             column="13"/>
     </issue>
 
@@ -463,7 +400,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="144"
+            line="115"
             column="13"/>
     </issue>
 
@@ -474,7 +411,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="145"
+            line="116"
             column="13"/>
     </issue>
 
@@ -485,7 +422,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="146"
+            line="117"
             column="13"/>
     </issue>
 
@@ -496,7 +433,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="147"
+            line="118"
             column="13"/>
     </issue>
 
@@ -507,7 +444,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="148"
+            line="119"
             column="13"/>
     </issue>
 
@@ -518,7 +455,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="149"
+            line="120"
             column="13"/>
     </issue>
 
@@ -529,7 +466,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="150"
+            line="121"
             column="13"/>
     </issue>
 
@@ -540,7 +477,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="151"
+            line="122"
             column="13"/>
     </issue>
 
@@ -551,7 +488,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="152"
+            line="123"
             column="13"/>
     </issue>
 
@@ -562,7 +499,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="153"
+            line="124"
             column="13"/>
     </issue>
 
@@ -573,7 +510,7 @@
         errorLine2="            ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="193"
+            line="157"
             column="13"/>
     </issue>
 
@@ -584,7 +521,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
-            line="16"
+            line="25"
             column="12"/>
     </issue>
 
@@ -595,7 +532,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles.xml"
-            line="17"
+            line="26"
             column="12"/>
     </issue>
 
@@ -608,39 +545,6 @@
             file="src/main/res/drawable/twilio_badge_white.xml"
             line="2"
             column="1"/>
-    </issue>
-
-    <issue
-        id="UselessParent"
-        message="This `ScrollView` layout or its `FrameLayout` parent is possibly useless; transfer the `background` attribute to the other view"
-        errorLine1="    &lt;ScrollView"
-        errorLine2="     ~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/login_landing_fragment.xml"
-            line="8"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="UselessParent"
-        message="This `RelativeLayout` layout or its `LinearLayout` parent is useless"
-        errorLine1="    &lt;RelativeLayout"
-        errorLine2="     ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/join_room.xml"
-            line="10"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="UselessParent"
-        message="This `LinearLayout` layout or its `LinearLayout` parent is useless"
-        errorLine1="    &lt;LinearLayout"
-        errorLine2="     ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/range_bar_preference.xml"
-            line="14"
-            column="6"/>
     </issue>
 
     <issue
@@ -659,17 +563,6 @@
             file="src/main/res/layout/number_preference.xml"
             line="16"
             column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout-v21/room_activity.xml"
-            line="153"
-            column="18"/>
     </issue>
 
     <issue

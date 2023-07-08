@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.room
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -19,6 +20,7 @@ class VideoService : Service() {
     @Inject
     lateinit var roomManager: RoomManager
 
+    @SuppressLint("RestrictedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         setupForegroundService(intent)
@@ -27,6 +29,7 @@ class VideoService : Service() {
         return START_NOT_STICKY
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("VideoService destroyed")

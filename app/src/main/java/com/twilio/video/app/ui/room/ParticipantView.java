@@ -74,7 +74,6 @@ abstract class ParticipantView extends FrameLayout {
         initParams(context, attrs);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     ParticipantView(
             @NonNull Context context,
             @Nullable AttributeSet attrs,

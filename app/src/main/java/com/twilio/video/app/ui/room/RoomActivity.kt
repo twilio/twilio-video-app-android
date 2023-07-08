@@ -448,7 +448,6 @@ class RoomActivity : AppCompatActivity() {
         }
     }
 
-    @TargetApi(21)
     private fun requestScreenCapturePermission() {
         Timber.d("Requesting permission to capture screen")
         val mediaProjectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
