@@ -2,8 +2,8 @@ package com.twilio.video.app.ui.room
 
 import android.net.Uri
 import com.twilio.video.app.BaseUnitTest
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test

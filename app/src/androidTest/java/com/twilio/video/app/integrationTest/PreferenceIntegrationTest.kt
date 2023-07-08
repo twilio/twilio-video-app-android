@@ -71,17 +71,21 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         // Use inverse of default as second param to ensure default works from preference screen
         val sharedPreferences = getSharedPreferences(getTargetContext())
         val acousticEchoCanceler = sharedPreferences.getBoolean(
-                Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
-                !Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT)
+            Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
+            !Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT,
+        )
         val noiseSuppressor = sharedPreferences.getBoolean(
-                Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
-                !Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT)
+            Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
+            !Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT,
+        )
         val automaticGainControl = sharedPreferences.getBoolean(
-                Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
-                !Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT)
+            Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
+            !Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
+        )
         val openSLESUsage = sharedPreferences.getBoolean(
-                Preferences.AUDIO_OPEN_SLES_USAGE,
-                !Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT)
+            Preferences.AUDIO_OPEN_SLES_USAGE,
+            !Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT,
+        )
 
         assertThat(acousticEchoCanceler, equalTo(Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT))
         assertThat(noiseSuppressor, equalTo(Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT))
@@ -98,8 +102,9 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         // Use inverse of default as second param to ensure default works from preference screen
         val sharedPreferences = getSharedPreferences(getTargetContext())
         val videoEncodingMode = sharedPreferences.getBoolean(
-                Preferences.VIDEO_ENCODING_MODE,
-                !Preferences.VIDEO_ENCODING_MODE_DEFAULT)
+            Preferences.VIDEO_ENCODING_MODE,
+            !Preferences.VIDEO_ENCODING_MODE_DEFAULT,
+        )
         assertThat(videoEncodingMode, equalTo(Preferences.VIDEO_ENCODING_MODE_DEFAULT))
     }
 
@@ -130,8 +135,10 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
         scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
 
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_switch_off_control),
-                getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0])
+        assertDefaultValue(
+            getString(R.string.settings_screen_bandwidth_profile_switch_off_control),
+            getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0],
+        )
     }
 
     @Test
@@ -158,8 +165,10 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)
         scrollAndClickView(getString(R.string.settings_title_bandwidth_profile), R.id.recycler_view)
 
-        assertDefaultValue(getString(R.string.settings_title_video_content_preferences_mode),
-                getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0])
+        assertDefaultValue(
+            getString(R.string.settings_title_video_content_preferences_mode),
+            getStringArray(R.array.settings_screen_bandwidth_media_optimizations_controls)[0],
+        )
     }
 
     @Test
@@ -182,22 +191,30 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
     }
 
     private fun assertDefaultBandwidthProfileSettings() {
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_mode),
-                getStringArray(R.array.settings_screen_bandwidth_profile_modes)[1])
+        assertDefaultValue(
+            getString(R.string.settings_screen_bandwidth_profile_mode),
+            getStringArray(R.array.settings_screen_bandwidth_profile_modes)[1],
+        )
 
-        assertDefaultValue(getString(R.string.settings_screen_max_subscription_bitrate),
-                Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT.toString())
+        assertDefaultValue(
+            getString(R.string.settings_screen_max_subscription_bitrate),
+            Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT.toString(),
+        )
 
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_dominant_speaker_priority),
-                getStringArray(R.array.settings_screen_bandwidth_profile_dominant_speaker_priorities)[2])
+        assertDefaultValue(
+            getString(R.string.settings_screen_bandwidth_profile_dominant_speaker_priority),
+            getStringArray(R.array.settings_screen_bandwidth_profile_dominant_speaker_priorities)[2],
+        )
 
-        assertDefaultValue(getString(R.string.settings_screen_bandwidth_profile_track_switch_mode),
-                Preferences.SERVER_DEFAULT)
+        assertDefaultValue(
+            getString(R.string.settings_screen_bandwidth_profile_track_switch_mode),
+            Preferences.SERVER_DEFAULT,
+        )
     }
 
     private fun assertDefaultValue(preferenceTitle: String, preferenceValue: String) {
         onView(withId(R.id.recycler_view))
-                .perform(scrollTo<ViewHolder>(hasDescendant(withText(preferenceTitle))))
+            .perform(scrollTo<ViewHolder>(hasDescendant(withText(preferenceTitle))))
         onView(withText(preferenceTitle)).check(matches(hasSibling(withText(preferenceValue))))
     }
 }

@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [SecurityModule::class]
+    replaces = [SecurityModule::class],
 )
 class FakeSecurityModule {
 

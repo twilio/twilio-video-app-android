@@ -26,7 +26,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsActivity : AppCompatActivity(),
+class SettingsActivity :
+    AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject
@@ -42,12 +43,13 @@ class SettingsActivity : AppCompatActivity(),
 
     override fun onPreferenceStartFragment(
         caller: PreferenceFragmentCompat?,
-        pref: Preference
+        pref: Preference,
     ): Boolean {
         val args = pref.extras
         val fragment = supportFragmentManager.fragmentFactory.instantiate(
             classLoader,
-            pref.fragment)
+            pref.fragment,
+        )
         fragment.arguments = args
         fragment.setTargetFragment(caller, 0)
 

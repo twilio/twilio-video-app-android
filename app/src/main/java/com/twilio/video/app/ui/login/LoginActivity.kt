@@ -38,6 +38,7 @@ private const val RC_SIGN_IN = 20
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var authUI: FirebaseAuth
+
     @Inject
     internal lateinit var sharedPreferences: SharedPreferences
 
@@ -64,22 +65,24 @@ class LoginActivity : AppCompatActivity() {
     private fun navigateToFirebaseUIAuth() {
         val acceptedDomain = "twilio.com"
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .setHostedDomain(acceptedDomain)
-                .build()
+            .requestEmail()
+            .setHostedDomain(acceptedDomain)
+            .build()
         val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(false).build(),
-                AuthUI.IdpConfig.GoogleBuilder().setSignInOptions(signInOptions).build())
+            AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(false).build(),
+            AuthUI.IdpConfig.GoogleBuilder().setSignInOptions(signInOptions).build(),
+        )
         startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .setIsSmartLockEnabled(false)
-                        .setAlwaysShowSignInMethodScreen(true)
-                        .setTheme(R.style.AppTheme_LoginScreen)
-                        .setLogo(R.drawable.video_logo_splash)
-                        .build(),
-                RC_SIGN_IN)
+            AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .setIsSmartLockEnabled(false)
+                .setAlwaysShowSignInMethodScreen(true)
+                .setTheme(R.style.AppTheme_LoginScreen)
+                .setLogo(R.drawable.video_logo_splash)
+                .build(),
+            RC_SIGN_IN,
+        )
     }
 
     private fun startLobbyActivity() {

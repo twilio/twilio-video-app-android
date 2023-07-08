@@ -6,18 +6,18 @@ import com.twilio.video.Video
 
 class VideoClient(
     private val context: Context,
-    private val connectOptionsFactory: ConnectOptionsFactory
+    private val connectOptionsFactory: ConnectOptionsFactory,
 ) {
 
     suspend fun connect(
         identity: String,
         roomName: String,
-        roomListener: Room.Listener
+        roomListener: Room.Listener,
     ): Room {
-
-            return Video.connect(
-                    context,
-                    connectOptionsFactory.newInstance(identity, roomName),
-                    roomListener)
+        return Video.connect(
+            context,
+            connectOptionsFactory.newInstance(identity, roomName),
+            roomListener,
+        )
     }
 }

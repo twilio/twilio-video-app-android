@@ -8,9 +8,8 @@ import kotlin.reflect.KClass
 
 fun FragmentManager.replaceFragment(
     fragment: Fragment,
-    @IdRes fragmentContainer: Int
+    @IdRes fragmentContainer: Int,
 ) {
-
     commit {
         addToBackStack(null)
         replace(fragmentContainer, findFragment(fragment::class) ?: fragment)
@@ -18,4 +17,4 @@ fun FragmentManager.replaceFragment(
 }
 
 fun FragmentManager.findFragment(fragment: KClass<out Fragment>): Fragment? =
-        fragments.find { it::class == fragment }
+    fragments.find { it::class == fragment }

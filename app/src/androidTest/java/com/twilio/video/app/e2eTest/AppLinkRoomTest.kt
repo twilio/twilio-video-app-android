@@ -23,20 +23,25 @@ import org.junit.runner.RunWith
 class AppLinkRoomTest {
 
     @get:Rule
-    var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA,
-            android.Manifest.permission.RECORD_AUDIO)
+    var permissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.CAMERA,
+        android.Manifest.permission.RECORD_AUDIO,
+    )
 
     @get:Rule
     var rule: ActivityTestRule<SplashActivity> =
-            ActivityTestRule(SplashActivity::class.java,
+        ActivityTestRule(
+            SplashActivity::class.java,
             true,
-            false)
+            false,
+        )
 
     @Test
     fun `room_app_link_should_navigate_to_room_screen_with_room_name_populated`() {
         val roomName = "test"
-        val intent = Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://${getString(R.string.web_app_domain)}/room/$roomName")
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://${getString(R.string.web_app_domain)}/room/$roomName"),
         )
         rule.launchActivity(intent)
 

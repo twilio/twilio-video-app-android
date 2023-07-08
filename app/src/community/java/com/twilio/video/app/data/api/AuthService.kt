@@ -9,6 +9,6 @@ interface AuthService {
     @POST
     suspend fun getToken(
         @Url url: String,
-        @Body authServiceRequestDTO: AuthServiceRequestDTO
+        @Body authServiceRequestDTO: AuthServiceRequestDTO,
     ): AuthServiceResponseDTO
 }

@@ -9,8 +9,8 @@ import android.os.IBinder
 import androidx.annotation.RestrictTo
 import com.twilio.video.app.sdk.RoomManager
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
@@ -47,7 +47,7 @@ class VideoService : Service() {
                 val roomNotification = RoomNotification(this@VideoService)
                 startForeground(
                     ONGOING_NOTIFICATION_ID,
-                    roomNotification.buildNotification(roomName)
+                    roomNotification.buildNotification(roomName),
                 )
             }
         }

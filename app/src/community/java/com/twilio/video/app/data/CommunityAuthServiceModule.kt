@@ -26,12 +26,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,31 +46,31 @@ class CommunityAuthServiceModule {
             builder.addInterceptor(interceptor)
         }
         return builder
-                .readTimeout(30, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .build()
+            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .build()
     }
 
     @Provides
     @Singleton
     fun providesAuthService(okHttpClient: OkHttpClient): AuthService {
         return Retrofit.Builder()
-                .client(okHttpClient)
+            .client(okHttpClient)
                 /*
                  * Retrofit requires a base URL when constructing a client. The final URL will be determined by the
                  * user, so insert a placeholder base URL to be replaced at runtime.
                  */
-                .baseUrl("https://PLACEHOLDER_URL")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(AuthService::class.java)
+            .baseUrl("https://PLACEHOLDER_URL")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AuthService::class.java)
     }
 
     @Provides
     fun providesTokenService(
         authService: AuthService,
         securePreferences: SecurePreferences,
-        sharedPreferences: SharedPreferences
+        sharedPreferences: SharedPreferences,
     ): TokenService {
         return AuthServiceRepository(authService, securePreferences, SharedPreferencesWrapper(sharedPreferences))
     }

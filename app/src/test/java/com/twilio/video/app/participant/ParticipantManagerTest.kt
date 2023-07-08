@@ -7,8 +7,8 @@ import com.twilio.video.VideoTrack
 import com.twilio.video.app.BaseUnitTest
 import com.twilio.video.app.sdk.VideoTrackViewState
 import junitparams.JUnitParamsRunner
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.fail
@@ -24,8 +24,12 @@ import org.mockito.kotlin.verifyNoInteractions
 class ParticipantManagerTest : BaseUnitTest() {
 
     val participantManager = ParticipantManager()
-    private val localParticipant = ParticipantViewState("1", "Local Participant",
-            videoTrack = VideoTrackViewState(mock<LocalVideoTrack>()), isLocalParticipant = true)
+    private val localParticipant = ParticipantViewState(
+        "1",
+        "Local Participant",
+        videoTrack = VideoTrackViewState(mock<LocalVideoTrack>()),
+        isLocalParticipant = true,
+    )
     val dominantSpeakers get() =
         participantManager.participantThumbnails.filter { it.isDominantSpeaker }
 
@@ -128,8 +132,10 @@ class ParticipantManagerTest : BaseUnitTest() {
         val screenTrack = mock<RemoteVideoTrack>()
         val screenSharingParticipant = setupThreeParticipantScenario()
 
-        participantManager.updateParticipantScreenTrack(screenSharingParticipant.sid!!,
-                VideoTrackViewState(videoTrack = screenTrack))
+        participantManager.updateParticipantScreenTrack(
+            screenSharingParticipant.sid!!,
+            VideoTrackViewState(videoTrack = screenTrack),
+        )
 
         verify(screenTrack).priority = HIGH
     }
@@ -146,8 +152,10 @@ class ParticipantManagerTest : BaseUnitTest() {
         setupThreeParticipantScenario()
 
         val screenTrack = mock<VideoTrack>()
-        participantManager.updateParticipantScreenTrack(localParticipant.sid!!,
-                VideoTrackViewState(screenTrack))
+        participantManager.updateParticipantScreenTrack(
+            localParticipant.sid!!,
+            VideoTrackViewState(screenTrack),
+        )
 
         verifyNoInteractions(screenTrack)
     }
@@ -184,8 +192,11 @@ class ParticipantManagerTest : BaseUnitTest() {
 
     @Test
     fun `primary participant VideoTrack priority should be high when there is one remote participant`() {
-        val participant2 = ParticipantViewState("2", "Participant 2",
-                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+        val participant2 = ParticipantViewState(
+            "2",
+            "Participant 2",
+            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()),
+        )
         participantManager.addParticipant(localParticipant)
         participantManager.addParticipant(participant2)
 
@@ -195,8 +206,11 @@ class ParticipantManagerTest : BaseUnitTest() {
 
     @Test
     fun `primary participant VideoTrack priority should not be set when there is one remote participant with a null video track`() {
-        val participant2 = ParticipantViewState("2", "Participant 2",
-                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+        val participant2 = ParticipantViewState(
+            "2",
+            "Participant 2",
+            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()),
+        )
         participantManager.addParticipant(localParticipant)
         participantManager.addParticipant(participant2)
 
@@ -237,8 +251,10 @@ class ParticipantManagerTest : BaseUnitTest() {
         val participant3 = setupThreeParticipantScenario()
         val screenTrack = mock<RemoteVideoTrack>()
 
-        participantManager.updateParticipantScreenTrack(participant3.sid!!,
-                VideoTrackViewState(screenTrack))
+        participantManager.updateParticipantScreenTrack(
+            participant3.sid!!,
+            VideoTrackViewState(screenTrack),
+        )
         participantManager.changePinnedParticipant("2")
 
         inOrder(screenTrack).run {
@@ -266,8 +282,10 @@ class ParticipantManagerTest : BaseUnitTest() {
         setupThreeParticipantScenario()
         val screenTrack = mock<RemoteVideoTrack>()
 
-        participantManager.updateParticipantScreenTrack("3",
-                VideoTrackViewState(screenTrack))
+        participantManager.updateParticipantScreenTrack(
+            "3",
+            VideoTrackViewState(screenTrack),
+        )
         participantManager.changePinnedParticipant(localParticipant.sid!!)
 
         inOrder(screenTrack).run {
@@ -277,8 +295,11 @@ class ParticipantManagerTest : BaseUnitTest() {
     }
 
     private fun setupExistingDominantSpeakerScenario() {
-        val participant2 = ParticipantViewState("2", "Participant 2",
-                isDominantSpeaker = true)
+        val participant2 = ParticipantViewState(
+            "2",
+            "Participant 2",
+            isDominantSpeaker = true,
+        )
         val dominantSpeaker = ParticipantViewState("3", "Participant 3")
         participantManager.addParticipant(localParticipant)
         participantManager.addParticipant(participant2)
@@ -286,10 +307,16 @@ class ParticipantManagerTest : BaseUnitTest() {
     }
 
     private fun setupThreeParticipantScenario(): ParticipantViewState {
-        val participant2 = ParticipantViewState("2", "Participant 2",
-                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
-        val participant3 = ParticipantViewState("3", "Participant 3",
-                videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()))
+        val participant2 = ParticipantViewState(
+            "2",
+            "Participant 2",
+            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()),
+        )
+        val participant3 = ParticipantViewState(
+            "3",
+            "Participant 3",
+            videoTrack = VideoTrackViewState(mock<RemoteVideoTrack>()),
+        )
         participantManager.updateLocalParticipant(localParticipant)
         participantManager.addParticipant(participant2)
         participantManager.addParticipant(participant3)

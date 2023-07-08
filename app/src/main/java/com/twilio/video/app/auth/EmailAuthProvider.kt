@@ -27,7 +27,7 @@ import timber.log.Timber
 // TODO unit test as part of https://issues.corp.twilio.com/browse/AHOYAPPS-140
 class EmailAuthProvider @JvmOverloads constructor(
     private val firebaseWrapper: FirebaseWrapper,
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    private val disposables: CompositeDisposable = CompositeDisposable(),
 ) : AuthenticationProvider {
     override fun logout() {
         firebaseWrapper.instance.signOut()
@@ -45,15 +45,15 @@ class EmailAuthProvider @JvmOverloads constructor(
                             onError(observable)
                         }
                         firebaseWrapper.instance.signInWithEmailAndPassword(email, password)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        observable.onNext(EmailLoginSuccessResult(email))
-                                        observable.onComplete()
-                                        disposables.clear()
-                                    } else {
-                                        onError(observable)
-                                    }
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    observable.onNext(EmailLoginSuccessResult(email))
+                                    observable.onComplete()
+                                    disposables.clear()
+                                } else {
+                                    onError(observable)
                                 }
+                            }
                     }
                 }
             }, {

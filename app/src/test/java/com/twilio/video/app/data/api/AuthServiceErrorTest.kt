@@ -14,20 +14,19 @@ import org.junit.runner.RunWith
 class AuthServiceErrorTest : BaseUnitTest() {
 
     fun params() =
-            arrayOf(
-                    arrayOf("passcode incorrect", INVALID_PASSCODE_ERROR),
-                    arrayOf("passcode expired", EXPIRED_PASSCODE_ERROR),
-                    arrayOf("bad input", null),
-                    arrayOf<Any?>(null, null)
-            )
+        arrayOf(
+            arrayOf("passcode incorrect", INVALID_PASSCODE_ERROR),
+            arrayOf("passcode expired", EXPIRED_PASSCODE_ERROR),
+            arrayOf("bad input", null),
+            arrayOf<Any?>(null, null),
+        )
 
     @Parameters(method = "params")
     @Test
     fun `value should return the corresponding AuthServiceError enum`(
         input: String?,
-        expectedValue: AuthServiceError?
+        expectedValue: AuthServiceError?,
     ) {
-
         assertThat(AuthServiceError.value(input), equalTo(expectedValue))
     }
 }

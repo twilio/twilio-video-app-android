@@ -41,11 +41,14 @@ private fun loginWithEmail(email: String, password: String) {
     onView(withId(R.id.email_button)).perform(click())
     onView(withId(R.id.email)).perform(
         DisableAutofillAction(),
-        typeText(email))
+        typeText(email),
+    )
     onView(withId(R.id.button_next)).perform(click())
-    retryEspressoAction { onView(withId(R.id.password)).perform(
-        DisableAutofillAction(),
-        typeText(password))
+    retryEspressoAction {
+        onView(withId(R.id.password)).perform(
+            DisableAutofillAction(),
+            typeText(password),
+        )
     }
     onView(withId(R.id.button_done)).perform(click())
 }

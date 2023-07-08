@@ -50,7 +50,7 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.spotless" version "5.8.2"
+    id "com.diffplug.spotless" version '6.19.0'
 }
 apply plugin: "com.diffplug.spotless"
 spotless {

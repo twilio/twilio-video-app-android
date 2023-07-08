@@ -8,29 +8,30 @@ import androidx.recyclerview.widget.ListAdapter
 import com.twilio.video.app.participant.ParticipantViewState
 
 internal class ParticipantAdapter : ListAdapter<ParticipantViewState, ParticipantViewHolder>(
-        ParticipantDiffCallback()) {
+    ParticipantDiffCallback(),
+) {
 
     private val mutableViewHolderEvents = MutableLiveData<RoomViewEvent>()
     val viewHolderEvents: LiveData<RoomViewEvent> = mutableViewHolderEvents
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantViewHolder =
-            ParticipantViewHolder(ParticipantThumbView(parent.context))
+        ParticipantViewHolder(ParticipantThumbView(parent.context))
 
     override fun onBindViewHolder(holder: ParticipantViewHolder, position: Int) =
-            holder.bind(getItem(position)) { mutableViewHolderEvents.value = it }
+        holder.bind(getItem(position)) { mutableViewHolderEvents.value = it }
 
     class ParticipantDiffCallback : DiffUtil.ItemCallback<ParticipantViewState>() {
         override fun areItemsTheSame(
             oldItem: ParticipantViewState,
-            newItem: ParticipantViewState
+            newItem: ParticipantViewState,
         ): Boolean =
-                oldItem.sid == newItem.sid
+            oldItem.sid == newItem.sid
 
         override fun areContentsTheSame(
             oldItem: ParticipantViewState,
-            newItem: ParticipantViewState
+            newItem: ParticipantViewState,
         ): Boolean =
-                oldItem == newItem
+            oldItem == newItem
 
         override fun getChangePayload(oldItem: ParticipantViewState, newItem: ParticipantViewState): Any? {
             return newItem
