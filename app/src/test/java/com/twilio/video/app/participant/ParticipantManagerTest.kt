@@ -18,7 +18,7 @@ import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 
 @RunWith(JUnitParamsRunner::class)
 class ParticipantManagerTest : BaseUnitTest() {
@@ -149,7 +149,7 @@ class ParticipantManagerTest : BaseUnitTest() {
         participantManager.updateParticipantScreenTrack(localParticipant.sid!!,
                 VideoTrackViewState(screenTrack))
 
-        verifyZeroInteractions(screenTrack)
+        verifyNoInteractions(screenTrack)
     }
 
     @Test
@@ -158,7 +158,7 @@ class ParticipantManagerTest : BaseUnitTest() {
 
         participantManager.changePinnedParticipant(localParticipant.sid!!)
 
-        verifyZeroInteractions(localParticipant.videoTrack!!.videoTrack)
+        verifyNoInteractions(localParticipant.videoTrack!!.videoTrack)
     }
 
     @Test
