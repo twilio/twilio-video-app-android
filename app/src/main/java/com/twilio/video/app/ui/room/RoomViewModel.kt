@@ -2,8 +2,8 @@ package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
-import androidx.annotation.VisibleForTesting.PROTECTED
+import androidx.annotation.VisibleForTesting.Companion.PRIVATE
+import androidx.annotation.VisibleForTesting.Companion.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope

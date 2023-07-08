@@ -88,7 +88,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
 
         // Fill out the rest of settings
         identityPreference = findPreference<EditTextPreference>(Preferences.DISPLAY_NAME)?.apply {
-            summary = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
+            summary = sharedPreferences!!.getString(Preferences.DISPLAY_NAME, null)
             setOnPreferenceChangeListener { _, newValue ->
                 summary = newValue as CharSequence?
                 true
