@@ -41,13 +41,13 @@ class SettingsActivity : AppCompatActivity(),
     }
 
     override fun onPreferenceStartFragment(
-        caller: PreferenceFragmentCompat?,
+        caller: PreferenceFragmentCompat,
         pref: Preference
     ): Boolean {
         val args = pref.extras
         val fragment = supportFragmentManager.fragmentFactory.instantiate(
             classLoader,
-            pref.fragment)
+            pref.fragment!!)
         fragment.arguments = args
         fragment.setTargetFragment(caller, 0)
 

@@ -12,7 +12,7 @@ class InternalSettingsFragment : BaseSettingsFragment() {
         addPreferencesFromResource(R.xml.internal_preferences)
 
         findPreference<ListPreference>(Preferences.ENVIRONMENT)?.run {
-            value = sharedPreferences.getString(Preferences.ENVIRONMENT,
+            value = sharedPreferences!!.getString(Preferences.ENVIRONMENT,
                     Preferences.ENVIRONMENT_DEFAULT)
         }
 
@@ -20,7 +20,7 @@ class InternalSettingsFragment : BaseSettingsFragment() {
             val roomTypes = Topology.values().map { it.value }.toTypedArray()
             entries = roomTypes
             entryValues = roomTypes
-            value = sharedPreferences.getString(Preferences.TOPOLOGY,
+            value = sharedPreferences!!.getString(Preferences.TOPOLOGY,
                     Preferences.TOPOLOGY_DEFAULT)
         }
 
