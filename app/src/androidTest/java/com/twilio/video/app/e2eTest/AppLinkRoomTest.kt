@@ -33,7 +33,7 @@ class AppLinkRoomTest {
             false)
 
     @Test
-    fun room_app_link_should_navigate_to_room_screen_with_room_name_populated() {
+    fun `room_app_link_should_navigate_to_room_screen_with_room_name_populated`() {
         val roomName = "test"
         val intent = Intent(Intent.ACTION_VIEW,
                 Uri.parse("https://${getString(R.string.web_app_domain)}/room/$roomName")
