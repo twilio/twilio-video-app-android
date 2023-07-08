@@ -12,7 +12,7 @@ import com.twilio.video.app.util.get
 
 abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
 
-    protected val sharedPreferences: SharedPreferences get() = preferenceManager.sharedPreferences!!
+    protected val sharedPreferences: SharedPreferences get() = preferenceManager.sharedPreferences
 
     override fun onResume() {
         super.onResume()
@@ -20,7 +20,10 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
         (requireActivity() as AppCompatActivity).supportActionBar?.title = preferenceScreen.title
     }
 
-    override fun onDisplayPreferenceDialog(preference: Preference) {
+    override fun onDisplayPreferenceDialog(preference: Preference?) {
+        if (preference == null) {
+            return
+        }
 
         // show custom dialog preference
         if (preference is NumberPreference) {
@@ -51,7 +54,7 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
      */
     protected fun setListPreferenceValue(arrayId: Int, key: String, defaultValue: String) {
         val valueIndex = resources
-            .getStringArray(arrayId).indexOf(sharedPreferences!!.get(key, defaultValue))
+            .getStringArray(arrayId).indexOf(sharedPreferences.get(key, defaultValue))
         findPreference<ListPreference>(key)?.setValueIndex(valueIndex)
     }
 
@@ -61,7 +64,7 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
      */
     protected fun setNumberPreferenceValue(key: String, defaultValue: Int) {
         findPreference<NumberPreference>(key)?.apply {
-            val numberValue = sharedPreferences!!.get(key, defaultValue)
+            val numberValue = sharedPreferences.get(key, defaultValue)
             summary = numberValue.toString()
             number = numberValue
         }

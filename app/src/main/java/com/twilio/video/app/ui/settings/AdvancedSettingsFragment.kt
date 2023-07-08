@@ -86,7 +86,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
 
         // Fill out the rest of settings
         identityPreference = findPreference<EditTextPreference>(Preferences.DISPLAY_NAME)?.apply {
-            summary = sharedPreferences!!.getString(Preferences.DISPLAY_NAME, null)
+            summary = sharedPreferences.getString(Preferences.DISPLAY_NAME, null)
             setOnPreferenceChangeListener { _, newValue ->
                 summary = newValue as CharSequence?
                 true
@@ -106,7 +106,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
 
         val codecEntries = if (codecClass == AudioCodec::class.java) audioCodecNames else videoCodecNames
         // saved value
-        val value = sharedPreferences!!.getString(key, defaultValue)
+        val value = sharedPreferences.getString(key, defaultValue)
 
         // bind values
         preference.entries = codecEntries

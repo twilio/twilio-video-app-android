@@ -38,7 +38,7 @@ class SettingsFragment : BaseSettingsFragment() {
             val loginIntent = Intent(activity, screenSelector.loginScreen)
 
             // Clear all preferences and set defaults
-            sharedPreferences!!.edit().clear().apply()
+            sharedPreferences.edit().clear().apply()
             PreferenceManager.setDefaultValues(activity, R.xml.preferences, true)
 
             // Return to login activity
