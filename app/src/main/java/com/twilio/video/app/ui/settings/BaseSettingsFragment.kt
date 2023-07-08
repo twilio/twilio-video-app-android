@@ -21,7 +21,6 @@ abstract class BaseSettingsFragment : PreferenceFragmentCompat() {
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference) {
-
         // show custom dialog preference
         if (preference is NumberPreference) {
             NumberPreferenceDialogFragmentCompat.newInstance(preference.key)?.let { dialog ->
