@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.128 (July 11, 2023)
+## 0.132 (July 11, 2023)
 
 ### Dependency Upgrades
 
