@@ -35,54 +35,69 @@ import tvi.webrtc.voiceengine.WebRtcAudioUtils
 class ConnectOptionsFactory(
     private val context: Context,
     private val sharedPreferences: SharedPreferences,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
 ) {
 
     suspend fun newInstance(identity: String, roomName: String): ConnectOptions {
-
         setSdkEnvironment(sharedPreferences)
         val token = tokenService.getToken(identity, roomName)
         val enableInsights = sharedPreferences.getBoolean(
-                Preferences.ENABLE_INSIGHTS,
-                Preferences.ENABLE_INSIGHTS_DEFAULT)
+            Preferences.ENABLE_INSIGHTS,
+            Preferences.ENABLE_INSIGHTS_DEFAULT,
+        )
 
         val enableAutomaticTrackSubscription = sharedPreferences.get(
-                Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION,
-                Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT)
+            Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION,
+            Preferences.ENABLE_AUTOMATIC_TRACK_SUBSCRIPTION_DEFAULT,
+        )
 
         val enableDominantSpeaker = sharedPreferences.get(
-                Preferences.ENABLE_DOMINANT_SPEAKER,
-                Preferences.ENABLE_DOMINANT_SPEAKER_DEFAULT)
+            Preferences.ENABLE_DOMINANT_SPEAKER,
+            Preferences.ENABLE_DOMINANT_SPEAKER_DEFAULT,
+        )
 
         val preferedVideoCodec: VideoCodec = getVideoCodecPreference(Preferences.VIDEO_CODEC)
 
         val preferredAudioCodec: AudioCodec = getAudioCodecPreference()
 
         val configuration = NetworkQualityConfiguration(
-                NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
-                NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL)
+            NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+            NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+        )
 
-        val mode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MODE,
-                Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT).let {
+        val mode = sharedPreferences.get(
+            Preferences.BANDWIDTH_PROFILE_MODE,
+            Preferences.BANDWIDTH_PROFILE_MODE_DEFAULT,
+        ).let {
             getBandwidthProfileMode(it)
         }
-        val maxSubscriptionBitrate = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
-                Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT).toLong()
+        val maxSubscriptionBitrate = sharedPreferences.get(
+            Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE,
+            Preferences.BANDWIDTH_PROFILE_MAX_SUBSCRIPTION_BITRATE_DEFAULT,
+        ).toLong()
 
-        val dominantSpeakerPriority = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
-                Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT).let {
+        val dominantSpeakerPriority = sharedPreferences.get(
+            Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY,
+            Preferences.BANDWIDTH_PROFILE_DOMINANT_SPEAKER_PRIORITY_DEFAULT,
+        ).let {
             getDominantSpeakerPriority(it)
         }
-        val trackSwitchOffMode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
-                Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
+        val trackSwitchOffMode = sharedPreferences.get(
+            Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE,
+            Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT,
+        ).let {
             getTrackSwitchOffMode(it)
         }
-        val clientTrackSwitchOffControl = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL,
-            Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT).let {
-                getClientTrackSwitchOffControl(it)
+        val clientTrackSwitchOffControl = sharedPreferences.get(
+            Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_CONTROL,
+            Preferences.BANDWIDTH_PROFILE_TRACK_SWITCH_OFF_MODE_DEFAULT,
+        ).let {
+            getClientTrackSwitchOffControl(it)
         }
-        val videoContentPreferencesMode = sharedPreferences.get(Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE,
-                Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE_DEFAULT).let {
+        val videoContentPreferencesMode = sharedPreferences.get(
+            Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE,
+            Preferences.BANDWIDTH_PROFILE_VIDEO_CONTENT_PREFERENCES_MODE_DEFAULT,
+        ).let {
             getVideoContentPreferencesMode(it)
         }
         val bandwidthProfileOptions = createBandwidthProfileOptions {
@@ -95,36 +110,45 @@ class ConnectOptionsFactory(
         }
 
         val acousticEchoCanceler = sharedPreferences.getBoolean(
-                Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
-                Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT)
+            Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
+            Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT,
+        )
         val noiseSuppressor = sharedPreferences.getBoolean(
-                Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
-                Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT)
+            Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
+            Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT,
+        )
         val automaticGainControl = sharedPreferences.getBoolean(
-                Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
-                Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT)
+            Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
+            Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
+        )
         val openSLESUsage = sharedPreferences.getBoolean(
-                Preferences.AUDIO_OPEN_SLES_USAGE,
-                Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT)
+            Preferences.AUDIO_OPEN_SLES_USAGE,
+            Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT,
+        )
         WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
         WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(!noiseSuppressor)
         WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(!automaticGainControl)
         WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(!openSLESUsage)
 
         val isNetworkQualityEnabled = sharedPreferences.get(
-                Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
-                Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT)
+            Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
+            Preferences.ENABLE_NETWORK_QUALITY_LEVEL_DEFAULT,
+        )
 
         val maxVideoBitrate = sharedPreferences.get(
-                Preferences.MAX_VIDEO_BITRATE,
-                Preferences.MAX_VIDEO_BITRATE_DEFAULT)
+            Preferences.MAX_VIDEO_BITRATE,
+            Preferences.MAX_VIDEO_BITRATE_DEFAULT,
+        )
 
         val maxAudioBitrate = sharedPreferences.get(
-                Preferences.MAX_AUDIO_BITRATE,
-                Preferences.MAX_AUDIO_BITRATE_DEFAULT)
+            Preferences.MAX_AUDIO_BITRATE,
+            Preferences.MAX_AUDIO_BITRATE_DEFAULT,
+        )
 
-        val videoEncodingMode = sharedPreferences.get(Preferences.VIDEO_ENCODING_MODE,
-                Preferences.VIDEO_ENCODING_MODE_DEFAULT).let {
+        val videoEncodingMode = sharedPreferences.get(
+            Preferences.VIDEO_ENCODING_MODE,
+            Preferences.VIDEO_ENCODING_MODE_DEFAULT,
+        ).let {
             getVideoEncodingMode(it)
         }
 
@@ -158,34 +182,34 @@ class ConnectOptionsFactory(
     }
 
     private fun getTrackSwitchOffMode(trackSwitchOffModeString: String) =
-            when (trackSwitchOffModeString) {
-                TrackSwitchOffMode.PREDICTED.name -> TrackSwitchOffMode.PREDICTED
-                TrackSwitchOffMode.DETECTED.name -> TrackSwitchOffMode.DETECTED
-                TrackSwitchOffMode.DISABLED.name -> TrackSwitchOffMode.DISABLED
-                else -> null
-            }
+        when (trackSwitchOffModeString) {
+            TrackSwitchOffMode.PREDICTED.name -> TrackSwitchOffMode.PREDICTED
+            TrackSwitchOffMode.DETECTED.name -> TrackSwitchOffMode.DETECTED
+            TrackSwitchOffMode.DISABLED.name -> TrackSwitchOffMode.DISABLED
+            else -> null
+        }
 
     private fun getClientTrackSwitchOffControl(controlString: String) =
-            when (controlString.uppercase()) {
-                ClientTrackSwitchOffControl.MANUAL.name -> ClientTrackSwitchOffControl.MANUAL
-                ClientTrackSwitchOffControl.AUTO.name -> ClientTrackSwitchOffControl.AUTO
-                else -> null
-            }
+        when (controlString.uppercase()) {
+            ClientTrackSwitchOffControl.MANUAL.name -> ClientTrackSwitchOffControl.MANUAL
+            ClientTrackSwitchOffControl.AUTO.name -> ClientTrackSwitchOffControl.AUTO
+            else -> null
+        }
 
     private fun getVideoContentPreferencesMode(modeString: String) =
-            when (modeString.uppercase()) {
-                VideoContentPreferencesMode.MANUAL.name -> VideoContentPreferencesMode.MANUAL
-                VideoContentPreferencesMode.AUTO.name -> VideoContentPreferencesMode.AUTO
-                else -> null
-            }
+        when (modeString.uppercase()) {
+            VideoContentPreferencesMode.MANUAL.name -> VideoContentPreferencesMode.MANUAL
+            VideoContentPreferencesMode.AUTO.name -> VideoContentPreferencesMode.AUTO
+            else -> null
+        }
 
     private fun getDominantSpeakerPriority(dominantSpeakerPriorityString: String) =
-            when (dominantSpeakerPriorityString) {
-                TrackPriority.LOW.name -> TrackPriority.LOW
-                TrackPriority.STANDARD.name -> TrackPriority.STANDARD
-                TrackPriority.HIGH.name -> TrackPriority.HIGH
-                else -> null
-            }
+        when (dominantSpeakerPriorityString) {
+            TrackPriority.LOW.name -> TrackPriority.LOW
+            TrackPriority.STANDARD.name -> TrackPriority.STANDARD
+            TrackPriority.HIGH.name -> TrackPriority.HIGH
+            else -> null
+        }
 
     private fun getBandwidthProfileMode(modeString: String): BandwidthProfileMode? {
         return when (modeString) {
@@ -201,7 +225,9 @@ class ConnectOptionsFactory(
             when (videoCodecName) {
                 Vp8Codec.NAME -> {
                     val simulcast = sharedPreferences.getBoolean(
-                            Preferences.VP8_SIMULCAST, Preferences.VP8_SIMULCAST_DEFAULT)
+                        Preferences.VP8_SIMULCAST,
+                        Preferences.VP8_SIMULCAST_DEFAULT,
+                    )
                     Vp8Codec(simulcast)
                 }
                 H264Codec.NAME -> H264Codec()
@@ -213,7 +239,9 @@ class ConnectOptionsFactory(
 
     private fun getAudioCodecPreference(): AudioCodec {
         return sharedPreferences.getString(
-                Preferences.AUDIO_CODEC, Preferences.AUDIO_CODEC_DEFAULT)?.let { audioCodecName ->
+            Preferences.AUDIO_CODEC,
+            Preferences.AUDIO_CODEC_DEFAULT,
+        )?.let { audioCodecName ->
 
             when (audioCodecName) {
                 IsacCodec.NAME -> IsacCodec()
@@ -234,12 +262,15 @@ class ConnectOptionsFactory(
 
     private fun setSdkEnvironment(sharedPreferences: SharedPreferences) {
         val env = sharedPreferences.getString(
-                Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT)
+            Preferences.ENVIRONMENT,
+            Preferences.ENVIRONMENT_DEFAULT,
+        )
         val nativeEnvironmentVariableValue = EnvUtil.getNativeEnvironmentVariableValue(env)
         Env.set(
-                context,
-                EnvUtil.TWILIO_ENV_KEY,
-                nativeEnvironmentVariableValue,
-                true)
+            context,
+            EnvUtil.TWILIO_ENV_KEY,
+            nativeEnvironmentVariableValue,
+            true,
+        )
     }
 }

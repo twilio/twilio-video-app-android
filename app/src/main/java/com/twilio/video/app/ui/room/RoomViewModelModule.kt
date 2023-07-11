@@ -30,11 +30,14 @@ class RoomViewModelModule {
     @Provides
     @ViewModelScoped
     fun providesAudioSwitch(application: Application): AudioSwitch =
-        AudioSwitch(application,
+        AudioSwitch(
+            application,
             loggingEnabled = true,
             preferredDeviceList = listOf(
                 AudioDevice.BluetoothHeadset::class.java,
                 AudioDevice.WiredHeadset::class.java,
                 AudioDevice.Speakerphone::class.java,
-                AudioDevice.Earpiece::class.java))
+                AudioDevice.Earpiece::class.java,
+            ),
+        )
 }

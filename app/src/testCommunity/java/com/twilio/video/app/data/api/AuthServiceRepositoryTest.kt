@@ -22,8 +22,8 @@ import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -34,7 +34,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 private const val passcode = "12345678901234"
@@ -55,7 +55,7 @@ class AuthServiceRepositoryTest {
         coroutineScope.runBlockingTest {
             authService = mock {
                 whenever(mock.getToken(isA(), isA()))
-                        .thenReturn(AuthServiceResponseDTO(token))
+                    .thenReturn(AuthServiceResponseDTO(token))
             }
             val securePreferences = mock<SecurePreferences> {
                 whenever(mock.getSecureString(PASSCODE)).thenReturn(passcode)
@@ -103,12 +103,12 @@ class AuthServiceRepositoryTest {
 
     fun illegalArgParams(): Array<String?> {
         return arrayOf(
-                "",
-                "123456789",
-                "12345678901",
-                "123456789012",
-                "1234567890123",
-                "123456789012345"
+            "",
+            "123456789",
+            "12345678901",
+            "123456789012",
+            "1234567890123",
+            "123456789012345",
         )
     }
 
@@ -125,10 +125,9 @@ class AuthServiceRepositoryTest {
         var parameters = arrayOf<AuthService>()
 
         coroutineScope.runBlockingTest {
-
             val nullToken: AuthService = mock {
                 whenever(mock.getToken(isA(), isA()))
-                        .thenReturn(AuthServiceResponseDTO())
+                    .thenReturn(AuthServiceResponseDTO())
             }
 
             val nullResponse: AuthService = getMockAuthService()
@@ -138,12 +137,14 @@ class AuthServiceRepositoryTest {
             val unknownErrorType: AuthService = getMockAuthService(UNKNOWN_ERROR_MESSAGE)
 
             parameters =
-                    arrayOf(nullToken,
-                            nullResponse,
-                            invalidJson,
-                            nullErrorBody,
-                            nullErrorDTO,
-                            unknownErrorType)
+                arrayOf(
+                    nullToken,
+                    nullResponse,
+                    invalidJson,
+                    nullErrorBody,
+                    nullErrorDTO,
+                    unknownErrorType,
+                )
         }
 
         return parameters
@@ -169,9 +170,9 @@ class AuthServiceRepositoryTest {
             val userIdentity = "identity"
             val roomName = "roomName"
             expectedRequestDTO = AuthServiceRequestDTO(
-                    passcode,
-                    userIdentity,
-                    roomName
+                passcode,
+                userIdentity,
+                roomName,
             )
             val repository = setupRepository()
             val actualToken = repository.getToken(userIdentity, roomName, passcode)
@@ -182,25 +183,32 @@ class AuthServiceRepositoryTest {
     }
 
     fun videoCodecParams() =
+        arrayOf(
             arrayOf(
-                    arrayOf(Topology.GROUP,
-                        Topology.GROUP_SMALL,
-                        true,
-                        VIDEO_CAPTURE_RESOLUTION_DEFAULT),
-                    arrayOf(
-                        Topology.PEER_TO_PEER,
-                        Topology.GROUP,
-                        true,
-                        VIDEO_CAPTURE_RESOLUTION_DEFAULT),
-                    arrayOf(
-                        Topology.GROUP_SMALL,
-                        Topology.PEER_TO_PEER, false,
-                            VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()),
-                    arrayOf(Topology.GROUP,
-                        Topology.GO,
-                        false,
-                        VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString())
-    )
+                Topology.GROUP,
+                Topology.GROUP_SMALL,
+                true,
+                VIDEO_CAPTURE_RESOLUTION_DEFAULT,
+            ),
+            arrayOf(
+                Topology.PEER_TO_PEER,
+                Topology.GROUP,
+                true,
+                VIDEO_CAPTURE_RESOLUTION_DEFAULT,
+            ),
+            arrayOf(
+                Topology.GROUP_SMALL,
+                Topology.PEER_TO_PEER,
+                false,
+                VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString(),
+            ),
+            arrayOf(
+                Topology.GROUP,
+                Topology.GO,
+                false,
+                VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString(),
+            ),
+        )
 
     @Parameters(method = "videoCodecParams")
     @Test
@@ -208,7 +216,7 @@ class AuthServiceRepositoryTest {
         oldRoomType: Topology,
         newRoomType: Topology,
         enableSimulcast: Boolean,
-        videoDimensionsIndex: String
+        videoDimensionsIndex: String,
     ) {
         runBlockingTest {
             val (editor, repository) = setupServerRoomTypeMock(oldRoomType, newRoomType)
@@ -229,7 +237,7 @@ class AuthServiceRepositoryTest {
 
             repository.getToken(passcode = "12345678901234")
 
-            verifyZeroInteractions(editor)
+            verifyNoInteractions(editor)
         }
     }
 
@@ -252,7 +260,7 @@ class AuthServiceRepositoryTest {
             val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
             authService = mock {
                 whenever(mock.getToken(isA(), isA()))
-                        .thenThrow(exception)
+                    .thenThrow(exception)
             }
             val repository = AuthServiceRepository(authService, mock(), mock())
             try {
@@ -271,7 +279,7 @@ class AuthServiceRepositoryTest {
             val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
             authService = mock {
                 whenever(mock.getToken(isA(), isA()))
-                        .thenThrow(exception)
+                    .thenThrow(exception)
             }
             val repository = AuthServiceRepository(authService, mock(), mock())
             try {
@@ -287,7 +295,7 @@ class AuthServiceRepositoryTest {
     private suspend fun setupServerRoomTypeMock(oldRoomType: Topology, newRoomType: Topology): Pair<SharedPreferences.Editor, AuthServiceRepository> {
         authService = mock {
             whenever(mock.getToken(isA(), isA()))
-                    .thenReturn(AuthServiceResponseDTO(token, newRoomType))
+                .thenReturn(AuthServiceResponseDTO(token, newRoomType))
         }
         val editor = mock<SharedPreferences.Editor>()
         val sharedPreferences = mock<SharedPreferencesWrapper> {
@@ -300,19 +308,18 @@ class AuthServiceRepositoryTest {
         return Pair(editor, repository)
     }
 
-    private suspend fun setupRepository():
-            AuthServiceRepository {
+    private suspend fun setupRepository(): AuthServiceRepository {
         authService = mock {
             whenever(mock.getToken(isA(), isA()))
-                    .thenReturn(AuthServiceResponseDTO(token))
+                .thenReturn(AuthServiceResponseDTO(token))
         }
         return AuthServiceRepository(authService, mock(), mock())
     }
 
     private suspend fun getMockAuthService(json: String? = null): AuthService =
-            mock {
-                val exception = json?.let { getMockHttpException(it) } ?: mock()
-                whenever(mock.getToken(isA(), isA()))
-                        .thenThrow(exception)
-            }
+        mock {
+            val exception = json?.let { getMockHttpException(it) } ?: mock()
+            whenever(mock.getToken(isA(), isA()))
+                .thenThrow(exception)
+        }
 }

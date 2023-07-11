@@ -22,7 +22,7 @@ fun clickView(@IdRes id: Int) {
 
 fun scrollAndClickView(viewText: String, recyclerViewId: Int) {
     onView(withId(recyclerViewId))
-            .perform(actionOnItem<RecyclerView.ViewHolder>(hasDescendant(withText(viewText)), click()))
+        .perform(actionOnItem<RecyclerView.ViewHolder>(hasDescendant(withText(viewText)), click()))
 }
 
 fun assertTextIsDisplayed(text: String) {
