@@ -20,21 +20,21 @@ class CameraCapturerCompat(
     private val frontCameraId: String?,
     private val backCameraId: String?,
     private val cameraCapturer: CameraCapturer? = null,
-    private val camera2Capturer: Camera2Capturer? = null
+    private val camera2Capturer: Camera2Capturer? = null,
 ) : VideoCapturer {
 
     val cameraId: String
         get() = cameraCapturer?.cameraId
-                ?: camera2Capturer?.cameraId
-                ?: throw IllegalStateException("At least one camera capturer must not be null")
+            ?: camera2Capturer?.cameraId
+            ?: throw IllegalStateException("At least one camera capturer must not be null")
 
     override fun initialize(
         surfaceTextureHelper: SurfaceTextureHelper,
         context: Context,
-        capturerObserver: CapturerObserver
+        capturerObserver: CapturerObserver,
     ) {
         cameraCapturer?.initialize(surfaceTextureHelper, context, capturerObserver)
-                ?: camera2Capturer?.initialize(surfaceTextureHelper, context, capturerObserver)
+            ?: camera2Capturer?.initialize(surfaceTextureHelper, context, capturerObserver)
     }
 
     override fun startCapture(width: Int, height: Int, framerate: Int) {
@@ -59,14 +59,21 @@ class CameraCapturerCompat(
         fun newInstance(context: Context): CameraCapturerCompat? {
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
-                    val cameraCapturer = Camera2Capturer(context, cameraIds.first
-                            ?: cameraIds.second ?: "")
+                    val cameraCapturer = Camera2Capturer(
+                        context,
+                        cameraIds.first
+                            ?: cameraIds.second ?: "",
+                    )
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, camera2Capturer = cameraCapturer)
                 }
             } else {
                 Camera1Enumerator().getFrontAndBackCameraIds(context, isCamera2 = false)?.let { cameraIds ->
-                    val cameraCapturer = CameraCapturer(context, cameraIds.first ?: cameraIds.second
-                    ?: "", getCameraListener())
+                    val cameraCapturer = CameraCapturer(
+                        context,
+                        cameraIds.first ?: cameraIds.second
+                            ?: "",
+                        getCameraListener(),
+                    )
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, cameraCapturer = cameraCapturer)
                 }
             }
@@ -82,16 +89,17 @@ class CameraCapturerCompat(
 
         private fun CameraEnumerator.getFrontAndBackCameraIds(context: Context, isCamera2: Boolean = true): Pair<String?, String?>? {
             val cameraIds = deviceNames.find { isFrontFacing(it) && isCameraIdSupported(isCamera2, context, it) } to
-                    deviceNames.find { isBackFacing(it) && isCameraIdSupported(isCamera2, context, it) }
-            return if (isAtLeastOneCameraAvailable(cameraIds.first, cameraIds.second)) cameraIds
-            else {
+                deviceNames.find { isBackFacing(it) && isCameraIdSupported(isCamera2, context, it) }
+            return if (isAtLeastOneCameraAvailable(cameraIds.first, cameraIds.second)) {
+                cameraIds
+            } else {
                 Timber.w("No cameras are available on this device")
                 null
             }
         }
 
         private fun isCameraIdSupported(isCamera2: Boolean, context: Context, cameraId: String) =
-                if (isCamera2) isCameraIdSupported(context, cameraId) else true
+            if (isCamera2) isCameraIdSupported(context, cameraId) else true
 
         private fun isCameraIdSupported(context: Context, cameraId: String): Boolean {
             val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -119,17 +127,20 @@ class CameraCapturerCompat(
              * Visit this link for details on supported values - https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics#SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
              */
             val colorFilterArrangement = cameraCharacteristics.get(
-                    CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT)
+                CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT,
+            )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && colorFilterArrangement != null) {
-                isMonoChromeSupported = (colorFilterArrangement
+                isMonoChromeSupported = (
+                    colorFilterArrangement
                         == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO ||
                         colorFilterArrangement
-                        == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR)
+                        == CameraMetadata.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR
+                    )
             }
             return isPrivateImageFormatSupported && !isMonoChromeSupported
         }
 
         private fun isAtLeastOneCameraAvailable(frontCameraId: String?, backCameraId: String?) =
-                frontCameraId != null || backCameraId != null
+            frontCameraId != null || backCameraId != null
     }
 }

@@ -15,14 +15,14 @@ import kotlinx.coroutines.Dispatchers
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [CommunityAuthModule::class]
+    replaces = [CommunityAuthModule::class],
 )
 class MockCommunityAuthModule {
     @Provides
     fun providesCommunityAuthenticator(
         preferences: SharedPreferences,
         securePreferences: SecurePreferences,
-        tokenService: TokenService
+        tokenService: TokenService,
     ): Authenticator {
         return CommunityAuthenticator(preferences, securePreferences, tokenService, Dispatchers.Main)
     }

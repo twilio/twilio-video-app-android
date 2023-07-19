@@ -15,8 +15,11 @@ import timber.log.Timber
 class LocalParticipantListener(private val roomManager: RoomManager) : LocalParticipant.Listener {
 
     override fun onNetworkQualityLevelChanged(localParticipant: LocalParticipant, networkQualityLevel: NetworkQualityLevel) {
-        Timber.i("LocalParticipant NetworkQualityLevel changed for LocalParticipant sid: %s, NetworkQualityLevel: %s",
-                localParticipant.sid, networkQualityLevel)
+        Timber.i(
+            "LocalParticipant NetworkQualityLevel changed for LocalParticipant sid: %s, NetworkQualityLevel: %s",
+            localParticipant.sid,
+            networkQualityLevel,
+        )
 
         roomManager.sendRoomEvent(NetworkQualityLevelChange(localParticipant.sid, networkQualityLevel))
     }

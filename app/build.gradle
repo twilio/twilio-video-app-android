@@ -33,35 +33,31 @@ afterEvaluate {
             debugImplementation project(':video:ktx')
             releaseImplementation project(':video:ktx')
         } else {
-            implementation "com.twilio:video-android-ktx:7.4.0"
+            implementation "com.twilio:video-android-ktx:7.6.3"
         }
     }
 }
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion '30.0.2'
+    compileSdkVersion 34
+    namespace 'com.twilio.video.app'
+    testNamespace 'com.twilio.video.app.e2eTest'
 
     buildFeatures {
         viewBinding true
     }
-
-    lintOptions {
-        disable 'GradleDependency'
-        warningsAsErrors true
-        // TODO: Fix all baseline app warnings and errors GSDK-1984
-        baseline file("lint-baseline.xml")
-    }
-
     packagingOptions {
-        exclude 'META-INF/LICENSE'
+        resources {
+            excludes += ['META-INF/LICENSE']
+        }
     }
+
 
     defaultConfig {
         applicationId "com.twilio.video.app"
 
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 34
 
         versionName "0.1.0"
         versionCode versionCodeProperty
@@ -139,6 +135,12 @@ android {
                     "\"${getLocalProperty("TWILIO_ACCESS_TOKEN")}\"")
         }
     }
+
+    lint {
+        baseline file('lint-baseline.xml')
+        disable 'GradleDependency'
+        warningsAsErrors true
+    }
 }
 
 dependencies {
@@ -210,9 +212,9 @@ dependencies {
     testImplementation junitExtensions
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesAndroidVersion"
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito.kotlin:mockito-kotlin:3.2.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.1.0'
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-    testImplementation 'org.robolectric:robolectric:4.4'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'android.arch.core:core-testing:1.1.1'
     testImplementation "org.uniflow-kt:uniflow-android-test:$uniflowVersion"

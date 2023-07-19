@@ -16,9 +16,7 @@
 
 package com.twilio.video.app.ui.room;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +42,6 @@ public class ParticipantThumbView extends ParticipantView {
         init(context);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ParticipantThumbView(
             Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

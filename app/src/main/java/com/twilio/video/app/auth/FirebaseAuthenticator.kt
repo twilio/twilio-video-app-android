@@ -4,7 +4,7 @@ import io.reactivex.Observable
 
 class FirebaseAuthenticator(
     private val firebaseWrapper: FirebaseWrapper,
-    private val authenticationProviders: List<AuthenticationProvider>
+    private val authenticationProviders: List<AuthenticationProvider>,
 ) : Authenticator {
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {

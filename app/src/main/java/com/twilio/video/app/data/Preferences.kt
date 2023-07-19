@@ -35,15 +35,15 @@ object Preferences {
     const val QCIF_VIDEO_HEIGHT = 144
     val TOPOLOGY_DEFAULT: String = Topology.GROUP.value
     val VIDEO_DIMENSIONS = arrayOf(
-            VideoDimensions(QCIF_VIDEO_WIDTH, QCIF_VIDEO_HEIGHT),
-            VideoDimensions.CIF_VIDEO_DIMENSIONS,
-            VideoDimensions.VGA_VIDEO_DIMENSIONS,
-            VideoDimensions.WVGA_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
-            VideoDimensions.HD_1080P_VIDEO_DIMENSIONS
+        VideoDimensions(QCIF_VIDEO_WIDTH, QCIF_VIDEO_HEIGHT),
+        VideoDimensions.CIF_VIDEO_DIMENSIONS,
+        VideoDimensions.VGA_VIDEO_DIMENSIONS,
+        VideoDimensions.WVGA_VIDEO_DIMENSIONS,
+        VideoDimensions.HD_540P_VIDEO_DIMENSIONS,
+        VideoDimensions.HD_720P_VIDEO_DIMENSIONS,
+        VideoDimensions.HD_960P_VIDEO_DIMENSIONS,
+        VideoDimensions.HD_S1080P_VIDEO_DIMENSIONS,
+        VideoDimensions.HD_1080P_VIDEO_DIMENSIONS,
     )
     const val VIDEO_CAPTURE_RESOLUTION = "pref_video_capture_resolution"
     const val VIDEO_CAPTURE_RESOLUTION_DEFAULT = "1"
