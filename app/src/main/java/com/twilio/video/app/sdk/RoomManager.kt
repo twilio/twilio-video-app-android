@@ -43,18 +43,20 @@ class RoomManager(
     private val context: Context,
     private val videoClient: VideoClient,
     sharedPreferences: SharedPreferences,
-    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
+    coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
 
     private var statsScheduler: StatsScheduler? = null
     private val roomListener = RoomListener()
+
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
     private val mutableRoomEvents: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
     val roomEvents: SharedFlow<RoomEvent> = mutableRoomEvents
+
     @VisibleForTesting(otherwise = PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
-            LocalParticipantManager(context, this, sharedPreferences)
+        LocalParticipantManager(context, this, sharedPreferences)
     var room: Room? = null
 
     fun disconnect() {
@@ -118,9 +120,9 @@ class RoomManager(
     fun sendStatsUpdate(statsReports: List<StatsReport>) {
         room?.let { room ->
             val roomStats = RoomStats(
-                    room.remoteParticipants,
-                    localParticipantManager.localVideoTrackNames,
-                    statsReports
+                room.remoteParticipants,
+                localParticipantManager.localVideoTrackNames,
+                statsReports,
             )
             sendRoomEvent(StatsUpdate(roomStats))
         }
@@ -136,8 +138,10 @@ class RoomManager(
 
     inner class RoomListener : Room.Listener {
         override fun onConnected(room: Room) {
-            Timber.i("onConnected -> room sid: %s",
-                    room.sid)
+            Timber.i(
+                "onConnected -> room sid: %s",
+                room.sid,
+            )
 
             startService(context, room.name)
 
@@ -148,8 +152,11 @@ class RoomManager(
         }
 
         override fun onDisconnected(room: Room, twilioException: TwilioException?) {
-            Timber.i("Disconnected from room -> sid: %s, state: %s",
-                    room.sid, room.state)
+            Timber.i(
+                "Disconnected from room -> sid: %s, state: %s",
+                room.sid,
+                room.state,
+            )
 
             stopService(context)
 
@@ -163,11 +170,12 @@ class RoomManager(
 
         override fun onConnectFailure(room: Room, twilioException: TwilioException) {
             Timber.e(
-                    "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
-                    room.sid,
-                    room.state,
-                    twilioException.code,
-                    twilioException.message)
+                "Failed to connect to room -> sid: %s, state: %s, code: %d, error: %s",
+                room.sid,
+                room.state,
+                twilioException.code,
+                twilioException.message,
+            )
 
             if (twilioException.code == ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION) {
                 sendRoomEvent(MaxParticipantFailure)
@@ -177,23 +185,32 @@ class RoomManager(
         }
 
         override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
-            Timber.i("RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
-                    room.sid, remoteParticipant.sid)
+            Timber.i(
+                "RemoteParticipant connected -> room sid: %s, remoteParticipant: %s",
+                room.sid,
+                remoteParticipant.sid,
+            )
 
             remoteParticipant.setListener(RemoteParticipantListener(this@RoomManager))
             sendRoomEvent(RemoteParticipantConnected(remoteParticipant))
         }
 
         override fun onParticipantDisconnected(room: Room, remoteParticipant: RemoteParticipant) {
-            Timber.i("RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
-                    room.sid, remoteParticipant.sid)
+            Timber.i(
+                "RemoteParticipant disconnected -> room sid: %s, remoteParticipant: %s",
+                room.sid,
+                remoteParticipant.sid,
+            )
 
             sendRoomEvent(RemoteParticipantDisconnected(remoteParticipant.sid))
         }
 
         override fun onDominantSpeakerChanged(room: Room, remoteParticipant: RemoteParticipant?) {
-            Timber.i("DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
-                    room.sid, remoteParticipant?.sid)
+            Timber.i(
+                "DominantSpeakerChanged -> room sid: %s, remoteParticipant: %s",
+                room.sid,
+                remoteParticipant?.sid,
+            )
 
             sendRoomEvent(DominantSpeakerChanged(remoteParticipant?.sid))
         }

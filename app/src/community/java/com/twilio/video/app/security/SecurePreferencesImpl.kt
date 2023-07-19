@@ -12,7 +12,7 @@ import com.facebook.soloader.SoLoader
 
 class SecurePreferencesImpl(
     context: Context,
-    private val preferences: SharedPreferences
+    private val preferences: SharedPreferences,
 ) : SecurePreferences {
 
     private val entity: Entity = Entity.create(context.packageName)

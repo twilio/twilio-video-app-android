@@ -5,5 +5,5 @@ import com.twilio.video.app.data.api.dto.Topology
 
 data class AuthServiceResponseDTO(
     val token: String? = null,
-    @SerializedName("room_type") val topology: Topology? = null
+    @SerializedName("room_type") val topology: Topology? = null,
 )

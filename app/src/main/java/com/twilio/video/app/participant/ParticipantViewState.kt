@@ -16,24 +16,24 @@ data class ParticipantViewState(
     val isPinned: Boolean = false,
     val isDominantSpeaker: Boolean = false,
     val isLocalParticipant: Boolean = false,
-    val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN
+    val networkQualityLevel: NetworkQualityLevel = NETWORK_QUALITY_LEVEL_UNKNOWN,
 ) {
     val isScreenSharing: Boolean get() = screenTrack != null
 
     fun getRemoteVideoTrack(): RemoteVideoTrack? =
-            if (!isLocalParticipant) videoTrack?.videoTrack as RemoteVideoTrack? else null
+        if (!isLocalParticipant) videoTrack?.videoTrack as RemoteVideoTrack? else null
 
     fun getRemoteScreenTrack(): RemoteVideoTrack? =
-            if (!isLocalParticipant) screenTrack?.videoTrack as RemoteVideoTrack? else null
+        if (!isLocalParticipant) screenTrack?.videoTrack as RemoteVideoTrack? else null
 }
 
 fun buildParticipantViewState(participant: Participant): ParticipantViewState {
     val videoTrack = participant.videoTracks.firstOrNull()?.videoTrack
     return ParticipantViewState(
-            participant.sid,
-            participant.identity,
-            videoTrack?.let { VideoTrackViewState(it) },
-            networkQualityLevel = participant.networkQualityLevel,
-            isMuted = participant.audioTracks.firstOrNull() == null
+        participant.sid,
+        participant.identity,
+        videoTrack?.let { VideoTrackViewState(it) },
+        networkQualityLevel = participant.networkQualityLevel,
+        isMuted = participant.audioTracks.firstOrNull() == null,
     )
 }

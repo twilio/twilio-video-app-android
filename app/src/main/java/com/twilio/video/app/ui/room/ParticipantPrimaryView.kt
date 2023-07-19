@@ -23,11 +23,11 @@ import com.twilio.video.app.databinding.ParticipantPrimaryViewBinding
 internal class ParticipantPrimaryView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ParticipantView(context, attrs, defStyleAttr) {
 
     private val binding: ParticipantPrimaryViewBinding =
-            ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true)
+        ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true)
     init {
         videoLayout = binding.videoLayout
         videoIdentity = binding.videoIdentity

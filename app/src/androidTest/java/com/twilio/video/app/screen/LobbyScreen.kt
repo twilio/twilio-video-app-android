@@ -18,8 +18,8 @@ import org.hamcrest.CoreMatchers.not
 
 fun assertScreenIsDisplayed() {
     onView(withText(getString(R.string.join)))
-            .check(matches(isDisplayed()))
-            .check(matches(not(isEnabled())))
+        .check(matches(isDisplayed()))
+        .check(matches(not(isEnabled())))
 }
 
 fun clickSettingsMenuItem() {

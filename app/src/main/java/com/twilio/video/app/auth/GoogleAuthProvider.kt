@@ -25,52 +25,55 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
     googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
     private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
     private val acceptedDomain: String? = null,
-    private val disposables: CompositeDisposable = CompositeDisposable()
+    private val disposables: CompositeDisposable = CompositeDisposable(),
 ) : AuthenticationProvider {
 
     companion object {
         fun newInstance(
             context: Context,
             googleSignInOptions: GoogleSignInOptions,
-            acceptedDomain: String? = null
+            acceptedDomain: String? = null,
         ): AuthenticationProvider =
             GoogleAuthProvider(
-                    FirebaseWrapper(),
-                    context,
-                    GoogleAuthWrapper(),
-                    GoogleSignInWrapper(),
-                    GoogleSignInOptionsWrapper(googleSignInOptions),
-                    GoogleAuthProviderWrapper(),
-                    acceptedDomain)
+                FirebaseWrapper(),
+                context,
+                GoogleAuthWrapper(),
+                GoogleSignInWrapper(),
+                GoogleSignInOptionsWrapper(googleSignInOptions),
+                GoogleAuthProviderWrapper(),
+                acceptedDomain,
+            )
     }
 
     private val googleSignInClient: GoogleSignInClient =
-            googleSignInWrapper.getClient(context, googleSignInOptionsWrapper)
+        googleSignInWrapper.getClient(context, googleSignInOptionsWrapper)
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {
         return Observable.create { observable ->
-            disposables + loginEventObservable.subscribe({ loginEvent ->
-                when (loginEvent) {
-                    GoogleLoginIntentRequestEvent -> {
-                        observable.onNext(GoogleLoginIntentResult(googleSignInClient.signInIntent))
-                    }
-                    is GoogleLoginEvent -> {
-                        getSignInResultFromIntent(loginEvent.signInResultIntent)?.let { result ->
-                            if (result.isSuccess) {
-                                result.signInAccount?.let { account ->
-                                    loginWithAccount(account, observable)
-                                } ?: onError(observable)
-                            } else {
-                                onError(observable)
+            disposables + loginEventObservable.subscribe(
+                { loginEvent ->
+                    when (loginEvent) {
+                        GoogleLoginIntentRequestEvent -> {
+                            observable.onNext(GoogleLoginIntentResult(googleSignInClient.signInIntent))
+                        }
+                        is GoogleLoginEvent -> {
+                            getSignInResultFromIntent(loginEvent.signInResultIntent)?.let { result ->
+                                if (result.isSuccess) {
+                                    result.signInAccount?.let { account ->
+                                        loginWithAccount(account, observable)
+                                    } ?: onError(observable)
+                                } else {
+                                    onError(observable)
+                                }
                             }
                         }
+                        else -> { Timber.e("Should never reach here") }
                     }
-                    else -> { Timber.e("Should never reach here") }
-                }
-            },
-                    {
-                        Timber.e(it)
-                    })
+                },
+                {
+                    Timber.e(it)
+                },
+            )
         }
     }
 
@@ -97,15 +100,15 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
         }
         val credential = googleAuthProviderWrapper.getCredential(idToken)
         firebaseWrapper.instance.signInWithCredential(credential)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        observable.onNext(GoogleLoginSuccessResult(account))
-                        observable.onComplete()
-                        disposables.clear()
-                    } else {
-                        onError(observable)
-                    }
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    observable.onNext(GoogleLoginSuccessResult(account))
+                    observable.onComplete()
+                    disposables.clear()
+                } else {
+                    onError(observable)
                 }
+            }
     }
 
     private fun onError(observable: ObservableEmitter<LoginResult>) {

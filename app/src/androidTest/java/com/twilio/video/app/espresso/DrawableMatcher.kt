@@ -15,7 +15,7 @@ import org.hamcrest.TypeSafeMatcher
 
 class DrawableMatcher(
     private val targetContext: Context,
-    @param:DrawableRes private val expectedId: Int
+    @param:DrawableRes private val expectedId: Int,
 ) : TypeSafeMatcher<View>(View::class.java) {
 
     override fun matchesSafely(target: View): Boolean {
@@ -47,7 +47,7 @@ class DrawableMatcher(
         val bitmap = Bitmap.createBitmap(
             drawable.intrinsicWidth,
             drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
+            Bitmap.Config.ARGB_8888,
         )
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)

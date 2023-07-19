@@ -26,8 +26,8 @@ import io.uniflow.android.test.createTestObserver
 import io.uniflow.test.rule.UniflowTestDispatchersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -46,6 +46,7 @@ class RoomViewModelTest : BaseUnitTest() {
     val rule = InstantTaskExecutorRule()
 
     private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+
     @get:Rule
     val coroutineScope = UniflowTestDispatchersRule(testDispatcher)
 
@@ -66,10 +67,11 @@ class RoomViewModelTest : BaseUnitTest() {
     @Before
     fun setUp() {
         viewModel = RoomViewModel(
-                roomManager,
-                mock(),
-                permissionUtil,
-                participantManager)
+            roomManager,
+            mock(),
+            permissionUtil,
+            participantManager,
+        )
         testObserver = viewModel.createTestObserver()
     }
 
@@ -81,7 +83,8 @@ class RoomViewModelTest : BaseUnitTest() {
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack)
         val expectedParticipantViewState = participantViewState.copy(
-                videoTrack = expectedTrackViewState)
+            videoTrack = expectedTrackViewState,
+        )
         val updatedParticipant = (viewModel.getState() as RoomViewState).participantThumbnails?.find {
             it.sid == PARTICIPANT_SID
         }
@@ -96,7 +99,8 @@ class RoomViewModelTest : BaseUnitTest() {
 
         val expectedTrackViewState = VideoTrackViewState(expectedVideoTrack, true)
         val expectedParticipantViewState = participantViewState.copy(
-                videoTrack = expectedTrackViewState)
+            videoTrack = expectedTrackViewState,
+        )
         val updatedParticipant = (viewModel.getState() as RoomViewState).participantThumbnails?.find {
             it.sid == PARTICIPANT_SID
         }
@@ -106,7 +110,7 @@ class RoomViewModelTest : BaseUnitTest() {
     @Test
     fun `The OnResume event should set the isCameraEnabled view state property to true if camera permission is allowed`() {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
-                .thenReturn(true)
+            .thenReturn(true)
         val expectedViewState = initialRoomViewState.copy(isCameraEnabled = true)
         viewModel.processInput(OnResume)
 
@@ -116,13 +120,14 @@ class RoomViewModelTest : BaseUnitTest() {
     @Test
     fun `The OnResume event should set the isCameraEnabled view state property to false if camera permission is denied`() {
         viewModel = RoomViewModel(
-                roomManager,
-                mock(),
-                permissionUtil,
-                participantManager,
-                initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
+            roomManager,
+            mock(),
+            permissionUtil,
+            participantManager,
+            initialViewState = initialRoomViewState.copy(isCameraEnabled = true),
+        )
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
-                .thenReturn(false)
+            .thenReturn(false)
         val expectedViewState = initialRoomViewState.copy(isCameraEnabled = false)
 
         viewModel.processInput(OnResume)
@@ -135,7 +140,7 @@ class RoomViewModelTest : BaseUnitTest() {
     @Test
     fun `The OnResume event should set the isMicEnabled view state property to true if camera permission is allowed`() {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
-                .thenReturn(true)
+            .thenReturn(true)
         val expectedViewState = initialRoomViewState.copy(isMicEnabled = true)
 
         viewModel.processInput(OnResume)
@@ -146,13 +151,14 @@ class RoomViewModelTest : BaseUnitTest() {
     @Test
     fun `The OnResume event should set the isMicEnabled view state property to false if camera permission is denied`() {
         viewModel = RoomViewModel(
-                roomManager,
-                mock(),
-                permissionUtil,
-                participantManager,
-                initialViewState = initialRoomViewState.copy(isCameraEnabled = true))
+            roomManager,
+            mock(),
+            permissionUtil,
+            participantManager,
+            initialViewState = initialRoomViewState.copy(isCameraEnabled = true),
+        )
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
-                .thenReturn(false)
+            .thenReturn(false)
         val expectedViewState = initialRoomViewState.copy(isMicEnabled = false)
 
         viewModel.processInput(OnResume)
@@ -165,9 +171,9 @@ class RoomViewModelTest : BaseUnitTest() {
     @Test
     fun `The OnResume event should invoke RoomManager onResume if camera and mic permissions are allowed`() {
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.CAMERA))
-                .thenReturn(true)
+            .thenReturn(true)
         whenever(permissionUtil.isPermissionGranted(Manifest.permission.RECORD_AUDIO))
-                .thenReturn(true)
+            .thenReturn(true)
 
         viewModel.processInput(OnResume)
 
@@ -180,13 +186,16 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(ConnectFailure)
 
         testObserver.verifySequence(
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
-                ShowConnectFailureDialog,
-                Disconnected,
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby,
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+            ShowConnectFailureDialog,
+            Disconnected,
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
+            initialRoomViewState.copy(
+                configuration = RoomViewConfiguration.Lobby,
                 primaryParticipant = localParticipantViewState,
-                participantThumbnails = listOf(localParticipantViewState)))
+                participantThumbnails = listOf(localParticipantViewState),
+            ),
+        )
     }
 
     @Test
@@ -195,13 +204,16 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(MaxParticipantFailure)
 
         testObserver.verifySequence(
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
-                ShowMaxParticipantFailureDialog,
-                Disconnected,
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby,
-                        primaryParticipant = localParticipantViewState,
-                        participantThumbnails = listOf(localParticipantViewState)))
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+            ShowMaxParticipantFailureDialog,
+            Disconnected,
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
+            initialRoomViewState.copy(
+                configuration = RoomViewConfiguration.Lobby,
+                primaryParticipant = localParticipantViewState,
+                participantThumbnails = listOf(localParticipantViewState),
+            ),
+        )
     }
 
     @Test
@@ -210,9 +222,12 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(RecordingStarted)
 
         testObserver.verifySequence(
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
-                        isRecording = true))
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+            initialRoomViewState.copy(
+                configuration = RoomViewConfiguration.Connecting,
+                isRecording = true,
+            ),
+        )
     }
 
     @Test
@@ -221,9 +236,12 @@ class RoomViewModelTest : BaseUnitTest() {
         roomManager.sendRoomEvent(RecordingStopped)
 
         testObserver.verifySequence(
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
-                initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting,
-                        isRecording = false))
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
+            initialRoomViewState.copy(
+                configuration = RoomViewConfiguration.Connecting,
+                isRecording = false,
+            ),
+        )
     }
 
     @Test
@@ -243,14 +261,14 @@ class RoomViewModelTest : BaseUnitTest() {
 
         testObserver.verifySequence(
             initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
-            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connected)
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Connected),
         )
 
         viewModel.onCleared()
 
         testObserver.verifySequence(
             initialRoomViewState.copy(configuration = RoomViewConfiguration.Connecting),
-            initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby)
+            initialRoomViewState.copy(configuration = RoomViewConfiguration.Lobby),
         )
     }
 

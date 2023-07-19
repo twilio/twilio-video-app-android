@@ -9,8 +9,8 @@ import com.twilio.video.app.screen.loginWithEmail
 import com.twilio.video.app.util.allowAllPermissions
 import com.twilio.video.app.util.retrieveEmailCredentials
 import com.twilio.video.app.util.uiDevice
-import java.util.concurrent.TimeoutException
 import org.junit.Before
+import java.util.concurrent.TimeoutException
 
 @E2ETest
 open class BaseE2ETest {
@@ -31,7 +31,7 @@ open class BaseE2ETest {
     }
 
     open fun getActivityInstance(): Activity? {
-        var currentActivity: Activity ? = null
+        var currentActivity: Activity? = null
         getInstrumentation().runOnMainSync {
             val resumedActivities: Collection<*> =
                 ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(RESUMED)
@@ -52,7 +52,8 @@ open class BaseE2ETest {
             Thread.sleep(100)
             if (System.currentTimeMillis() - startTime >= timeout) {
                 throw AssertionError(
-                    "Activity ${T::class.java.simpleName} not visible after $timeout milliseconds")
+                    "Activity ${T::class.java.simpleName} not visible after $timeout milliseconds",
+                )
             }
         }
     }

@@ -41,7 +41,7 @@ const val URL_SUFFIX = "-dev.twil.io/token"
 class AuthServiceRepository(
     private val authService: AuthService,
     private val securePreferences: SecurePreferences,
-    private val sharedPreferences: SharedPreferencesWrapper
+    private val sharedPreferences: SharedPreferencesWrapper,
 ) : TokenService {
     override suspend fun getToken(identity: String?, roomName: String?): String {
         return getToken(identity, roomName, passcode = null)
@@ -54,7 +54,7 @@ class AuthServiceRepository(
             try {
                 authService.getToken(url, requestBody).let { response ->
                     return handleResponse(response)
-                            ?: throw AuthServiceException(message = "Token cannot be null")
+                        ?: throw AuthServiceException(message = "Token cannot be null")
                 }
             } catch (httpException: HttpException) {
                 handleException(httpException)
@@ -67,7 +67,7 @@ class AuthServiceRepository(
     private fun buildRequest(
         passcode: String,
         identity: String?,
-        roomName: String?
+        roomName: String?,
     ): Pair<AuthServiceRequestDTO, String> {
         val requestBody = roomName?.let { roomName ->
             AuthServiceRequestDTO(passcode, identity, roomName, true)
@@ -84,19 +84,24 @@ class AuthServiceRepository(
 
     private fun handleResponse(response: AuthServiceResponseDTO): String? {
         return response.token?.let { token ->
-            Timber.d("Response successfully retrieved from the Twilio auth service: %s",
-                    response)
+            Timber.d(
+                "Response successfully retrieved from the Twilio auth service: %s",
+                response,
+            )
             response.topology?.let { serverTopology ->
                 val isTopologyChange =
-                        sharedPreferences.getString(TOPOLOGY, null) != serverTopology.value
+                    sharedPreferences.getString(TOPOLOGY, null) != serverTopology.value
                 if (isTopologyChange) {
                     sharedPreferences.edit { putString(TOPOLOGY, serverTopology.value) }
                     val (enableSimulcast, videoDimensionsIndex) = when (serverTopology) {
                         Topology.GROUP, Topology.GROUP_SMALL -> true to VIDEO_CAPTURE_RESOLUTION_DEFAULT
                         Topology.PEER_TO_PEER, Topology.GO -> false to VIDEO_DIMENSIONS.indexOf(HD_720P_VIDEO_DIMENSIONS).toString()
                     }
-                    Timber.d("Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
-                            serverTopology, enableSimulcast)
+                    Timber.d(
+                        "Server topology has changed to %s. Setting the codec to Vp8 with simulcast set to %s",
+                        serverTopology,
+                        enableSimulcast,
+                    )
                     sharedPreferences.edit { putString(VIDEO_CODEC, Vp8Codec.NAME) }
                     sharedPreferences.edit { putBoolean(VP8_SIMULCAST, enableSimulcast) }
                     sharedPreferences.edit { putString(VIDEO_CAPTURE_RESOLUTION, videoDimensionsIndex) }
@@ -113,9 +118,13 @@ class AuthServiceRepository(
 
     private fun validatePasscode(passcode: String?) {
         passcode?.let { passcode ->
-            require(passcode.isNotEmpty() &&
-                    (passcode.length == LEGACY_PASSCODE_SIZE ||
-                            passcode.length == PASSCODE_SIZE))
+            require(
+                passcode.isNotEmpty() &&
+                    (
+                        passcode.length == LEGACY_PASSCODE_SIZE ||
+                            passcode.length == PASSCODE_SIZE
+                        ),
+            )
         }
     }
 

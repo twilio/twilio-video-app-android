@@ -19,7 +19,7 @@ import com.twilio.video.VideoTrack
 import com.twilio.video.app.sdk.VideoTrackViewState
 
 internal class PrimaryParticipantController(
-    private val primaryView: ParticipantPrimaryView
+    private val primaryView: ParticipantPrimaryView,
 ) {
     private var primaryItem: Item? = null
 
@@ -28,14 +28,15 @@ internal class PrimaryParticipantController(
         screenTrack: VideoTrackViewState?,
         videoTrack: VideoTrackViewState?,
         muted: Boolean,
-        mirror: Boolean
+        mirror: Boolean,
     ) {
         val old = primaryItem
         val newItem = Item(
-                identity,
-                screenTrack?.videoTrack ?: videoTrack?.videoTrack,
-                muted,
-                mirror)
+            identity,
+            screenTrack?.videoTrack ?: videoTrack?.videoTrack,
+            muted,
+            mirror,
+        )
         primaryItem = newItem
         primaryView.setIdentity(newItem.identity)
         primaryView.showIdentityBadge(true)
@@ -63,6 +64,6 @@ internal class PrimaryParticipantController(
         var identity: String?,
         var videoTrack: VideoTrack?,
         var muted: Boolean,
-        var mirror: Boolean
+        var mirror: Boolean,
     )
 }

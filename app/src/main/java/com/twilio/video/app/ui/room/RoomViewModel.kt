@@ -68,11 +68,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.uniflow.android.AndroidDataFlow
 import io.uniflow.core.flow.data.UIState
 import io.uniflow.core.flow.onState
-import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class RoomViewModel @Inject constructor(
@@ -80,10 +80,11 @@ class RoomViewModel @Inject constructor(
     private val audioSwitch: AudioSwitch,
     private val permissionUtil: PermissionUtil,
     private val participantManager: ParticipantManager = ParticipantManager(),
-    initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant)
+    initialViewState: RoomViewState = RoomViewState(participantManager.primaryParticipant),
 ) : AndroidDataFlow(defaultState = initialViewState) {
 
     private var permissionCheckRetry = false
+
     @VisibleForTesting(otherwise = PRIVATE)
     internal var roomManagerJob: Job? = null
 
@@ -124,7 +125,9 @@ class RoomViewModel @Inject constructor(
             EnableLocalAudio -> roomManager.enableLocalAudio()
             DisableLocalAudio -> roomManager.disableLocalAudio()
             is StartScreenCapture -> roomManager.startScreenCapture(
-                    viewEvent.captureResultCode, viewEvent.captureIntent)
+                viewEvent.captureResultCode,
+                viewEvent.captureIntent,
+            )
             StopScreenCapture -> roomManager.stopScreenCapture()
             SwitchCamera -> roomManager.switchCamera()
             is VideoTrackRemoved -> {
@@ -161,7 +164,7 @@ class RoomViewModel @Inject constructor(
                 updateState { currentState ->
                     currentState.copy(
                         selectedDevice = selectedDevice,
-                        availableAudioDevices = audioDevices
+                        availableAudioDevices = audioDevices,
                     )
                 }
             }
@@ -223,29 +226,41 @@ class RoomViewModel @Inject constructor(
         when (remoteParticipantEvent) {
             is RemoteParticipantConnected -> addParticipant(remoteParticipantEvent.participant)
             is RemoteParticipantEvent.VideoTrackUpdated -> {
-                participantManager.updateParticipantVideoTrack(remoteParticipantEvent.sid,
-                        remoteParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
+                participantManager.updateParticipantVideoTrack(
+                    remoteParticipantEvent.sid,
+                    remoteParticipantEvent.videoTrack?.let { VideoTrackViewState(it) },
+                )
                 updateParticipantViewState()
             }
             is TrackSwitchOff -> {
-                participantManager.updateParticipantVideoTrack(remoteParticipantEvent.sid,
-                        VideoTrackViewState(remoteParticipantEvent.videoTrack,
-                                remoteParticipantEvent.switchOff))
+                participantManager.updateParticipantVideoTrack(
+                    remoteParticipantEvent.sid,
+                    VideoTrackViewState(
+                        remoteParticipantEvent.videoTrack,
+                        remoteParticipantEvent.switchOff,
+                    ),
+                )
                 updateParticipantViewState()
             }
             is ScreenTrackUpdated -> {
-                participantManager.updateParticipantScreenTrack(remoteParticipantEvent.sid,
-                        remoteParticipantEvent.screenTrack?.let { VideoTrackViewState(it) })
+                participantManager.updateParticipantScreenTrack(
+                    remoteParticipantEvent.sid,
+                    remoteParticipantEvent.screenTrack?.let { VideoTrackViewState(it) },
+                )
                 updateParticipantViewState()
             }
             is MuteRemoteParticipant -> {
-                participantManager.muteParticipant(remoteParticipantEvent.sid,
-                        remoteParticipantEvent.mute)
+                participantManager.muteParticipant(
+                    remoteParticipantEvent.sid,
+                    remoteParticipantEvent.mute,
+                )
                 updateParticipantViewState()
             }
             is NetworkQualityLevelChange -> {
-                participantManager.updateNetworkQuality(remoteParticipantEvent.sid,
-                        remoteParticipantEvent.networkQualityLevel)
+                participantManager.updateNetworkQuality(
+                    remoteParticipantEvent.sid,
+                    remoteParticipantEvent.networkQualityLevel,
+                )
                 updateParticipantViewState()
             }
             is RemoteParticipantDisconnected -> {
@@ -259,7 +274,8 @@ class RoomViewModel @Inject constructor(
         when (localParticipantEvent) {
             is LocalParticipantEvent.VideoTrackUpdated -> {
                 participantManager.updateLocalParticipantVideoTrack(
-                        localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) })
+                    localParticipantEvent.videoTrack?.let { VideoTrackViewState(it) },
+                )
                 updateParticipantViewState()
                 updateState { currentState -> currentState.copy(isVideoOff = localParticipantEvent.videoTrack == null) }
             }
@@ -315,27 +331,28 @@ class RoomViewModel @Inject constructor(
     private fun updateParticipantViewState() {
         updateState { currentState ->
             currentState.copy(
-                    participantThumbnails = participantManager.participantThumbnails,
-                    primaryParticipant = participantManager.primaryParticipant
+                participantThumbnails = participantManager.participantThumbnails,
+                primaryParticipant = participantManager.primaryParticipant,
             )
         }
     }
 
     private fun connect(identity: String, roomName: String) =
-            viewModelScope.launch {
-                roomManager.connect(
-                        identity,
-                        roomName)
-            }
+        viewModelScope.launch {
+            roomManager.connect(
+                identity,
+                roomName,
+            )
+        }
 
     private fun updateState(action: (currentState: RoomViewState) -> UIState) =
-            action { onState<RoomViewState> { currentState -> setState { action(currentState) } } }
+        action { onState<RoomViewState> { currentState -> setState { action(currentState) } } }
 
     @Suppress("UNCHECKED_CAST")
     class RoomViewModelFactory(
         private val roomManager: RoomManager,
         private val audioDeviceSelector: AudioSwitch,
-        private val permissionUtil: PermissionUtil
+        private val permissionUtil: PermissionUtil,
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

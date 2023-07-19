@@ -23,8 +23,10 @@ import org.junit.runner.RunWith
 class LoginTest {
 
     @get:Rule
-    var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA,
-            android.Manifest.permission.RECORD_AUDIO)
+    var permissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.CAMERA,
+        android.Manifest.permission.RECORD_AUDIO,
+    )
 
     @get:Rule
     var scenario = activityScenarioRule<SplashActivity>()

@@ -18,6 +18,7 @@ class SettingsFragment : BaseSettingsFragment() {
 
     @Inject
     internal lateinit var screenSelector: ScreenSelector
+
     @Inject
     internal lateinit var authenticator: Authenticator
 

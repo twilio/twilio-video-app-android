@@ -1,5 +1,6 @@
 package com.twilio.video.app.ui.room
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,8 +9,8 @@ import android.os.IBinder
 import androidx.annotation.RestrictTo
 import com.twilio.video.app.sdk.RoomManager
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val ROOM_NAME_EXTRA = "ROOM_NAME_EXTRA"
 
@@ -19,6 +20,7 @@ class VideoService : Service() {
     @Inject
     lateinit var roomManager: RoomManager
 
+    @SuppressLint("RestrictedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         setupForegroundService(intent)
@@ -27,6 +29,7 @@ class VideoService : Service() {
         return START_NOT_STICKY
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("VideoService destroyed")
@@ -44,7 +47,7 @@ class VideoService : Service() {
                 val roomNotification = RoomNotification(this@VideoService)
                 startForeground(
                     ONGOING_NOTIFICATION_ID,
-                    roomNotification.buildNotification(roomName)
+                    roomNotification.buildNotification(roomName),
                 )
             }
         }

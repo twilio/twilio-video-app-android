@@ -31,14 +31,16 @@ import javax.inject.Inject
 class SplashActivity : AppCompatActivity() {
 
     @Inject lateinit var authenticator: Authenticator
+
     @Inject lateinit var screenSelector: ScreenSelector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val newIntent = if (authenticator.loggedIn())
+        val newIntent = if (authenticator.loggedIn()) {
             Intent(this, RoomActivity::class.java)
-        else
+        } else {
             Intent(this, screenSelector.loginScreen)
+        }
         startActivity(newIntent.apply { data = intent.data })
         finish()
     }

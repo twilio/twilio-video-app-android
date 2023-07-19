@@ -26,16 +26,16 @@ import com.twilio.video.app.data.api.AuthServiceException
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.security.SecurePreferences
 import io.reactivex.Observable
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 class CommunityAuthenticator constructor(
     private val sharedPreferences: SharedPreferences,
     private val securePreferences: SecurePreferences,
     private val tokenService: TokenService,
-    private val coroutineContext: CoroutineContext = Dispatchers.IO
+    private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : Authenticator {
 
     override fun login(loginEventObservable: Observable<LoginEvent>): Observable<LoginResult> {

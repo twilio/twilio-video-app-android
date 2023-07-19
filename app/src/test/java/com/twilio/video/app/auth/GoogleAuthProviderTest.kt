@@ -63,14 +63,14 @@ class GoogleAuthProviderTest : BaseUnitTest() {
     @Test
     fun `loginWithAccount should login successfully`() {
         val googleAuthenticator = GoogleAuthProvider(
-                firebaseWrapper,
-                context,
-                googleAuthWrapper,
-                googleSignInWrapper,
-                googleSignInOptionsWrapper,
-                googleAuthProviderWrapper,
-                "test.com",
-                disposables
+            firebaseWrapper,
+            context,
+            googleAuthWrapper,
+            googleSignInWrapper,
+            googleSignInOptionsWrapper,
+            googleAuthProviderWrapper,
+            "test.com",
+            disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
         testObservable.assertValue(GoogleLoginSuccessResult(googleSignInAccount))
@@ -81,13 +81,13 @@ class GoogleAuthProviderTest : BaseUnitTest() {
     @Test
     fun `loginWithAccount should login successfully with no accepted domain`() {
         val googleAuthenticator = GoogleAuthProvider(
-                firebaseWrapper,
-                context,
-                googleAuthWrapper,
-                googleSignInWrapper,
-                googleSignInOptionsWrapper,
-                googleAuthProviderWrapper,
-                disposables = disposables
+            firebaseWrapper,
+            context,
+            googleAuthWrapper,
+            googleSignInWrapper,
+            googleSignInOptionsWrapper,
+            googleAuthProviderWrapper,
+            disposables = disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
         testObservable.assertValue(GoogleLoginSuccessResult(googleSignInAccount))
@@ -100,14 +100,14 @@ class GoogleAuthProviderTest : BaseUnitTest() {
         whenever(googleSignInAccount.email).thenReturn("test@blah.com")
 
         val googleAuthenticator = GoogleAuthProvider(
-                mock(),
-                context,
-                googleAuthWrapper,
-                googleSignInWrapper,
-                googleSignInOptionsWrapper,
-                mock(),
-                "test.com",
-                disposables
+            mock(),
+            context,
+            googleAuthWrapper,
+            googleSignInWrapper,
+            googleSignInOptionsWrapper,
+            mock(),
+            "test.com",
+            disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
         assertThat(testObservable.errorCount(), equalTo(1))

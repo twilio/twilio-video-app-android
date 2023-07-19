@@ -7,5 +7,5 @@ import androidx.core.content.ContextCompat.checkSelfPermission
 class PermissionUtil(private val context: Context) {
 
     fun isPermissionGranted(permission: String) =
-            checkSelfPermission(context, permission) == PERMISSION_GRANTED
+        checkSelfPermission(context, permission) == PERMISSION_GRANTED
 }

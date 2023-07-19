@@ -30,8 +30,13 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
 
     private val sharedPreferences: SharedPreferences = mock {
         whenever(mock.getString(TOPOLOGY, TOPOLOGY_DEFAULT)).thenReturn(TOPOLOGY_DEFAULT)
-        whenever(mock.getBoolean(RECORD_PARTICIPANTS_ON_CONNECT, Preferences
-            .RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)).thenReturn(RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)
+        whenever(
+            mock.getBoolean(
+                RECORD_PARTICIPANTS_ON_CONNECT,
+                Preferences
+                    .RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT,
+            ),
+        ).thenReturn(RECORD_PARTICIPANTS_ON_CONNECT_DEFAULT)
     }
     private val videoAppServiceDev: InternalTokenApi = mock()
     private val videoAppServiceStage: InternalTokenApi = mock()
@@ -43,7 +48,7 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
             mockService(videoAppServiceProd, prodTestToken)
             val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
             whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
-                    .thenReturn("production")
+                .thenReturn("production")
 
             val token = videoAppServiceDelegate.getToken(identity, roomName)
 
@@ -57,7 +62,7 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
             mockService(videoAppServiceStage, stageTestToken)
             val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
             whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
-                    .thenReturn(TWILIO_API_STAGE_ENV)
+                .thenReturn(TWILIO_API_STAGE_ENV)
 
             val token = videoAppServiceDelegate.getToken(identity, roomName)
 
@@ -71,7 +76,7 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
             mockService(videoAppServiceDev, devTestToken)
             val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
             whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
-                    .thenReturn(TWILIO_API_DEV_ENV)
+                .thenReturn(TWILIO_API_DEV_ENV)
 
             val token = videoAppServiceDelegate.getToken(identity, roomName)
 
@@ -81,8 +86,9 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
 
     private suspend fun mockService(mock: InternalTokenApi, token: String) {
         whenever(
-            mock.getToken(AuthServiceRequestDTO(null, identity, roomName, true)
-        )
+            mock.getToken(
+                AuthServiceRequestDTO(null, identity, roomName, true),
+            ),
         ).thenReturn(AuthServiceResponseDTO(token, Topology.GROUP))
     }
 }

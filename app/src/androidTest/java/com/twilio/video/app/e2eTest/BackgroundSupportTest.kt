@@ -43,11 +43,14 @@ class BackgroundSupportTest : BaseE2ETest() {
             // Click notification
             wait(Until.hasObject(By.pkg("com.android.systemui")), 10000)
             val notificationStackScroller = UiSelector()
-                    .resourceId("com.android.systemui:id/notification_stack_scroller")
+                .resourceId("com.android.systemui:id/notification_stack_scroller")
             findObject(notificationStackScroller)
-                    .getChild(UiSelector().textContains(
-                    getString(R.string.room_notification_message)))
-                    .click()
+                .getChild(
+                    UiSelector().textContains(
+                        getString(R.string.room_notification_message),
+                    ),
+                )
+                .click()
         }
 
         retryEspressoAction { assertRoomIsConnected() }

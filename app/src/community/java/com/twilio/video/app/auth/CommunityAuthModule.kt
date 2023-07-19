@@ -32,7 +32,7 @@ class CommunityAuthModule {
     fun providesCommunityAuthenticator(
         preferences: SharedPreferences,
         securePreferences: SecurePreferences,
-        tokenService: TokenService
+        tokenService: TokenService,
     ): Authenticator {
         return CommunityAuthenticator(preferences, securePreferences, tokenService)
     }

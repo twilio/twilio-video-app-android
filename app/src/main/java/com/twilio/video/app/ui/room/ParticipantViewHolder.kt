@@ -18,7 +18,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
 import timber.log.Timber
 
 internal class ParticipantViewHolder(internal val thumb: ParticipantThumbView) :
-        RecyclerView.ViewHolder(thumb) {
+    RecyclerView.ViewHolder(thumb) {
 
     private val localParticipantIdentity = thumb.context.getString(R.string.you)
 
@@ -32,8 +32,9 @@ internal class ParticipantViewHolder(internal val thumb: ParticipantThumbView) :
                     viewEventAction(PinParticipant(sid))
                 }
             }
-            val identity = if (participantViewState.isLocalParticipant)
-                localParticipantIdentity else participantViewState.identity
+            val identity = if (participantViewState.isLocalParticipant) {
+                localParticipantIdentity
+            } else participantViewState.identity
             setIdentity(identity)
             setMuted(participantViewState.isMuted)
             setPinned(participantViewState.isPinned)
@@ -68,7 +69,7 @@ internal class ParticipantViewHolder(internal val thumb: ParticipantThumbView) :
             setState(ParticipantView.State.SWITCHED_OFF)
         } else {
             videoTrackViewState?.videoTrack?.let { setState(ParticipantView.State.VIDEO) }
-                    ?: setState(ParticipantView.State.NO_VIDEO)
+                ?: setState(ParticipantView.State.NO_VIDEO)
         }
     }
 
@@ -79,7 +80,7 @@ internal class ParticipantViewHolder(internal val thumb: ParticipantThumbView) :
 
     private fun setNetworkQualityLevelImage(
         networkQualityImage: ImageView,
-        networkQualityLevel: NetworkQualityLevel?
+        networkQualityLevel: NetworkQualityLevel?,
     ) {
         when (networkQualityLevel) {
             NETWORK_QUALITY_LEVEL_ZERO -> R.drawable.network_quality_level_0

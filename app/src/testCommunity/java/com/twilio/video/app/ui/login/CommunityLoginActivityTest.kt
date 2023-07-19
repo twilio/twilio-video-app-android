@@ -33,7 +33,6 @@ import com.twilio.video.app.util.getMockHttpException
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -46,6 +45,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
 private const val IDENTITY = "Identity"
 private const val VALID_PASSCODE = "0123456789"
@@ -109,8 +109,8 @@ class CommunityLoginActivityTest {
             val response = AuthServiceResponseDTO("token")
             val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
             whenever(authService.getToken(url, requestBody))
-                    .thenThrow(exception)
-                    .thenReturn(response)
+                .thenThrow(exception)
+                .thenReturn(response)
 
             enterYourName(IDENTITY)
             enterPasscode(VALID_PASSCODE)
@@ -126,8 +126,8 @@ class CommunityLoginActivityTest {
             val response = AuthServiceResponseDTO("token")
             val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
             whenever(authService.getToken(url, requestBody))
-                    .thenThrow(exception)
-                    .thenReturn(response)
+                .thenThrow(exception)
+                .thenReturn(response)
 
             enterYourName(IDENTITY)
             enterPasscode(VALID_PASSCODE)

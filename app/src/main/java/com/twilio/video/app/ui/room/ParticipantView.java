@@ -16,10 +16,8 @@
 
 package com.twilio.video.app.ui.room;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -74,7 +72,6 @@ abstract class ParticipantView extends FrameLayout {
         initParams(context, attrs);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     ParticipantView(
             @NonNull Context context,
             @Nullable AttributeSet attrs,

@@ -5,8 +5,8 @@ import androidx.test.filters.MediumTest
 import com.twilio.video.Camera2Capturer
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.getTargetContext
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
@@ -23,8 +23,11 @@ import tvi.webrtc.CameraEnumerator
 class CameraCapturerCompatTest {
 
     private var cameraEnumerator: CameraEnumerator =
-            if (Camera2Capturer.isSupported(getTargetContext())) Camera2Enumerator(getTargetContext())
-            else Camera1Enumerator()
+        if (Camera2Capturer.isSupported(getTargetContext())) {
+            Camera2Enumerator(getTargetContext())
+        } else {
+            Camera1Enumerator()
+        }
 
     @Test
     fun it_should_return_a_null_camera_capturer_when_no_device_cameras_are_available() {

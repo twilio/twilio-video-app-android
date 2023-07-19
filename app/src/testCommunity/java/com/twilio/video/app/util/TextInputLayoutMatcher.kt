@@ -11,5 +11,5 @@ fun isTextInputLayoutError(): Matcher<View> = object : TypeSafeMatcher<View>() {
     override fun describeTo(description: Description?) { }
 
     override fun matchesSafely(item: View?): Boolean =
-            if (item is TextInputLayout) item.isErrorEnabled else false
+        if (item is TextInputLayout) item.isErrorEnabled else false
 }

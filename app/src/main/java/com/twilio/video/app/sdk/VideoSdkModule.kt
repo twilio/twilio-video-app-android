@@ -18,7 +18,7 @@ class VideoSdkModule {
     fun providesRoomManager(
         application: Application,
         sharedPreferences: SharedPreferences,
-        tokenService: TokenService
+        tokenService: TokenService,
     ): RoomManager {
         val connectOptionsFactory = ConnectOptionsFactory(application, sharedPreferences, tokenService)
         val videoClient = VideoClient(application, connectOptionsFactory)

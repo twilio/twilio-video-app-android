@@ -73,16 +73,18 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
             }
         }
         setupCodecListPreference(
-                VideoCodec::class.java,
-                Preferences.VIDEO_CODEC,
-                Preferences.VIDEO_CODEC_DEFAULT,
-                findPreference(Preferences.VIDEO_CODEC) as ListPreference?)
+            VideoCodec::class.java,
+            Preferences.VIDEO_CODEC,
+            Preferences.VIDEO_CODEC_DEFAULT,
+            findPreference(Preferences.VIDEO_CODEC) as ListPreference?,
+        )
 
         setupCodecListPreference(
-                AudioCodec::class.java,
-                Preferences.AUDIO_CODEC,
-                Preferences.AUDIO_CODEC_DEFAULT,
-                findPreference(Preferences.AUDIO_CODEC) as ListPreference?)
+            AudioCodec::class.java,
+            Preferences.AUDIO_CODEC,
+            Preferences.AUDIO_CODEC_DEFAULT,
+            findPreference(Preferences.AUDIO_CODEC) as ListPreference?,
+        )
 
         // Fill out the rest of settings
         identityPreference = findPreference<EditTextPreference>(Preferences.DISPLAY_NAME)?.apply {
@@ -98,7 +100,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
         codecClass: Class<*>,
         key: String,
         defaultValue: String,
-        preference: ListPreference?
+        preference: ListPreference?,
     ) {
         if (preference == null) {
             return

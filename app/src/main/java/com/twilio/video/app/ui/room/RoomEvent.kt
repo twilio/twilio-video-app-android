@@ -13,7 +13,7 @@ sealed class RoomEvent {
     data class Connected(
         val participants: List<Participant>,
         val room: Room,
-        val roomName: String
+        val roomName: String,
     ) : RoomEvent()
     object Disconnected : RoomEvent()
     object ConnectFailure : RoomEvent()
@@ -31,12 +31,12 @@ sealed class RoomEvent {
         data class TrackSwitchOff(val sid: String, val videoTrack: VideoTrack, val switchOff: Boolean) : RemoteParticipantEvent()
         data class ScreenTrackUpdated(
             val sid: String,
-            val screenTrack: VideoTrack?
+            val screenTrack: VideoTrack?,
         ) : RemoteParticipantEvent()
         data class MuteRemoteParticipant(val sid: String, val mute: Boolean) : RemoteParticipantEvent()
         data class NetworkQualityLevelChange(
             val sid: String,
-            val networkQualityLevel: NetworkQualityLevel
+            val networkQualityLevel: NetworkQualityLevel,
         ) : RemoteParticipantEvent()
         data class RemoteParticipantDisconnected(val sid: String) : RemoteParticipantEvent()
     }

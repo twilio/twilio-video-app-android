@@ -32,7 +32,7 @@ executors:
         type: string
     working_directory: *workspace
     docker:
-      - image: cimg/android:2021.10.2-node
+      - image: cimg/android:2023.06.1-node
     environment:
       _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
     resource_class: << parameters.resource-class >>
@@ -52,7 +52,7 @@ commands:
           name: Configure git user
           command: |
             git config --global user.email "twilio-sdk-build@twilio.com"
-            git config --global user.name "twilio-sdk-build"jobs:
+            git config --global user.name "twilio-sdk-build"
 
   gcloud_auth:
     description: "Authenticate gcloud client"

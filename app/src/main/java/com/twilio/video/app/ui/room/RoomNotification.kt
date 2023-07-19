@@ -16,30 +16,32 @@ const val ONGOING_NOTIFICATION_ID = 1
 class RoomNotification(private val context: Context) {
 
     private val pendingIntent
-            get() =
-                Intent(context, RoomActivity::class.java).let { notificationIntent ->
-                    notificationIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    // Android 12/S requires a flag to be set and FLAG_IMMUTBALE isn't available
-                    // before Android M (23)
-                    var flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-                    PendingIntent.getActivity(context, 0, notificationIntent, flags)
-                }
+        get() =
+            Intent(context, RoomActivity::class.java).let { notificationIntent ->
+                notificationIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                // Android 12/S requires a flag to be set and FLAG_IMMUTBALE isn't available
+                // before Android M (23)
+                var flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+                PendingIntent.getActivity(context, 0, notificationIntent, flags)
+            }
 
     init {
-        createDownloadNotificationChannel(VIDEO_SERVICE_CHANNEL,
-                context.getString(R.string.room_notification_channel_title),
-                context)
+        createDownloadNotificationChannel(
+            VIDEO_SERVICE_CHANNEL,
+            context.getString(R.string.room_notification_channel_title),
+            context,
+        )
     }
 
     fun buildNotification(roomName: String): Notification =
-            NotificationCompat.Builder(context, VIDEO_SERVICE_CHANNEL)
-                    .setContentTitle(context.getString(R.string.room_notification_title, roomName))
-                    .setContentText(context.getString(R.string.room_notification_message))
-                    .setContentIntent(pendingIntent)
-                    .setUsesChronometer(true)
-                    .setSmallIcon(R.drawable.ic_videocam_notification)
-                    .setTicker(context.getString(R.string.room_notification_message))
-                    .build()
+        NotificationCompat.Builder(context, VIDEO_SERVICE_CHANNEL)
+            .setContentTitle(context.getString(R.string.room_notification_title, roomName))
+            .setContentText(context.getString(R.string.room_notification_message))
+            .setContentIntent(pendingIntent)
+            .setUsesChronometer(true)
+            .setSmallIcon(R.drawable.ic_videocam_notification)
+            .setTicker(context.getString(R.string.room_notification_message))
+            .build()
 
     private fun createDownloadNotificationChannel(channelId: String, channelName: String, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
