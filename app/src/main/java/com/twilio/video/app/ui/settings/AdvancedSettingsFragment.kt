@@ -8,6 +8,7 @@ import androidx.preference.Preference
 import com.twilio.video.AudioCodec
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
+import com.twilio.video.IsacCodec
 import com.twilio.video.OpusCodec
 import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
@@ -28,7 +29,7 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
 
     private var identityPreference: EditTextPreference? = null
     private val videoCodecNames = arrayOf(Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME)
-    private val audioCodecNames = arrayOf(OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME)
+    private val audioCodecNames = arrayOf(IsacCodec.NAME, OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME)
 
     override fun onStart() {
         super.onStart()
