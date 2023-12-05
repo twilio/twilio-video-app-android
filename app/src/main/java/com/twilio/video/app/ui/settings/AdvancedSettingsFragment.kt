@@ -23,6 +23,7 @@ import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VIDEO_ENCODING_MODE
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
+import com.twilio.video.app.util.get
 import com.twilio.video.app.util.isInternalFlavor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
