@@ -63,6 +63,7 @@ spotless {
     }
     java {
         target '**/*.java'
+        targetExclude '**/build/**/*.*'
         googleJavaFormat().aosp()
     }
     kotlin {
