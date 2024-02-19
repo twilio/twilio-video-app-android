@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.134 (Sep 23, 2023)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.6.4
+
 ## 0.132 (July 11, 2023)
 
 ### Dependency Upgrades
@@ -13,6 +19,10 @@
 
 * Updated AudioSwitch version to 1.1.8
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c1606601914998a03499278481da0ab31ef193fc
 ## 0.126 (Oct 10, 2022)
 
 ### Dependency Upgrades

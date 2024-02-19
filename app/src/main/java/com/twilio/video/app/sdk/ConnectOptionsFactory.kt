@@ -10,7 +10,6 @@ import com.twilio.video.ConnectOptions
 import com.twilio.video.EncodingParameters
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
 import com.twilio.video.NetworkQualityConfiguration
 import com.twilio.video.NetworkQualityVerbosity
 import com.twilio.video.OpusCodec
@@ -244,7 +243,6 @@ class ConnectOptionsFactory(
         )?.let { audioCodecName ->
 
             when (audioCodecName) {
-                IsacCodec.NAME -> IsacCodec()
                 PcmaCodec.NAME -> PcmaCodec()
                 PcmuCodec.NAME -> PcmuCodec()
                 G722Codec.NAME -> G722Codec()
