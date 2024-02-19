@@ -19,10 +19,7 @@
 
 * Updated AudioSwitch version to 1.1.8
 
-<<<<<<< HEAD
-=======
 
->>>>>>> c1606601914998a03499278481da0ab31ef193fc
 ## 0.126 (Oct 10, 2022)
 
 ### Dependency Upgrades
