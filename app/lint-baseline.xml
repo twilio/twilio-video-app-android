@@ -5,7 +5,7 @@
         id="ObsoleteLintCustomCheck"
         message="Library lint checks out of date;&#xA;these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`dagger.lint.DaggerIssueRegistry`)&#xA;which was compiled against an older version of lint&#xA;than this one. This is usually fine, but not in this&#xA;case; some basic verification shows that the lint&#xA;check jar references (for example) the following API&#xA;which is no longer valid in this version of lint:&#xA;org.jetbrains.uast.kotlin.KotlinUClass: org.jetbrains.kotlin.psi.KtClassOrObject getKtClass()&#xA;(Referenced from dagger/lint/DaggerKotlinIssueDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`JvmStaticProvidesInObjectDetector`,`FieldSiteTargetOnQualifierAnnotation`,`ModuleCompanionObjects`,`ModuleCompanionObjectsNotInModuleParent`&#xA;&#xA;Recompile the checks against the latest version, or if&#xA;this is a check bundled with a third-party library, see&#xA;if there is a more recent version available.&#xA;&#xA;Version of Lint API this lint check is using is 8.&#xA;The Lint API version currently running is 14 (8.0+).">
         <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/63662b5bdbc4be339324324a5f561224/transformed/jetified-dagger-lint-aar-2.38.1/jars/lint.jar"/>
+            file="$GRADLE_USER_HOME/caches/transforms-3/c120d90cbf9ac5b0f7fd8bea6591311d/transformed/jetified-dagger-lint-aar-2.38.1/jars/lint.jar"/>
     </issue>
 
     <issue
