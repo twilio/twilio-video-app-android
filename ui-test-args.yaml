@@ -17,7 +17,7 @@ integration-tests:
   device:
     - {model: hammerhead, version: 23}
     - {model: griffin, version: 24}
-    - {model: HWCOR, version: 27}
+    - {model: starqlteue, version: 26}
     - {model: pettyl, version: 27}
     - {model: redfin, version: 30}
   test-targets:
