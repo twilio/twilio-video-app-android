@@ -32,7 +32,7 @@ executors:
         type: string
     working_directory: *workspace
     docker:
-      - image: cimg/android:2023.06.1-node
+      - image: cimg/android:2024.01.1-node
     environment:
       _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
     resource_class: << parameters.resource-class >>
