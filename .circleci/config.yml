@@ -23,6 +23,11 @@ aliases:
         only:
           - master
 
+parameters:
+  biweekly_run:
+    type: boolean
+    default: false
+
 executors:
   build:
     parameters:
@@ -324,6 +329,8 @@ jobs:
 
 workflows:
   build-test:
+    when:
+      not: << pipeline.parameters.biweekly_run >>
     jobs:
       - lint
       - check-format
@@ -349,7 +356,21 @@ workflows:
             - lint
             - check-format
 
+  biweekly-e2e-run:
+    when: << pipeline.parameters.biweekly_run >>
+    jobs:
+      - lint
+      - check-format
+      - build-app
+      - e2e-tests:
+          requires:
+            - build-app
+            - lint
+            - check-format
+
   publish-to-appcenter:
+    when:
+      not: << pipeline.parameters.biweekly_run >>
     jobs:
       - build-release-app:
           <<: *publish-to-appcenter-filter
