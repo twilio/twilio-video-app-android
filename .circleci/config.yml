@@ -322,7 +322,7 @@ jobs:
       name: build
       resource-class: medium+
     steps:
-      - attache_workspace:
+      - attach_workspace:
           at: *workspace
       - run:
           command: |
