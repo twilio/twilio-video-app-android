@@ -28,6 +28,7 @@ aliases:
       branches:
         only:
           - master
+          - afalls/VBLOCKS-3105/publish-app-tofirebase
 
 parameters:
   biweekly_run:
