@@ -23,6 +23,12 @@ aliases:
         only:
           - master
 
+  - &publish-to-firebase-filter
+    filters:
+      branches:
+        only:
+          - master
+
 parameters:
   biweekly_run:
     type: boolean
@@ -311,6 +317,21 @@ jobs:
             - app/build
       - save_cache: *save-cache-gradle
 
+  publish-to-firebase:
+    executor:
+      name: build
+      resource-class: medium+
+    steps:
+      - attache_workspace:
+          at: *workspace
+      - run:
+          command: |
+            echo $GCP_KEY | base64 -d > firebase-key.json
+            export GOOGLE_APPLICATION_CREDENTIALS=$(stat -f %R firebase-key.json)
+            sudo npm -g install firebase
+            firebase appdistribution:distribute app/build/outputs/apk/internal/release/app-internal-release.apk --app 1:285008367772:android:4da97cc5e2ebc0ea
+            
+
   publish-to-appcenter:
     executor:
       name: build
@@ -368,13 +389,13 @@ workflows:
             - lint
             - check-format
 
-  publish-to-appcenter:
+  publish-to-firebase:
     when:
       not: << pipeline.parameters.biweekly_run >>
     jobs:
       - build-release-app:
-          <<: *publish-to-appcenter-filter
-      - publish-to-appcenter:
-          <<: *publish-to-appcenter-filter
+          <<: *publish-to-firebase-filter
+      - publish-to-firebase:
+          <<: *publish-to-firebase-filter
           requires:
             - build-release-app
