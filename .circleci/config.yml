@@ -327,8 +327,7 @@ jobs:
           at: *workspace
       - run:
           command: |
-            echo $GCP_KEY | base64 -d > firebase-key.json
-            export GOOGLE_APPLICATION_CREDENTIALS=$(realpath firebase-key.json)
+            export GOOGLE_APPLICATION_CREDENTIALS=$(echo $GCP_KEY | base64 -d)
             sudo npm -g install firebase
             firebase appdistribution:distribute app/build/outputs/apk/internal/release/app-internal-release.apk --app 1:285008367772:android:4da97cc5e2ebc0ea
             
