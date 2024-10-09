@@ -63,7 +63,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
 
-        versionName "$versionCodeProperty"
+        versionName "v0.$versionCodeProperty"
         versionCode versionCodeProperty
 
         vectorDrawables.useSupportLibrary = true
