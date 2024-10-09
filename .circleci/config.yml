@@ -28,10 +28,6 @@ parameters:
     type: boolean
     default: false
 
-  test-publishing:
-    type: boolean
-    default: false
-
 executors:
   build:
     parameters:
@@ -380,13 +376,5 @@ workflows:
           <<: *publish-to-firebase-filter
       - publish-to-firebase:
           <<: *publish-to-firebase-filter
-          requires:
-            - build-release-app
-
-  test-publish-to-firebase:
-    when: << pipeline.parameters.test-publishing >>
-    jobs:
-      - build-release-app
-      - publish-to-firebase:
           requires:
             - build-release-app
