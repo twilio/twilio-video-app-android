@@ -251,6 +251,7 @@ jobs:
     steps:
       # Setup
       - checkout
+      - install_secrets
       - attach_workspace:
           at: *workspace
       - gcloud_auth
@@ -274,6 +275,7 @@ jobs:
     steps:
       # Setup
       - checkout
+      - install_secrets
       - attach_workspace:
           at: *workspace
       - gcloud_auth
