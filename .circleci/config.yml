@@ -321,6 +321,8 @@ jobs:
       name: build
       resource-class: medium+
     steps:
+      - checkout
+      - install_secrets
       - attach_workspace:
           at: *workspace
       - run:
