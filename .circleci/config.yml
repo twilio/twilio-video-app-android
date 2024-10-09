@@ -27,6 +27,7 @@ parameters:
   biweekly_run:
     type: boolean
     default: false
+
   test-publishing:
     type: boolean
     default: false
@@ -382,7 +383,7 @@ workflows:
   test-publish-to-firebase:
     when: << pipeline.parameters.test-publishing >>
     jobs:
-      - build-release-app:
+      - build-release-app
       - publish-to-firebase:
           requires:
             - build-release-app
