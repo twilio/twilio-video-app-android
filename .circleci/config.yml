@@ -64,8 +64,7 @@ commands:
     steps:
       - run:
           name: Google Cloud Auth
-          command: <
-            gcloud auth activate-service-account --key-file=app/gcp-key.json
+          command: gcloud auth activate-service-account --key-file=app/gcp-key.json
 
   install_secrets:
     description: Extract and configure secrets required for building and publishing
