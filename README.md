@@ -1,8 +1,5 @@
 # Twilio Video Android App
 
-> [!WARNING]
-> We are no longer allowing new customers to onboard to Twilio Video. Effective **December 5th, 2026**, Twilio Video will End of Life (EOL) and will cease to function for all customers. Customers may transition to any video provider they choose, however, we are recommending customers migrate to the Zoom Video SDK and we have prepared a [Migration Guide](https://developers.zoom.us/docs/video-sdk/twilio/). Additional information on this EOL is available in our Help Center [here](https://help.twilio.com/articles/24158233644443-Programmable-Video-End-of-Life-Extension).
-
 > To make sure your app is ready for **Android 11** please visit [this page](https://github.com/twilio/video-quickstart-android/issues/543).
 
 [![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=svg)](https://circleci.com/gh/twilio/twilio-video-app-android)
