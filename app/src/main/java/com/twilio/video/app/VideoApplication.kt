@@ -37,7 +37,5 @@ class VideoApplication : Application() {
         super.onCreate()
 
         Timber.plant(tree)
-
-        startAppcenter(this)
     }
 }

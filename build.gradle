@@ -7,6 +7,8 @@ buildscript {
             project.property('androidReleaseKeyAlias') : 'fakealias')
     ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
             project.property('androidReleaseKeyPassword') : 'fakepassword')
+    ext.firebaseAppId = (project.hasProperty('firebaseAppId') ?
+            project.property('firebaseAppId') : 'fakeappid')
 
     ext.getPropertyValue =  { propertyKey ->
         def property  = System.getenv(propertyKey)
@@ -44,8 +46,9 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.3.1'
         classpath "com.google.gms:google-services:4.3.10"
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.2'
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.40.1'
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:5.0.0'
     }
 }
 
