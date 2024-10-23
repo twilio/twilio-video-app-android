@@ -88,8 +88,8 @@ task incrementVersionCode {
         def versionCodeTag = "v0.$versionCode"
         def newVersionCode = (versionCode as Integer) + 1
         // Create build directory if not created
-        if (!buildDir.exists()) {
-            buildDir.mkdir()
+        if (!getLayout().getBuildDirectory().asFile.get().exists()) {
+            getLayout().getBuildDirectory().asFile.get().mkdir()
         }
 
         exec {
