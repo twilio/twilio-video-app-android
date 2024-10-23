@@ -1,9 +1,12 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'dagger.hilt.android.plugin'
+plugins {
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'com.google.firebase.appdistribution'
+}
 
 def versionCodeProperty = project.property('versionCode') as Integer
 def includeSdkFromSourceProperty = 'includeSdkFromSource'
@@ -60,7 +63,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
 
-        versionName "0.1.0"
+        versionName "v0.$versionCodeProperty"
         versionCode versionCodeProperty
 
         vectorDrawables.useSupportLibrary = true
@@ -110,8 +113,6 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
             signingConfig signingConfigs.debug
         }
     }
@@ -123,8 +124,13 @@ android {
             dimension "environment"
             applicationId "com.twilio.video.app.internal"
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
-            buildConfigField 'String', 'APPCENTER_APP_KEY',
-                    "\"${getLocalProperty("APPCENTER_APP_KEY")}\""
+
+            firebaseAppDistribution {
+                appId = firebaseAppId
+                artifactType = "APK"
+                releaseNotes = "Ahoy App (Internal), look at CHANGELOG.md for more info."
+                groups = "QE"
+            }
         }
 
         community {
@@ -193,7 +199,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.1.8'
+    implementation 'com.twilio:audioswitch:1.2.0'
     implementation "org.uniflow-kt:uniflow-android:$uniflowVersion"
 
     /*
@@ -201,8 +207,6 @@ dependencies {
      * to com.android.ViewBinding.
      */
     compileOnly 'com.android.databinding:viewbinding:4.1.3'
-
-    internalImplementation "com.microsoft.appcenter:appcenter-distribute:4.3.1"
 
     kapt daggerAndroidProcessor
     kapt daggerCompiler

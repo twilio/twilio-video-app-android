@@ -17,11 +17,16 @@ aliases:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
 
-  - &publish-to-appcenter-filter
+  - &publish-to-firebase-filter
     filters:
       branches:
         only:
           - master
+
+parameters:
+  biweekly_run:
+    type: boolean
+    default: false
 
 executors:
   build:
@@ -32,7 +37,7 @@ executors:
         type: string
     working_directory: *workspace
     docker:
-      - image: cimg/android:2023.06.1-node
+      - image: cimg/android:2024.01.1-node
     environment:
       _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
     resource_class: << parameters.resource-class >>
@@ -59,7 +64,7 @@ commands:
     steps:
       - run:
           name: Google Cloud Auth
-          command: echo $GCP_KEY | base64 -d | gcloud auth activate-service-account --key-file=-
+          command: gcloud auth activate-service-account --key-file=app/gcp-key.json
 
   install_secrets:
     description: Extract and configure secrets required for building and publishing
@@ -69,10 +74,12 @@ commands:
           command: |
             # Internal debug google services
             mkdir -p app/src/internal/debug || true
-            echo $GOOGLE_SERVICES_INTERNAL_DEBUG_JSON | base64 -di > app/src/internal/debug/google-services.json
+            echo $GOOGLE_SERVICES_INTERNAL_JSON | base64 -di > app/src/internal/debug/google-services.json
             # Internal release google services
             mkdir -p app/src/internal/release || true
-            echo $GOOGLE_SERVICES_INTERNAL_RELEASE_JSON | base64 -di > app/src/internal/release/google-services.json
+            echo $GOOGLE_SERVICES_INTERNAL_JSON | base64 -di > app/src/internal/release/google-services.json
+            # GCP key
+            echo $GCP_KEY | base64 -di > app/gcp-key.json
             # Gradle Properties
             mkdir -p ~/.gradle
             mkdir -p $PWD/secrets
@@ -81,8 +88,8 @@ commands:
             echo "androidKeystorePassword=$VIDEO_APP_KEYSTORE_PASSWORD" >> ~/.gradle/gradle.properties
             echo "androidReleaseKeyAlias=$VIDEO_APP_RELEASE_KEY_ALIAS" >> ~/.gradle/gradle.properties
             echo "androidReleaseKeyPassword=$VIDEO_APP_RELEASE_KEY_PASSWORD" >> ~/.gradle/gradle.properties
+            echo "firebaseAppId=$FIREBASE_APP_ID" >> ~/.gradle/gradle.properties
             echo "org.gradle.jvmargs=-Xmx4608m" >> ~/.gradle/gradle.properties
-            echo "APPCENTER_APP_KEY=$APPCENTER_APP_KEY" >> ./local.properties
 
   setup_ftl_output:
     description: Setup environment to capture FTL output
@@ -244,6 +251,7 @@ jobs:
     steps:
       # Setup
       - checkout
+      - install_secrets
       - attach_workspace:
           at: *workspace
       - gcloud_auth
@@ -267,6 +275,7 @@ jobs:
     steps:
       # Setup
       - checkout
+      - install_secrets
       - attach_workspace:
           at: *workspace
       - gcloud_auth
@@ -306,24 +315,24 @@ jobs:
             - app/build
       - save_cache: *save-cache-gradle
 
-  publish-to-appcenter:
+  publish-to-firebase:
     executor:
       name: build
       resource-class: medium+
     steps:
+      - checkout
+      - install_secrets
       - attach_workspace:
           at: *workspace
       - run:
-          # TODO Ticket to improve build time here https://issues.corp.twilio.com/browse/AHOYAPPS-67
-          # TODO Ticket to add latest changelog update https://issues.corp.twilio.com/browse/AHOYAPPS-94
-          command: |
-            sudo npm install webpack
-            echo no | sudo npm install -g appcenter-cli
-            appcenter login --token $APPCENTER_API_TOKEN
-            appcenter distribute release -f app/build/outputs/apk/internal/release/app-internal-release.apk -g Testers --app nico-hokeyapp-dzyz/Video-App-Internal
+          command: >
+            GOOGLE_APPLICATION_CREDENTIALS=app/gcp-key.json 
+            ./gradlew -q app:assembleInternalRelease app:appDistributionUploadInternalRelease
 
 workflows:
   build-test:
+    when:
+      not: << pipeline.parameters.biweekly_run >>
     jobs:
       - lint
       - check-format
@@ -349,11 +358,25 @@ workflows:
             - lint
             - check-format
 
-  publish-to-appcenter:
+  biweekly-e2e-run:
+    when: << pipeline.parameters.biweekly_run >>
+    jobs:
+      - lint
+      - check-format
+      - build-app
+      - e2e-tests:
+          requires:
+            - build-app
+            - lint
+            - check-format
+
+  publish-to-firebase:
+    when:
+      not: << pipeline.parameters.biweekly_run >>
     jobs:
       - build-release-app:
-          <<: *publish-to-appcenter-filter
-      - publish-to-appcenter:
-          <<: *publish-to-appcenter-filter
+          <<: *publish-to-firebase-filter
+      - publish-to-firebase:
+          <<: *publish-to-firebase-filter
           requires:
             - build-release-app

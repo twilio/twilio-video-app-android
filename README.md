@@ -1,8 +1,5 @@
 # Twilio Video Android App
 
-> [!WARNING]
-> We are no longer allowing new customers to onboard to Twilio Video. Effective **December 5th, 2024**, Twilio Video will End of Life (EOL) and will cease to function for all customers. Customers may transition to any video provider they choose, however, we are recommending customers migrate to the Zoom Video SDK and we have prepared a [Migration Guide](https://developers.zoom.us/docs/video-sdk/twilio/). Additional information on this EOL is available in our Help Center [here](https://support.twilio.com/hc/en-us/articles/20950630029595-Programmable-Video-End-of-Life-Notice).
-
 > To make sure your app is ready for **Android 11** please visit [this page](https://github.com/twilio/video-quickstart-android/issues/543).
 
 [![CircleCI](https://circleci.com/gh/twilio/twilio-video-app-android.svg?style=svg)](https://circleci.com/gh/twilio/twilio-video-app-android)
@@ -53,22 +50,6 @@ If any errors occur after running a [Twilio CLI RTC Plugin](https://github.com/t
 1. Run `twilio rtc:apps:video:delete` to delete any existing authentication servers.
 1. Run `twilio rtc:apps:video:deploy --authentication passcode` to deploy a new authentication server.
 
-#### App Behavior with Different Room Types
-
-**NOTE:** Usage charges will apply for most room types. See [pricing](https://www.twilio.com/video/pricing) for more information.
-
-After running the command [to deploy a Twilio Access Token Server](https://github.com/twilio/twilio-video-app-android#deploy-twilio-access-token-server), the room type will be returned in the command line output. Each room type provides a different video experience. More details about these room types can be found [here](https://www.twilio.com/docs/video/tutorials/understanding-video-rooms). The rest of this section explains how these room types affect the behavior of the video app.
-
-*Group* - The Group room type allows up to fifty participants to join a video room in the app. The Network Quality Level (NQL) indicators and dominant speaker are demonstrated with this room type. Also, the VP8 video codec with simulcast enabled along with a bandwidth profile are set by default in order to provide an optimal group video app experience.
-
-*Small Group* - The Small Group room type provides an identical group video app experience except for a smaller limit of four participants.
-
-*Peer-to-peer* - Although up to ten participants can join a room using the Peer-to-peer (P2P) room type, it is ideal for a one to one video experience. The NQL indicators, bandwidth profiles, and dominant speaker cannot be used with this room type. Thus, they are not demonstrated in the video app. Also, the VP8 video codec with simulcast disabled and 720p minimum video capturing dimensions are also set by default in order to provide an optimal one to one video app experience. If more than ten participants join a room with this room type, then the video app will present an error.
-
-*Go* - The Go room type provides a similar Peer-to-peer video app experience except for a smaller limit of two participants. If more than two participants join a room with this room type, then the video app will present an error.
-
-If the max number of participants is exceeded, then the video app will present an error for all room types.
-
 ### Build
 
 There are different product flavors for the application:
@@ -86,7 +67,7 @@ To get started with the community flavor follow these steps:
 1. Select the `communityDebug` Build Variant.
 1. Run the application.
 
-### Start Video Conference
+### Start Video Call
 
 For each device:
 
@@ -102,6 +83,8 @@ The passcode will expire after one week. Follow the steps below to sign in with 
 1. [Generate a new passcode](#deploy-twilio-access-token-server).
 1. In the app tap `Settings > Sign Out`.
 1. Repeat the [steps above](#start-video-conference).
+
+**NOTE:** Usage charges will apply for video calls. See [pricing](https://www.twilio.com/video/pricing) for more information.
 
 ## Tests
 
