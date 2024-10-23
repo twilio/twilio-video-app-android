@@ -8,7 +8,12 @@ plugins {
     id 'com.google.firebase.appdistribution'
 }
 
-def versionCodeProperty = project.property('versionCode') as Integer
+def appVersionCode = project.property('versionCode') as Integer
+
+def versionNameProperty = 'versionName'
+def appVersionName = project.hasProperty(versionNameProperty) ?
+        project.property(versionNameProperty) : "v0.$appVersionCode"
+
 def includeSdkFromSourceProperty = 'includeSdkFromSource'
 def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
         project.property(includeSdkFromSourceProperty) as Boolean
@@ -63,8 +68,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
 
-        versionName "v0.$versionCodeProperty"
-        versionCode versionCodeProperty
+        versionName appVersionName
+        versionCode appVersionCode
 
         vectorDrawables.useSupportLibrary = true
 
