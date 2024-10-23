@@ -47,7 +47,7 @@ afterEvaluate {
 }
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
     namespace 'com.twilio.video.app'
     testNamespace 'com.twilio.video.app.e2eTest'
 
