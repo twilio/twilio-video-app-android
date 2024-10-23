@@ -7,6 +7,8 @@ buildscript {
             project.property('androidReleaseKeyAlias') : 'fakealias')
     ext.releaseKeyPassword = (project.hasProperty('androidReleaseKeyPassword') ?
             project.property('androidReleaseKeyPassword') : 'fakepassword')
+    ext.firebaseAppId = (project.hasProperty('firebaseAppId') ?
+            project.property('firebaseAppId') : 'fakeappid')
 
     ext.getPropertyValue =  { propertyKey ->
         def property  = System.getenv(propertyKey)

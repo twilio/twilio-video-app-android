@@ -126,7 +126,7 @@ android {
             buildConfigField 'String', 'ENVIRONMENT_DEFAULT', '"production"'
 
             firebaseAppDistribution {
-                appId = "1:285008367772:android:4da97cc5e2ebc0ea"
+                appId = firebaseAppId
                 artifactType = "APK"
                 releaseNotes = "Ahoy App (Internal), look at CHANGELOG.md for more info."
                 groups = "QE"
