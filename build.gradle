@@ -44,7 +44,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.3.1'
-        classpath "com.google.gms:google-services:4.3.10"
+        classpath "com.google.gms:google-services:4.4.2"
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.2'
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.40.1'
@@ -88,8 +88,8 @@ task incrementVersionCode {
         def versionCodeTag = "v0.$versionCode"
         def newVersionCode = (versionCode as Integer) + 1
         // Create build directory if not created
-        if (!buildDir.exists()) {
-            buildDir.mkdir()
+        if (!getLayout().getBuildDirectory().asFile.get().exists()) {
+            getLayout().getBuildDirectory().asFile.get().mkdir()
         }
 
         exec {
