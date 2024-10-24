@@ -79,7 +79,7 @@ commands:
             mkdir -p app/src/internal/release || true
             echo $GOOGLE_SERVICES_INTERNAL_JSON | base64 -di > app/src/internal/release/google-services.json
             # GCP key
-            echo $GCP_KEY | base64 -di > app/gcp-key.json
+            echo $GCP_KEY | base64 -d > app/gcp-key.json
             # Gradle Properties
             mkdir -p ~/.gradle
             mkdir -p $PWD/secrets

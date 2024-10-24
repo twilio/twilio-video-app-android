@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.155 (Oct 23, 2024)
+
+### Dependency Upgrades
+
+* Updated to target API 35
+
 ## 0.149 (Sep 3, 2024)
 
 ### Dependency Upgrades
