@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.156 (Nov 12, 2024)
+
+### Dependency Upgrades
+
+* Updated twilio-android-env to 1.1.1 to support 16k pages
+
+### Feature Changes
+
+* In preparation for the WebRTC-124 upgrade, the following necessary changes were made
+   * removed support for globally setting audio channel effects as the necessary class WebRtcAudioUtils is removed from WebRTC-124.
+   * removed support for globally setting the usage of SLES audio device as the necessary class WebRtcAudioManager is removed from WebRTC-124.
+
+
 ## 0.155 (Oct 23, 2024)
 
 ### Dependency Upgrades
