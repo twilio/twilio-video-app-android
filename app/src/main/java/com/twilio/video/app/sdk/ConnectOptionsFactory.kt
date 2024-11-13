@@ -28,8 +28,6 @@ import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.createBandwidthProfileOptions
 import com.twilio.video.ktx.createConnectOptions
-import tvi.webrtc.voiceengine.WebRtcAudioManager
-import tvi.webrtc.voiceengine.WebRtcAudioUtils
 
 class ConnectOptionsFactory(
     private val context: Context,
