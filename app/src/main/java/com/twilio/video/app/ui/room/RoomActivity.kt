@@ -244,7 +244,7 @@ class RoomActivity : AppCompatActivity() {
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == MEDIA_PROJECTION_REQUEST_CODE) {
+        if (requestCode == MEDIA_PROJECTION_REQUEST_CODE &&  data != null) {
             if (resultCode != RESULT_OK) {
                 Snackbar.make(
                     binding.room.primaryVideo,
@@ -338,7 +338,17 @@ class RoomActivity : AppCompatActivity() {
     private fun requestPermissions() {
         // nested if statements used to keep lint happy and avoid needing a @SuppressLint decoration
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissions(
+                    arrayOf(
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ),
+                    PERMISSIONS_REQUEST_CODE,
+                )
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 requestPermissions(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,

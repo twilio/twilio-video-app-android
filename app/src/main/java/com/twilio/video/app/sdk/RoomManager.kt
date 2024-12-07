@@ -25,6 +25,8 @@ import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
+import com.twilio.video.app.ui.room.VideoService.Companion.disableScreenShare
+import com.twilio.video.app.ui.room.VideoService.Companion.enableScreenShare
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
 import com.twilio.video.app.ui.room.VideoService.Companion.stopService
 import kotlinx.coroutines.CoroutineDispatcher
@@ -108,10 +110,12 @@ class RoomManager(
     }
 
     fun startScreenCapture(captureResultCode: Int, captureIntent: Intent) {
+        enableScreenShare(room!!.name)
         localParticipantManager.startScreenCapture(captureResultCode, captureIntent)
     }
 
     fun stopScreenCapture() {
+        disableScreenShare(room!!.name)
         localParticipantManager.stopScreenCapture()
     }
 
