@@ -51,12 +51,12 @@ class VideoService : Service() {
                 ONGOING_NOTIFICATION_ID,
                 roomNotification.buildNotification(roomName),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
-                        if (enable) {
-                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
-                        } else {
-                            0
-                        }
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
+                    if (enable) {
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+                    } else {
+                        0
+                    },
             )
         }
     }
@@ -70,12 +70,12 @@ class VideoService : Service() {
                         ONGOING_NOTIFICATION_ID,
                         roomNotification.buildNotification(roomName),
                         ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
                     )
                 } else {
                     startForeground(
                         ONGOING_NOTIFICATION_ID,
-                        roomNotification.buildNotification(roomName)
+                        roomNotification.buildNotification(roomName),
                     )
                 }
             }
