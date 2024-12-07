@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.157 (Dec 6, 2024)
+
+### Bug Fixes
+
+* Fixed bug regarding missing permissions when using android 34+ devices
+
 ## 0.156 (Nov 12, 2024)
 
 ### Dependency Upgrades

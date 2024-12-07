@@ -171,6 +171,7 @@ dependencies {
     def coroutinesAndroidVersion = '1.4.3'
     def fragmentVersion = '1.3.2'
     def uniflowVersion = '1.0.5'
+    def androidEnv = '1.1.1'
 
     implementation platform('com.google.firebase:firebase-bom:25.9.0')
 
@@ -179,7 +180,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
     // TODO Remove as part of https://issues.corp.twilio.com/browse/AHOYAPPS-445
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$coroutinesAndroidVersion"
-    implementation 'com.twilio:twilio-android-env:1.1.1@aar'
+    implementation "com.twilio:twilio-android-env:$androidEnv@aar"
     implementation "androidx.constraintlayout:constraintlayout:2.0.4"
     implementation 'com.google.android.material:material:1.3.0'
     implementation "androidx.preference:preference-ktx:1.1.1"
