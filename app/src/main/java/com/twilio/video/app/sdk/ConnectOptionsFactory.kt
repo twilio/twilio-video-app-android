@@ -28,8 +28,6 @@ import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.createBandwidthProfileOptions
 import com.twilio.video.ktx.createConnectOptions
-import tvi.webrtc.voiceengine.WebRtcAudioManager
-import tvi.webrtc.voiceengine.WebRtcAudioUtils
 
 class ConnectOptionsFactory(
     private val context: Context,
@@ -120,16 +118,18 @@ class ConnectOptionsFactory(
             Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
             Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
         )
+        // Removed due WebRTC-124 removing the WebRtcAudioUtils & WebRtcAudioManager classes
+        // Audio effects shall be added on a per-audio track basis. VBLOCKS-3744
+        //
+        // val openSLESUsage = sharedPreferences.getBoolean(
+        //     Preferences.AUDIO_OPEN_SLES_USAGE,
+        //     Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT,
+        // )
 
-        val openSLESUsage = sharedPreferences.getBoolean(
-            Preferences.AUDIO_OPEN_SLES_USAGE,
-            Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT,
-        )
-
-        WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
-        WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(!noiseSuppressor)
-        WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(!automaticGainControl)
-        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(!openSLESUsage)
+        // WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
+        // WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(!noiseSuppressor)
+        // WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(!automaticGainControl)
+        // WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(!openSLESUsage)
 
         val isNetworkQualityEnabled = sharedPreferences.get(
             Preferences.ENABLE_NETWORK_QUALITY_LEVEL,
