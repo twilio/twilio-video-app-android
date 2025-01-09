@@ -166,7 +166,7 @@ class LocalParticipantManager(
                         Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
                         Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT))
                 noiseSuppression(
-                    sharedPreferences.getBoolean(d
+                    sharedPreferences.getBoolean(
                         Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
                         Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT))
                 autoGainControl(
