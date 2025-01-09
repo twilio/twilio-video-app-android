@@ -27,7 +27,6 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUp
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.AudioOptionsBuilder
-import com.twilio.video.ktx.createAudioOptions
 import com.twilio.video.ktx.createLocalAudioTrack
 import com.twilio.video.ktx.createLocalVideoTrack
 import timber.log.Timber
@@ -160,19 +159,25 @@ class LocalParticipantManager(
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
-            var audioOptions: AudioOptionsBuilder =  {
+            var audioOptions: AudioOptionsBuilder = {
                 echoCancellation(
                     sharedPreferences.getBoolean(
                         Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
-                        Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT))
+                        Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT,
+                    ),
+                )
                 noiseSuppression(
                     sharedPreferences.getBoolean(
                         Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
-                        Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT))
+                        Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT,
+                    ),
+                )
                 autoGainControl(
                     sharedPreferences.getBoolean(
                         Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
-                        Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT))
+                        Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
+                    ),
+                )
             }
             localAudioTrack = createLocalAudioTrack(context, true, MICROPHONE_TRACK_NAME, audioOptions)
             localAudioTrack?.let { publishAudioTrack(it) }
