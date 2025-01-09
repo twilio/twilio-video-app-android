@@ -82,15 +82,10 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
             Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
             !Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
         )
-        val openSLESUsage = sharedPreferences.getBoolean(
-            Preferences.AUDIO_OPEN_SLES_USAGE,
-            !Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT,
-        )
 
         assertThat(acousticEchoCanceler, equalTo(Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT))
         assertThat(noiseSuppressor, equalTo(Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT))
         assertThat(automaticGainControl, equalTo(Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT))
-        assertThat(openSLESUsage, equalTo(Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT))
     }
 
     @Test
