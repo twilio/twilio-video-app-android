@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.160 (Jan 9, 2025)
+
+### Feature Changes
+
+* Audio track options are now set upon audio track construction.
+
 ## 0.159 (Dec 10, 2024)
 
 ### Bug Fixes
