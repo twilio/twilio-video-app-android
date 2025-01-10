@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.161 (Jan 11, 2024)
+
+### Bug Fixes
+
+* Fixed bug with internal releases where users could not login using their gCloud credentials
+
 ## 0.160 (Jan 9, 2025)
 
 ### Feature Changes
