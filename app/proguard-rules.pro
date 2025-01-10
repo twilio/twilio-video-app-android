@@ -2,6 +2,7 @@
 -dontwarn tvi.webrtc.**
 -keep class com.twilio.video.** { *; }
 -keep class com.twilio.common.** { *; }
+-keep class com.google.android.gms.internal.** { *; }
 -keepattributes InnerClasses
 
 # Facebook Conceal proguard config
