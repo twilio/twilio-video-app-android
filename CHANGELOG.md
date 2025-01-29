@@ -1,5 +1,35 @@
 # Change Log
 
+## 0.161 (Jan 11, 2024)
+
+### Bug Fixes
+
+* Fixed bug with internal releases where users could not login using their gCloud credentials
+
+## 0.160 (Jan 9, 2025)
+
+### Feature Changes
+
+* Audio track options are now set upon audio track construction.
+
+## 0.159 (Dec 10, 2024)
+
+### Bug Fixes
+
+* Fixed bug regarding missing permissions when using android 34+ devices
+
+## 0.156 (Nov 12, 2024)
+
+### Dependency Upgrades
+
+* Updated twilio-android-env to 1.1.1 to support 16k pages
+
+### Feature Changes
+
+* In preparation for the WebRTC-124 upgrade, the following necessary changes were made
+   * removed support for globally setting audio channel effects as the necessary class WebRtcAudioUtils is removed from WebRTC-124.
+   * removed support for globally setting the usage of SLES audio device as the necessary class WebRtcAudioManager is removed from WebRTC-124.
+
 ## 0.155 (Oct 23, 2024)
 
 ### Dependency Upgrades
