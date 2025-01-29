@@ -20,10 +20,5 @@
         android:title="@string/settings_screen_audio_automatic_gain_control"
         android:defaultValue="true"
         app:iconSpaceReserved="false"/>
-
-    <CheckBoxPreference
-        android:key="pref_audio_open_sles_usage"
-        android:title="@string/settings_screen_audio_open_sles_usage"
-        android:defaultValue="false"
-        app:iconSpaceReserved="false"/>
+    
 </PreferenceScreen>

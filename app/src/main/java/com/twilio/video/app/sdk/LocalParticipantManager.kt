@@ -11,6 +11,7 @@ import com.twilio.video.ScreenCapturer
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoFormat
 import com.twilio.video.app.R
+import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
@@ -25,6 +26,7 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.get
+import com.twilio.video.ktx.AudioOptionsBuilder
 import com.twilio.video.ktx.createLocalAudioTrack
 import com.twilio.video.ktx.createLocalVideoTrack
 import timber.log.Timber
@@ -157,7 +159,27 @@ class LocalParticipantManager(
 
     private fun setupLocalAudioTrack() {
         if (localAudioTrack == null && !isAudioMuted) {
-            localAudioTrack = createLocalAudioTrack(context, true, MICROPHONE_TRACK_NAME)
+            var audioOptions: AudioOptionsBuilder = {
+                echoCancellation(
+                    sharedPreferences.getBoolean(
+                        Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
+                        Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT,
+                    ),
+                )
+                noiseSuppression(
+                    sharedPreferences.getBoolean(
+                        Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
+                        Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT,
+                    ),
+                )
+                autoGainControl(
+                    sharedPreferences.getBoolean(
+                        Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
+                        Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
+                    ),
+                )
+            }
+            localAudioTrack = createLocalAudioTrack(context, true, MICROPHONE_TRACK_NAME, audioOptions)
             localAudioTrack?.let { publishAudioTrack(it) }
                 ?: Timber.e(RuntimeException(), "Failed to create local audio track")
         }

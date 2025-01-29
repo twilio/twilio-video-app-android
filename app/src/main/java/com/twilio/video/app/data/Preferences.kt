@@ -90,8 +90,6 @@ object Preferences {
     const val AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT = true
     const val AUDIO_AUTOMATIC_GAIN_CONTROL = "pref_audio_automatic_gain_control"
     const val AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT = true
-    const val AUDIO_OPEN_SLES_USAGE = "pref_audio_open_sles_usage"
-    const val AUDIO_OPEN_SLES_USAGE_DEFAULT = false
     const val VIDEO_ENCODING_MODE = "pref_video_encoding_mode"
     const val VIDEO_ENCODING_MODE_DEFAULT = true
 }

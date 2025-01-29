@@ -169,5 +169,4 @@
     <string name="settings_screen_audio_acoustic_echo_canceler">Hardware Acoustic Echo Canceler</string>
     <string name="settings_screen_audio_noise_supressor">Hardware Noise Supressor</string>
     <string name="settings_screen_audio_automatic_gain_control">Hardware Automatic Gain Control</string>
-    <string name="settings_screen_audio_open_sles_usage">Open SLES Usage</string>
 </resources>
