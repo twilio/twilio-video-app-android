@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.161 (Jan 11, 2024)
+## 0.162 (Feb 4, 2025)
+
+### Bug Fixes
+
+* Fixed obfuscation issue causing the internal edition to fail to retrieve a token in release builds.
+
+## 0.161 (Jan 11, 2025)
 
 ### Bug Fixes
 
