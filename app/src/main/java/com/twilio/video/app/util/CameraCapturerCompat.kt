@@ -61,6 +61,7 @@ class CameraCapturerCompat(
     companion object {
         fun newInstance(context: Context): CameraCapturerCompat? {
             val frameProcessor = ReplaceVideoProcessor(
+                context,
                 BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p))
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
