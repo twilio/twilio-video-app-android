@@ -2,6 +2,7 @@ package com.twilio.video.app.util
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.graphics.BitmapFactory.Options
 import android.graphics.ImageFormat
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
@@ -60,9 +61,9 @@ class CameraCapturerCompat(
 
     companion object {
         fun newInstance(context: Context): CameraCapturerCompat? {
-            val frameProcessor = ReplaceVideoProcessor(
-                context,
-                BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p))
+            val bkgImage =
+                BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p)
+            val frameProcessor = ReplaceVideoProcessor(context, bkgImage)
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
                     val cameraCapturer = Camera2Capturer(
