@@ -66,7 +66,7 @@ class CameraCapturerCompat(
                 BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p)
             val frameProcessor = VirtualBackgroundVideoFrameProcessor(context, bkgImage)
 */
-            val frameProcessor = BlurBackgroundVideoFrameProcessor(context, 16)
+            val frameProcessor = BlurBackgroundVideoFrameProcessor(context, 16, 12.5f)
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
                     val cameraCapturer = Camera2Capturer(
