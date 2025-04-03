@@ -7,6 +7,7 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.os.Build
+import com.twilio.video.BlurBackgroundVideoFrameProcessor
 import com.twilio.video.Camera2Capturer
 import com.twilio.video.CameraCapturer
 import com.twilio.video.VirtualBackgroundVideoFrameProcessor
@@ -60,9 +61,12 @@ class CameraCapturerCompat(
 
     companion object {
         fun newInstance(context: Context): CameraCapturerCompat? {
+/*
             val bkgImage =
                 BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p)
             val frameProcessor = VirtualBackgroundVideoFrameProcessor(context, bkgImage)
+*/
+            val frameProcessor = BlurBackgroundVideoFrameProcessor(context, 16)
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
                     val cameraCapturer = Camera2Capturer(
