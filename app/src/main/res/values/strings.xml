@@ -28,8 +28,10 @@
     <string name="settings_screen_environment_string">Environment</string>
     <string name="settings_screen_topology">Room Type</string>
     <string name="settings_screen_media">Media</string>
+    <string name="settings_screen_effects">Effects</string>
     <string name="settings_screen_video_codecs">Video Codec</string>
     <string name="settings_screen_audio_codecs">Audio Codec</string>
+    <string name="settings_screen_capturer_effects">Capturer Effects</string>
     <string name="settings_screen_max_video_bitrate">Video Bitrate (Kbps)</string>
     <string name="settings_screen_max_audio_bitrate">Audio Bitrate (Kbps)</string>
     <string name="settings_screen_vp8_simulcast">VP8 Simulcast</string>

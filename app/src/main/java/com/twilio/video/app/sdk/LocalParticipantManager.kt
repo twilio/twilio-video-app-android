@@ -3,6 +3,8 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.BitmapFactory
+import com.twilio.video.BlurBackgroundVideoFrameProcessor
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalTrackPublicationOptions
@@ -10,8 +12,12 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.ScreenCapturer
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoFormat
+import com.twilio.video.VideoFrameProcessor
+import com.twilio.video.VirtualBackgroundVideoFrameProcessor
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS
+import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
@@ -215,7 +221,13 @@ class LocalParticipantManager(
         ).toInt()
         val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
 
-        cameraCapturer = CameraCapturerCompat.newInstance(context)
+        val selectedEffects = sharedPreferences.get(
+            CAPTURER_EFFECTS,
+            CAPTURER_EFFECTS_DEFAULT,
+        )
+        val videoEffectsProcessor = createVideoFrameProcessor(selectedEffects)
+
+        cameraCapturer = CameraCapturerCompat.newInstance(context, videoEffectsProcessor)
         cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
             LocalVideoTrack.create(
                 context,
@@ -247,6 +259,22 @@ class LocalParticipantManager(
             unpublishTrack(localAudioTrack)
             localAudioTrack.release()
             this.localAudioTrack = null
+        }
+    }
+
+    private fun createVideoFrameProcessor(type: String): VideoFrameProcessor? {
+        return when (type) {
+            BlurBackgroundVideoFrameProcessor::class.simpleName ->
+                BlurBackgroundVideoFrameProcessor(context, 15)
+
+            VirtualBackgroundVideoFrameProcessor::class.simpleName -> {
+                VirtualBackgroundVideoFrameProcessor(
+                    context,
+                    BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p),
+                )
+            }
+
+            else -> null
         }
     }
 }
