@@ -62,8 +62,7 @@ class CameraCapturerCompat(
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
                     val cameraCapturer = Camera2Capturer(
                         context,
-                        cameraIds.first
-                            ?: cameraIds.second ?: "",
+                        cameraIds.first ?: cameraIds.second ?: "",
                         frameProcessor,
                         null,
                     )
@@ -73,8 +72,7 @@ class CameraCapturerCompat(
                 Camera1Enumerator().getFrontAndBackCameraIds(context, isCamera2 = false)?.let { cameraIds ->
                     val cameraCapturer = CameraCapturer(
                         context,
-                        cameraIds.first ?: cameraIds.second
-                            ?: "",
+                        cameraIds.first ?: cameraIds.second ?: "",
                         frameProcessor,
                         getCameraListener(),
                     )

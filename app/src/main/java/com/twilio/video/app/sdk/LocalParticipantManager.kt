@@ -43,6 +43,9 @@ class LocalParticipantManager(
     private val sharedPreferences: SharedPreferences,
 ) {
 
+    // DEBUG
+    private var videoFrameProcessor: VideoFrameProcessor? = null
+
     private var localAudioTrack: LocalAudioTrack? = null
         set(value) {
             field = value
@@ -115,9 +118,28 @@ class LocalParticipantManager(
     fun toggleLocalAudio() {
         if (!isAudioMuted) {
             isAudioMuted = true
+            /* re-enable to test on-the-fly changing background processor config
+            if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).blurFilterRadius = 32;
+                (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).blurFilterSigma = 27.5f;
+            }
+            if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).background =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.halfdome_720p);
+            }
+             */
             removeAudioTrack()
         } else {
             isAudioMuted = false
+            /* re-enable to test on-the-fly changing background processor config
+            if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).blurFilterRadius = 15;
+            }
+            if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).background =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p);
+            }
+             */
             setupLocalAudioTrack()
         }
     }
@@ -227,6 +249,9 @@ class LocalParticipantManager(
         )
         val videoEffectsProcessor = createVideoFrameProcessor(selectedEffects)
 
+        // DEBUG: Remove when done testing Virtual background 'on-the-fly' config
+        this.videoFrameProcessor = videoEffectsProcessor
+
         cameraCapturer = CameraCapturerCompat.newInstance(context, videoEffectsProcessor)
         cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
             LocalVideoTrack.create(
@@ -265,7 +290,7 @@ class LocalParticipantManager(
     private fun createVideoFrameProcessor(type: String): VideoFrameProcessor? {
         return when (type) {
             BlurBackgroundVideoFrameProcessor::class.simpleName ->
-                BlurBackgroundVideoFrameProcessor(context, 15)
+                BlurBackgroundVideoFrameProcessor(context, 15, 7.5f)
 
             VirtualBackgroundVideoFrameProcessor::class.simpleName -> {
                 VirtualBackgroundVideoFrameProcessor(
