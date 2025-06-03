@@ -173,7 +173,7 @@ dependencies {
     def uniflowVersion = '1.0.5'
     def androidEnv = '1.1.1'
 
-    implementation project(':BackgroundProcessor')
+    implementation project(':VirtualBackgroundProcessor')
     implementation platform('com.google.firebase:firebase-bom:25.9.0')
 
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'

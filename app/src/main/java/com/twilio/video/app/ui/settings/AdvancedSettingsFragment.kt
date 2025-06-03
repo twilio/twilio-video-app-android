@@ -6,14 +6,12 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.twilio.video.AudioCodec
-import com.twilio.video.BlurBackgroundVideoFrameProcessor
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
 import com.twilio.video.OpusCodec
 import com.twilio.video.PcmaCodec
 import com.twilio.video.PcmuCodec
 import com.twilio.video.VideoCodec
-import com.twilio.video.VirtualBackgroundVideoFrameProcessor
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.R
@@ -25,6 +23,8 @@ import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VIDEO_ENCODING_MODE
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
 import com.twilio.video.app.util.isInternalFlavor
+import com.twilio.video.virtualbackgroundprocessor.BlurBackgroundVideoFrameProcessor
+import com.twilio.video.virtualbackgroundprocessor.VirtualBackgroundVideoFrameProcessor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
 

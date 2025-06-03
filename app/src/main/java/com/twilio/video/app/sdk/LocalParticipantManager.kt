@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
-import com.twilio.video.BlurBackgroundVideoFrameProcessor
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalTrackPublicationOptions
@@ -13,7 +12,6 @@ import com.twilio.video.ScreenCapturer
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoFormat
 import com.twilio.video.VideoFrameProcessor
-import com.twilio.video.VirtualBackgroundVideoFrameProcessor
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
 import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS
@@ -35,6 +33,8 @@ import com.twilio.video.app.util.get
 import com.twilio.video.ktx.AudioOptionsBuilder
 import com.twilio.video.ktx.createLocalAudioTrack
 import com.twilio.video.ktx.createLocalVideoTrack
+import com.twilio.video.virtualbackgroundprocessor.BlurBackgroundVideoFrameProcessor
+import com.twilio.video.virtualbackgroundprocessor.VirtualBackgroundVideoFrameProcessor
 import timber.log.Timber
 
 class LocalParticipantManager(
