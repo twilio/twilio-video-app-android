@@ -29,7 +29,7 @@ import com.twilio.video.virtualbackgroundprocessor.VirtualBackgroundVideoFramePr
 class AdvancedSettingsFragment : BaseSettingsFragment() {
 
     private var identityPreference: EditTextPreference? = null
-    private val capturerEffects = arrayOf("None", BlurBackgroundVideoFrameProcessor::class.simpleName, VirtualBackgroundVideoFrameProcessor::class.simpleName)
+    private val capturerEffects = arrayOf(Preferences.CAPTURER_EFFECTS_DEFAULT, BlurBackgroundVideoFrameProcessor::class.simpleName, VirtualBackgroundVideoFrameProcessor::class.simpleName)
     private val videoCodecNames = arrayOf(Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME)
     private val audioCodecNames = arrayOf(OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME)
 

@@ -28,6 +28,8 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptur
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VirtualBackgroundPaused
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VirtualBackgroundResumed
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.AudioOptionsBuilder
@@ -113,6 +115,24 @@ class LocalParticipantManager(
     fun disableLocalAudio() {
         localAudioTrack?.enable(false)
         roomManager.sendRoomEvent(AudioDisabled)
+    }
+
+    fun resumeLocalVirtualBackground() {
+        if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).pauseProcessing = false
+        } else if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).pauseProcessing = false
+        }
+        roomManager.sendRoomEvent(VirtualBackgroundResumed)
+    }
+
+    fun pauseLocalVirtualBackground() {
+        if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).pauseProcessing = true
+        } else if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).pauseProcessing = true
+        }
+        roomManager.sendRoomEvent(VirtualBackgroundPaused)
     }
 
     fun toggleLocalAudio() {
@@ -262,6 +282,10 @@ class LocalParticipantManager(
                 CAMERA_TRACK_NAME,
             )
         }
+        // reset Virtual Background processing ui state
+        roomManager.sendRoomEvent(VirtualBackgroundResumed)
+
+        // publish track
         cameraVideoTrack?.let { cameraVideoTrack ->
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
             publishCameraTrack(cameraVideoTrack)

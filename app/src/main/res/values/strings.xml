@@ -129,6 +129,8 @@
     <string name="resume_audio">Resume audio</string>
     <string name="pause_video">Pause video</string>
     <string name="resume_video">Resume video</string>
+    <string name="pause_vbackground">Pause Virtual Background</string>
+    <string name="resume_vbackground">Resume Virtual Background</string>
     <string name="share_screen">Share screen</string>
     <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>
