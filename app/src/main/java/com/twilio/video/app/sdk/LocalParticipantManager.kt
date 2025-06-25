@@ -76,6 +76,7 @@ class LocalParticipantManager(
         }
     private var isAudioMuted = false
     private var isVideoMuted = false
+    private var isVideoProcessorPaused = false
     internal val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     fun onResume() {
@@ -118,21 +119,13 @@ class LocalParticipantManager(
     }
 
     fun resumeLocalVirtualBackground() {
-        if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
-            (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).pauseProcessing = false
-        } else if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
-            (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).pauseProcessing = false
-        }
-        roomManager.sendRoomEvent(VirtualBackgroundResumed)
+        pauseVirtualFrameProcessor(false)
+        sendPauseVirtualFrameProcessorEvent(false)
     }
 
     fun pauseLocalVirtualBackground() {
-        if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
-            (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).pauseProcessing = true
-        } else if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
-            (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).pauseProcessing = true
-        }
-        roomManager.sendRoomEvent(VirtualBackgroundPaused)
+        pauseVirtualFrameProcessor(true)
+        sendPauseVirtualFrameProcessorEvent(true)
     }
 
     fun toggleLocalAudio() {
@@ -283,7 +276,7 @@ class LocalParticipantManager(
             )
         }
         // reset Virtual Background processing ui state
-        roomManager.sendRoomEvent(VirtualBackgroundResumed)
+        sendPauseVirtualFrameProcessorEvent(isVideoProcessorPaused)
 
         // publish track
         cameraVideoTrack?.let { cameraVideoTrack ->
@@ -314,16 +307,35 @@ class LocalParticipantManager(
     private fun createVideoFrameProcessor(type: String): VideoFrameProcessor? {
         return when (type) {
             BlurBackgroundVideoFrameProcessor::class.simpleName ->
-                BlurBackgroundVideoFrameProcessor(context, 15, 7.5f)
+                BlurBackgroundVideoFrameProcessor(context, 15, 7.5f).apply {
+                    pauseProcessing = isVideoProcessorPaused
+                }
 
             VirtualBackgroundVideoFrameProcessor::class.simpleName -> {
                 VirtualBackgroundVideoFrameProcessor(
                     context,
                     BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p),
-                )
+                ).apply {
+                    pauseProcessing = isVideoProcessorPaused
+                }
             }
-
-            else -> null
+            else -> {
+                isVideoProcessorPaused = false
+                null
+            }
         }
+    }
+
+    private fun sendPauseVirtualFrameProcessorEvent(pause: Boolean) {
+        roomManager.sendRoomEvent(if (pause) VirtualBackgroundPaused else VirtualBackgroundResumed)
+    }
+
+    private fun pauseVirtualFrameProcessor(pause: Boolean) {
+        if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).pauseProcessing = pause
+        } else if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).pauseProcessing = pause
+        }
+        isVideoProcessorPaused = pause
     }
 }
