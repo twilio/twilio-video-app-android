@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.163 (Feb 10, 2025)
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.8.0
+
 ## 0.162 (Feb 4, 2025)
 
 ### Bug Fixes
