@@ -31,4 +31,9 @@
           android:title="@string/settings_title"
           android:enabled="true"
           app:showAsAction="never"/>
+
+    <item android:id="@+id/pause_vbackground_menu_item"
+        android:title="@string/pause_vbackground"
+        android:enabled="true"
+        app:showAsAction="never"/>
 </menu>

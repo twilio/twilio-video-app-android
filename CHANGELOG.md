@@ -42,7 +42,6 @@
    * removed support for globally setting audio channel effects as the necessary class WebRtcAudioUtils is removed from WebRTC-124.
    * removed support for globally setting the usage of SLES audio device as the necessary class WebRtcAudioManager is removed from WebRTC-124.
 
-
 ## 0.155 (Oct 23, 2024)
 
 ### Dependency Upgrades
@@ -128,7 +127,6 @@
 ### Bug Fixes
 
 * Modified 'internal' auth process to reflect internal changes to Twilio's auth service.
-
 
 ## 0.117 (January 6, 2022)
 

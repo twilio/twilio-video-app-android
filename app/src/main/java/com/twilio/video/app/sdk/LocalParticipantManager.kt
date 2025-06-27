@@ -3,6 +3,7 @@ package com.twilio.video.app.sdk
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.BitmapFactory
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalParticipant
 import com.twilio.video.LocalTrackPublicationOptions
@@ -10,8 +11,11 @@ import com.twilio.video.LocalVideoTrack
 import com.twilio.video.ScreenCapturer
 import com.twilio.video.TrackPriority
 import com.twilio.video.VideoFormat
+import com.twilio.video.VideoFrameProcessor
 import com.twilio.video.app.R
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS
+import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION
 import com.twilio.video.app.data.Preferences.VIDEO_CAPTURE_RESOLUTION_DEFAULT
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
@@ -24,11 +28,15 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptur
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoTrackUpdated
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VirtualBackgroundPaused
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VirtualBackgroundResumed
 import com.twilio.video.app.util.CameraCapturerCompat
 import com.twilio.video.app.util.get
 import com.twilio.video.ktx.AudioOptionsBuilder
 import com.twilio.video.ktx.createLocalAudioTrack
 import com.twilio.video.ktx.createLocalVideoTrack
+import com.twilio.video.virtualbackgroundprocessor.BlurBackgroundVideoFrameProcessor
+import com.twilio.video.virtualbackgroundprocessor.VirtualBackgroundVideoFrameProcessor
 import timber.log.Timber
 
 class LocalParticipantManager(
@@ -36,6 +44,9 @@ class LocalParticipantManager(
     private val roomManager: RoomManager,
     private val sharedPreferences: SharedPreferences,
 ) {
+
+    // DEBUG
+    private var videoFrameProcessor: VideoFrameProcessor? = null
 
     private var localAudioTrack: LocalAudioTrack? = null
         set(value) {
@@ -65,6 +76,7 @@ class LocalParticipantManager(
         }
     private var isAudioMuted = false
     private var isVideoMuted = false
+    private var isVideoProcessorPaused = false
     internal val localVideoTrackNames: MutableMap<String, String> = HashMap()
 
     fun onResume() {
@@ -106,12 +118,41 @@ class LocalParticipantManager(
         roomManager.sendRoomEvent(AudioDisabled)
     }
 
+    fun resumeLocalVirtualBackground() {
+        pauseVirtualFrameProcessor(false)
+        sendPauseVirtualFrameProcessorEvent(false)
+    }
+
+    fun pauseLocalVirtualBackground() {
+        pauseVirtualFrameProcessor(true)
+        sendPauseVirtualFrameProcessorEvent(true)
+    }
+
     fun toggleLocalAudio() {
         if (!isAudioMuted) {
             isAudioMuted = true
+            /* re-enable to test on-the-fly changing background processor config
+            if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).blurFilterRadius = 32;
+                (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).blurFilterSigma = 27.5f;
+            }
+            if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).background =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.halfdome_720p);
+            }
+             */
             removeAudioTrack()
         } else {
             isAudioMuted = false
+            /* re-enable to test on-the-fly changing background processor config
+            if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).blurFilterRadius = 15;
+            }
+            if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+                (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).background =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p);
+            }
+             */
             setupLocalAudioTrack()
         }
     }
@@ -215,7 +256,16 @@ class LocalParticipantManager(
         ).toInt()
         val videoFormat = VideoFormat(VIDEO_DIMENSIONS[dimensionsIndex], 30)
 
-        cameraCapturer = CameraCapturerCompat.newInstance(context)
+        val selectedEffects = sharedPreferences.get(
+            CAPTURER_EFFECTS,
+            CAPTURER_EFFECTS_DEFAULT,
+        )
+        val videoEffectsProcessor = createVideoFrameProcessor(selectedEffects)
+
+        // DEBUG: Remove when done testing Virtual background 'on-the-fly' config
+        this.videoFrameProcessor = videoEffectsProcessor
+
+        cameraCapturer = CameraCapturerCompat.newInstance(context, videoEffectsProcessor)
         cameraVideoTrack = cameraCapturer?.let { cameraCapturer ->
             LocalVideoTrack.create(
                 context,
@@ -225,6 +275,10 @@ class LocalParticipantManager(
                 CAMERA_TRACK_NAME,
             )
         }
+        // reset Virtual Background processing ui state
+        sendPauseVirtualFrameProcessorEvent(isVideoProcessorPaused)
+
+        // publish track
         cameraVideoTrack?.let { cameraVideoTrack ->
             localVideoTrackNames[cameraVideoTrack.name] = context.getString(R.string.camera_video_track)
             publishCameraTrack(cameraVideoTrack)
@@ -248,5 +302,40 @@ class LocalParticipantManager(
             localAudioTrack.release()
             this.localAudioTrack = null
         }
+    }
+
+    private fun createVideoFrameProcessor(type: String): VideoFrameProcessor? {
+        return when (type) {
+            BlurBackgroundVideoFrameProcessor::class.simpleName ->
+                BlurBackgroundVideoFrameProcessor(context, 15, 7.5f).apply {
+                    pauseProcessing = isVideoProcessorPaused
+                }
+
+            VirtualBackgroundVideoFrameProcessor::class.simpleName -> {
+                VirtualBackgroundVideoFrameProcessor(
+                    context,
+                    BitmapFactory.decodeResource(context.resources, R.drawable.mt_whitney_720p),
+                ).apply {
+                    pauseProcessing = isVideoProcessorPaused
+                }
+            }
+            else -> {
+                isVideoProcessorPaused = false
+                null
+            }
+        }
+    }
+
+    private fun sendPauseVirtualFrameProcessorEvent(pause: Boolean) {
+        roomManager.sendRoomEvent(if (pause) VirtualBackgroundPaused else VirtualBackgroundResumed)
+    }
+
+    private fun pauseVirtualFrameProcessor(pause: Boolean) {
+        if (videoFrameProcessor is VirtualBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as VirtualBackgroundVideoFrameProcessor).pauseProcessing = pause
+        } else if (videoFrameProcessor is BlurBackgroundVideoFrameProcessor) {
+            (videoFrameProcessor as BlurBackgroundVideoFrameProcessor).pauseProcessing = pause
+        }
+        isVideoProcessorPaused = pause
     }
 }
