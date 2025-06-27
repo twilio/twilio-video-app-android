@@ -47,7 +47,7 @@ sdk/libs/
 *~
 *.swp
 *.swo
-**/**/**/libs
+
 
 # Screenshots
 .gradletasknamecache

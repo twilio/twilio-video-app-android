@@ -14,40 +14,6 @@ def versionNameProperty = 'versionName'
 def appVersionName = project.hasProperty(versionNameProperty) ?
         project.property(versionNameProperty) : "v0.$appVersionCode"
 
-def includeSdkFromSourceProperty = 'includeSdkFromSource'
-def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
-        project.property(includeSdkFromSourceProperty) as Boolean
-
-afterEvaluate {
-    def ndkVersion = 'ndkVersion'
-//    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
-//        android.ndkVersion = "${project.property(ndkVersion)}"
-//    }
-
-    /*
-    * Enable the application to consume the Video Android SDK directly from source
-    * instead of from Bintray.
-    *
-    * The property is not defined by default when consuming the
-    * application as a stand-alone project, but is defined by default in the Video Android SDK project.
-    * This property enables the Video Android SDK project to build the application as a git subtree
-    * with the contents of the source itself as a dependency. This coupling is intentional as it allows
-    * SDK developers to iterate on SDK features within the application that is maintained in a separate
-    * project.
-    */
-    dependencies {
-        if (includeSdkFromSource) {
-            debugImplementation project(':video')
-            debugImplementation project(':video:ktx')
-            releaseImplementation project(':video:ktx')
-            debugImplementation project(':VirtualBackgroundProcessor')
-            releaseImplementation project(':VirtualBackgroundProcessor')
-        } else {
-            implementation "com.twilio:video-android-ktx:7.9.0-rc5"
-            implementation "com.twilio:video-virtual-background-processor:7.9.0-rc5"
-        }
-    }
-}
 
 android {
     compileSdkVersion 35
@@ -177,6 +143,14 @@ dependencies {
     def androidEnv = '1.1.1'
 
     implementation platform('com.google.firebase:firebase-bom:25.9.0')
+
+    // *** PLEASE NOTE: Needed because aar files are local and aar files do not contain dependency info
+    implementation files('libs/video-android-beta.aar')
+    implementation files('libs/video-android-ktx-beta.aar')
+    implementation files('libs/video-virtual-background-processor-beta.aar')
+    implementation 'com.getkeepsafe.relinker:relinker:1.4.2'
+    implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta6'
+    // *** PLEASE NOTE: END
 
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
