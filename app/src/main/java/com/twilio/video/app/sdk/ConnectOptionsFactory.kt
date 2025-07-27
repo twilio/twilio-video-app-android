@@ -23,6 +23,8 @@ import com.twilio.video.VideoEncodingMode
 import com.twilio.video.Vp8Codec
 import com.twilio.video.Vp9Codec
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.ENABLE_LIVE_TRANSCRIPTION
+import com.twilio.video.app.data.Preferences.ENABLE_LIVE_TRANSCRIPTION_DEFAULT
 import com.twilio.video.app.data.api.TokenService
 import com.twilio.video.app.util.EnvUtil
 import com.twilio.video.app.util.get
@@ -106,24 +108,30 @@ class ConnectOptionsFactory(
             videoContentPreferencesMode?.let { videoContentPreferencesMode(it) }
         }
 
-        val acousticEchoCanceler = sharedPreferences.getBoolean(
-            Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
-            Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT,
+        val enableLiveTranscription = sharedPreferences.get(
+            ENABLE_LIVE_TRANSCRIPTION,
+            ENABLE_LIVE_TRANSCRIPTION_DEFAULT
         )
-        val noiseSuppressor = sharedPreferences.getBoolean(
-            Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
-            Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT,
-        )
-        val automaticGainControl = sharedPreferences.getBoolean(
-            Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
-            Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
-        )
+
         // Removed due WebRTC-124 removing the WebRtcAudioUtils & WebRtcAudioManager classes
         // Audio effects shall be added on a per-audio track basis. VBLOCKS-3744
         //
         // val openSLESUsage = sharedPreferences.getBoolean(
         //     Preferences.AUDIO_OPEN_SLES_USAGE,
         //     Preferences.AUDIO_OPEN_SLES_USAGE_DEFAULT,
+        // )
+
+        // val acousticEchoCanceler = sharedPreferences.getBoolean(
+        //      Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER,
+        //      Preferences.AUDIO_ACOUSTIC_ECHO_CANCELER_DEFAULT,
+        // )
+        // val noiseSuppressor = sharedPreferences.getBoolean(
+        //      Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR,
+        //      Preferences.AUDIO_ACOUSTIC_NOISE_SUPRESSOR_DEFAULT,
+        // )
+        // val automaticGainControl = sharedPreferences.getBoolean(
+        //      Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
+        //      Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
         // )
 
         // WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
@@ -165,6 +173,7 @@ class ConnectOptionsFactory(
                 encodingParameters(EncodingParameters(maxAudioBitrate, 0))
                 preferAudioCodecs(listOf(preferredAudioCodec))
                 videoEncodingMode(videoEncodingMode)
+                receiveTranscriptions(enableLiveTranscription)
             }
         }
 
@@ -179,6 +188,7 @@ class ConnectOptionsFactory(
             encodingParameters(EncodingParameters(maxAudioBitrate, maxVideoBitrate))
             preferVideoCodecs(listOf(preferedVideoCodec))
             preferAudioCodecs(listOf(preferredAudioCodec))
+            receiveTranscriptions(enableLiveTranscription)
         }
     }
 

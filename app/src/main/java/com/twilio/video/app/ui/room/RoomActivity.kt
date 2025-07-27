@@ -31,6 +31,8 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
@@ -47,6 +49,7 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDevice.BluetoothHeadset
 import com.twilio.audioswitch.AudioDevice.Speakerphone
 import com.twilio.audioswitch.AudioDevice.WiredHeadset
+import com.twilio.video.LogLevel
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.data.Preferences
@@ -61,6 +64,7 @@ import com.twilio.video.app.ui.room.RoomViewEffect.PermissionsDenied
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowConnectFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowMaxParticipantFailureDialog
 import com.twilio.video.app.ui.room.RoomViewEffect.ShowTokenErrorDialog
+import com.twilio.video.app.ui.room.RoomViewEffect.Transcription
 import com.twilio.video.app.ui.room.RoomViewEvent.ActivateAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.Connect
 import com.twilio.video.app.ui.room.RoomViewEvent.DeactivateAudioDevice
@@ -79,6 +83,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.InputUtils
+import com.twilio.video.ktx.Video
 import dagger.hilt.android.AndroidEntryPoint
 import io.uniflow.android.livedata.onEvents
 import io.uniflow.android.livedata.onStates
@@ -94,6 +99,7 @@ class RoomActivity : AppCompatActivity() {
     private lateinit var screenCaptureMenuItem: MenuItem
     private lateinit var settingsMenuItem: MenuItem
     private lateinit var deviceMenuItem: MenuItem
+    private lateinit var activityHandler: Handler
     private var savedVolumeControlStream = 0
     private var displayName: String? = null
     private var localParticipantSid = LOCAL_PARTICIPANT_STUB_SID
@@ -125,6 +131,9 @@ class RoomActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
 
+        //debug
+        Video.logLevel = LogLevel.ALL
+
         // Grab views
         setupThumbnailRecyclerView()
 
@@ -138,6 +147,9 @@ class RoomActivity : AppCompatActivity() {
         primaryParticipantController = PrimaryParticipantController(binding.room.primaryVideo)
 
         setupRecordingAnimation()
+
+        // setup handler
+        activityHandler = Handler(Looper.myLooper()!!);
     }
 
     override fun onDestroy() {
@@ -559,6 +571,16 @@ class RoomActivity : AppCompatActivity() {
                 handleTokenError(error)
             }
             PermissionsDenied -> requestPermissions()
+            is Transcription -> {
+                // set the text and set a timer to clear it 3 seconds later
+                primaryParticipantController.transcriptionText = roomViewEffect.text
+                activityHandler.postDelayed({
+                    if (roomViewEffect.text == primaryParticipantController.transcriptionText) {
+                        primaryParticipantController.transcriptionText = ""
+                    }
+                },
+                3000)
+            }
         }
     }
 

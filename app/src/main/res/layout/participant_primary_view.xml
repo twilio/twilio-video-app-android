@@ -68,6 +68,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/video_transcription_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            tools:text="Some Identity"
+            android:background="@android:color/transparent"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="83dp"
+            android:ellipsize="end"
+            android:maxLines="2" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

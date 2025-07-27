@@ -23,6 +23,13 @@ internal class PrimaryParticipantController(
 ) {
     private var primaryItem: Item? = null
 
+    var transcriptionText : String
+        set(value) {
+            primaryView.transcriptionText = value
+        }
+        get() = primaryView.transcriptionText
+
+
     fun renderAsPrimary(
         identity: String?,
         screenTrack: VideoTrackViewState?,
