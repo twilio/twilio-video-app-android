@@ -68,6 +68,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/bottom_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/video_transcription_text"
@@ -75,14 +81,16 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
-            tools:text="Some Identity"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="20dp"
+            tools:text="Some Transcription"
             android:background="@android:color/transparent"
             android:padding="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/bottom_guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="83dp"
+            android:layout_marginBottom="10dp"
             android:ellipsize="end"
             android:maxLines="2" />
 

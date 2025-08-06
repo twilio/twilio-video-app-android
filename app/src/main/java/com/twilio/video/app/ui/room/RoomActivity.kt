@@ -572,10 +572,17 @@ class RoomActivity : AppCompatActivity() {
             }
             PermissionsDenied -> requestPermissions()
             is Transcription -> {
-                // set the text and set a timer to clear it 3 seconds later
-                primaryParticipantController.transcriptionText = roomViewEffect.text
+                // add to text buffer unless it is larger than 512 characters and set a timer to
+                // clear it 3 seconds later
+                val transcriptionText = "${primaryParticipantController.transcriptionText} ${roomViewEffect.text}"
+                if(512 > transcriptionText.length) {
+                    primaryParticipantController.transcriptionText = transcriptionText
+                } else {
+                    primaryParticipantController.transcriptionText = roomViewEffect.text
+                }
                 activityHandler.postDelayed({
-                    if (roomViewEffect.text == primaryParticipantController.transcriptionText) {
+                    if ((transcriptionText == primaryParticipantController.transcriptionText) ||
+                        (roomViewEffect.text == primaryParticipantController.transcriptionText)) {
                         primaryParticipantController.transcriptionText = ""
                     }
                 },
