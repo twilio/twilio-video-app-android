@@ -29,7 +29,7 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
 
     private val binding: ParticipantPrimaryViewBinding =
         ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true)
-    private val transcriptionTextWidget: TextView;
+    private val transcriptionTextWidget: TextView
     init {
         videoLayout = binding.videoLayout
         videoIdentity = binding.videoIdentity
@@ -44,7 +44,7 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
         setScaleType(scaleType)
     }
 
-    var transcriptionText : String
+    var transcriptionText: String
         set(value) {
             transcriptionTextWidget.text = value
         }

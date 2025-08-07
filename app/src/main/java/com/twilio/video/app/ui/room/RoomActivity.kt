@@ -131,7 +131,7 @@ class RoomActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
 
-        //debug
+        // debug
         Video.logLevel = LogLevel.ALL
 
         // Grab views
@@ -149,7 +149,7 @@ class RoomActivity : AppCompatActivity() {
         setupRecordingAnimation()
 
         // setup handler
-        activityHandler = Handler(Looper.myLooper()!!);
+        activityHandler = Handler(Looper.myLooper()!!)
     }
 
     override fun onDestroy() {
@@ -575,18 +575,21 @@ class RoomActivity : AppCompatActivity() {
                 // add to text buffer unless it is larger than 512 characters and set a timer to
                 // clear it 3 seconds later
                 val transcriptionText = "${primaryParticipantController.transcriptionText} ${roomViewEffect.text}"
-                if(512 > transcriptionText.length) {
+                if (512 > transcriptionText.length) {
                     primaryParticipantController.transcriptionText = transcriptionText
                 } else {
                     primaryParticipantController.transcriptionText = roomViewEffect.text
                 }
-                activityHandler.postDelayed({
-                    if ((transcriptionText == primaryParticipantController.transcriptionText) ||
-                        (roomViewEffect.text == primaryParticipantController.transcriptionText)) {
-                        primaryParticipantController.transcriptionText = ""
-                    }
-                },
-                3000)
+                activityHandler.postDelayed(
+                    {
+                        if ((transcriptionText == primaryParticipantController.transcriptionText) ||
+                            (roomViewEffect.text == primaryParticipantController.transcriptionText)
+                        ) {
+                            primaryParticipantController.transcriptionText = ""
+                        }
+                    },
+                    3000,
+                )
             }
         }
     }

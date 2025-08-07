@@ -110,7 +110,7 @@ class ConnectOptionsFactory(
 
         val enableLiveTranscription = sharedPreferences.get(
             ENABLE_LIVE_TRANSCRIPTION,
-            ENABLE_LIVE_TRANSCRIPTION_DEFAULT
+            ENABLE_LIVE_TRANSCRIPTION_DEFAULT,
         )
 
         // Removed due WebRTC-124 removing the WebRtcAudioUtils & WebRtcAudioManager classes
