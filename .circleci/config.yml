@@ -27,9 +27,6 @@ parameters:
   biweekly_run:
     type: boolean
     default: false
-  test_version_bump:
-    type: boolean
-    default: false
 
 executors:
   build:
@@ -318,19 +315,6 @@ jobs:
             - app/build
       - save_cache: *save-cache-gradle
 
-  test-version-bump:
-    executor: build
-    steps:
-      - checkout
-      - attach_workspace:
-          at: *workspace
-      - restore_cache: *restore-cache-gradle
-      - install_secrets
-      - configure_git_user
-      - run:
-          name: Increment Version Code
-          command: ./gradlew incrementVersionCode
-
   publish-to-firebase:
     executor:
       name: build
@@ -397,7 +381,3 @@ workflows:
           requires:
             - build-release-app
 
-  test-version-bump:
-    when: << pipeline.parameters.test_version_bump >>
-    jobs:
-      - test-version-bump
