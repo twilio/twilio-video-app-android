@@ -150,7 +150,7 @@ android {
 
     lint {
         baseline file('lint-baseline.xml')
-        disable 'GradleDependency'
+        disable 'GradleDependency', 'AndroidGradlePluginVersion'
         warningsAsErrors true
     }
 }
