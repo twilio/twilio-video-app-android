@@ -129,6 +129,7 @@
 
 * Modified 'internal' auth process to reflect internal changes to Twilio's auth service.
 
+
 ## 0.117 (January 6, 2022)
 
 ### Bug Fixes

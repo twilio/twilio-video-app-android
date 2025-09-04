@@ -133,7 +133,7 @@ class ConnectOptionsFactory(
         //      Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL,
         //      Preferences.AUDIO_AUTOMATIC_GAIN_CONTROL_DEFAULT,
         // )
-        
+
         // WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(!acousticEchoCanceler)
         // WebRtcAudioUtils.setWebRtcBasedNoiseSuppressor(!noiseSuppressor)
         // WebRtcAudioUtils.setWebRtcBasedAutomaticGainControl(!automaticGainControl)
