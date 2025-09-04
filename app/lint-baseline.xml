@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.0.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.0.2)" variant="all" version="8.0.2">
+<issues format="6" by="lint 8.12.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.12.1)" variant="all" version="8.12.1">
 
     <issue
         id="ObsoleteLintCustomCheck"
-        message="Library lint checks out of date;&#xA;these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`dagger.lint.DaggerIssueRegistry`)&#xA;which was compiled against an older version of lint&#xA;than this one. This is usually fine, but not in this&#xA;case; some basic verification shows that the lint&#xA;check jar references (for example) the following API&#xA;which is no longer valid in this version of lint:&#xA;org.jetbrains.uast.kotlin.KotlinUClass: org.jetbrains.kotlin.psi.KtClassOrObject getKtClass()&#xA;(Referenced from dagger/lint/DaggerKotlinIssueDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`JvmStaticProvidesInObjectDetector`,`FieldSiteTargetOnQualifierAnnotation`,`ModuleCompanionObjects`,`ModuleCompanionObjectsNotInModuleParent`&#xA;&#xA;Recompile the checks against the latest version, or if&#xA;this is a check bundled with a third-party library, see&#xA;if there is a more recent version available.&#xA;&#xA;Version of Lint API this lint check is using is 8.&#xA;The Lint API version currently running is 14 (8.0+).">
+        message="Library lint checks out of date;&#xA;these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`dagger.lint.DaggerIssueRegistry`)&#xA;which was compiled against an older version of lint&#xA;than this one. This is usually fine, but not in this&#xA;case; some basic verification shows that the lint&#xA;check jar references (for example) the following API&#xA;which is no longer valid in this version of lint:&#xA;org.jetbrains.uast.kotlin.KotlinUClass#getKtClass(): org.jetbrains.kotlin.psi.KtClassOrObject&#xA;(Referenced from dagger/lint/DaggerKotlinIssueDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`JvmStaticProvidesInObjectDetector`,`FieldSiteTargetOnQualifierAnnotation`,`ModuleCompanionObjects`,`ModuleCompanionObjectsNotInModuleParent`&#xA;&#xA;Recompile the checks against the latest version, or if&#xA;this is a check bundled with a third-party library, see&#xA;if there is a more recent version available.&#xA;&#xA;Version of Lint API this lint check is using is 8.&#xA;The Lint API version currently running is 16 (8.7+).">
         <location
-            file="$GRADLE_USER_HOME/caches/transforms-3/c120d90cbf9ac5b0f7fd8bea6591311d/transformed/jetified-dagger-lint-aar-2.38.1/jars/lint.jar"/>
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/e97d08b03f7add3143ab985965acd1b6/transformed/jetified-dagger-lint-aar-2.38.1/jars/lint.jar"/>
     </issue>
 
     <issue
@@ -17,6 +17,38 @@
             file="src/main/res/drawable/ic_switch_camera_512dp.xml"
             line="3"
             column="20"/>
+    </issue>
+
+    <issue
+        id="AndroidGradlePluginVersion"
+        message="A newer version of Gradle than 8.13 is available: 8.14.3"
+        errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-all.zip"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$HOME/code/twilio-video-app-android/gradle/wrapper/gradle-wrapper.properties"
+            line="6"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `x86_64/libconcealjni.so` (from `com.facebook.conceal:conceal:2.0.2`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/ab57a97dba6d11971cc6527bcaa34bf9/transformed/jetified-conceal-2.0.2/jni/x86_64/libconcealjni.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `x86_64/libconcealjni.so` (from `com.facebook.conceal:conceal:2.0.2`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/ab57a97dba6d11971cc6527bcaa34bf9/transformed/jetified-conceal-2.0.2/jni/x86_64/libconcealjni.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `x86_64/libconcealjni.so` (from `com.facebook.conceal:conceal:2.0.2`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/ab57a97dba6d11971cc6527bcaa34bf9/transformed/jetified-conceal-2.0.2/jni/x86_64/libconcealjni.so"/>
     </issue>
 
     <issue
@@ -120,13 +152,9 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.mipmap.ic_launcher_round` appears to be unused"
-        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
-        errorLine2="^">
+        message="The resource `R.mipmap.ic_launcher_round` appears to be unused">
         <location
-            file="src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
-            line="2"
-            column="1"/>
+            file="src/main/res/mipmap-hdpi/ic_launcher_round.png"/>
     </issue>
 
     <issue
@@ -279,7 +307,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="96"
+            line="97"
             column="13"/>
     </issue>
 
@@ -290,7 +318,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="97"
+            line="98"
             column="13"/>
     </issue>
 
@@ -301,7 +329,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="99"
+            line="100"
             column="13"/>
     </issue>
 
@@ -312,7 +340,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="106"
+            line="107"
             column="13"/>
     </issue>
 
@@ -323,7 +351,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="107"
+            line="108"
             column="13"/>
     </issue>
 
@@ -334,7 +362,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="108"
+            line="109"
             column="13"/>
     </issue>
 
@@ -345,7 +373,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="109"
+            line="110"
             column="13"/>
     </issue>
 
@@ -356,7 +384,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="110"
+            line="111"
             column="13"/>
     </issue>
 
@@ -367,7 +395,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="111"
+            line="112"
             column="13"/>
     </issue>
 
@@ -378,7 +406,7 @@
         errorLine2="            ~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="113"
+            line="114"
             column="13"/>
     </issue>
 
@@ -389,7 +417,7 @@
         errorLine2="            ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="114"
+            line="115"
             column="13"/>
     </issue>
 
@@ -400,7 +428,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="115"
+            line="116"
             column="13"/>
     </issue>
 
@@ -411,7 +439,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="116"
+            line="117"
             column="13"/>
     </issue>
 
@@ -422,7 +450,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="117"
+            line="118"
             column="13"/>
     </issue>
 
@@ -433,7 +461,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="118"
+            line="119"
             column="13"/>
     </issue>
 
@@ -444,7 +472,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="119"
+            line="120"
             column="13"/>
     </issue>
 
@@ -455,7 +483,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="120"
+            line="121"
             column="13"/>
     </issue>
 
@@ -466,7 +494,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="121"
+            line="122"
             column="13"/>
     </issue>
 
@@ -477,7 +505,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="122"
+            line="123"
             column="13"/>
     </issue>
 
@@ -488,7 +516,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="123"
+            line="124"
             column="13"/>
     </issue>
 
@@ -499,7 +527,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="124"
+            line="125"
             column="13"/>
     </issue>
 
@@ -510,7 +538,7 @@
         errorLine2="            ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="157"
+            line="158"
             column="13"/>
     </issue>
 
@@ -563,6 +591,39 @@
             file="src/main/res/layout/number_preference.xml"
             line="16"
             column="10"/>
+    </issue>
+
+    <issue
+        id="UnnecessaryRequiredFeature"
+        message="Consider whether this feature (`android.hardware.camera.autofocus`) really is required for the app to function; you can set `android:required=&quot;false&quot;` to indicate that the feature is used but not required"
+        errorLine1="    &lt;uses-feature android:name=&quot;android.hardware.camera.autofocus&quot;/>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="6"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        return preferences.edit().putString(key, encrypt(value)).apply()"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/community/java/com/twilio/video/app/security/SecurePreferencesImpl.kt"
+            line="28"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            sharedPreferences.edit().clear().apply()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/twilio/video/app/ui/settings/SettingsFragment.kt"
+            line="42"
+            column="13"/>
     </issue>
 
     <issue
