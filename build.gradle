@@ -43,7 +43,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.1'
+        classpath 'com.android.tools.build:gradle:8.12.1'
         classpath "com.google.gms:google-services:4.4.2"
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.2'
@@ -54,7 +54,9 @@ buildscript {
 
 plugins {
     id "com.diffplug.spotless" version '6.19.0'
+    id 'org.ajoberstar.grgit' version '5.3.2'
 }
+
 apply plugin: "com.diffplug.spotless"
 spotless {
     format 'misc', {
@@ -74,85 +76,46 @@ spotless {
     }
 }
 
-task incrementVersionCode {
-    description = 'Increment the version code'
-    group = 'Git'
-
+tasks.register('incrementVersionCode') {
+    description = 'Increment the version after a release'
     doLast {
+        def githubUser = System.getenv("GIT_USER_NAME")
         def githubToken = System.getenv("GITHUB_TOKEN")
         def repoSlug = "${System.env.CIRCLE_PROJECT_USERNAME}/${System.env.CIRCLE_PROJECT_REPONAME}"
-        def gitRef = "https://${githubToken}@github.com/${repoSlug}.git"
-        def remote = "upstream"
-        def pushNullFile = new FileOutputStream("/dev/null")
+        def gitRef = "https://${githubUser}:${githubToken}@github.com/${repoSlug}.git"
+        def remoteName = "upstream"
         def versionCode = project.property("versionCode")
         def versionCodeTag = "v0.$versionCode"
         def newVersionCode = (versionCode as Integer) + 1
-        // Create build directory if not created
-        if (!getLayout().getBuildDirectory().asFile.get().exists()) {
-            getLayout().getBuildDirectory().asFile.get().mkdir()
+
+
+        // Add remote if it doesn't exist
+        try {
+            grgit.remote.add(name: remoteName, url: gitRef)
+        } catch (Exception ignored) {
+            // Remote already exists
         }
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "remote", "add", "${remote}", "${gitRef}"
-            // Ignore exit value because remote may have been added in previous task
-            ignoreExitValue true
-        }
+        // fetch the branch
+        grgit.fetch(remote: remoteName)
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "fetch", "${remote}"
-        }
+        // annotate tag
+        grgit.tag.add(name: versionCodeTag, message: versionCodeTag, annotate: true)
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "tag", "-a", "$versionCodeTag", "-m", "$versionCodeTag"
-        }
+        // update the version in gradle.properties
+        def gradlePropertiesFile = file('gradle.properties')
+        def properties = new Properties()
+        gradlePropertiesFile.withInputStream { properties.load(it) }
+        properties.setProperty("versionCode", newVersionCode.toString())
+        gradlePropertiesFile.withOutputStream { properties.store(it, null) }
+        println("New version code: ${newVersionCode}")
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "sed",
-                    "s@versionCode=.*@versionCode=${newVersionCode}@",
-                    "gradle.properties"
-            standardOutput new FileOutputStream("${buildDir}/gradle.properties")
-        }
+        // commit the change
+        grgit.add(patterns: ['gradle.properties'])
+        grgit.commit(message: "Bump patch version [skip ci]")
+        grgit.push(remote: remoteName, refsOrSpecs: [System.env.CIRCLE_BRANCH])
+        grgit.push(remote: remoteName, refsOrSpecs: [versionCodeTag])
 
-        exec {
-            workingDir "${rootDir}"
-            commandLine "mv", "${buildDir}/gradle.properties", "gradle.properties"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "echo", "New version code:"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "cat", "gradle.properties"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "add", "gradle.properties"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "commit", "gradle.properties", "-m", "Bump version code [skip ci]"
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "--quiet", "${remote}", "${System.env.CIRCLE_BRANCH}"
-            standardOutput pushNullFile
-        }
-
-        exec {
-            workingDir "${rootDir}"
-            commandLine "git", "push", "--quiet", "${remote}", "$versionCodeTag"
-            standardOutput pushNullFile
-        }
     }
 }
 
