@@ -25,6 +25,7 @@ import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantConnected
 import com.twilio.video.app.ui.room.RoomEvent.RemoteParticipantEvent.RemoteParticipantDisconnected
 import com.twilio.video.app.ui.room.RoomEvent.StatsUpdate
+import com.twilio.video.app.ui.room.RoomEvent.Transcription
 import com.twilio.video.app.ui.room.VideoService.Companion.disableScreenShare
 import com.twilio.video.app.ui.room.VideoService.Companion.enableScreenShare
 import com.twilio.video.app.ui.room.VideoService.Companion.startService
@@ -35,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import timber.log.Timber
 
 const val MICROPHONE_TRACK_NAME = "microphone"
@@ -229,6 +231,10 @@ class RoomManager(
 
         override fun onReconnecting(room: Room, twilioException: TwilioException) {
             Timber.i("onReconnecting: %s", room.name)
+        }
+
+        override fun onTranscription(room: Room, json: JSONObject) {
+            sendRoomEvent(Transcription(json.getString("transcription")))
         }
 
         private fun setupParticipants(room: Room) {

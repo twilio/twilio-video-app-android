@@ -60,6 +60,8 @@ object Preferences {
     const val ENABLE_DOMINANT_SPEAKER = "pref_enable_dominant_speaker"
     const val ENABLE_DOMINANT_SPEAKER_DEFAULT = true
     const val ENABLE_INSIGHTS_DEFAULT = true
+    const val ENABLE_LIVE_TRANSCRIPTION = "perf_enable_live_transcription"
+    const val ENABLE_LIVE_TRANSCRIPTION_DEFAULT = true
     const val VIDEO_CODEC = "pref_video_codecs"
     const val VIDEO_CODEC_DEFAULT = Vp8Codec.NAME
     const val VP8_SIMULCAST = "pref_vp8_simulcast"

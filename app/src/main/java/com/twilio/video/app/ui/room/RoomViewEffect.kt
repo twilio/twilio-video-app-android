@@ -13,4 +13,5 @@ sealed class RoomViewEffect : UIEvent() {
     object ShowConnectFailureDialog : RoomViewEffect()
     object ShowMaxParticipantFailureDialog : RoomViewEffect()
     data class ShowTokenErrorDialog(val serviceError: AuthServiceError? = null) : RoomViewEffect()
+    data class Transcription(val text: String) : RoomViewEffect()
 }

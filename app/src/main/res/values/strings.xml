@@ -25,6 +25,7 @@
     <string name="settings_screen_enable_dominant_speaker">Enable Dominant Speaker</string>
     <string name="settings_screen_record_participants_on_connect">Record Participants on Connect</string>
     <string name="settings_screen_enable_network_quality_level_description">Network Quality Level</string>
+    <string name="settings_screen_enable_live_transcriptions">Live Transcriptions</string>
     <string name="settings_screen_environment_string">Environment</string>
     <string name="settings_screen_topology">Room Type</string>
     <string name="settings_screen_media">Media</string>
