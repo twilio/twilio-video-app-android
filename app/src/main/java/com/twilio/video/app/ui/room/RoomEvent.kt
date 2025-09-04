@@ -23,6 +23,7 @@ sealed class RoomEvent {
     data class TokenError(val serviceError: AuthServiceError? = null) : RoomEvent()
     data class DominantSpeakerChanged(val newDominantSpeakerSid: String?) : RoomEvent()
     data class StatsUpdate(val roomStats: RoomStats) : RoomEvent()
+    data class Transcription(val text: String) : RoomEvent()
 
     sealed class RemoteParticipantEvent : RoomEvent() {
 
