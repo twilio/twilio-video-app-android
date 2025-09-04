@@ -4,7 +4,7 @@ e2e-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: hammerhead, version: 23}
+    - {model: tokay, version: 35}
     - {model: redfin, version: 30}
   test-targets:
     - "annotation com.twilio.video.app.e2eTest.E2ETest"
@@ -15,9 +15,9 @@ integration-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: hammerhead, version: 23}
-    - {model: griffin, version: 24}
-    - {model: starqlteue, version: 26}
+    - {model: tokay, version: 35}
+    - {model: shiba, version: 34}
+    - {model: dm3q, version: 33}
     - {model: pettyl, version: 27}
     - {model: redfin, version: 30}
   test-targets:
