@@ -42,10 +42,7 @@
    * removed support for globally setting audio channel effects as the necessary class WebRtcAudioUtils is removed from WebRTC-124.
    * removed support for globally setting the usage of SLES audio device as the necessary class WebRtcAudioManager is removed from WebRTC-124.
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 84319a49916d15b103563bc0f316cf787464fd5a
 ## 0.155 (Oct 23, 2024)
 
 ### Dependency Upgrades
