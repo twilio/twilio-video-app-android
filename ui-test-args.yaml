@@ -15,7 +15,7 @@ integration-tests:
   app: app/build/outputs/apk/internal/debug/app-internal-debug.apk
   test: app/build/outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk
   device:
-    - {model: tokay, version: 35}
+    - {model: tokay, version: 34}
     - {model: shiba, version: 34}
     - {model: dm3q, version: 33}
     - {model: pettyl, version: 27}
