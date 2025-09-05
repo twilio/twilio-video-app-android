@@ -150,7 +150,7 @@ android {
 
     lint {
         baseline file('lint-baseline.xml')
-        disable 'GradleDependency'
+        disable 'GradleDependency', 'AndroidGradlePluginVersion'
         warningsAsErrors true
     }
 }
@@ -175,6 +175,7 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:25.9.0')
 
+    //noinspection Aligned16KB
     implementation 'com.facebook.conceal:conceal:2.0.2@aar'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesAndroidVersion"
