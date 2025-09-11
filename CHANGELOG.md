@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.166 (Sept 11, 2025)
+
+### Dependency Changes
+
+* Replaced use of `com.facebook.conceal` with `androidx.security:security-crypto` for encryption needs.
+
+
 ## 0.165 (Sept 5, 2025)
 
 ### Dependency Upgrades
