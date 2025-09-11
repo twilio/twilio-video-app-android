@@ -2,10 +2,9 @@ package com.twilio.video.app.security
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Base64
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import androidx.core.content.edit
 
 class SecurePreferencesImpl(
     context: Context,
@@ -24,7 +23,7 @@ class SecurePreferencesImpl(
             "secure_prefs",
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
     }
 
@@ -35,5 +34,4 @@ class SecurePreferencesImpl(
     override fun getSecureString(key: String): String? {
         return securePreferences.getString(key, null)
     }
-
 }
