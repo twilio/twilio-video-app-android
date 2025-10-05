@@ -35,6 +35,11 @@
             android:key="pref_enable_network_quality_level"
             android:title="@string/settings_screen_enable_network_quality_level"
             app:iconSpaceReserved="false"/>
+        <CheckBoxPreference
+            android:key="perf_enable_live_transcription"
+            android:title="@string/settings_screen_enable_live_transcriptions"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/settings_screen_effects"

@@ -229,6 +229,11 @@ class RoomViewModel @Inject constructor(
             is RemoteParticipantEvent -> handleRemoteParticipantEvent(roomEvent)
             is LocalParticipantEvent -> handleLocalParticipantEvent(roomEvent)
             is StatsUpdate -> updateState { currentState -> currentState.copy(roomStats = roomEvent.roomStats) }
+            is RoomEvent.Transcription -> action {
+                sendEvent {
+                    RoomViewEffect.Transcription(roomEvent.text)
+                }
+            }
         }
     }
 

@@ -18,6 +18,7 @@ package com.twilio.video.app.ui.room
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.TextView
 import com.twilio.video.app.databinding.ParticipantPrimaryViewBinding
 
 internal class ParticipantPrimaryView @JvmOverloads constructor(
@@ -28,6 +29,7 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
 
     private val binding: ParticipantPrimaryViewBinding =
         ParticipantPrimaryViewBinding.inflate(LayoutInflater.from(context), this, true)
+    private val transcriptionTextWidget: TextView
     init {
         videoLayout = binding.videoLayout
         videoIdentity = binding.videoIdentity
@@ -35,11 +37,18 @@ internal class ParticipantPrimaryView @JvmOverloads constructor(
         selectedLayout = binding.selectedLayout
         stubImage = binding.stub
         selectedIdentity = binding.selectedIdentity
+        transcriptionTextWidget = binding.videoTranscriptionText
         setIdentity(identity)
         setState(state)
         setMirror(mirror)
         setScaleType(scaleType)
     }
+
+    var transcriptionText: String
+        set(value) {
+            transcriptionTextWidget.text = value
+        }
+        get() = transcriptionTextWidget.text.toString()
 
     fun showIdentityBadge(show: Boolean) {
         binding.videoIdentity.visibility = if (show) VISIBLE else GONE

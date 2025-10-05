@@ -380,3 +380,4 @@ workflows:
           <<: *publish-to-firebase-filter
           requires:
             - build-release-app
+

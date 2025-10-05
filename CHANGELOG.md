@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.166 (Sept 11, 2025)
+
+### Dependency Changes
+
+* Replaced use of `com.facebook.conceal` with `androidx.security:security-crypto` for encryption needs.
+
+
+## 0.165 (Sept 5, 2025)
+
+### Dependency Upgrades
+
+* Updated to use AGP 8.12.1 and Gradle 8.13
+
+## 0.164 (Aug 7, 2025)
+
+### Feature Changes
+
+* Added support for realtime transcriptions which can be enabled from the internal preferences menu.
+
 ## 0.163 (Feb 10, 2025)
 
 ### Dependency Upgrades
