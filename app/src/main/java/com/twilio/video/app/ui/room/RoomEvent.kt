@@ -52,5 +52,7 @@ sealed class RoomEvent {
         object AudioDisabled : LocalParticipantEvent()
         object ScreenCaptureOn : LocalParticipantEvent()
         object ScreenCaptureOff : LocalParticipantEvent()
+        object VirtualBackgroundResumed : LocalParticipantEvent()
+        object VirtualBackgroundPaused : LocalParticipantEvent()
     }
 }

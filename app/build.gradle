@@ -40,8 +40,11 @@ afterEvaluate {
             debugImplementation project(':video')
             debugImplementation project(':video:ktx')
             releaseImplementation project(':video:ktx')
+            debugImplementation project(':VirtualBackgroundProcessor')
+            releaseImplementation project(':VirtualBackgroundProcessor')
         } else {
             implementation "com.twilio:video-android-ktx:7.9.1"
+            implementation "com.twilio:video-virtual-background-processor:7.9.1"
         }
     }
 }
@@ -173,6 +176,7 @@ dependencies {
     def uniflowVersion = '1.0.5'
     def androidEnv = '1.1.1'
 
+    implementation project(':VirtualBackgroundProcessor')
     implementation platform('com.google.firebase:firebase-bom:25.9.0')
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesAndroidVersion"

@@ -10,6 +10,6 @@ open class BaseIntegrationTest {
     @Before
     fun setUp() {
         // Skip any devices that don't have a front or back camera
-        assumeTrue(CameraCapturerCompat.newInstance(getTargetContext()) != null)
+        assumeTrue(CameraCapturerCompat.newInstance(getTargetContext(), null) != null)
     }
 }

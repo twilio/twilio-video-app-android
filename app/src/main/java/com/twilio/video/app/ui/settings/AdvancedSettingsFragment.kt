@@ -22,12 +22,14 @@ import com.twilio.video.app.data.Preferences.VIDEO_CODEC
 import com.twilio.video.app.data.Preferences.VIDEO_DIMENSIONS
 import com.twilio.video.app.data.Preferences.VIDEO_ENCODING_MODE
 import com.twilio.video.app.data.Preferences.VP8_SIMULCAST
-import com.twilio.video.app.util.get
 import com.twilio.video.app.util.isInternalFlavor
+import com.twilio.video.virtualbackgroundprocessor.BlurBackgroundVideoFrameProcessor
+import com.twilio.video.virtualbackgroundprocessor.VirtualBackgroundVideoFrameProcessor
 
 class AdvancedSettingsFragment : BaseSettingsFragment() {
 
     private var identityPreference: EditTextPreference? = null
+    private val capturerEffects = arrayOf(Preferences.CAPTURER_EFFECTS_DEFAULT, BlurBackgroundVideoFrameProcessor::class.simpleName, VirtualBackgroundVideoFrameProcessor::class.simpleName)
     private val videoCodecNames = arrayOf(Vp8Codec.NAME, H264Codec.NAME, Vp9Codec.NAME)
     private val audioCodecNames = arrayOf(OpusCodec.NAME, PcmaCodec.NAME, PcmuCodec.NAME, G722Codec.NAME)
 
@@ -71,6 +73,11 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
                 }
             }
         }
+        setupCapturerPreference(
+            Preferences.CAPTURER_EFFECTS_DEFAULT,
+            findPreference(Preferences.CAPTURER_EFFECTS) as ListPreference?,
+        )
+
         setupCodecListPreference(
             VideoCodec::class.java,
             Preferences.VIDEO_CODEC,
@@ -112,6 +119,25 @@ class AdvancedSettingsFragment : BaseSettingsFragment() {
         // bind values
         preference.entries = codecEntries
         preference.entryValues = codecEntries
+        preference.value = value
+        preference.summary = value
+        preference.setOnPreferenceChangeListener { changedPreference, newValue ->
+            changedPreference.summary = newValue.toString()
+            true
+        }
+    }
+
+    private fun setupCapturerPreference(defaultValue: String, preference: ListPreference?) {
+        if (preference == null) {
+            return
+        }
+
+        // saved value
+        val value = sharedPreferences.getString(Preferences.CAPTURER_EFFECTS, defaultValue)
+
+        // bind values
+        preference.entries = capturerEffects
+        preference.entryValues = capturerEffects
         preference.value = value
         preference.summary = value
         preference.setOnPreferenceChangeListener { changedPreference, newValue ->

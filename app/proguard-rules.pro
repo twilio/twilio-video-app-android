@@ -20,3 +20,7 @@
  # kept. Suspend functions are wrapped in continuations where the type argument
  # is used.
  -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+ # Needed when using the VirtualBackgroundProcessor
+ -keep class com.google.mlkit.common.** { *; }
+ -keep class com.google.mlkit.vision.** { *; }

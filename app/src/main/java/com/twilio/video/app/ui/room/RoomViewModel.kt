@@ -27,6 +27,8 @@ import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptur
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.ScreenCaptureOn
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoDisabled
 import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VideoEnabled
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VirtualBackgroundPaused
+import com.twilio.video.app.ui.room.RoomEvent.LocalParticipantEvent.VirtualBackgroundResumed
 import com.twilio.video.app.ui.room.RoomEvent.MaxParticipantFailure
 import com.twilio.video.app.ui.room.RoomEvent.RecordingStarted
 import com.twilio.video.app.ui.room.RoomEvent.RecordingStopped
@@ -54,7 +56,9 @@ import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
+import com.twilio.video.app.ui.room.RoomViewEvent.PauseVirtualBackground
 import com.twilio.video.app.ui.room.RoomViewEvent.PinParticipant
+import com.twilio.video.app.ui.room.RoomViewEvent.ResumeVirtualBackground
 import com.twilio.video.app.ui.room.RoomViewEvent.ScreenTrackRemoved
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
@@ -139,6 +143,12 @@ class RoomViewModel @Inject constructor(
                 updateParticipantViewState()
             }
             Disconnect -> roomManager.disconnect()
+            ResumeVirtualBackground -> {
+                roomManager.resumeLocalVirtualBackground()
+            }
+            PauseVirtualBackground -> {
+                roomManager.pauseLocalVirtualBackground()
+            }
         }
     }
 
@@ -292,6 +302,8 @@ class RoomViewModel @Inject constructor(
             ScreenCaptureOff -> updateState { currentState -> currentState.copy(isScreenCaptureOn = false) }
             VideoEnabled -> updateState { currentState -> currentState.copy(isVideoEnabled = true) }
             VideoDisabled -> updateState { currentState -> currentState.copy(isVideoEnabled = false) }
+            VirtualBackgroundResumed -> updateState { currentState -> currentState.copy(isVirtualBackgroundPaused = false) }
+            VirtualBackgroundPaused -> updateState { currentState -> currentState.copy(isVirtualBackgroundPaused = true) }
         }
     }
 

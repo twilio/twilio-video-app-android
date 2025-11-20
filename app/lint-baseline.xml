@@ -108,6 +108,13 @@
 
     <issue
         id="UnusedResources"
+        message="The resource `R.drawable.halfdome_720p` appears to be unused">
+        <location
+            file="src/main/res/drawable-nodpi/halfdome_720p.jpg"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
         message="The resource `R.drawable.ic_add_circle_white_24px` appears to be unused"
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
@@ -307,7 +314,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="97"
+            line="99"
             column="13"/>
     </issue>
 
@@ -318,7 +325,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="98"
+            line="100"
             column="13"/>
     </issue>
 
@@ -329,7 +336,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="100"
+            line="102"
             column="13"/>
     </issue>
 
@@ -340,7 +347,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="107"
+            line="109"
             column="13"/>
     </issue>
 
@@ -351,7 +358,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="108"
+            line="110"
             column="13"/>
     </issue>
 
@@ -362,7 +369,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="109"
+            line="111"
             column="13"/>
     </issue>
 
@@ -373,7 +380,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="110"
+            line="112"
             column="13"/>
     </issue>
 
@@ -384,7 +391,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="111"
+            line="113"
             column="13"/>
     </issue>
 
@@ -395,7 +402,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="112"
+            line="114"
             column="13"/>
     </issue>
 
@@ -406,7 +413,7 @@
         errorLine2="            ~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="114"
+            line="116"
             column="13"/>
     </issue>
 
@@ -417,7 +424,7 @@
         errorLine2="            ~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="115"
+            line="117"
             column="13"/>
     </issue>
 
@@ -428,7 +435,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="116"
+            line="118"
             column="13"/>
     </issue>
 
@@ -439,7 +446,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="117"
+            line="119"
             column="13"/>
     </issue>
 
@@ -450,7 +457,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="118"
+            line="120"
             column="13"/>
     </issue>
 
@@ -461,7 +468,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="119"
+            line="121"
             column="13"/>
     </issue>
 
@@ -472,7 +479,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="120"
+            line="122"
             column="13"/>
     </issue>
 
@@ -483,7 +490,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="121"
+            line="123"
             column="13"/>
     </issue>
 
@@ -494,7 +501,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="122"
+            line="124"
             column="13"/>
     </issue>
 
@@ -505,7 +512,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="123"
+            line="125"
             column="13"/>
     </issue>
 
@@ -516,7 +523,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="124"
+            line="126"
             column="13"/>
     </issue>
 
@@ -527,7 +534,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="125"
+            line="127"
             column="13"/>
     </issue>
 
@@ -538,7 +545,7 @@
         errorLine2="            ~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="158"
+            line="162"
             column="13"/>
     </issue>
 
@@ -602,17 +609,6 @@
             file="src/main/AndroidManifest.xml"
             line="6"
             column="33"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
-        message="Use the KTX extension function `SharedPreferences.edit` instead?"
-        errorLine1="        return preferences.edit().putString(key, encrypt(value)).apply()"
-        errorLine2="               ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/community/java/com/twilio/video/app/security/SecurePreferencesImpl.kt"
-            line="28"
-            column="16"/>
     </issue>
 
     <issue

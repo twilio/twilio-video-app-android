@@ -32,7 +32,7 @@ class CameraCapturerCompatTest {
     @Test
     fun it_should_return_a_null_camera_capturer_when_no_device_cameras_are_available() {
         assumeTrue(cameraEnumerator.deviceNames.isEmpty())
-        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext())
+        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext(), null)
 
         assertThat(capturerCompat, `is`(nullValue()))
     }
@@ -40,7 +40,7 @@ class CameraCapturerCompatTest {
     @Test
     fun it_should_switch_the_camera() {
         assumeTrue(cameraEnumerator.deviceNames.isNotEmpty())
-        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext())
+        val capturerCompat = CameraCapturerCompat.newInstance(getTargetContext(), null)
         assertThat(capturerCompat, `is`(not(nullValue())))
 
         capturerCompat?.run {
