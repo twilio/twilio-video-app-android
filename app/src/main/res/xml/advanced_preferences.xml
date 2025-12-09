@@ -42,6 +42,16 @@
             app:iconSpaceReserved="false"/>
     </PreferenceCategory>
     <PreferenceCategory
+        android:title="@string/settings_screen_effects"
+        app:iconSpaceReserved="false">
+        <ListPreference
+            android:key="perf_capturer_effects"
+            android:negativeButtonText="@null"
+            android:summary="%s"
+            android:title="@string/settings_screen_capturer_effects"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+    <PreferenceCategory
         android:title="@string/settings_screen_media"
         app:iconSpaceReserved="false">
         <ListPreference

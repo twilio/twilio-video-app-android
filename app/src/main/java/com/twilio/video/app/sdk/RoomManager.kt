@@ -142,6 +142,10 @@ class RoomManager(
 
     fun disableLocalVideo() = localParticipantManager.disableLocalVideo()
 
+    fun resumeLocalVirtualBackground() = localParticipantManager.resumeLocalVirtualBackground()
+
+    fun pauseLocalVirtualBackground() = localParticipantManager.pauseLocalVirtualBackground()
+
     inner class RoomListener : Room.Listener {
         override fun onConnected(room: Room) {
             Timber.i(

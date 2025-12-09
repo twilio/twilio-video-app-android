@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.169 (Dec 9, 2025)
+
+### Feature Changes
+
+* Added support for selecting virtual backgrounds during video calls.
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.10.0
+
 ## 0.167 (Oct 8, 2025)
 
 ### Dependency Upgrades
@@ -66,7 +76,6 @@
 * In preparation for the WebRTC-124 upgrade, the following necessary changes were made
    * removed support for globally setting audio channel effects as the necessary class WebRtcAudioUtils is removed from WebRTC-124.
    * removed support for globally setting the usage of SLES audio device as the necessary class WebRtcAudioManager is removed from WebRTC-124.
-
 
 ## 0.155 (Oct 23, 2024)
 
@@ -153,7 +162,6 @@
 ### Bug Fixes
 
 * Modified 'internal' auth process to reflect internal changes to Twilio's auth service.
-
 
 ## 0.117 (January 6, 2022)
 

@@ -20,9 +20,9 @@ def includeSdkFromSource = project.hasProperty(includeSdkFromSourceProperty) &&
 
 afterEvaluate {
     def ndkVersion = 'ndkVersion'
-    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
-        android.ndkVersion = "${project.property(ndkVersion)}"
-    }
+//    if (includeSdkFromSource && project.hasProperty(ndkVersion)) {
+//        android.ndkVersion = "${project.property(ndkVersion)}"
+//    }
 
     /*
     * Enable the application to consume the Video Android SDK directly from source
@@ -40,8 +40,11 @@ afterEvaluate {
             debugImplementation project(':video')
             debugImplementation project(':video:ktx')
             releaseImplementation project(':video:ktx')
+            debugImplementation project(':VirtualBackgroundProcessor')
+            releaseImplementation project(':VirtualBackgroundProcessor')
         } else {
-            implementation "com.twilio:video-android-ktx:7.9.1"
+            implementation "com.twilio:video-android-ktx:7.10.0"
+            implementation "com.twilio:video-virtual-background-processor:7.10.0"
         }
     }
 }

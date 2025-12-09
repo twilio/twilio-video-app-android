@@ -29,8 +29,10 @@
     <string name="settings_screen_environment_string">Environment</string>
     <string name="settings_screen_topology">Room Type</string>
     <string name="settings_screen_media">Media</string>
+    <string name="settings_screen_effects">Effects</string>
     <string name="settings_screen_video_codecs">Video Codec</string>
     <string name="settings_screen_audio_codecs">Audio Codec</string>
+    <string name="settings_screen_capturer_effects">Capturer Effects</string>
     <string name="settings_screen_max_video_bitrate">Video Bitrate (Kbps)</string>
     <string name="settings_screen_max_audio_bitrate">Audio Bitrate (Kbps)</string>
     <string name="settings_screen_vp8_simulcast">VP8 Simulcast</string>
@@ -128,6 +130,8 @@
     <string name="resume_audio">Resume audio</string>
     <string name="pause_video">Pause video</string>
     <string name="resume_video">Resume video</string>
+    <string name="pause_vbackground">Pause Virtual Background</string>
+    <string name="resume_vbackground">Resume Virtual Background</string>
     <string name="share_screen">Share screen</string>
     <string name="select_audio_device">Select audio device</string>
     <string name="stop_screen_share">Stop screen share</string>

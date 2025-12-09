@@ -53,6 +53,8 @@ import com.twilio.video.LogLevel
 import com.twilio.video.app.R
 import com.twilio.video.app.adapter.StatsListAdapter
 import com.twilio.video.app.data.Preferences
+import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS
+import com.twilio.video.app.data.Preferences.CAPTURER_EFFECTS_DEFAULT
 import com.twilio.video.app.data.api.AuthServiceError
 import com.twilio.video.app.databinding.RoomActivityBinding
 import com.twilio.video.app.participant.ParticipantViewState
@@ -75,6 +77,8 @@ import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.EnableLocalVideo
 import com.twilio.video.app.ui.room.RoomViewEvent.OnPause
 import com.twilio.video.app.ui.room.RoomViewEvent.OnResume
+import com.twilio.video.app.ui.room.RoomViewEvent.PauseVirtualBackground
+import com.twilio.video.app.ui.room.RoomViewEvent.ResumeVirtualBackground
 import com.twilio.video.app.ui.room.RoomViewEvent.SelectAudioDevice
 import com.twilio.video.app.ui.room.RoomViewEvent.StartScreenCapture
 import com.twilio.video.app.ui.room.RoomViewEvent.StopScreenCapture
@@ -83,6 +87,7 @@ import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalAudio
 import com.twilio.video.app.ui.room.RoomViewEvent.ToggleLocalVideo
 import com.twilio.video.app.ui.settings.SettingsActivity
 import com.twilio.video.app.util.InputUtils
+import com.twilio.video.app.util.get
 import com.twilio.video.ktx.Video
 import dagger.hilt.android.AndroidEntryPoint
 import io.uniflow.android.livedata.onEvents
@@ -99,6 +104,7 @@ class RoomActivity : AppCompatActivity() {
     private lateinit var screenCaptureMenuItem: MenuItem
     private lateinit var settingsMenuItem: MenuItem
     private lateinit var deviceMenuItem: MenuItem
+    private lateinit var pauseVirtualBackgroundMenuItem: MenuItem
     private lateinit var activityHandler: Handler
     private var savedVolumeControlStream = 0
     private var displayName: String? = null
@@ -203,6 +209,7 @@ class RoomActivity : AppCompatActivity() {
         pauseAudioMenuItem = menu.findItem(R.id.pause_audio_menu_item)
         screenCaptureMenuItem = menu.findItem(R.id.share_screen_menu_item)
         deviceMenuItem = menu.findItem(R.id.device_menu_item)
+        pauseVirtualBackgroundMenuItem = menu.findItem(R.id.pause_vbackground_menu_item)
 
         onStates(roomViewModel) { state ->
             if (state is RoomViewState) bindRoomViewState(state)
@@ -248,6 +255,14 @@ class RoomActivity : AppCompatActivity() {
             R.id.settings_menu_item -> {
                 val intent = Intent(this@RoomActivity, SettingsActivity::class.java)
                 startActivity(intent)
+                true
+            }
+            R.id.pause_vbackground_menu_item -> {
+                if (item.title == getString(R.string.pause_vbackground)) {
+                    roomViewModel.processInput(PauseVirtualBackground)
+                } else {
+                    roomViewModel.processInput(ResumeVirtualBackground)
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -448,8 +463,16 @@ class RoomActivity : AppCompatActivity() {
         binding.recordingNotice.visibility = recordingWarningVisibility
         val pauseAudioTitle = getString(if (roomViewState.isAudioEnabled) R.string.pause_audio else R.string.resume_audio)
         val pauseVideoTitle = getString(if (roomViewState.isVideoEnabled) R.string.pause_video else R.string.resume_video)
+        val pauseVirtualBackgroundTitle = getString(if (!roomViewState.isVirtualBackgroundPaused) R.string.pause_vbackground else R.string.resume_vbackground)
         pauseAudioMenuItem.title = pauseAudioTitle
         pauseVideoMenuItem.title = pauseVideoTitle
+        pauseVirtualBackgroundMenuItem.title = pauseVirtualBackgroundTitle
+        // disable the pause/resume virtual background menu item if no capturer effects have been selected
+        val selectedEffects = sharedPreferences.get(
+            CAPTURER_EFFECTS,
+            CAPTURER_EFFECTS_DEFAULT,
+        )
+        pauseVirtualBackgroundMenuItem.isVisible = (selectedEffects != CAPTURER_EFFECTS_DEFAULT)
 
         // TODO: Remove when we use a Service to obtainTokenAndConnect to a room
         settingsMenuItem.isVisible = settingsMenuItemState

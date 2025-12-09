@@ -9,6 +9,7 @@ import android.os.Build
 import com.twilio.video.Camera2Capturer
 import com.twilio.video.CameraCapturer
 import com.twilio.video.VideoCapturer
+import com.twilio.video.VideoFrameProcessor
 import timber.log.Timber
 import tvi.webrtc.Camera1Enumerator
 import tvi.webrtc.Camera2Enumerator
@@ -56,13 +57,14 @@ class CameraCapturerCompat(
     }
 
     companion object {
-        fun newInstance(context: Context): CameraCapturerCompat? {
+        fun newInstance(context: Context, frameProcessor: VideoFrameProcessor?): CameraCapturerCompat? {
             return if (Camera2Capturer.isSupported(context)) {
                 Camera2Enumerator(context).getFrontAndBackCameraIds(context)?.let { cameraIds ->
                     val cameraCapturer = Camera2Capturer(
                         context,
-                        cameraIds.first
-                            ?: cameraIds.second ?: "",
+                        cameraIds.first ?: cameraIds.second ?: "",
+                        frameProcessor,
+                        null,
                     )
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, camera2Capturer = cameraCapturer)
                 }
@@ -70,8 +72,8 @@ class CameraCapturerCompat(
                 Camera1Enumerator().getFrontAndBackCameraIds(context, isCamera2 = false)?.let { cameraIds ->
                     val cameraCapturer = CameraCapturer(
                         context,
-                        cameraIds.first ?: cameraIds.second
-                            ?: "",
+                        cameraIds.first ?: cameraIds.second ?: "",
+                        frameProcessor,
                         getCameraListener(),
                     )
                     CameraCapturerCompat(cameraIds.first, cameraIds.second, cameraCapturer = cameraCapturer)
