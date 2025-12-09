@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.169 (Dec 9, 2025)
+
+### Feature Changes
+
+* Added support for selecting virtual backgrounds during video calls.
+
+### Dependency Upgrades
+
+* Updated Twilio Video SDK version to 7.10.0
+
 ## 0.167 (Oct 8, 2025)
 
 ### Dependency Upgrades
