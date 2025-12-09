@@ -43,8 +43,8 @@ afterEvaluate {
             debugImplementation project(':VirtualBackgroundProcessor')
             releaseImplementation project(':VirtualBackgroundProcessor')
         } else {
-            implementation "com.twilio:video-android-ktx:7.9.0-rc5"
-            implementation "com.twilio:video-virtual-background-processor:7.9.0-rc5"
+            implementation "com.twilio:video-android-ktx:7.10.0"
+            implementation "com.twilio:video-virtual-background-processor:7.10.0"
         }
     }
 }
