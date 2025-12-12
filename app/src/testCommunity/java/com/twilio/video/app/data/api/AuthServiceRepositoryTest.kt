@@ -22,6 +22,7 @@ import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
@@ -51,54 +52,46 @@ class AuthServiceRepositoryTest {
     private var authService = mock<AuthService>()
 
     @Test
-    fun `it should retrieve the passcode from SecurePreferences for a null passcode`() {
-        coroutineScope.runBlockingTest {
-            authService = mock {
-                whenever(mock.getToken(isA(), isA()))
-                    .thenReturn(AuthServiceResponseDTO(token))
-            }
-            val securePreferences = mock<SecurePreferences> {
-                whenever(mock.getSecureString(PASSCODE)).thenReturn(passcode)
-            }
-            val repository = AuthServiceRepository(authService, securePreferences, mock())
-
-            val actualToken = repository.getToken()
-
-            verify(authService).getToken(expectedURL, expectedRequestDTO)
-            assertThat(actualToken, equalTo(token))
+    fun `it should retrieve the passcode from SecurePreferences for a null passcode`() = runTest {
+        authService = mock {
+            whenever(mock.getToken(isA(), isA()))
+                .thenReturn(AuthServiceResponseDTO(token))
         }
+        val securePreferences = mock<SecurePreferences> {
+            whenever(mock.getSecureString(PASSCODE)).thenReturn(passcode)
+        }
+        val repository = AuthServiceRepository(authService, securePreferences, mock())
+
+        val actualToken = repository.getToken()
+
+        verify(authService).getToken(expectedURL, expectedRequestDTO)
+        assertThat(actualToken, equalTo(token))
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `it should throw an IllegalArgumentException if the passcode parameter and passcode retrieved from SecurePreferences are null`() {
-        coroutineScope.runBlockingTest {
-            val repository = AuthServiceRepository(mock(), mock(), mock())
-            repository.getToken()
-        }
+    fun `it should throw an IllegalArgumentException if the passcode parameter and passcode retrieved from SecurePreferences are null`() = runTest {
+        val repository = AuthServiceRepository(mock(), mock(), mock())
+        repository.getToken()
     }
 
     @Test
-    fun `it should return a token for a valid passcode size`() {
-        coroutineScope.runBlockingTest {
-            val repository = setupRepository()
-            val actualToken = repository.getToken(passcode = passcode)
+    fun `it should return a token for a valid passcode size`() = runTest {
+        val repository = setupRepository()
+        val actualToken = repository.getToken(passcode = passcode)
 
-            verify(authService).getToken(expectedURL, expectedRequestDTO)
-            assertThat(actualToken, equalTo(token))
-        }
+        verify(authService).getToken(expectedURL, expectedRequestDTO)
+        assertThat(actualToken, equalTo(token))
     }
 
     @Test
-    fun `it should return a token for a valid legacy passcode size`() {
-        coroutineScope.runBlockingTest {
-            val passcode = "1234567890"
-            val legacyURL = "https://video-app-7890-dev.twil.io/token"
-            val repository = setupRepository()
-            val actualToken = repository.getToken(passcode = passcode)
+    fun `it should return a token for a valid legacy passcode size`() = runTest {
+        val passcode = "1234567890"
+        val legacyURL = "https://video-app-7890-dev.twil.io/token"
+        val repository = setupRepository()
+        val actualToken = repository.getToken(passcode = passcode)
 
-            verify(authService).getToken(legacyURL, expectedRequestDTO.copy(passcode = passcode))
-            assertThat(actualToken, equalTo(token))
-        }
+        verify(authService).getToken(legacyURL, expectedRequestDTO.copy(passcode = passcode))
+        assertThat(actualToken, equalTo(token))
     }
 
     fun illegalArgParams(): Array<String?> {
@@ -114,72 +107,59 @@ class AuthServiceRepositoryTest {
 
     @Parameters(method = "illegalArgParams")
     @Test(expected = IllegalArgumentException::class)
-    fun `it should throw an IllegalArgumentException for an invalid passcode`(passcode: String?) {
-        coroutineScope.runBlockingTest {
-            val repository = setupRepository()
-            repository.getToken(passcode = passcode)
-        }
+    fun `it should throw an IllegalArgumentException for an invalid passcode`(passcode: String?) = runTest {
+        val repository = setupRepository()
+        repository.getToken(passcode = passcode)
     }
 
     fun authServiceExceptionParams(): Array<AuthService> {
-        var parameters = arrayOf<AuthService>()
-
-        coroutineScope.runBlockingTest {
-            val nullToken: AuthService = mock {
-                whenever(mock.getToken(isA(), isA()))
-                    .thenReturn(AuthServiceResponseDTO())
-            }
-
-            val nullResponse: AuthService = getMockAuthService()
-            val invalidJson: AuthService = getMockAuthService("Bad format!")
-            val nullErrorBody: AuthService = getMockAuthService("{}")
-            val nullErrorDTO: AuthService = getMockAuthService("")
-            val unknownErrorType: AuthService = getMockAuthService(UNKNOWN_ERROR_MESSAGE)
-
-            parameters =
-                arrayOf(
-                    nullToken,
-                    nullResponse,
-                    invalidJson,
-                    nullErrorBody,
-                    nullErrorDTO,
-                    unknownErrorType,
-                )
+        val nullToken: AuthService = mock {
+            onBlocking {  getToken(isA(), isA()) }
+                .thenReturn(AuthServiceResponseDTO(null))
         }
 
-        return parameters
+        val nullResponse: AuthService = getMockAuthService()
+        val invalidJson: AuthService = getMockAuthService("Bad format!")
+        val nullErrorBody: AuthService = getMockAuthService("{}")
+        val nullErrorDTO: AuthService = getMockAuthService("")
+        val unknownErrorType: AuthService = getMockAuthService(UNKNOWN_ERROR_MESSAGE)
+
+        return arrayOf(
+            nullToken,
+            nullResponse,
+            invalidJson,
+            nullErrorBody,
+            nullErrorDTO,
+            unknownErrorType,
+        )
     }
 
     @Parameters(method = "authServiceExceptionParams")
     @Test
-    fun `it should throw an AuthServiceException with no error type`(authService: AuthService) {
-        coroutineScope.runBlockingTest {
-            val repository = AuthServiceRepository(authService, mock(), mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(nullValue()))
-            }
+    fun `it should throw an AuthServiceException with no error type`(authService: AuthService) = runTest {
+        val repository = AuthServiceRepository(authService, mock(), mock())
+        try {
+            repository.getToken(passcode = passcode)
+            fail("Exception was never thrown!")
+        } catch (e: AuthServiceException) {
+            assertThat(e.error, `is`(nullValue()))
         }
     }
 
     @Test
-    fun `it should return a token if the request is successful with optional parameters`() {
-        coroutineScope.runBlockingTest {
-            val userIdentity = "identity"
-            val roomName = "roomName"
-            expectedRequestDTO = AuthServiceRequestDTO(
-                passcode,
-                userIdentity,
-                roomName,
-            )
-            val repository = setupRepository()
-            val actualToken = repository.getToken(userIdentity, roomName, passcode)
+    fun `it should return a token if the request is successful with optional parameters`() = runTest {
+        val userIdentity = "identity"
+        val roomName = "roomName"
+        expectedRequestDTO = AuthServiceRequestDTO(
+            passcode,
+            userIdentity,
+            roomName,
+        )
+        val repository = setupRepository()
+        val actualToken = repository.getToken(userIdentity, roomName, passcode)
 
-            verify(authService).getToken(expectedURL, expectedRequestDTO.copy(create_room = true))
-            assertThat(actualToken, equalTo(token))
-        }
+        verify(authService).getToken(expectedURL, expectedRequestDTO.copy(create_room = true))
+        assertThat(actualToken, equalTo(token))
     }
 
     fun videoCodecParams() =
@@ -217,78 +197,68 @@ class AuthServiceRepositoryTest {
         newRoomType: Topology,
         enableSimulcast: Boolean,
         videoDimensionsIndex: String,
-    ) {
-        runBlockingTest {
-            val (editor, repository) = setupServerRoomTypeMock(oldRoomType, newRoomType)
+    ) = runTest {
+        val (editor, repository) = setupServerRoomTypeMock(oldRoomType, newRoomType)
 
-            repository.getToken(passcode = "12345678901234")
+        repository.getToken(passcode = "12345678901234")
 
-            verify(editor).putString(TOPOLOGY, newRoomType.value)
-            verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
-            verify(editor).putBoolean(VP8_SIMULCAST, enableSimulcast)
-            verify(editor).putString(VIDEO_CAPTURE_RESOLUTION, videoDimensionsIndex)
+        verify(editor).putString(TOPOLOGY, newRoomType.value)
+        verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
+        verify(editor).putBoolean(VP8_SIMULCAST, enableSimulcast)
+        verify(editor).putString(VIDEO_CAPTURE_RESOLUTION, videoDimensionsIndex)
+    }
+
+    @Test
+    fun `it should not update the video codec, room type, and video dimensions if the room type has not changed`() = runTest {
+        val (editor, repository) = setupServerRoomTypeMock(Topology.GROUP, Topology.GROUP)
+
+        repository.getToken(passcode = "12345678901234")
+
+        verifyNoInteractions(editor)
+    }
+
+    @Test
+    fun `it should update the video codec and the room type if using a legacy passcode`() = runTest {
+        val (editor, repository) = setupServerRoomTypeMock(Topology.GROUP_SMALL, Topology.GROUP)
+
+        repository.getToken(passcode = "1234567890")
+
+        verify(editor).putString(TOPOLOGY, Topology.GROUP.value)
+        verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
+        verify(editor).putBoolean(VP8_SIMULCAST, true)
+    }
+
+    @Test
+    fun `it should throw an AuthServiceException with error type INVALID_PASSCODE_ERROR if the passcode is invalid`() = runTest {
+        val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
+        authService = mock {
+            whenever(mock.getToken(isA(), isA()))
+                .thenThrow(exception)
+        }
+        val repository = AuthServiceRepository(authService, mock(), mock())
+        try {
+            repository.getToken(passcode = passcode)
+            fail("Exception was never thrown!")
+        } catch (e: AuthServiceException) {
+            assertThat(e.error, `is`(not(nullValue())))
+            assertThat(e.error, equalTo(AuthServiceError.INVALID_PASSCODE_ERROR))
         }
     }
 
     @Test
-    fun `it should not update the video codec, room type, and video dimensions if the room type has not changed`() {
-        runBlockingTest {
-            val (editor, repository) = setupServerRoomTypeMock(Topology.GROUP, Topology.GROUP)
-
-            repository.getToken(passcode = "12345678901234")
-
-            verifyNoInteractions(editor)
+    fun `it should throw an AuthServiceException with error type EXPIRED_PASSCODE_ERROR if the passcode is expired`() = runTest {
+        val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
+        authService = mock {
+            whenever(mock.getToken(isA(), isA()))
+                .thenThrow(exception)
         }
-    }
-
-    @Test
-    fun `it should update the video codec and the room type if using a legacy passcode`() {
-        runBlockingTest {
-            val (editor, repository) = setupServerRoomTypeMock(Topology.GROUP_SMALL, Topology.GROUP)
-
-            repository.getToken(passcode = "1234567890")
-
-            verify(editor).putString(TOPOLOGY, Topology.GROUP.value)
-            verify(editor).putString(VIDEO_CODEC, Vp8Codec.NAME)
-            verify(editor).putBoolean(VP8_SIMULCAST, true)
-        }
-    }
-
-    @Test
-    fun `it should throw an AuthServiceException with error type INVALID_PASSCODE_ERROR if the passcode is invalid`() {
-        coroutineScope.runBlockingTest {
-            val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
-            authService = mock {
-                whenever(mock.getToken(isA(), isA()))
-                    .thenThrow(exception)
-            }
-            val repository = AuthServiceRepository(authService, mock(), mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(not(nullValue())))
-                assertThat(e.error, equalTo(AuthServiceError.INVALID_PASSCODE_ERROR))
-            }
-        }
-    }
-
-    @Test
-    fun `it should throw an AuthServiceException with error type EXPIRED_PASSCODE_ERROR if the passcode is expired`() {
-        coroutineScope.runBlockingTest {
-            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
-            authService = mock {
-                whenever(mock.getToken(isA(), isA()))
-                    .thenThrow(exception)
-            }
-            val repository = AuthServiceRepository(authService, mock(), mock())
-            try {
-                repository.getToken(passcode = passcode)
-                fail("Exception was never thrown!")
-            } catch (e: AuthServiceException) {
-                assertThat(e.error, `is`(not(nullValue())))
-                assertThat(e.error, equalTo(AuthServiceError.EXPIRED_PASSCODE_ERROR))
-            }
+        val repository = AuthServiceRepository(authService, mock(), mock())
+        try {
+            repository.getToken(passcode = passcode)
+            fail("Exception was never thrown!")
+        } catch (e: AuthServiceException) {
+            assertThat(e.error, `is`(not(nullValue())))
+            assertThat(e.error, equalTo(AuthServiceError.EXPIRED_PASSCODE_ERROR))
         }
     }
 
@@ -316,10 +286,10 @@ class AuthServiceRepositoryTest {
         return AuthServiceRepository(authService, mock(), mock())
     }
 
-    private suspend fun getMockAuthService(json: String? = null): AuthService =
+    private fun getMockAuthService(json: String? = null): AuthService =
         mock {
             val exception = json?.let { getMockHttpException(it) } ?: mock()
-            whenever(mock.getToken(isA(), isA()))
+            onBlocking { getToken(isA(), isA())}
                 .thenThrow(exception)
         }
 }

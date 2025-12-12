@@ -10,6 +10,7 @@ import com.twilio.video.app.data.Preferences.TOPOLOGY_DEFAULT
 import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
@@ -43,45 +44,39 @@ class VideoAppServiceDelegateTest : BaseUnitTest() {
     private val videoAppServiceProd: InternalTokenApi = mock()
 
     @Test
-    fun `getToken should retrieve production environment token successfully`() {
-        coroutineScope.runBlockingTest {
-            mockService(videoAppServiceProd, prodTestToken)
-            val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
-            whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
-                .thenReturn("production")
+    fun `getToken should retrieve production environment token successfully`() = runTest {
+        mockService(videoAppServiceProd, prodTestToken)
+        val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
+        whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
+            .thenReturn("production")
 
-            val token = videoAppServiceDelegate.getToken(identity, roomName)
+        val token = videoAppServiceDelegate.getToken(identity, roomName)
 
-            assertThat(token, equalTo(prodTestToken))
-        }
+        assertThat(token, equalTo(prodTestToken))
     }
 
     @Test
-    fun `getToken should retrieve stage environment token successfully`() {
-        coroutineScope.runBlockingTest {
-            mockService(videoAppServiceStage, stageTestToken)
-            val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
-            whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
-                .thenReturn(TWILIO_API_STAGE_ENV)
+    fun `getToken should retrieve stage environment token successfully`() = runTest {
+        mockService(videoAppServiceStage, stageTestToken)
+        val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
+        whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
+            .thenReturn(TWILIO_API_STAGE_ENV)
 
-            val token = videoAppServiceDelegate.getToken(identity, roomName)
+        val token = videoAppServiceDelegate.getToken(identity, roomName)
 
-            assertThat(token, equalTo(stageTestToken))
-        }
+        assertThat(token, equalTo(stageTestToken))
     }
 
     @Test
-    fun `getToken should retrieve dev environment token successfully`() {
-        coroutineScope.runBlockingTest {
-            mockService(videoAppServiceDev, devTestToken)
-            val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
-            whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
-                .thenReturn(TWILIO_API_DEV_ENV)
+    fun `getToken should retrieve dev environment token successfully`() = runTest {
+        mockService(videoAppServiceDev, devTestToken)
+        val videoAppServiceDelegate = InternalTokenService(sharedPreferences, videoAppServiceDev, videoAppServiceStage, videoAppServiceProd)
+        whenever(sharedPreferences.getString(Preferences.ENVIRONMENT, Preferences.ENVIRONMENT_DEFAULT))
+            .thenReturn(TWILIO_API_DEV_ENV)
 
-            val token = videoAppServiceDelegate.getToken(identity, roomName)
+        val token = videoAppServiceDelegate.getToken(identity, roomName)
 
-            assertThat(token, equalTo(devTestToken))
-        }
+        assertThat(token, equalTo(devTestToken))
     }
 
     private suspend fun mockService(mock: InternalTokenApi, token: String) {
