@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
 import com.twilio.video.Participant
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
@@ -53,12 +52,12 @@ class RoomManager(
     private var statsScheduler: StatsScheduler? = null
     private val roomListener = RoomListener()
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal var roomScope = CoroutineScope(coroutineDispatcher)
     private val mutableRoomEvents: MutableSharedFlow<RoomEvent> = MutableSharedFlow()
     val roomEvents: SharedFlow<RoomEvent> = mutableRoomEvents
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal var localParticipantManager: LocalParticipantManager =
         LocalParticipantManager(context, this, sharedPreferences)
     var room: Room? = null

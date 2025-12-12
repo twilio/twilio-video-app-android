@@ -2,6 +2,7 @@ package com.twilio.video.app.ui.login
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Looper
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.textfield.TextInputEditText
@@ -30,11 +31,12 @@ import com.twilio.video.app.util.EXPIRED_PASSCODE_ERROR
 import com.twilio.video.app.util.INVALID_PASSCODE_ERROR
 import com.twilio.video.app.util.MainCoroutineScopeRule
 import com.twilio.video.app.util.getMockHttpException
+import com.twilio.video.app.util.runTest
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -86,69 +88,83 @@ class CommunityLoginActivityTest {
     }
 
     @Test
-    fun `it should store the passcode and identity and finish the login flow when auth is successful`() {
-        coroutineScope.runBlockingTest {
-            val response = AuthServiceResponseDTO("token")
-            whenever(authService.getToken(url, requestBody)).thenReturn(response)
+    fun `it should store the passcode and identity and finish the login flow when auth is successful`() = runTest {
+        val response = AuthServiceResponseDTO("token")
+        whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-            enterYourName(IDENTITY)
-            enterPasscode(VALID_PASSCODE)
-            clickLoginButton()
+        enterYourName(IDENTITY)
+        enterPasscode(VALID_PASSCODE)
+        clickLoginButton()
 
-            assertThat(securePreferences.getSecureString(PASSCODE), equalTo(VALID_PASSCODE))
-            assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(IDENTITY))
+        // advance coroutines and then process UI events
+        testScheduler.advanceUntilIdle()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
-            val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
-            assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
-        }
+        assertThat(securePreferences.getSecureString(PASSCODE), equalTo(VALID_PASSCODE))
+        assertThat(preferences.getString(DISPLAY_NAME, null), equalTo(IDENTITY))
+
+        val roomActivityRequest = Shadows.shadowOf(testApp).nextStartedActivity
+        assertThat(roomActivityRequest.component, equalTo(Intent(testApp, RoomActivity::class.java).component))
     }
 
     @Test
-    fun `it should display an error message when the auth request fails from an invalid passcode`() {
-        coroutineScope.runBlockingTest {
-            val response = AuthServiceResponseDTO("token")
-            val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
-            whenever(authService.getToken(url, requestBody))
-                .thenThrow(exception)
-                .thenReturn(response)
+    fun `it should display an error message when the auth request fails from an invalid passcode`() = runTest {
+        val response = AuthServiceResponseDTO("token")
+        val exception = getMockHttpException(INVALID_PASSCODE_ERROR)
+        whenever(authService.getToken(url, requestBody))
+            .thenThrow(exception)
+            .thenReturn(response)
 
-            enterYourName(IDENTITY)
-            enterPasscode(VALID_PASSCODE)
-            clickLoginButton()
+        enterYourName(IDENTITY)
+        enterPasscode(VALID_PASSCODE)
+        clickLoginButton()
 
-            assertInvalidPasscodeErrorIsDisplayed()
-        }
+        // advance coroutines and then process UI events
+        testScheduler.advanceUntilIdle()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertInvalidPasscodeErrorIsDisplayed()
     }
 
     @Test
-    fun `it should display an error message when the auth request fails from an expired passcode`() {
-        coroutineScope.runBlockingTest {
-            val response = AuthServiceResponseDTO("token")
-            val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
-            whenever(authService.getToken(url, requestBody))
-                .thenThrow(exception)
-                .thenReturn(response)
+    fun `it should display an error message when the auth request fails from an expired passcode`() = runTest {
+        val response = AuthServiceResponseDTO("token")
+        val exception = getMockHttpException(EXPIRED_PASSCODE_ERROR)
+        whenever(authService.getToken(url, requestBody))
+            .thenThrow(exception)
+            .thenReturn(response)
 
-            enterYourName(IDENTITY)
-            enterPasscode(VALID_PASSCODE)
-            clickLoginButton()
+        enterYourName(IDENTITY)
+        enterPasscode(VALID_PASSCODE)
+        clickLoginButton()
 
-            assertExpiredPasscodeErrorIsDisplayed()
+        // advance coroutines and then process UI events
+        testScheduler.advanceUntilIdle()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
-            // Re enter input again for valid response
-            enterYourName(IDENTITY)
-            enterPasscode(VALID_PASSCODE)
-            clickLoginButton()
+        assertExpiredPasscodeErrorIsDisplayed()
 
-            assertThatPasscodeErrorIsDisabled()
-        }
+        // Re enter input again for valid response
+        enterYourName(IDENTITY)
+        enterPasscode(VALID_PASSCODE)
+        clickLoginButton()
+
+        // advance coroutines and then process UI events
+        testScheduler.advanceUntilIdle()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
+
+        assertThatPasscodeErrorIsDisabled()
     }
 
     @Test
-    fun `it should display an error message when the auth request fails for an unknown reason`() {
+    fun `it should display an error message when the auth request fails for an unknown reason`() = runTest {
         enterYourName(IDENTITY)
         enterPasscode("123")
         clickLoginButton()
+
+        // advance coroutines and then process UI events
+        testScheduler.advanceUntilIdle()
+        Shadows.shadowOf(Looper.getMainLooper()).idle()
 
         assertErrorDialogIsDisplayed()
     }
@@ -167,27 +183,28 @@ class CommunityLoginActivityTest {
     }
 
     @Test
-    fun `it should enable and disable the proper view state before and after login`() {
-        coroutineScope.runBlockingTest {
-            val passcode = "0123456789"
-            val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
-            val identity = "TestUser"
-            val requestBody = AuthServiceRequestDTO(passcode, identity)
-            val response = AuthServiceResponseDTO("token")
-            whenever(authService.getToken(url, requestBody)).thenReturn(response)
+    fun `it should enable and disable the proper view state before and after login`() = runTest {
+        val passcode = "0123456789"
+        val url = URL_PREFIX + passcode.substring(6) + URL_SUFFIX
+        val identity = "TestUser"
+        val requestBody = AuthServiceRequestDTO(passcode, identity)
+        val response = AuthServiceResponseDTO("token")
+        whenever(authService.getToken(url, requestBody)).thenReturn(response)
 
-            enterYourName(identity)
-            enterPasscode(VALID_PASSCODE)
-            pauseDispatcher()
+        enterYourName(identity)
+        enterPasscode(VALID_PASSCODE)
+        // pause execution
+        testScheduler.apply {
             clickLoginButton()
 
             assertLoadingIndicatorIsDisplayed()
             assertLoginButtonIsDisabled()
-            resumeDispatcher()
 
-            assertLoadingIndicatorIsNotDisplayed()
-            assertLoginButtonIsEnabled()
+            // Resume execution
+            advanceUntilIdle()
         }
+        assertLoadingIndicatorIsNotDisplayed()
+        assertLoginButtonIsEnabled()
     }
 
     // TODO Use Espresso for passcode entering as soon as Robolectric bug is fixed https://github.com/robolectric/robolectric/issues/5110

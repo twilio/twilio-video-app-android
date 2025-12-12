@@ -2,8 +2,6 @@ package com.twilio.video.app.ui.room
 
 import android.Manifest.permission
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
-import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -89,14 +87,14 @@ class RoomViewModel @Inject constructor(
 
     private var permissionCheckRetry = false
 
-    @VisibleForTesting(otherwise = PRIVATE)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal var roomManagerJob: Job? = null
 
     init {
         subscribeToRoomEvents()
     }
 
-    @VisibleForTesting(otherwise = PROTECTED)
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public override fun onCleared() {
         super.onCleared()
         audioSwitch.stop()

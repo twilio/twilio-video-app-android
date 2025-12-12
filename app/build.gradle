@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs
+
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
@@ -39,8 +41,8 @@ afterEvaluate {
         if (includeSdkFromSource) {
             debugImplementation project(':video')
             debugImplementation project(':video:ktx')
-            releaseImplementation project(':video:ktx')
             debugImplementation project(':VirtualBackgroundProcessor')
+            releaseImplementation project(':video:ktx')
             releaseImplementation project(':VirtualBackgroundProcessor')
         } else {
             implementation "com.twilio:video-android-ktx:7.10.0"
@@ -88,7 +90,13 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        jvmTarget = "${JavaVersion.VERSION_11}"
+    }
+    // needed to force kapt to use java 11 and not the system/gradle default java 17
+    tasks.withType(KaptGenerateStubs).configureEach {
+        kotlinOptions {
+            jvmTarget = '11'
+        }
     }
 
     testOptions {
@@ -159,10 +167,10 @@ android {
 }
 
 dependencies {
-    def daggerVersion = '2.35.1'
+    def daggerVersion = '2.48.1'
     def daggerAndroidProcessor = "com.google.dagger:dagger-android-processor:$daggerVersion"
     def daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
-    def hiltVersion = '2.38.1'
+    def hiltVersion = '2.48.1'
     def retrofitVersion = '2.9.0'
     def espressoVersion = '3.5.1'
     def espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
@@ -171,7 +179,7 @@ dependencies {
     def testCore = "androidx.test:core:$androidXTest"
     def junitExtensions = "androidx.test.ext:junit-ktx:$andoridXJunit"
     def lifecycleVersion = '2.3.1'
-    def coroutinesAndroidVersion = '1.4.3'
+    def coroutinesAndroidVersion = '1.7.2'
     def fragmentVersion = '1.3.2'
     def uniflowVersion = '1.0.5'
     def androidEnv = '1.1.1'
@@ -187,8 +195,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     //noinspection Aligned16KB
-    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
-    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.security:security-crypto:1.1.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
     implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
@@ -209,7 +217,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
-    implementation 'com.twilio:audioswitch:1.2.0'
+    implementation 'com.twilio:audioswitch:1.2.4'
     implementation "org.uniflow-kt:uniflow-android:$uniflowVersion"
 
     /*
