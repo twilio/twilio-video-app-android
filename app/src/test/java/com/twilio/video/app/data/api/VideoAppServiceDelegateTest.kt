@@ -9,7 +9,6 @@ import com.twilio.video.app.data.Preferences.TOPOLOGY
 import com.twilio.video.app.data.Preferences.TOPOLOGY_DEFAULT
 import com.twilio.video.app.data.api.dto.Topology
 import com.twilio.video.app.util.MainCoroutineScopeRule
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat

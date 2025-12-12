@@ -21,7 +21,6 @@ import com.twilio.video.app.util.getMockHttpException
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.`is`
@@ -114,7 +113,7 @@ class AuthServiceRepositoryTest {
 
     fun authServiceExceptionParams(): Array<AuthService> {
         val nullToken: AuthService = mock {
-            onBlocking {  getToken(isA(), isA()) }
+            onBlocking { getToken(isA(), isA()) }
                 .thenReturn(AuthServiceResponseDTO(null))
         }
 
@@ -289,7 +288,7 @@ class AuthServiceRepositoryTest {
     private fun getMockAuthService(json: String? = null): AuthService =
         mock {
             val exception = json?.let { getMockHttpException(it) } ?: mock()
-            onBlocking { getToken(isA(), isA())}
+            onBlocking { getToken(isA(), isA()) }
                 .thenThrow(exception)
         }
 }

@@ -34,8 +34,6 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 import kotlin.time.toDuration
 
 /**
@@ -76,7 +74,7 @@ import kotlin.time.toDuration
  */
 @ExperimentalCoroutinesApi
 class MainCoroutineScopeRule(
-    val dispatcher: TestDispatcher = StandardTestDispatcher()
+    val dispatcher: TestDispatcher = StandardTestDispatcher(),
 ) : TestWatcher() {
     val testScheduler get() = dispatcher.scheduler
 
@@ -89,8 +87,8 @@ class MainCoroutineScopeRule(
     }
 }
 
-
 fun MainCoroutineScopeRule.runTest(
     timeout: Duration = 60.toDuration(DurationUnit.SECONDS),
-    block: suspend TestScope.() -> Unit) =
+    block: suspend TestScope.() -> Unit,
+) =
     kotlinx.coroutines.test.runTest(dispatcher, timeout, block)
