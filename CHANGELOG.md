@@ -2,6 +2,12 @@
 
 ## 0.169 (Dec 9, 2025)
 
+### Dependency Upgrades
+
+* Updated Kotlin version to 1.8.22
+
+## 0.169 (Dec 9, 2025)
+
 ### Feature Changes
 
 * Added support for selecting virtual backgrounds during video calls.
