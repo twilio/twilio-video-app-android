@@ -1,6 +1,12 @@
 # Change Log
 
-## 0.168 (Dec 9, 2025)
+## 0.170 (Dec 12, 2025)
+
+### Dependency Upgrades
+
+* Updated Kotlin version to 1.8.22
+
+## 0.169 (Dec 9, 2025)
 
 ### Feature Changes
 
@@ -9,7 +15,6 @@
 ### Dependency Upgrades
 
 * Updated Twilio Video SDK version to 7.10.0
-
 
 ## 0.167 (Oct 8, 2025)
 
@@ -77,7 +82,6 @@
 * In preparation for the WebRTC-124 upgrade, the following necessary changes were made
    * removed support for globally setting audio channel effects as the necessary class WebRtcAudioUtils is removed from WebRTC-124.
    * removed support for globally setting the usage of SLES audio device as the necessary class WebRtcAudioManager is removed from WebRTC-124.
-
 
 ## 0.155 (Oct 23, 2024)
 

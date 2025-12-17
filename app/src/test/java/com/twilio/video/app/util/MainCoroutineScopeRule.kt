@@ -23,12 +23,18 @@ package com.twilio.video.app.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * MainCoroutineRule installs a TestCoroutineDispatcher for Disptachers.Main.
@@ -67,23 +73,22 @@ import org.junit.runner.Description
  * @param dispatcher if provided, this [TestCoroutineDispatcher] will be used.
  */
 @ExperimentalCoroutinesApi
-class MainCoroutineScopeRule(val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) :
-    TestWatcher(),
-    TestCoroutineScope by TestCoroutineScope(dispatcher) {
-    override fun starting(description: Description?) {
-        super.starting(description)
-        // If your codebase allows the injection of other dispatchers like
-        // Dispatchers.Default and Dispatchers.IO, consider injecting all of them here
-        // and renaming this class to `CoroutineScopeRule`
-        //
-        // All injected dispatchers in a test should point to a single instance of
-        // TestCoroutineDispatcher.
+class MainCoroutineScopeRule(
+    val dispatcher: TestDispatcher = StandardTestDispatcher(),
+) : TestWatcher() {
+    val testScheduler get() = dispatcher.scheduler
+
+    override fun starting(description: Description) {
         Dispatchers.setMain(dispatcher)
     }
 
     override fun finished(description: Description?) {
-        super.finished(description)
-        cleanupTestCoroutines()
         Dispatchers.resetMain()
     }
 }
+
+fun MainCoroutineScopeRule.runTest(
+    timeout: Duration = 60.toDuration(DurationUnit.SECONDS),
+    block: suspend TestScope.() -> Unit,
+) =
+    kotlinx.coroutines.test.runTest(dispatcher, timeout, block)
