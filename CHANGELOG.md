@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.172 (Jan 14, 2025)
+
+#### Enhancements
+
+* New min supported Android version is 28 (Android 9/Android Pie)
+
+## 0.171 (Jan 13, 2025)
+
+### Dependency Upgrades
+
+* Updated AudioSwitch version to 1.2.5
+
 ## 0.170 (Dec 12, 2025)
 
 ### Dependency Upgrades

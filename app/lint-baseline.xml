@@ -2,13 +2,6 @@
 <issues format="6" by="lint 8.12.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.12.1)" variant="all" version="8.12.1">
 
     <issue
-        id="ObsoleteLintCustomCheck"
-        message="Library lint checks out of date;&#xA;these checks **will be skipped**!&#xA;&#xA;Lint found an issue registry (`dagger.lint.DaggerIssueRegistry`)&#xA;which was compiled against an older version of lint&#xA;than this one. This is usually fine, but not in this&#xA;case; some basic verification shows that the lint&#xA;check jar references (for example) the following API&#xA;which is no longer valid in this version of lint:&#xA;org.jetbrains.uast.kotlin.KotlinUClass#getKtClass(): org.jetbrains.kotlin.psi.KtClassOrObject&#xA;(Referenced from dagger/lint/DaggerKotlinIssueDetector.class)&#xA;&#xA;Therefore, this lint check library is **not** included&#xA;in analysis. This affects the following lint checks:&#xA;`JvmStaticProvidesInObjectDetector`,`FieldSiteTargetOnQualifierAnnotation`,`ModuleCompanionObjects`,`ModuleCompanionObjectsNotInModuleParent`&#xA;&#xA;Recompile the checks against the latest version, or if&#xA;this is a check bundled with a third-party library, see&#xA;if there is a more recent version available.&#xA;&#xA;Version of Lint API this lint check is using is 8.&#xA;The Lint API version currently running is 16 (8.7+).">
-        <location
-            file="$GRADLE_USER_HOME/caches/8.13/transforms/e97d08b03f7add3143ab985965acd1b6/transformed/jetified-dagger-lint-aar-2.38.1/jars/lint.jar"/>
-    </issue>
-
-    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;512dp&quot;"
@@ -127,9 +120,13 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.mipmap.ic_launcher_round` appears to be unused">
+        message="The resource `R.mipmap.ic_launcher_round` appears to be unused"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
         <location
-            file="src/main/res/mipmap-hdpi/ic_launcher_round.png"/>
+            file="src/main/res/mipmap-anydpi/ic_launcher_round.xml"
+            line="2"
+            column="1"/>
     </issue>
 
     <issue
@@ -566,17 +563,6 @@
             file="src/main/res/layout/number_preference.xml"
             line="16"
             column="10"/>
-    </issue>
-
-    <issue
-        id="UnnecessaryRequiredFeature"
-        message="Consider whether this feature (`android.hardware.camera.autofocus`) really is required for the app to function; you can set `android:required=&quot;false&quot;` to indicate that the feature is used but not required"
-        errorLine1="    &lt;uses-feature android:name=&quot;android.hardware.camera.autofocus&quot;/>"
-        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="6"
-            column="33"/>
     </issue>
 
     <issue
