@@ -19,10 +19,7 @@ class RoomNotification(private val context: Context) {
         get() =
             Intent(context, RoomActivity::class.java).let { notificationIntent ->
                 notificationIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                // Android 12/S requires a flag to be set and FLAG_IMMUTBALE isn't available
-                // before Android M (23)
-                var flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-                PendingIntent.getActivity(context, 0, notificationIntent, flags)
+                PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
             }
 
     init {
@@ -44,12 +41,10 @@ class RoomNotification(private val context: Context) {
             .build()
 
     private fun createDownloadNotificationChannel(channelId: String, channelName: String, context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW).apply {
-                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            }
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(notificationChannel)
+        val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW).apply {
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
     }
 }
