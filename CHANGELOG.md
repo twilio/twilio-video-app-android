@@ -4,7 +4,7 @@
 
 #### Enhancements
 
-*New min supported Android version is 28 (Android 9/Android Pie)
+* New min supported Android version is 28 (Android 9/Android Pie)
 
 ## 0.171 (Jan 13, 2025)
 
