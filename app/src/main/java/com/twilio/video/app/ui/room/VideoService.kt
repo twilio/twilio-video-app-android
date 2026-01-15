@@ -90,11 +90,7 @@ class VideoService : Service() {
         fun startService(context: Context, roomName: String) {
             Intent(context, VideoService::class.java).let { intent ->
                 intent.putExtra(ROOM_NAME_EXTRA, roomName)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent)
-                } else {
-                    context.startService(intent)
-                }
+                context.startForegroundService(intent)
             }
         }
 

@@ -364,35 +364,33 @@ class RoomActivity : AppCompatActivity() {
 
     private fun requestPermissions() {
         // nested if statements used to keep lint happy and avoid needing a @SuppressLint decoration
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                requestPermissions(
-                    arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.BLUETOOTH_CONNECT,
-                        Manifest.permission.POST_NOTIFICATIONS,
-                    ),
-                    PERMISSIONS_REQUEST_CODE,
-                )
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                requestPermissions(
-                    arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.BLUETOOTH_CONNECT,
-                    ),
-                    PERMISSIONS_REQUEST_CODE,
-                )
-            } else {
-                requestPermissions(
-                    arrayOf(
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA,
-                    ),
-                    PERMISSIONS_REQUEST_CODE,
-                )
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ),
+                PERMISSIONS_REQUEST_CODE,
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                ),
+                PERMISSIONS_REQUEST_CODE,
+            )
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA,
+                ),
+                PERMISSIONS_REQUEST_CODE,
+            )
         }
     }
 
