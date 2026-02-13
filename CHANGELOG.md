@@ -1,10 +1,11 @@
 # Change Log
 
-## 0.173 (Feb, 2026)
+## 0.173 (Feb 12, 2026)
 
 ### Dependency Upgrades
 
-* Updated Twilio Video SDK version to 7.10.1
+* Updated Twilio Video SDK version to 7.10.1 (https://www.twilio.com/docs/video/changelog-twilio-video-android-latest)
+
 
 ## 0.172 (Jan 14, 2026)
 
