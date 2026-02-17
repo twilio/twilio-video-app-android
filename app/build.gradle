@@ -45,8 +45,8 @@ afterEvaluate {
             releaseImplementation project(':video:ktx')
             releaseImplementation project(':VirtualBackgroundProcessor')
         } else {
-            implementation "com.twilio:video-android-ktx:7.10.0"
-            implementation "com.twilio:video-virtual-background-processor:7.10.0"
+            implementation "com.twilio:video-android-ktx:7.10.1"
+            implementation "com.twilio:video-virtual-background-processor:7.10.1"
         }
     }
 }
