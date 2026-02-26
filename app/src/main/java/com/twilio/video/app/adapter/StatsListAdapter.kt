@@ -96,7 +96,7 @@ class StatsListAdapter(private val context: Context) : RecyclerView.Adapter<Stat
         roomStats?.statsReports?.let { statsReports ->
             for (report in statsReports) {
                 if (!localTracksAdded) {
-                    // go trough local tracks
+                    // go through local tracks
                     for (localAudioTrackStats in report.localAudioTrackStats) {
                         val item = StatsListItem.Builder()
                             .baseTrackInfo(localAudioTrackStats)
