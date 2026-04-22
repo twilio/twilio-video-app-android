@@ -71,7 +71,7 @@ object Preferences {
     const val AUDIO_CODEC = "pref_audio_codecs"
     const val AUDIO_CODEC_DEFAULT = OpusCodec.NAME
     const val MAX_AUDIO_BITRATE = "pref_max_audio_bitrate"
-    const val MAX_AUDIO_BITRATE_DEFAULT = 16
+    const val MAX_AUDIO_BITRATE_DEFAULT = 0
     const val MAX_VIDEO_BITRATE = "pref_max_video_bitrate"
     const val MAX_VIDEO_BITRATE_DEFAULT = 0
     const val RECORD_PARTICIPANTS_ON_CONNECT = "pref_record_participants_on_connect"

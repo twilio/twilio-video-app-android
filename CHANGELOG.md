@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.176 (Apr 22, 2026)
+
+### Bug Fixes
+
+* Changed default max audio bitrate from 16 kbps to 0 (uncapped). The 16 kbps cap prevented Opus FEC from functioning effectively under packet loss.
+
 ## 0.175 (Apr 20, 2026)
 
 ### Dependency Upgrades
