@@ -88,7 +88,9 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
             onError(observable)
             return
         }
-        if (acceptedDomains.isNotEmpty() && acceptedDomains.none { email.endsWith("@$it") }) {
+        val emailDomain = email.substringAfterLast('@', "").trim().lowercase()
+        val normalizedAcceptedDomains = acceptedDomains.map { it.trim().removePrefix("@").lowercase() }
+        if (normalizedAcceptedDomains.isNotEmpty() && emailDomain !in normalizedAcceptedDomains) {
             onError(observable)
             return
         }
