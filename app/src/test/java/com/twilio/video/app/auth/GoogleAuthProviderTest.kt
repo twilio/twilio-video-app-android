@@ -69,7 +69,7 @@ class GoogleAuthProviderTest : BaseUnitTest() {
             googleSignInWrapper,
             googleSignInOptionsWrapper,
             googleAuthProviderWrapper,
-            "test.com",
+            listOf("test.com"),
             disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
@@ -106,7 +106,7 @@ class GoogleAuthProviderTest : BaseUnitTest() {
             googleSignInWrapper,
             googleSignInOptionsWrapper,
             mock(),
-            "test.com",
+            listOf("test.com"),
             disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()

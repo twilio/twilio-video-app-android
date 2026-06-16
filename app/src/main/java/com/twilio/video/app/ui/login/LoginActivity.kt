@@ -63,10 +63,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun navigateToFirebaseUIAuth() {
-        val acceptedDomain = "twilio.com"
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .setHostedDomain(acceptedDomain)
             .build()
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(false).build(),
