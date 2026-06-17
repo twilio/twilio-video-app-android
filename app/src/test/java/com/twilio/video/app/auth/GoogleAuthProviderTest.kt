@@ -69,7 +69,7 @@ class GoogleAuthProviderTest : BaseUnitTest() {
             googleSignInWrapper,
             googleSignInOptionsWrapper,
             googleAuthProviderWrapper,
-            "test.com",
+            listOf("test.com"),
             disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
@@ -106,7 +106,26 @@ class GoogleAuthProviderTest : BaseUnitTest() {
             googleSignInWrapper,
             googleSignInOptionsWrapper,
             mock(),
-            "test.com",
+            listOf("test.com"),
+            disposables,
+        )
+        val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()
+        assertThat(testObservable.errorCount(), equalTo(1))
+        verify(disposables).clear()
+    }
+
+    @Test
+    fun `loginWithAccount should reject email with domain that is a suffix match but not exact`() {
+        whenever(googleSignInAccount.email).thenReturn("user@notwilio.com")
+
+        val googleAuthenticator = GoogleAuthProvider(
+            mock(),
+            context,
+            googleAuthWrapper,
+            googleSignInWrapper,
+            googleSignInOptionsWrapper,
+            mock(),
+            listOf("twilio.com"),
             disposables,
         )
         val testObservable = googleAuthenticator.login(Observable.just(LoginEvent.GoogleLoginEvent(intent))).test()

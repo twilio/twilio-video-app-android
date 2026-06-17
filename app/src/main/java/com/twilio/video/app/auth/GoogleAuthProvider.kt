@@ -24,7 +24,7 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
     googleSignInWrapper: GoogleSignInWrapper,
     googleSignInOptionsWrapper: GoogleSignInOptionsWrapper,
     private val googleAuthProviderWrapper: GoogleAuthProviderWrapper,
-    private val acceptedDomain: String? = null,
+    private val acceptedDomains: List<String> = emptyList(),
     private val disposables: CompositeDisposable = CompositeDisposable(),
 ) : AuthenticationProvider {
 
@@ -32,7 +32,7 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
         fun newInstance(
             context: Context,
             googleSignInOptions: GoogleSignInOptions,
-            acceptedDomain: String? = null,
+            vararg acceptedDomains: String,
         ): AuthenticationProvider =
             GoogleAuthProvider(
                 FirebaseWrapper(),
@@ -41,7 +41,7 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
                 GoogleSignInWrapper(),
                 GoogleSignInOptionsWrapper(googleSignInOptions),
                 GoogleAuthProviderWrapper(),
-                acceptedDomain,
+                acceptedDomains.toList(),
             )
     }
 
@@ -88,11 +88,11 @@ class GoogleAuthProvider @JvmOverloads internal constructor(
             onError(observable)
             return
         }
-        acceptedDomain?.let {
-            if (!email.endsWith(it)) {
-                onError(observable)
-                return
-            }
+        val emailDomain = email.substringAfterLast('@', "").trim().lowercase()
+        val normalizedAcceptedDomains = acceptedDomains.map { it.trim().removePrefix("@").lowercase() }
+        if (normalizedAcceptedDomains.isNotEmpty() && emailDomain !in normalizedAcceptedDomains) {
+            onError(observable)
+            return
         }
         if (idToken.isNullOrBlank()) {
             onError(observable)

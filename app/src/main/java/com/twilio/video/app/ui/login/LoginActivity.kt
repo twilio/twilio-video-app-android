@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.firebase.ui.auth.AuthUI
@@ -36,6 +37,8 @@ private const val RC_SIGN_IN = 20
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
+
+    private val allowedDomains = listOf("twilio.com", "gmail.com")
 
     private lateinit var authUI: FirebaseAuth
 
@@ -54,19 +57,30 @@ class LoginActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == Activity.RESULT_OK) {
                 authUI.currentUser?.let { user ->
-                    saveIdentity(user)
-                    startLobbyActivity()
+                    if (isAllowedDomain(user.email)) {
+                        saveIdentity(user)
+                        startLobbyActivity()
+                    } else {
+                        AuthUI.getInstance().signOut(this)
+                        Toast.makeText(this, R.string.login_unauthorized_domain, Toast.LENGTH_LONG).show()
+                        navigateToFirebaseUIAuth()
+                        return
+                    }
                 }
             }
             finish()
         }
     }
 
+    private fun isAllowedDomain(email: String?): Boolean {
+        if (email.isNullOrBlank()) return false
+        val domain = email.substringAfterLast('@').lowercase()
+        return domain in allowedDomains
+    }
+
     private fun navigateToFirebaseUIAuth() {
-        val acceptedDomain = "twilio.com"
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .setHostedDomain(acceptedDomain)
             .build()
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(false).build(),
