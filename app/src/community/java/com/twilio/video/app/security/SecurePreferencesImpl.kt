@@ -34,4 +34,8 @@ class SecurePreferencesImpl(
     override fun getSecureString(key: String): String? {
         return securePreferences.getString(key, null)
     }
+
+    override fun removeSecureString(key: String) {
+        securePreferences.edit { remove(key) }
+    }
 }

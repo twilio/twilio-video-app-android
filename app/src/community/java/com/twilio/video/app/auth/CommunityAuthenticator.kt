@@ -68,6 +68,6 @@ class CommunityAuthenticator constructor(
 
     override fun logout() {
         sharedPreferences.edit { remove(DISPLAY_NAME) }
-        sharedPreferences.edit { remove(PASSCODE) }
+        securePreferences.removeSecureString(PASSCODE)
     }
 }

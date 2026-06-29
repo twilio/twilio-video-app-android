@@ -9,4 +9,8 @@ class SecurePreferencesFake : SecurePreferences {
     }
 
     override fun getSecureString(key: String) = preferences[key]
+
+    override fun removeSecureString(key: String) {
+        preferences.remove(key)
+    }
 }
