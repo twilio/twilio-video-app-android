@@ -103,7 +103,7 @@ class PreferenceIntegrationTest : BaseIntegrationTest() {
         assertThat(videoEncodingMode, equalTo(Preferences.VIDEO_ENCODING_MODE_DEFAULT))
     }
 
-    @Ignore("Topology is no longer selectable from applicaiton due to auth changes")
+    @Ignore("Topology is no longer selectable from application due to auth changes")
     @Test
     fun it_should_select_the_correct_topology() {
         scrollAndClickView(getString(R.string.settings_title_advanced), R.id.recycler_view)

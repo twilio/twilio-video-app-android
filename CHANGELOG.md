@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.177 (Jul 23, 2026)
+
+### Bug Fixes
+
+* Fixed spelling errors in code
+
 ## 0.176 (Apr 22, 2026)
 
 ### Bug Fixes
