@@ -63,11 +63,12 @@ class RoomManager(
     var room: Room? = null
 
     fun disconnect() {
-        room?.disconnect()
+        room?.disconnect() ?: stopService(context)
     }
 
     suspend fun connect(identity: String, roomName: String) {
         sendRoomEvent(Connecting)
+        startService(context, roomName)
         connectToRoom(identity, roomName)
     }
 
@@ -90,6 +91,7 @@ class RoomManager(
 
     private fun handleTokenException(e: Exception, error: AuthServiceError? = null): Room? {
         Timber.e(e, "Failed to retrieve token")
+        stopService(context)
         sendRoomEvent(RoomEvent.TokenError(serviceError = error))
         return null
     }
@@ -152,8 +154,6 @@ class RoomManager(
                 room.sid,
             )
 
-            startService(context, room.name)
-
             setupParticipants(room)
 
             statsScheduler = StatsScheduler(this@RoomManager, room).apply { start() }
@@ -185,6 +185,8 @@ class RoomManager(
                 twilioException.code,
                 twilioException.message,
             )
+
+            stopService(context)
 
             if (twilioException.code == ROOM_MAX_PARTICIPANTS_EXCEEDED_EXCEPTION) {
                 sendRoomEvent(MaxParticipantFailure)
