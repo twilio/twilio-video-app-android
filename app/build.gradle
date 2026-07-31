@@ -72,6 +72,7 @@ android {
 
         minSdkVersion 28
         targetSdkVersion 35
+        buildToolsVersion '35.0.1'
 
         versionName appVersionName
         versionCode appVersionCode
