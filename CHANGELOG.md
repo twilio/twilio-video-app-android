@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.178 (Not released yet)
+
+### Bug Fixes
+
+* Fix foreground service crash when app is backgrounded during room connection.
+* Pinned android build tools version to 35.0.1
+
 ## 0.177 (Jul 23, 2026)
 
 ### Bug Fixes
